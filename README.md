@@ -18,7 +18,7 @@ A collection of universal environments for DRL in quant finance.
 
 ● Closing the sim-real gap by “simulation-validation-trading”: simulation for training andconnecting real-time APIs for trading;  here a “virtual env” may be a good solution.
 
-● Efficient sampling: accelerate sampling is key! Here, we can learn ideas from the ElegantRL project. Note that multi-processing is a key to reducing training time. (scheduling between CPU +. GPU)
+● Efficient sampling: accelerate sampling is key! Here, we can learn ideas from the ElegantRL project. Note that multi-processing is a key to reducing training time. (scheduling between CPU + GPU)
 
 ● Transparency: a virtual env which is invisible to the upper layer
 
