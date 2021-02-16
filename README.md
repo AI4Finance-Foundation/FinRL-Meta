@@ -24,6 +24,8 @@ A collection of universal environments for DRL in quant finance.
 
 ● Completeness and universal:
    
-  Different markets ○Various data sources (API, Excel, etc)○User-friendly variables (complete and allow user-define): may use heritage of class
+  Different markets; 
+  
+  Various data sources (API, Excel, etc)○User-friendly variables (complete and allow user-define): may use heritage of class
 
 ● Flexibility and extensibility: Inheritance might be helpful here
