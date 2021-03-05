@@ -29,3 +29,16 @@ A collection of universal environments for DRL in quant finance.
   Various data sources (API, Excel, etc)○User-friendly variables (complete and allow user-define): may use heritage of class
 
 ● Flexibility and extensibility: Inheritance might be helpful here
+
+# What is Gym?
+● Gym by OpenAI
+
+Gym is a toolkit for developing and comparing DRL algorithms.
+Gym’s main purpose is to provide a large collection of environments that expose a unified interface and allow fair comparisons.
+
+Two main constraints of Gym:
+1. The need for better benchmarks
+2. Lack of standardization of environments used in publications
+
+Resources:
+https://github.com/openai/gym/blob/master/docs/creating-environments.md
