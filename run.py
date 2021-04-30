@@ -41,7 +41,34 @@ def run__demo():
     # train_and_evaluate__multiprocessing(args)  # try multiprocessing in complete version
     exit()
 
+def btc_run__demo():
+    import gym
+    from gym_finrl.BitCoinEnv import BitcoinEnv
+    from agent import AgentDQN
+    
+    args = Arguments(agent=None, env=None, gpu_id=0)
+    args.agent = AgentDQN()
 
+    '''choose environment'''
+    args.env = BitcoinEnv(if_train=True)
+    args.env_eval = BitcoinEnv(if_train=False)
+    args.net_dim = 2 ** 9 # change a default hyper-parameters
+    args.batch_size = 2 ** 8
+    
+    train_and_evaluate(args)
+
+    args = Arguments(agent=None, env=None, gpu_id=0)
+    args.agent = AgentDQN()
+    args.env = BitcoinEnv(if_train=False)
+    args.net_dim = 2 ** 9 # change a default hyper-parameters
+    args.batch_size = 2 ** 8
+    args.if_remove = False
+    args.cwd = './AgentDQN/BitcoinEnv_0'
+    args.init_before_training()
+    # Draw the graph
+    BitcoinEnv(if_train=False)\
+    .draw_cumulative_return(self = args.env, _torch = torch)
+    
 class Arguments:
     def __init__(self, agent=None, env=None, gpu_id=None, if_on_policy=False):
         self.agent = agent  # Deep Reinforcement Learning algorithm
