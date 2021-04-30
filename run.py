@@ -196,7 +196,6 @@ def train_and_evaluate(args):
 
 '''utils'''
 
-
 class Evaluator:
     def __init__(self, cwd, agent_id, eval_times, show_gap, env, device):
         self.recorder = [(0., -np.inf, 0., 0., 0.), ]  # total_step, r_avg, r_std, obj_a, obj_c
