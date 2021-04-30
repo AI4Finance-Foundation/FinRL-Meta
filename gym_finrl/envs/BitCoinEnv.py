@@ -10,7 +10,7 @@ from agent import AgentDQN
 class BitcoinEnv:  # custom env
     def __init__(self, initial_account=1e6, max_stock=1e2, \
                  transaction_fee_percent=1e-3, if_train=True,\
-                   gamma = 0.99):
+                   gamma = 0.995):
         self.stock_dim = 1
         self.initial_account = initial_account
         self.transaction_fee_percent = transaction_fee_percent
@@ -42,7 +42,7 @@ class BitcoinEnv:  # custom env
         self.state_dim = 14
         self.action_dim = 3
         self.if_discrete = True
-        self.target_reward = 1.1
+        self.target_return = 1.02
         self.max_step = self.ary.shape[0]
 
 
@@ -107,8 +107,6 @@ class BitcoinEnv:  # custom env
             reward += self.gamma_return
             self.gamma_return = 0.0  
             self.episode_return = next_total_asset / self.initial_account  
-            if self.episode_return > 1.0:
-                print(self.episode_return)
         return state, reward, done, None
     
     
@@ -136,10 +134,11 @@ class BitcoinEnv:  # custom env
                 s_tensor = _torch.as_tensor((state,), device=device)
                 action = act(s_tensor)[0]  # not need detach(), because with torch.no_grad() outside
                 a_int = action.argmax(dim=0).cpu().numpy()
-                action = a_int 
+                action = a_int
+                print(action)# not need detach(), because with torch.no_grad() outside
                 state, reward, done, _ = self.step(action)
                 
-                total_asset = self.account + (self.time_npy[0] * self.stocks)
+                total_asset = self.account + (self.day_npy[0] * self.stocks)
                 episode_return = total_asset / self.initial_account
                 episode_returns.append(episode_return)
                 btc_return = (state[1]/init_price)
