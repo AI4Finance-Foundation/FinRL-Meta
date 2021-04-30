@@ -4,7 +4,7 @@ import numpy.random as rd
 import pandas as pd
 from gym import spaces
 import torch
-from elegantrl.agent import AgentDQN
+from agent import AgentDQN
 
 
 class BitcoinEnv:  # custom env
