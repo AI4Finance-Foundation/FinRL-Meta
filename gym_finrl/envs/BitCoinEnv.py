@@ -16,7 +16,7 @@ class BitcoinEnv:  # custom env
         self.transaction_fee_percent = transaction_fee_percent
         self.max_stock = 1
         self.gamma = gamma
-        processed = pd.read_csv('./btc_spot_future1.csv')
+        processed = pd.read_csv('./btc_data.csv')
         ary = processed.values
         data_ary = ary.astype(np.float32)
         assert data_ary.shape == (9661, 12)  
