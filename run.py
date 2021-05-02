@@ -6,7 +6,7 @@ import numpy as np
 import numpy.random as rd
 from copy import deepcopy
 from elegantrl.replay import ReplayBuffer, ReplayBufferMP
-from elegantrl.Env import PreprocessEnv
+from elegantrl.env import PreprocessEnv
 
 """From [ElegantRL](https://github.com/AI4Finance-LLC/ElegantRL)"""
 
@@ -14,13 +14,13 @@ from elegantrl.Env import PreprocessEnv
 ## DEMO using AgentPPO
 def run__demo():
     import gym
-    import gym_finrl
+    import neo_finrl
     gym.logger.set_level(40)  # Block warning: 'WARN: Box bound precision lowered by casting to float32'
 
     """DEMO 3: Custom Continuous action env: FinanceStock-v1"""
     args = Arguments(if_on_policy=True)
     '''choose an DRL algorithm'''
-    from agent import AgentPPO
+    from elegantrl.agent import AgentPPO
     args.agent = AgentPPO()
 
     # from Env import FinanceMultiStockEnv
@@ -47,8 +47,8 @@ def run__demo():
 
 def btc_run__demo():
     import gym
-    from gym_finrl.envs.BitCoinEnv import BitcoinEnv
-    from agent import AgentDQN
+    from neo_finrl.envs.bitcoin_env import BitcoinEnv
+    from elegantrl.agent import AgentDQN
     
     args = Arguments(agent=None, env=None, gpu_id=0)
     args.agent = AgentDQN()
