@@ -8,8 +8,10 @@ import numpy.random as rd
 class ReplayBuffer1:
     def __init__(self, max_len, state_dim, action_dim, if_on_policy, if_per, if_gpu):
         """Experience Replay Buffer
+
         save environment transition in a continuous RAM for high performance training
         we save trajectory in order and save state and other (action, reward, mask, ...) separately.
+
         `int max_len` the maximum capacity of ReplayBuffer. First In First Out
         `int state_dim` the dimension of state
         `int action_dim` the dimension of action (action_dim==1 for discrete action)
@@ -120,6 +122,7 @@ class ReplayBuffer1:
 
     def sample_batch(self, batch_size) -> tuple:
         """randomly sample a batch of data for training
+
         :int batch_size: the number of data in a batch for Stochastic Gradient Descent
         :return torch.Tensor reward: reward.shape==(now_len, 1)
         :return torch.Tensor mask:   mask.shape  ==(now_len, 1), mask = 0.0 if done else gamma
@@ -151,6 +154,7 @@ class ReplayBuffer1:
 
     def sample_all(self) -> tuple:
         """sample all the data in ReplayBuffer (for on-policy)
+
         :return torch.Tensor reward: reward.shape==(now_len, 1)
         :return torch.Tensor mask:   mask.shape  ==(now_len, 1), mask = 0.0 if done else gamma
         :return torch.Tensor action: action.shape==(now_len, action_dim)
@@ -178,11 +182,13 @@ class ReplayBuffer1:
 
     def print_state_norm(self, neg_avg=None, div_std=None):  # non-essential
         """print the state norm information: state_avg, state_std
+
         We don't suggest to use running stat state.
         We directly do normalization on state using the historical avg and std
         eg. `state = (state + self.neg_state_avg) * self.div_state_std` in `PreprocessEnv.step_norm()`
         neg_avg = -states.mean()
         div_std = 1/(states.std()+1e-5) or 6/(states.max()-states.min())
+
         :array neg_avg: neg_avg.shape=(state_dim)
         :array div_std: div_std.shape=(state_dim)
         """
@@ -232,8 +238,10 @@ class ReplayBuffer1:
 class ReplayBuffer:
     def __init__(self, max_len, state_dim, action_dim, if_on_policy, if_per, if_gpu):
         """Experience Replay Buffer
+
         save environment transition in a continuous RAM for high performance training
         we save trajectory in order and save state and other (action, reward, mask, ...) separately.
+
         `int max_len` the maximum capacity of ReplayBuffer. First In First Out
         `int state_dim` the dimension of state
         `int action_dim` the dimension of action (action_dim==1 for discrete action)
@@ -310,6 +318,7 @@ class ReplayBuffer:
 
     def sample_batch(self, batch_size) -> tuple:
         """randomly sample a batch of data for training
+
         :int batch_size: the number of data in a batch for Stochastic Gradient Descent
         :return torch.Tensor reward: reward.shape==(now_len, 1)
         :return torch.Tensor mask:   mask.shape  ==(now_len, 1), mask = 0.0 if done else gamma
@@ -343,6 +352,7 @@ class ReplayBuffer:
 
     def sample_all(self) -> tuple:
         """sample all the data in ReplayBuffer (for on-policy)
+
         :return torch.Tensor reward: reward.shape==(now_len, 1)
         :return torch.Tensor mask:   mask.shape  ==(now_len, 1), mask = 0.0 if done else gamma
         :return torch.Tensor action: action.shape==(now_len, action_dim)
@@ -370,11 +380,13 @@ class ReplayBuffer:
 
     def print_state_norm(self, neg_avg=None, div_std=None):  # non-essential
         """print the state norm information: state_avg, state_std
+
         We don't suggest to use running stat state.
         We directly do normalization on state using the historical avg and std
         eg. `state = (state + self.neg_state_avg) * self.div_state_std` in `PreprocessEnv.step_norm()`
         neg_avg = -states.mean()
         div_std = 1/(states.std()+1e-5) or 6/(states.max()-states.min())
+
         :array neg_avg: neg_avg.shape=(state_dim)
         :array div_std: div_std.shape=(state_dim)
         """
@@ -424,6 +436,7 @@ class ReplayBuffer:
 class ReplayBufferMP:
     def __init__(self, max_len, state_dim, action_dim, if_on_policy, if_per, if_gpu, rollout_num):
         """Experience Replay Buffer for Multiple Processing
+
         `int rollout_num` the rollout workers number
         """
         self.now_len = 0
@@ -480,6 +493,7 @@ class ReplayBufferMP:
 
 class BinarySearchTree:
     """Binary Search Tree for PER
+
     Contributor: Github GyChou, Github mississippiu
     Reference: https://github.com/kaixindelele/DRLib/tree/main/algos/pytorch/td3_sp
     Reference: https://github.com/jaromiru/AI-blog/blob/master/SumTree.py
@@ -530,6 +544,7 @@ class BinarySearchTree:
 
     def get_leaf_id(self, v):
         """Tree structure and array storage:
+
         Tree index:
               0       -> storing priority sum
             |  |
