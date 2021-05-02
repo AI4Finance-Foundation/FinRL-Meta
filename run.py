@@ -5,8 +5,8 @@ import torch
 import numpy as np
 import numpy.random as rd
 from copy import deepcopy
-from replay import ReplayBuffer, ReplayBufferMP
-from env import PreprocessEnv
+from elegantrl.replay import ReplayBuffer, ReplayBufferMP
+from elegantrl.Env import PreprocessEnv
 
 """From [ElegantRL](https://github.com/AI4Finance-LLC/ElegantRL)"""
 
