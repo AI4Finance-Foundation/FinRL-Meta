@@ -45,4 +45,5 @@ https://github.com/openai/gym/blob/master/docs/creating-environments.md
 
 
 **ccxt**
+
 run demo_ccxt.py
