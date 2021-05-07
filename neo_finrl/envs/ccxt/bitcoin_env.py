@@ -4,11 +4,11 @@ import numpy.random as rd
 import pandas as pd
 from gym import spaces
 import torch
-from agent import AgentDQN
+from elegantrl.agent import AgentDQN
 
 
 class BitcoinEnv:  # custom env
-    def __init__(self, initial_account=1e6, max_stock=1e2, \
+    def __init__(self, processed_ary, initial_account=1e6, max_stock=1e2, \
                  transaction_fee_percent=1e-3, if_train=True,\
                    gamma = 0.99):
         self.stock_dim = 1
@@ -16,10 +16,8 @@ class BitcoinEnv:  # custom env
         self.transaction_fee_percent = transaction_fee_percent
         self.max_stock = 1
         self.gamma = gamma
-        processed = pd.read_csv('./btc_data.csv')
-        ary = processed.values
-        data_ary = ary.astype(np.float32)
-        assert data_ary.shape == (9661, 12)  
+        data_ary = processed_ary
+        assert data_ary.shape == (8640, 13)  
         self.ary_train = data_ary[2500:6000]
         self.ary_valid = data_ary[6000:7000]
         self.ary = self.ary_train if if_train else self.ary_valid
@@ -32,17 +30,17 @@ class BitcoinEnv:  # custom env
         self.day_npy = self.ary[self.day]
         self.stocks = 0.0  # multi-stack
 
-        self.total_asset = self.account + self.day_npy[0] * self.stocks
+        self.total_asset = self.account + self.day_npy[3] * self.stocks
         self.episode_return = 0.0  
         self.gamma_return = 0.0
         
 
         '''env information'''
         self.env_name = 'BitcoinEnv'
-        self.state_dim = 14
+        self.state_dim = 15
         self.action_dim = 3
         self.if_discrete = True
-        self.target_reward = 1.1
+        self.target_return = 1.05
         self.max_step = self.ary.shape[0]
 
 
@@ -67,7 +65,7 @@ class BitcoinEnv:  # custom env
         elif action == 2:
             stock_action = -1
         """bug or sell stock"""
-        adj = self.day_npy[0]
+        adj = self.day_npy[3]
         if stock_action == 1:  
             if self.stocks <= 0.0:
                 available_amount = self.total_asset / adj
@@ -98,7 +96,7 @@ class BitcoinEnv:  # custom env
         done = self.day == self.max_step  
         state = np.hstack((self.account * 2 ** -16, self.day_npy * 2 ** -8, self.stocks * 2 ** -12,)).astype(np.float32)
 
-        next_total_asset = self.account + self.day_npy[0]*self.stocks
+        next_total_asset = self.account + self.day_npy[3]*self.stocks
         reward = (next_total_asset - self.total_asset) * 2 ** -16  
         self.total_asset = next_total_asset
 
@@ -107,8 +105,6 @@ class BitcoinEnv:  # custom env
             reward += self.gamma_return
             self.gamma_return = 0.0  
             self.episode_return = next_total_asset / self.initial_account  
-            if self.episode_return > 1.0:
-                print(self.episode_return)
         return state, reward, done, None
     
     
@@ -132,17 +128,17 @@ class BitcoinEnv:  # custom env
         with _torch.no_grad():
             for i in range(self.max_step):
                 if i == 0:
-                    init_price = float(state[1])
+                    init_price = float(state[4])
                 s_tensor = _torch.as_tensor((state,), device=device)
                 action = act(s_tensor)[0]  # not need detach(), because with torch.no_grad() outside
                 a_int = action.argmax(dim=0).cpu().numpy()
                 action = a_int 
                 state, reward, done, _ = self.step(action)
                 
-                total_asset = self.account + (self.time_npy[0] * self.stocks)
+                total_asset = self.account + (self.day_npy[3] * self.stocks)
                 episode_return = total_asset / self.initial_account
                 episode_returns.append(episode_return)
-                btc_return = (state[1]/init_price)
+                btc_return = (state[4]/init_price)
                 btc_returns.append(btc_return)
                 if done:
                     break
