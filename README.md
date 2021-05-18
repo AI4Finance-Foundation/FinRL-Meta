@@ -52,3 +52,7 @@ run demo_ccxt.py
 
 run demo_wrds.py
 
+**JoinQuant**
+
+run demo_jq.py
+
