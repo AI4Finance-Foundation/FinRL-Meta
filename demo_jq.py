@@ -7,7 +7,7 @@ from elegantrl.agent import *
 
 '''data_fetch'''
 #please fill in your own account info
-jq.auth('', '')
+jq.auth('user_name', 'password')
 stock_list = ['000001.XSHE', '000002.XSHE', '000004.XSHE', '000006.XSHE', '000009.XSHE']
 num=3000
 unit = '15m'
