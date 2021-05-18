@@ -52,6 +52,10 @@ run demo_ccxt.py
 
 run demo_wrds.py
 
+**Alpaca**
+
+run demo_alpaca.py
+
 **JoinQuant**
 
 run demo_jq.py
