@@ -1,8 +1,8 @@
 from elegantrl.run import *
-from neo_finrl.wrds.preprocess import preprocess
-from neo_finrl.wrds.data_fetch import wrds_fetch_data
+from neo_finrl.wrds.preprocess_wrds import preprocess
+from neo_finrl.wrds.data_fetch_wrds import wrds_fetch_data
 
-from neo_finrl.wrds.stock_min_env import StockTradingEnv
+from neo_finrl.wrds.env_stock_wrds import StockTradingEnv
 from elegantrl.agent import *
 
 '''data_fetch'''
