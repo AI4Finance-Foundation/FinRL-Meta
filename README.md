@@ -1,5 +1,5 @@
 # NeoFinRL
-A collection of universal environments for DRL in quant finance.
+A suite of universal near real-market environments for DRL in quant finance.
 
 
 **Why NeoFinRL (FinRL-Gym): Motivation**
