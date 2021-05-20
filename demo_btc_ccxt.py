@@ -5,7 +5,7 @@ from elegantrl.run import *
 from neo_finrl.ccxt.data_fetch_ccxt import ccxt_fetch_data
 from neo_finrl.ccxt.preprocess_ccxt import preprocess_btc
 
-from neo_finrl.ccxt.bitcoin_env import BitcoinEnv
+from neo_finrl.ccxt.env_btc_ccxt import BitcoinEnv
 from elegantrl.agent import *
 
 '''data_fetch'''
