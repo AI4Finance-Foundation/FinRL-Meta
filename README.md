@@ -46,17 +46,21 @@ https://github.com/openai/gym/blob/master/docs/creating-environments.md
 
 **ccxt**
 
-run demo_ccxt.py
+run demo_btc_ccxt.py
 
 **wrds**
 
-run demo_wrds.py
+run demo_stock_wrds.py
 
 **Alpaca**
 
-run demo_alpaca.py
+run demo_stock_alpaca.py
 
 **JoinQuant**
 
-run demo_jq.py
+run demo_stock_jq.py
 
+**QuantConnect**
+
+See demo_stock_qc.ipynb
+(Run it on QuantConnect web)
