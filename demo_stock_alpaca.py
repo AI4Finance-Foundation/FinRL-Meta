@@ -2,7 +2,7 @@ from elegantrl.run import *
 from neo_finrl.alpaca.preprocess_alpaca import preprocess
 from neo_finrl.alpaca.data_fetch_alpaca import data_fetch
 
-from neo_finrl.alpaca.stock_env_alpaca import StockTradingEnv
+from neo_finrl.alpaca.env_stock_alpaca import StockTradingEnv
 from elegantrl.agent import *
 
 '''data_fetch'''
