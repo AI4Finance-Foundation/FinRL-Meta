@@ -44,11 +44,13 @@ Resources:
 https://github.com/openai/gym/blob/master/docs/creating-environments.md
 
 
-**ccxt**
+**CCXT**
 
 run demo_btc_ccxt.py
 
-**wrds**
+**WRDS**
+WrdsEnginner: An aggregation class of data fetching, preprocessing functions of TAQ data under WRDS.
+(Still under test. A jupyter notebook about this class will be released soon.)
 
 run demo_stock_wrds.py
 
