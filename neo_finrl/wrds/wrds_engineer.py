@@ -4,9 +4,10 @@ import pandas as pd
 import trading_calendars as tc
 import pytz
 import numpy as np
+from stockstats import StockDataFrame as Sdf
 pd.options.mode.chained_assignment = None 
 
-class WrdsEnginner():
+class WrdsEngineer():
     def __init__(self,if_offline=False):
         if not if_offline:
             self.db = wrds.Connection()
@@ -59,7 +60,7 @@ class WrdsEnginner():
             if not x[1]:
                 empty = False
                 dataset = x[0]
-                dataset = self.preprocess_ohlcv(dataset, time_interval = (str(time_interval)+'S'))
+                dataset = self.preprocess_to_ohlcv(dataset, time_interval = (str(time_interval)+'S'))
                 if first_time:
                     print('Data for date: ' + i + ' finished')
                     temp = dataset
@@ -119,7 +120,7 @@ class WrdsEnginner():
         for i in range(ary.shape[0]):
             row = ary[i]
             time = row[0]
-            if str(time[-8:]) == '16:00:00':
+            if str(time)[-8:] == '16:00:00':
                 rows_1600.append(i)
 
         df = df.drop(rows_1600)
@@ -177,6 +178,27 @@ class WrdsEnginner():
         df = df.reset_index(drop=True)
         return df
     
-    def add_technical_indicators(self, df):
-        print('This method will be released soon.')
+    def add_technical_indicators(self, df, tech_indicator_list = [
+            'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',
+            'close_30_sma', 'close_60_sma']):
+        df = df.copy()
+        df = df.sort_values(by=['tic', 'date'])
+        stock = Sdf.retype(df.copy())
+        unique_ticker = stock.tic.unique()
+        tech_indicator_list = tech_indicator_list
+        
+        for indicator in tech_indicator_list:
+            indicator_df = pd.DataFrame()
+            for i in range(len(unique_ticker)):
+                # print(unique_ticker[i], i)
+                temp_indicator = stock[stock.tic == unique_ticker[i]][indicator]
+                temp_indicator = pd.DataFrame(temp_indicator)
+                temp_indicator['tic'] = unique_ticker[i]
+                # print(len(df[df.tic == unique_ticker[i]]['date'].to_list()))
+                temp_indicator['date'] = df[df.tic == unique_ticker[i]]['date'].to_list()
+                indicator_df = indicator_df.append(
+                    temp_indicator, ignore_index=True
+                )
+            df = df.merge(indicator_df[['tic', 'date', indicator]], on=['tic', 'date'], how='left')
+        df = df.sort_values(by=['date', 'tic'])
         return df
