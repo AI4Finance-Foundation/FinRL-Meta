@@ -22,17 +22,12 @@ args.env = BitcoinEnv(processed_ary = data_ary, if_train=True)
 args.env_eval = BitcoinEnv(processed_ary = data_ary, if_train=False)
 args.net_dim = 2 ** 9 # change a default hyper-parameters
 args.batch_size = 2 ** 8
-
-train_and_evaluate(args)
-
-args = Arguments(agent=None, env=None, gpu_id=0)
-args.agent = AgentDQN()
-args.env = BitcoinEnv(processed_ary = data_ary, if_train=False)
-args.net_dim = 2 ** 9 # change a default hyper-parameters
-args.batch_size = 2 ** 8
 args.if_remove = False
 args.cwd = './AgentDQN/BitcoinEnv_0'
 args.init_before_training()
+
+train_and_evaluate(args)
+
 # Draw the graph
 BitcoinEnv(processed_ary = data_ary, if_train=False)\
 .draw_cumulative_return(self = args.env, _torch = torch)
