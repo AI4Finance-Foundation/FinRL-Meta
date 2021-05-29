@@ -113,6 +113,7 @@ class WrdsEngineer():
         return final_df
     
     def data_clean(self, df):
+        df = df[['time', 'open', 'high', 'low', 'close', 'volume', 'tic']]
         # remove 16:00 data
         tic_list = np.unique(df['tic'].values)
         ary = df.values
@@ -138,13 +139,11 @@ class WrdsEngineer():
             if volume != 0:
                 tic_dic[tic][0] += 1
             tic_dic[tic][1] += 1
-            
         constant = np.unique(df['time'].values).shape[0]
         nan_tics = []
         for tic in tic_dic:
             if tic_dic[tic][1] != constant:
                 nan_tics.append(tic)
-        
         #fill missing rows
         normal_time = np.unique(df['time'].values) 
         
@@ -163,24 +162,27 @@ class WrdsEngineer():
         #fill nan data
         df = df2.sort_values(by=['tic','time'])
         for i in range(df.shape[0]):
-            row = df.iloc[i]
-            if row['volume'] == 0:
+            if float(df.iloc[i]['volume']) == 0:
                 previous_close = df.iloc[i-1]['close']
-                row['open'] = previous_close
-                row['high']= previous_close
-                row['low']= previous_close
-                row['close']= previous_close
+                if str(previous_close) == 'nan':
+                    raise ValueError('Error nan price')
+                df.iloc[i,1] = previous_close
+                df.iloc[i,2]= previous_close
+                df.iloc[i,3]= previous_close
+                df.iloc[i,4]= previous_close
         #check if nan 
-        ary = np.asarray(df[['open','high','low','close','volume']].values,dtype = float)
+        ary = df[['open','high','low','close','volume']].values
         assert np.isnan(np.min(ary)) == False
         #final preprocess
         df = df[['time','open','high','low','close','volume','tic']]
         df = df.reset_index(drop=True)
+        print('Data clean finished')
         return df
     
     def add_technical_indicators(self, df, tech_indicator_list = [
             'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',
             'close_30_sma', 'close_60_sma']):
+        df = df.rename(columns={'time':'date'})
         df = df.copy()
         df = df.sort_values(by=['tic', 'date'])
         stock = Sdf.retype(df.copy())
@@ -201,4 +203,29 @@ class WrdsEngineer():
                 )
             df = df.merge(indicator_df[['tic', 'date', indicator]], on=['tic', 'date'], how='left')
         df = df.sort_values(by=['date', 'tic'])
+        print('Succesfully add technical indicators')
         return df
+    
+    def df_to_ary(self,df,tech_indicator_list):
+        columns = ['open','high','low','close','volume']
+        columns.extend(tech_indicator_list)
+        N = df.shape[0]
+        stocks_num = len(np.unique(df['tic'].values))
+        minutes = int(N/stocks_num)
+        if_first_time = True
+        for i in range(0,minutes):
+            if (i%1000) == 1:
+                print(i)
+            temp_ary = df.iloc[stocks_num * i:stocks_num*(i+1)][columns].values
+            temp_ary = temp_ary.flatten()
+            if if_first_time:
+                ary = temp_ary
+                if_first_time = False
+            else:
+                ary = np.vstack((ary,temp_ary))
+        print('Successfully transformed into array')
+        return ary
+        
+        
+    
+            
