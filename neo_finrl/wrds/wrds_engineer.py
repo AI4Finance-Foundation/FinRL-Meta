@@ -214,8 +214,6 @@ class WrdsEngineer():
         minutes = int(N/stocks_num)
         if_first_time = True
         for i in range(0,minutes):
-            if (i%1000) == 1:
-                print(i)
             temp_ary = df.iloc[stocks_num * i:stocks_num*(i+1)][columns].values
             temp_ary = temp_ary.flatten()
             if if_first_time:
