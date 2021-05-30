@@ -50,10 +50,7 @@ run demo_btc_ccxt.py
 
 **WRDS**
 
-WrdsEngineer: An aggregation class of data fetching, preprocessing functions of TAQ data under WRDS.
-(Still under test. A jupyter notebook about this class will be released soon.)
-
-run demo_stock_wrds.py
+See demo_stock_wrds.ipynb
 
 **Alpaca**
 
