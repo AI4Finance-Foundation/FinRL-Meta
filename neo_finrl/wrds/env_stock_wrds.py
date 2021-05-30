@@ -34,7 +34,7 @@ class StockTradingEnv():
         self.gamma_return = 0.0
 
         '''env information'''
-        self.env_name = 'Stock_minute-v1'
+        self.env_name = 'Stock_wrds-v1'
         self.state_dim = 1 + 13 * self.stock_dim
         self.action_dim = self.stock_dim
         self.if_discrete = False
