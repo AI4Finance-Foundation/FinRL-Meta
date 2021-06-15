@@ -38,7 +38,7 @@ class WrdsEngineer():
             parm = {'syms' : stock_set, 'num_shares': filter_shares}
             try:
                 data = self.db.raw_sql("select * from " + lib + '.'+ table + 
-                                  " where sym_root in %(syms)s and time_m between '9:30:00' and '16:00:00' and size > %(num_shares)s",
+                                  " where sym_root in %(syms)s and time_m between '9:30:00' and '16:00:00' and size > %(num_shares)s and sym_suffix is null",
                                   params = parm)
                 if_empty = False
                 return data, if_empty
