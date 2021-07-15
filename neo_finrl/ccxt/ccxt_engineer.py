@@ -90,6 +90,7 @@ class CCXTEngineer():
         'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',
         'close_30_sma', 'close_60_sma']):
         df = df.dropna()
+        date_ary = df.index.values
         price_array = df[pd.MultiIndex.from_product([pair_list,['close']])].values
         tech_array = df[pd.MultiIndex.from_product([pair_list,tech_indicator_list])].values
-        return price_array, tech_array
+        return price_array, tech_array, date_ary
