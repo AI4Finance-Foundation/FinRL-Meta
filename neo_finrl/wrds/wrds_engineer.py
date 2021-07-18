@@ -206,23 +206,80 @@ class WrdsEngineer():
         print('Succesfully add technical indicators')
         return df
     
+    def calculate_turbulence(self,data, time_period=252):
+        # can add other market assets
+        df = data.copy()
+        df_price_pivot = df.pivot(index="date", columns="tic", values="close")
+        # use returns to calculate turbulence
+        df_price_pivot = df_price_pivot.pct_change()
+    
+        unique_date = df.date.unique()
+        # start after a fixed time period
+        start = time_period
+        turbulence_index = [0] * start
+        # turbulence_index = [0]
+        count = 0
+        for i in range(start, len(unique_date)):
+            current_price = df_price_pivot[df_price_pivot.index == unique_date[i]]
+            # use one year rolling window to calcualte covariance
+            hist_price = df_price_pivot[
+                (df_price_pivot.index < unique_date[i])
+                & (df_price_pivot.index >= unique_date[i - time_period])
+                ]
+            # Drop tickers which has number missing values more than the "oldest" ticker
+            filtered_hist_price = hist_price.iloc[hist_price.isna().sum().min():].dropna(axis=1)
+    
+            cov_temp = filtered_hist_price.cov()
+            current_temp = current_price[[x for x in filtered_hist_price]] - np.mean(filtered_hist_price, axis=0)
+            temp = current_temp.values.dot(np.linalg.pinv(cov_temp)).dot(
+                current_temp.values.T
+            )
+            if temp > 0:
+                count += 1
+                if count > 2:
+                    turbulence_temp = temp[0][0]
+                else:
+                    # avoid large outlier because of the calculation just begins
+                    turbulence_temp = 0
+            else:
+                turbulence_temp = 0
+            turbulence_index.append(turbulence_temp)
+    
+        turbulence_index = pd.DataFrame(
+            {"date": df_price_pivot.index, "turbulence": turbulence_index}
+        )
+        return turbulence_index
+    
+    def add_turbulence(self,data, time_period=252):
+        """
+        add turbulence index from a precalcualted dataframe
+        :param data: (df) pandas dataframe
+        :return: (df) pandas dataframe
+        """
+        df = data.copy()
+        turbulence_index = self.calculate_turbulence(df, time_period=time_period)
+        df = df.merge(turbulence_index, on="date")
+        df = df.sort_values(["date", "tic"]).reset_index(drop=True)
+        return df
+
     def df_to_ary(self,df,tech_indicator_list):
-        columns = ['open','high','low','close','volume']
-        columns.extend(tech_indicator_list)
-        N = df.shape[0]
-        stocks_num = len(np.unique(df['tic'].values))
-        minutes = int(N/stocks_num)
+        unique_ticker = df.tic.unique()
+        print(unique_ticker)
         if_first_time = True
-        for i in range(0,minutes):
-            temp_ary = df.iloc[stocks_num * i:stocks_num*(i+1)][columns].values
-            temp_ary = temp_ary.flatten()
+        for tic in unique_ticker:
             if if_first_time:
-                ary = temp_ary
+                price_ary = df[df.tic==tic][['close']].values
+                #price_ary = df[df.tic==tic]['close'].values
+                tech_ary = df[df.tic==tic][tech_indicator_list].values
+                turbulence_ary = df[df.tic==tic]['turbulence'].values
                 if_first_time = False
             else:
-                ary = np.vstack((ary,temp_ary))
+                price_ary = np.hstack([price_ary, df[df.tic==tic][['close']].values])
+                tech_ary = np.hstack([tech_ary, df[df.tic==tic][tech_indicator_list].values])
         print('Successfully transformed into array')
-        return ary
+        return price_ary,tech_ary,turbulence_ary
+    
+
         
         
     
