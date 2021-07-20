@@ -126,15 +126,13 @@ class StockEnvNAS100:
         data_path_tech_array = f'{cwd}/tech_ary.npy'
         data_path_turb_array = f'{cwd}/turb_ary.npy'
 
-        turbulence_ary = np.load(data_turb_array)  # turbulence_ary.shape = (1358, ). std, min, max = 3, 0, 65.2
+        turbulence_ary = np.load(data_path_turb_array)  # turbulence_ary.shape = (1358, ). std, min, max = 3, 0, 65.2
         turbulence_ary = turbulence_ary.repeat(390)  # 13580*390 = 529620
         turbulence_ary = turbulence_ary[-528026:]  # 15926 + 528026 = 528026
 
-        if os.path.exists(data_path_array):
-            load_dict = np.load(data_path_array, allow_pickle=True)
-
-            price_ary = load_dict['price_ary'].astype(np.float32)
-            tech_ary = load_dict['tech_ary'].astype(np.float32)
+        if os.path.exists(data_path_price_array):
+            price_ary = np.load(data_path_price_array).astype(np.float32)
+            tech_ary = np.load(data_path_tech_array).astype(np.float32)
             # turbulence_ary = load_dict['turbulence_ary'].astype(np.float32)
 
         return price_ary, tech_ary, turbulence_ary
