@@ -18,7 +18,7 @@ data_url = 'wss://data.alpaca.markets'
 '''load prepared model'''
 action_dim = 5
 state_dim = 1+ 1 + 1+ 2*5+ 5*7
-from elegantrl2.agent import AgentPPO
+from elegantrl.agent import AgentPPO
 agent = AgentPPO()
 net_dim = 2 ** 7
 cwd = './AgentPPO/test-v1'
