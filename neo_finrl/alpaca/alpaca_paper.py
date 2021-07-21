@@ -81,14 +81,14 @@ class PPO_PaperTrading:
             print("Sleeping until market close (15 minutes).")
             time.sleep(60 * 15)
           else:
-            # Rebalance the portfolio.
+            # Trade and save equity records
             trade = threading.Thread(target=self.trade)
             trade.start()
             trade.join()
             last_equity = float(self.alpaca.get_account().last_equity)
             cur_time = time.time()
             self.equities.append([cur_time,last_equity])
-            np.save('./data/0708equity.npy', np.asarray(self.equities, dtype = float))
+            np.save('./equity.npy', np.asarray(self.equities, dtype = float))
             time.sleep(60)
             
     def awaitMarketOpen(self):
