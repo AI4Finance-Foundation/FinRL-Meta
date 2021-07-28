@@ -1,5 +1,5 @@
 import sys
-from elegantrl.run import *
+from neo_finrl.agents.elegantrl.run import *
 import torch 
 import numpy as np
 
@@ -7,7 +7,7 @@ def demo_nas100_GPU_Podracer():  # 1.7+ 2.0+
     args = Arguments(if_on_policy=True)  # hyper-parameters of on-policy is different from off-policy
     args.random_seed = 312
 
-    from elegantrl.agent import AgentPPO
+    from neo_finrl.agents.elegantrl.agent import AgentPPO
     args.agent = AgentPPO()
     # args.agent.cri_target = False  # todo beta0
     args.agent.cri_target = True  # todo beta1
@@ -15,7 +15,7 @@ def demo_nas100_GPU_Podracer():  # 1.7+ 2.0+
 
     args.gamma = 0.999
 
-    from neo_finrl.wrds.StockEnvNAS100 import StockEnvNAS100
+    from neo_finrl.environments.env_nas100_wrds import StockEnvNAS100
     args.env = StockEnvNAS100(if_eval=False, gamma=args.gamma, turbulence_thresh=30)
     args.env_eval = StockEnvNAS100(if_eval=True, gamma=args.gamma, turbulence_thresh=15)
 
