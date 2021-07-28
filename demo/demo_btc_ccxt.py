@@ -1,9 +1,9 @@
 import torch
 import sys
-from neo_finrl.elegantrl.run import *
+from neo_finrl.agents.elegantrl.run import *
 from neo_finrl.data_processors.ccxt.ccxt_engineer import CCXTEngineer
 from neo_finrl.data_processors.ccxt.env_btc_ccxt import BitcoinEnv
-from neo_finrl.elegantrl.agent import *
+from neo_finrl.agents.elegantrl.agent import *
 import numpy as np
 import pandas as pd
 
