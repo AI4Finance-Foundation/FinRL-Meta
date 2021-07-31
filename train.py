@@ -3,6 +3,7 @@ import ray
 import torch 
 
 def train_erl(data_dic, drl_lib, env, agent, **kwargs):
+    #load data
     if 'price_ary' in data_dic and 'tech_ary' in data_dic and 'turbulence_ary'\
     in data_dic:
         price_ary = data_dic['price_ary']
@@ -15,9 +16,11 @@ def train_erl(data_dic, drl_lib, env, agent, **kwargs):
     else:
         raise ValueError('Invalid input data_dic!')
     
+    #build environment
     env = env(price_ary = price_ary, tech_ary = tech_ary, turbulence_ary = \
               turbulence_ary, if_train = True)
     
+    #set parameters for DRL algorithm
     learning_rate = kwargs.get('learning_rate', 0.00025)
     batch_size = kwargs.get('batch_size', 2**7)
     gamma = kwargs.get('gamma', 0.99)
@@ -25,7 +28,8 @@ def train_erl(data_dic, drl_lib, env, agent, **kwargs):
     total_timesteps = kwargs.get('total_timesteps', 1e6)
     net_dimension = kwargs.get('net_dimension', 2**7)
     cwd = kwargs.get('cwd','./'+str(agent))
-    print(cwd)
+    
+    #select drl library
     if drl_lib == 'elegantrl':
         if agent == 'ppo':
             from elegantrl.agent import AgentPPO
@@ -52,6 +56,7 @@ def train_erl(data_dic, drl_lib, env, agent, **kwargs):
             args.net_dimension = 2**7
             args.env = env
             train_and_evaluate(args)
+            
     elif drl_lib == 'rllib':
         ray.init(ignore_reinit_error=True)
         if agent == 'ppo':
@@ -111,4 +116,6 @@ if __name__ == '__main__':
     #construct environment
     from neo_finrl.environments.env_stock_trading.env_stock_alpaca import StockTradingEnv
     env = StockTradingEnv
+    
+    #train
     train_erl(data_dic, drl_lib='elegantrl', env=env, agent='ppo', cwd='./test_ppo_erl')
