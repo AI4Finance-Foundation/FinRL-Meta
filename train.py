@@ -3,6 +3,7 @@ import ray
 import torch 
 
 def train_erl(data_dic, drl_lib, env, agent, **kwargs):
+    
     #load data
     if 'price_ary' in data_dic and 'tech_ary' in data_dic and 'turbulence_ary'\
     in data_dic:
