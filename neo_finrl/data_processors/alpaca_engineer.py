@@ -83,63 +83,50 @@ class AlpacaEngineer():
             tmp_df['tic'] = tic
             new_df = new_df.append(tmp_df)
         
+        new_df = new_df.reset_index()
+        new_df = new_df.rename(columns={'index':'time'})
+        
         print('Data clean finished!')
         
         return new_df
-    
+      
     def add_technical_indicators(self, df, tech_indicator_list = [
             'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',
             'close_30_sma', 'close_60_sma']):
-        stock_list = np.unique(df['tic'].values)
-        df = df.dropna()
+        df = df.rename(columns={'time':'date'})
         df = df.copy()
-        column_list = [stock_list, ['open','high','low','close','volume']+(tech_indicator_list)]
-        column = pd.MultiIndex.from_product(column_list)
-        index_list = df.index
-        dataset = pd.DataFrame(columns=column,index=index_list)
-        for stock in stock_list:
-            stock_column = pd.MultiIndex.from_product([[stock],['open','high','low','close','volume']])
-            dataset[stock_column] = df[stock]
-            temp_df = df[stock].reset_index().sort_values(by=['time'])
-            temp_df = temp_df.rename(columns={'time':'date'})
-            stock_df = Sdf.retype(temp_df.copy())  
-            for indicator in tech_indicator_list:
-                temp_indicator = stock_df[indicator].values.tolist()
-                dataset[(stock,indicator)] = temp_indicator
+        df = df.sort_values(by=['tic', 'date'])
+        stock = Sdf.retype(df.copy())
+        unique_ticker = stock.tic.unique()
+        tech_indicator_list = tech_indicator_list
+        
+        for indicator in tech_indicator_list:
+            indicator_df = pd.DataFrame()
+            for i in range(len(unique_ticker)):
+                # print(unique_ticker[i], i)
+                temp_indicator = stock[stock.tic == unique_ticker[i]][indicator]
+                temp_indicator = pd.DataFrame(temp_indicator)
+                temp_indicator['tic'] = unique_ticker[i]
+                # print(len(df[df.tic == unique_ticker[i]]['date'].to_list()))
+                temp_indicator['date'] = df[df.tic == unique_ticker[i]]['date'].to_list()
+                indicator_df = indicator_df.append(
+                    temp_indicator, ignore_index=True
+                )
+            df = df.merge(indicator_df[['tic', 'date', indicator]], on=['tic', 'date'], how='left')
+        df = df.sort_values(by=['date', 'tic'])
         print('Succesfully add technical indicators')
-        return dataset
-    
-    def df_to_ary(self, df, stock_list, tech_indicator_list=[
-            'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',
-            'close_30_sma', 'close_60_sma']):
-        price_array = df[pd.MultiIndex.from_product([stock_list,['close']])].values
-        tech_array = df[pd.MultiIndex.from_product([stock_list,tech_indicator_list])].values
-        return price_array, tech_array
-    
-    def add_turbulence(self, data):
-        """
-        add turbulence index from a precalcualted dataframe
-        :param data: (df) pandas dataframe
-        :return: (df) pandas dataframe
-        """
-        df = data.copy()
-        turbulence_index = self.calculate_turbulence(df)
-        df = df.merge(turbulence_index, on="date")
-        df = df.sort_values(["date", "tic"]).reset_index(drop=True)
         return df
-
-    def calculate_turbulence(self, data):
-        """calculate turbulence index based on dow 30"""
+    
+    def calculate_turbulence(self,data, time_period=252):
         # can add other market assets
         df = data.copy()
-        df = df.dropna()
         df_price_pivot = df.pivot(index="date", columns="tic", values="close")
         # use returns to calculate turbulence
         df_price_pivot = df_price_pivot.pct_change()
-
+    
         unique_date = df.date.unique()
-        # start after a year
-        start = 60
+        # start after a fixed time period
+        start = time_period
         turbulence_index = [0] * start
         # turbulence_index = [0]
         count = 0
@@ -148,11 +135,11 @@ class AlpacaEngineer():
             # use one year rolling window to calcualte covariance
             hist_price = df_price_pivot[
                 (df_price_pivot.index < unique_date[i])
-                & (df_price_pivot.index >= unique_date[i - 60])
-            ]
+                & (df_price_pivot.index >= unique_date[i - time_period])
+                ]
             # Drop tickers which has number missing values more than the "oldest" ticker
             filtered_hist_price = hist_price.iloc[hist_price.isna().sum().min():].dropna(axis=1)
-
+    
             cov_temp = filtered_hist_price.cov()
             current_temp = current_price[[x for x in filtered_hist_price]] - np.mean(filtered_hist_price, axis=0)
             temp = current_temp.values.dot(np.linalg.pinv(cov_temp)).dot(
@@ -168,11 +155,41 @@ class AlpacaEngineer():
             else:
                 turbulence_temp = 0
             turbulence_index.append(turbulence_temp)
+    
         turbulence_index = pd.DataFrame(
             {"date": df_price_pivot.index, "turbulence": turbulence_index}
         )
         return turbulence_index
+    
+    def add_turbulence(self,data, time_period=252):
+        """
+        add turbulence index from a precalcualted dataframe
+        :param data: (df) pandas dataframe
+        :return: (df) pandas dataframe
+        """
+        df = data.copy()
+        turbulence_index = self.calculate_turbulence(df, time_period=time_period)
+        df = df.merge(turbulence_index, on="date")
+        df = df.sort_values(["date", "tic"]).reset_index(drop=True)
+        return df
 
+    def df_to_ary(self,df,tech_indicator_list):
+        unique_ticker = df.tic.unique()
+        print(unique_ticker)
+        if_first_time = True
+        for tic in unique_ticker:
+            if if_first_time:
+                price_ary = df[df.tic==tic][['close']].values
+                #price_ary = df[df.tic==tic]['close'].values
+                tech_ary = df[df.tic==tic][tech_indicator_list].values
+                turbulence_ary = df[df.tic==tic]['turbulence'].values
+                if_first_time = False
+            else:
+                price_ary = np.hstack([price_ary, df[df.tic==tic][['close']].values])
+                tech_ary = np.hstack([tech_ary, df[df.tic==tic][tech_indicator_list].values])
+        print('Successfully transformed into array')
+        return price_ary,tech_ary,turbulence_ary
+    
     def get_trading_days(self, start, end):
         nyse = tc.get_calendar('NYSE')
         df = nyse.sessions_in_range(pd.Timestamp(start,tz=pytz.UTC),
