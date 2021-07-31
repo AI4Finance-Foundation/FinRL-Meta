@@ -30,7 +30,7 @@ def train_erl(data_dic, drl_lib, env, agent, **kwargs):
     net_dimension = kwargs.get('net_dimension', 2**7)
     cwd = kwargs.get('cwd','./'+str(agent))
     
-    #select drl library
+    #select drl library and train the agent
     if drl_lib == 'elegantrl':
         if agent == 'ppo':
             from elegantrl.agent import AgentPPO
