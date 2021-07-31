@@ -1,99 +1,123 @@
 import numpy as np
+import os
+import gym
+from numpy import random as rd
 
 class StockTradingEnv():
-    """FinRL
-    Paper: A Deep Reinforcement Learning Library for Automated Stock Trading in Quantitative Finance
-           https://arxiv.org/abs/2011.09607 NeurIPS 2020: Deep RL Workshop.
-    Source: Github https://github.com/AI4Finance-LLC/FinRL-Library
-    Modify: Github Yonv1943 ElegantRL
-    """
 
-    def __init__(self, ary, initial_account=1e6, max_stock=1e2, transaction_fee_percent=1e-3, if_train=True,
-                 ):
-        self.stock_dim = 3
-        self.initial_account = initial_account
-        self.transaction_fee_percent = transaction_fee_percent
-        self.max_stock = max_stock
-
-        N = ary.shape[0]
-        x = int(N*0.8)# ary: (date, item*stock_dim), item: (adjcp, macd, rsi, cci, adx)
+    def __init__(self, price_ary, tech_ary, turbulence_ary, initial_account=1e6,
+                 gamma=0.99, turbulence_thresh=30, min_stock_rate=0.1,
+                 max_stock=1e2, initial_capital=1e6, buy_cost_pct=1e-3, 
+                 sell_cost_pct=1e-3,reward_scaling=2 ** -11,  initial_stocks=None,
+                 if_train=True,):
+        n = price_ary.shape[0]
+        price_ary = price_ary[int(0.1*n):]
+        tech_ary = tech_ary[int(0.1*n):]
+        turbulence_ary = turbulence_ary[int(0.1*n):]
+        self.price_ary, self.tech_ary, turbulence_ary = price_ary, tech_ary, turbulence_ary
         
-        # reset
-        self.day = 0
-        if if_train:
-            self.ary = ary[:x] 
-        else:
-            self.ary = ary[x:]
-        self.initial_account__reset = self.initial_account
-        self.account = self.initial_account__reset
-        self.day_npy = self.ary[self.day]
-        self.prices = self.day_npy[[5*x+3 for x in range(self.stock_dim)]]
-        self.stocks = np.zeros(self.stock_dim, dtype=np.float32)  # multi-stack
+        self.tech_ary = self.tech_ary * 2 ** -7
+        self.turbulence_bool = (turbulence_ary > turbulence_thresh).astype(np.float32)
+        self.turbulence_ary = (self.sigmoid_sign(turbulence_ary, turbulence_thresh) * 2 ** -5).astype(np.float32)
 
-        self.total_asset = self.account + (self.prices[:self.stock_dim] * self.stocks).sum()
-        self.episode_return = 0.0  # Compatibility for ElegantRL 2020-12-21
-        self.gamma_return = 0.0
+        stock_dim = self.price_ary.shape[1]
+        self.gamma = gamma
+        self.max_stock = max_stock
+        self.buy_cost_pct = buy_cost_pct
+        self.sell_cost_pct = sell_cost_pct
+        self.reward_scaling = reward_scaling
+        self.initial_capital = initial_capital
+        self.initial_stocks = np.zeros(stock_dim, dtype=np.float32) if initial_stocks is None else initial_stocks
 
-        '''env information'''
-        self.env_name = 'Stock_alpaca-v1'
-        self.state_dim = 1 + 6 * self.stock_dim
-        self.action_dim = self.stock_dim
+        # reset()
+        self.day = None
+        self.amount = None
+        self.stocks = None
+        self.total_asset = None
+        self.gamma_reward = None
+        self.initial_total_asset = None
+
+        # environment information
+        self.env_name = 'StockEnv'
+        # self.state_dim = 1 + 2 + 2 * stock_dim + self.tech_ary.shape[1]
+        # # amount + (turbulence, turbulence_bool) + (price, stock) * stock_dim + tech_dim
+        self.state_dim = 1 + 2 + 3 * stock_dim + self.tech_ary.shape[1]
+        # amount + (turbulence, turbulence_bool) + (price, stock) * stock_dim + tech_dim
+        self.stocks_cd = None
+        self.action_dim = stock_dim
+        self.max_step = self.price_ary.shape[0] - 1
         self.if_discrete = False
-        self.target_return = 1.25  # convergence 1.5
-        self.max_step = self.ary.shape[0]
+        self.target_return = 2.2
+        self.episode_return = 0.0
 
     def reset(self):
-        self.account = self.initial_account
-        self.stocks = np.zeros(self.stock_dim, dtype=np.float32)
-        self.prices = self.day_npy[[5*x+3 for x in range(self.stock_dim)]]
-        self.total_asset = self.account + (self.prices[:self.stock_dim] * self.stocks).sum()
-        # total_asset = account + (adjcp * stocks).sum()
-
         self.day = 0
-        self.day_npy = self.ary[self.day]
+        price = self.price_ary[self.day]
+
+        self.stocks = (self.initial_stocks + rd.randint(0, 64, size=self.initial_stocks.shape)).astype(np.float32)
+        self.stocks_cd = np.zeros_like(self.stocks)
+        self.amount = self.initial_capital * rd.uniform(0.95, 1.05) - (self.stocks * price).sum()
+
+        self.total_asset = self.amount + (self.stocks * price).sum()
+        self.initial_total_asset = self.total_asset
+        self.gamma_reward = 0.0
+        return self.get_state(price)  # state
+
+    def step(self, actions):
+        actions = (actions * self.max_stock).astype(int)
+
         self.day += 1
+        price = self.price_ary[self.day]
+        self.stocks_cd += 1
 
-        state = np.hstack((self.account * 2 ** -16,
-                           self.day_npy * 2 ** -8,
-                           self.stocks * 2 ** -12,), ).astype(np.float32)
-        return state
+        if self.turbulence_bool[self.day] == 0:
+            min_action = int(self.max_stock * self.min_stock_rate)  # stock_cd
+            for index in np.where(actions < -min_action)[0]:  # sell_index:
+                if price[index] > 0:  # Sell only if current asset is > 0
+                    sell_num_shares = min(self.stocks[index], -actions[index])
+                    self.stocks[index] -= sell_num_shares
+                    self.amount += price[index] * sell_num_shares * (1 - self.sell_cost_pct)
+                    self.stocks_cd[index] = 0
+            for index in np.where(actions > min_action)[0]:  # buy_index:
+                if price[index] > 0:  # Buy only if the price is > 0 (no missing data in this particular date)
+                    buy_num_shares = min(self.amount // price[index], actions[index])
+                    self.stocks[index] += buy_num_shares
+                    self.amount -= price[index] * buy_num_shares * (1 + self.buy_cost_pct)
+                    self.stocks_cd[index] = 0
 
-    def step(self, action):
-        action = action * self.max_stock
-        self.prices = self.day_npy[[5*x+3 for x in range(self.stock_dim)]]
-        """buy or sell stock"""
-        for index in range(self.stock_dim):
-            stock_action = action[index]
-            adj = self.prices[index]
-            if stock_action > 0:  # buy_stock
-                available_amount = self.account // adj
-                delta_stock = min(available_amount, stock_action)
-                self.account -= adj * delta_stock * (1 + self.transaction_fee_percent)
-                self.stocks[index] += delta_stock
-            elif self.stocks[index] > 0:  # sell_stock
-                delta_stock = min(-stock_action, self.stocks[index])
-                self.account += adj * delta_stock * (1 - self.transaction_fee_percent)
-                self.stocks[index] -= delta_stock
+        else:  # sell all when turbulence
+            self.amount += (self.stocks * price).sum() * (1 - self.sell_cost_pct)
+            self.stocks[:] = 0
+            self.stocks_cd[:] = 0
 
-        """update day"""
-        self.day_npy = self.ary[self.day]
-        self.prices = self.day_npy[[5*x+3 for x in range(self.stock_dim)]]
-        self.day += 1
-        done = self.day == self.max_step  # 2020-12-21
+        state = self.get_state(price)
+        total_asset = self.amount + (self.stocks * price).sum()
+        reward = (total_asset - self.total_asset) * self.reward_scaling
+        self.total_asset = total_asset
 
-        state = np.hstack((self.account * 2 ** -16,
-                           self.day_npy * 2 ** -8,
-                           self.stocks * 2 ** -12,), ).astype(np.float32)
-
-        next_total_asset = self.account + (self.prices[:self.stock_dim] * self.stocks).sum()
-        reward = (next_total_asset - self.total_asset) * 2 ** -16  # notice scaling!
-        self.total_asset = next_total_asset
-
-        self.gamma_return = self.gamma_return * 0.99 + reward  # notice: gamma_r seems good? Yes
+        self.gamma_reward = self.gamma_reward * self.gamma + reward
+        done = self.day == self.max_step
         if done:
-            reward += self.gamma_return
-            self.gamma_return = 0.0  # env.reset()
+            reward = self.gamma_reward
+            self.episode_return = total_asset / self.initial_total_asset
 
-            # cumulative_return_rate
-            self.episode_return = next_total_asset / self.initial_account
-        return state, reward, done, None
+        return state, reward, done, dict()
+
+    def get_state(self, price):
+        amount = np.array(max(self.amount, 1e4) * (2 ** -12), dtype=np.float32)
+        scale = np.array(2 ** -6, dtype=np.float32)
+        return np.hstack((amount,
+                          self.turbulence_ary[self.day],
+                          self.turbulence_bool[self.day],
+                          price * scale,
+                          self.stocks * scale,
+                          self.stocks_cd,
+                          self.tech_ary[self.day],
+                          ))  # state.astype(np.float32)
+    
+    @staticmethod
+    def sigmoid_sign(ary, thresh):
+        def sigmoid(x):
+            return 1 / (1 + np.exp(-x * np.e)) - 0.5
+
+        return sigmoid(ary / thresh) * thresh
