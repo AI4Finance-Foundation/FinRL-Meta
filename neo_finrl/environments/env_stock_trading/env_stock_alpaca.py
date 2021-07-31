@@ -14,7 +14,9 @@ class StockTradingEnv():
         price_ary = price_ary[int(0.1*n):]
         tech_ary = tech_ary[int(0.1*n):]
         turbulence_ary = turbulence_ary[int(0.1*n):]
-        self.price_ary, self.tech_ary, turbulence_ary = price_ary, tech_ary, turbulence_ary
+        self.price_ary =  price_ary.astype(np.float32)
+        self.tech_ary = tech_ary.astype(np.float32)
+        self.turbulence_ary = turbulence_ary
         
         self.tech_ary = self.tech_ary * 2 ** -7
         self.turbulence_bool = (turbulence_ary > turbulence_thresh).astype(np.float32)
@@ -23,6 +25,7 @@ class StockTradingEnv():
         stock_dim = self.price_ary.shape[1]
         self.gamma = gamma
         self.max_stock = max_stock
+        self.min_stock_rate = min_stock_rate
         self.buy_cost_pct = buy_cost_pct
         self.sell_cost_pct = sell_cost_pct
         self.reward_scaling = reward_scaling
