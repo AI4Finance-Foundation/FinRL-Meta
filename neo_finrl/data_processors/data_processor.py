@@ -1,29 +1,33 @@
-from alpaca_engineer import AlpacaEngineer as AE
-from ccxt_engineer import CCXTEngineer as CE
-from joinquant_engineer import JoinQuantEngineer as JE
-from quantconnect_engineer import QuantConnectEngineer as QE
-from wrds_engineer import WrdsEngineer as WE
-from yahoofinance_engineer import YahooFinanceEngineer as YE
+from neo_finrl.data_processors.alpaca_engineer import AlpacaEngineer as AE
+from neo_finrl.data_processors.ccxt_engineer import CCXTEngineer as CE
+from neo_finrl.data_processors.joinquant_engineer import JoinQuantEngineer as JE
+from neo_finrl.data_processors.wrds_engineer import WrdsEngineer as WE
+from neo_finrl.data_processors.yahoofinance_engineer import YahooFinanceEngineer as YE
 import pandas as pd
 import numpy as np
 
 class DataProcessor():
-    def __init__(self, data_source):
+    def __init__(self, data_source, **kwargs):
         if data_source == 'alpaca':
-            self.processor = AE
+            try:
+                API_KEY= kwargs.get('API_KEY')
+                API_SECRET= kwargs.get('API_SECRET')
+                APCA_API_BASE_URL= kwargs.get('APCA_API_BASE_URL')
+                self.processor = AE(API_KEY, API_SECRET, APCA_API_BASE_URL)
+                print('alpaca successfully connect')
+            except:
+                raise ValueError('Please input correct account info for alpaca!')
         elif data_source == 'ccxt':
             self.processor = CE
         elif data_source == 'joinquant':
             self.processor = JE
-        elif data_source == 'quantconnect':
-            self.processor = QE
         elif data_source == 'wrds':
             self.processor = WE
         elif data_source == 'yahoofinance':
             self.processor = YE
     
     def data_fetch(self,stock_list=['AAPL'], start_date='2021-05-10',
-                   end_date='2021-05-10',time_interval='1Min') -> pd.DataFrame:
+                   end_date='2021-05-10',time_interval='1Min'):
         df = self.processor.data_fetch(self, stock_list, start_date, end_date,
                                        time_interval)
         return df
@@ -49,5 +53,4 @@ class DataProcessor():
         price_ary,tech_ary,turbulence_ary = self.df_to_ary(df)
         
         return price_ary,tech_ary,turbulence_ary
-        
         
