@@ -16,8 +16,11 @@ def train_erl(data_dic, drl_lib, env, agent, **kwargs):
     else:
         raise ValueError('Invalid input data_dic!')
     
-    env = env(price_ary = price_ary, tech_ary = tech_ary, turbulence_ary = \
-              turbulence_ary, if_train = True)
+    env_config = {'price_ary':price_ary,
+            'tech_ary':tech_ary,
+            'turbulence_ary':turbulence_ary,
+            'if_train':True}
+    env_instance = env(config=env_config)
     
     learning_rate = kwargs.get('learning_rate', 0.00025)
     batch_size = kwargs.get('batch_size', 2**7)
@@ -29,7 +32,7 @@ def train_erl(data_dic, drl_lib, env, agent, **kwargs):
     print(cwd)
     if drl_lib == 'elegantrl':
         if agent == 'ppo':
-            args = Arguments(agent=AgentPPO(), env=env, if_on_policy=True)
+            args = Arguments(agent=AgentPPO(), env=env_instance, if_on_policy=True)
         else:
             raise ValueError('Invalid agent input or the agent input is not \
                              supported yet.')
@@ -49,23 +52,24 @@ def train_erl(data_dic, drl_lib, env, agent, **kwargs):
             args.seed = 312
             args.break_step = 1e6
             args.net_dimension = 2**7
-            args.env = env
             
         train_and_evaluate(args)
     elif drl_lib == 'rllib':
         ray.init(ignore_reinit_error=True)
         if agent == 'ppo':
-            from ray.rllib.agents.ppo import ddppo
-            from ray.rllib.agents.ppo.ddppo import DDPPOTrainer
-            config = ddppo.DEFAULT_CONFIG.copy()
-            try:
-                for key,value in kwargs.items():
-                    config[key] = value
-            except:
-                print('Invalid parameters input! Use default value.')
-                config = ddppo.DEFAULT_CONFIG.copy()
-            
-            agent = DDPPOTrainer(env=env, config=config)
+            from ray.rllib.agents import ppo
+            from ray.rllib.agents.ppo.ppo import PPOTrainer
+ 
+            config = ppo.DEFAULT_CONFIG.copy()
+            print(tech_ary)
+            print(turbulence_ary)
+            config['env'] = env
+            config["log_level"] = "WARN"
+            config['env_config'] = {'price_ary':price_ary,
+                                    'tech_ary':tech_ary,
+                                    'turbulence_ary':turbulence_ary,
+                                    'if_train':True}
+            agent = PPOTrainer(env=env, config=config)
             agent.train()
             agent.save(cwd)
         
@@ -82,9 +86,7 @@ def train_erl(data_dic, drl_lib, env, agent, **kwargs):
             model.learn(total_timesteps=total_timesteps)
             model.save(cwd)
             
-if __name__ == '__main__':
-    #demo for elegantrl
-    
+if __name__ == '__main__':    
     #fetch data
     from neo_finrl.data_processors.alpaca_engineer import AlpacaEngineer as AE
     API_KEY = ""
@@ -95,7 +97,7 @@ if __name__ == '__main__':
             APCA_API_BASE_URL)
     stock_list = ['FB',  'AMZN', 'AAPL', 'NFLX', 'GOOG']
     start_date = '2021-01-01'
-    end_date = '2021-01-31'
+    end_date = '2021-01-10'
     tech_indicator_list = [
             'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',
             'close_30_sma', 'close_60_sma']
@@ -111,4 +113,15 @@ if __name__ == '__main__':
     #construct environment
     from neo_finrl.environments.env_stock_trading.env_stock_alpaca import StockTradingEnv
     env = StockTradingEnv
-    train_erl(data_dic, drl_lib='elegantrl', env=env, agent='ppo', cwd='./test_ppo_erl')
+    
+    #demo for elegantrl
+    train_erl(data_dic, drl_lib='elegantrl', env=env, agent='ppo', cwd='./test_ppo_erl'
+              ,total_timesteps=3e4)
+    
+    #demo for rllib
+    train_erl(data_dic, drl_lib='rllib', env=env, agent='ppo', cwd='./test_ppo_erl'
+              ,total_timesteps=3e4)
+    
+    '''#demo for stable-baselines3
+    train_erl(data_dic, drl_lib='stable_baselines3', env=env, agent='ppo', cwd='./test_ppo_erl'
+              ,total_timesteps=3e4)'''
