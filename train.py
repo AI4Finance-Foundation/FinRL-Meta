@@ -58,7 +58,11 @@ def train(data_dic, drl_lib, env, agent, **kwargs):
         if agent == 'ppo':
             from ray.rllib.agents import ppo
             from ray.rllib.agents.ppo.ppo import PPOTrainer
- 
+            try:
+                total_episodes = kwargs.get('total_episodes')
+            except:
+                print('total training episodes is not given! Use default value 1000')
+                total_episodes = 1000
             config = ppo.DEFAULT_CONFIG.copy()
             config['env'] = env
             config["log_level"] = "WARN"
@@ -66,9 +70,10 @@ def train(data_dic, drl_lib, env, agent, **kwargs):
                                     'tech_ary':tech_ary,
                                     'turbulence_ary':turbulence_ary,
                                     'if_train':True}
-            agent = PPOTrainer(env=env, config=config)
-            agent.train()
-            agent.save(cwd)
+            trainer = PPOTrainer(env=env, config=config)
+            for i in range(total_episodes):
+                trainer.train()
+            trainer.save(cwd)
         
         else:
             raise ValueError('Invalid agent input or the agent input is not \
@@ -87,7 +92,9 @@ def train(data_dic, drl_lib, env, agent, **kwargs):
             print('Training finished!')
             model.save(cwd)
             print('Trained model saved in ' + str(cwd))
-            
+    
+    else:
+        raise ValueError('DRL library input is NOT supported. Please check.')
             
 if __name__ == '__main__':    
     #fetch data
@@ -123,7 +130,7 @@ if __name__ == '__main__':
     
     #demo for rllib
     train(data_dic, drl_lib='rllib', env=env, agent='ppo', cwd='./test_ppo'
-              ,total_timesteps=3e5)
+              ,total_episodes=1000)
     
     #demo for stable-baselines3
     train(data_dic, drl_lib='stable_baselines3', env=env, agent='ppo', cwd='./test_ppo'
