@@ -3,7 +3,7 @@ from elegantrl.run import *
 import torch 
 import ray
 
-def train(data_dic, drl_lib, env, agent, **kwargs):
+def train_erl(data_dic, drl_lib, env, agent, **kwargs):
     if 'price_ary' in data_dic and 'tech_ary' in data_dic and 'turbulence_ary'\
     in data_dic:
         price_ary = data_dic['price_ary']
@@ -29,7 +29,6 @@ def train(data_dic, drl_lib, env, agent, **kwargs):
     total_timesteps = kwargs.get('total_timesteps', 1e6)
     net_dimension = kwargs.get('net_dimension', 2**7)
     cwd = kwargs.get('cwd','./'+str(agent))
-    print(cwd)
     if drl_lib == 'elegantrl':
         if agent == 'ppo':
             args = Arguments(agent=AgentPPO(), env=env_instance, if_on_policy=True)
@@ -61,8 +60,6 @@ def train(data_dic, drl_lib, env, agent, **kwargs):
             from ray.rllib.agents.ppo.ppo import PPOTrainer
  
             config = ppo.DEFAULT_CONFIG.copy()
-            print(tech_ary)
-            print(turbulence_ary)
             config['env'] = env
             config["log_level"] = "WARN"
             config['env_config'] = {'price_ary':price_ary,
@@ -80,15 +77,21 @@ def train(data_dic, drl_lib, env, agent, **kwargs):
     elif drl_lib == 'stable_baselines3':
         if agent == 'ppo':
             from stable_baselines3 import PPO
-            model = PPO("MlpPolicy", env, learning_rate=learning_rate, 
+            from stable_baselines3.common.vec_env import DummyVecEnv
+            
+            env_train = DummyVecEnv([lambda : env_instance])
+            model = PPO("MlpPolicy", env_train, learning_rate=learning_rate, 
                         n_steps=2048, batch_size=batch_size, ent_coef=0.0, 
                         gamma=gamma, seed=seed)
-            model.learn(total_timesteps=total_timesteps)
+            model.learn(total_timesteps=total_timesteps, tb_log_name = 'ppo')
+            print('Training finished!')
             model.save(cwd)
+            print('Trained model saved in ' + str(cwd))
+            
             
 if __name__ == '__main__':    
     #fetch data
-    from neo_finrl.data_processors.alpaca_engineer import AlpacaEngineer as AE
+    from neo_finrl.data_processors.processor_alpaca import AlpacaEngineer as AE
     API_KEY = ""
     API_SECRET = ""
     APCA_API_BASE_URL = 'https://paper-api.alpaca.markets'
@@ -111,17 +114,17 @@ if __name__ == '__main__':
     price_ary, tech_ary, turb_ary = AE.df_to_ary(data, tech_indicator_list)
     data_dic = {'price_ary':price_ary, 'tech_ary':tech_ary, 'turbulence_ary':turb_ary}
     #construct environment
-    from neo_finrl.environments.env_stock_trading.env_stock_alpaca import StockTradingEnv
+    from neo_finrl.env_stock_trading.env_stock_alpaca import StockTradingEnv
     env = StockTradingEnv
     
     #demo for elegantrl
-    train(data_dic, drl_lib='elegantrl', env=env, agent='ppo', cwd='./test_ppo_erl'
+    train_erl(data_dic, drl_lib='elegantrl', env=env, agent='ppo', cwd='./test_ppo_erl'
               ,total_timesteps=3e4)
     
-    #demo for rllib
-    train(data_dic, drl_lib='rllib', env=env, agent='ppo', cwd='./test_ppo_erl'
-              ,total_timesteps=3e4)
-    
-    '''#demo for stable-baselines3
-    train(data_dic, drl_lib='stable_baselines3', env=env, agent='ppo', cwd='./test_ppo_erl'
+    '''#demo for rllib
+    train_erl(data_dic, drl_lib='rllib', env=env, agent='ppo', cwd='./test_ppo_erl'
               ,total_timesteps=3e4)'''
+    
+    #demo for stable-baselines3
+    train_erl(data_dic, drl_lib='stable_baselines3', env=env, agent='ppo', cwd='./test_ppo_erl'
+              ,total_timesteps=3e4)
