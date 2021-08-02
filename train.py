@@ -3,7 +3,7 @@ from elegantrl.run import *
 import torch 
 import ray
 
-def train_erl(data_dic, drl_lib, env, agent, **kwargs):
+def train(data_dic, drl_lib, env, agent, **kwargs):
     if 'price_ary' in data_dic and 'tech_ary' in data_dic and 'turbulence_ary'\
     in data_dic:
         price_ary = data_dic['price_ary']
@@ -118,13 +118,13 @@ if __name__ == '__main__':
     env = StockTradingEnv
     
     #demo for elegantrl
-    train_erl(data_dic, drl_lib='elegantrl', env=env, agent='ppo', cwd='./test_ppo_erl'
-              ,total_timesteps=3e4)
+    train(data_dic, drl_lib='elegantrl', env=env, agent='ppo', cwd='./test_ppo'
+              ,total_timesteps=3e5)
     
-    '''#demo for rllib
-    train_erl(data_dic, drl_lib='rllib', env=env, agent='ppo', cwd='./test_ppo_erl'
-              ,total_timesteps=3e4)'''
+    #demo for rllib
+    train(data_dic, drl_lib='rllib', env=env, agent='ppo', cwd='./test_ppo'
+              ,total_timesteps=3e5)
     
     #demo for stable-baselines3
-    train_erl(data_dic, drl_lib='stable_baselines3', env=env, agent='ppo', cwd='./test_ppo_erl'
-              ,total_timesteps=3e4)
+    train(data_dic, drl_lib='stable_baselines3', env=env, agent='ppo', cwd='./test_ppo'
+              ,total_timesteps=3e5)
