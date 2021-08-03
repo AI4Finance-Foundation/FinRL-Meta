@@ -41,11 +41,11 @@ def test(data_dic, drl_lib, env, agent, **kwargs):
         
         #load agent
         try:
-            state_dim = env.state_dim
-            action_dim = env.action_dim
+            state_dim = env_instance.state_dim
+            action_dim = env_instance.action_dim
     
             agent = args.agent
-            net_dim = args.net_dim
+            net_dim = net_dimension
     
             agent.init(net_dim, state_dim, action_dim)
             agent.save_load_model(cwd=cwd, if_save=False)
@@ -56,21 +56,22 @@ def test(data_dic, drl_lib, env, agent, **kwargs):
             raise ValueError('Fail to load agent!')
         
         #test on the testing env
-        state = env.reset()
+        _torch = torch
+        state = env_instance.reset()
         episode_returns = list()  # the cumulative_return / initial_account
         with _torch.no_grad():
-            for i in range(env.max_step):
+            for i in range(env_instance.max_step):
                 s_tensor = _torch.as_tensor((state,), device=device)
                 a_tensor = act(s_tensor)  # action_tanh = act.forward()
                 action = a_tensor.detach().cpu().numpy()[0]  # not need detach(), because with torch.no_grad() outside
-                state, reward, done, _ = env.step(action)
+                state, reward, done, _ = env_instance.step(action)
 
-                total_asset = env.amount + (env.price_ary[env.day] * env.stocks).sum()
-                episode_return = total_asset / env.initial_total_asset
+                total_asset = env_instance.amount + (env_instance.price_ary[env_instance.day] * env_instance.stocks).sum()
+                episode_return = total_asset / env_instance.initial_total_asset
                 episode_returns.append(episode_return)
                 if done:
                     break
-        
+        print('Test Finished!')
         #return episode returns on testing data
         return episode_returns
     
@@ -79,7 +80,7 @@ def test(data_dic, drl_lib, env, agent, **kwargs):
             
 if __name__ == '__main__':    
     #fetch data
-    from neo_finrl.data_processors.alpaca_engineer import AlpacaEngineer as AE
+    from neo_finrl.data_processors.processor_alpaca import AlpacaEngineer as AE
     API_KEY = ""
     API_SECRET = ""
     APCA_API_BASE_URL = 'https://paper-api.alpaca.markets'
@@ -103,8 +104,9 @@ if __name__ == '__main__':
     data_dic = {'price_ary':price_ary, 'tech_ary':tech_ary, 'turbulence_ary':turb_ary}
     
     #construct environment
-    from neo_finrl.environments.env_stock_trading.env_stock_alpaca import StockTradingEnv
+    from neo_finrl.env_stock_trading.env_stock_alpaca import StockTradingEnv
     env = StockTradingEnv
     
     #demo for elegantrl
-    test(data_dic, drl_lib='elegantrl', env=env, agent='ppo', cwd='./test_ppo_erl')
+    test(data_dic, drl_lib='elegantrl', env=env, agent='ppo', 
+    cwd='./test_ppo', net_dimension = 2 ** 9)
