@@ -69,9 +69,9 @@ def train(data_dict, drl_lib, env, agent, **kwargs):
             config = ppo.DEFAULT_CONFIG.copy()
             config['env'] = env
             config["log_level"] = "WARN"
-            config['env_config'] = {'price_ary':price_ary,
-                                    'tech_ary':tech_ary,
-                                    'turbulence_ary':turbulence_ary,
+            config['env_config'] = {'price_array':price_array,
+                                    'tech_array':tech_array,
+                                    'turbulence_array':turbulence_array,
                                     'if_train':True}
             trainer = PPOTrainer(env=env, config=config)
             for i in range(total_episodes):
