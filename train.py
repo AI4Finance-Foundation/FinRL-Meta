@@ -98,11 +98,12 @@ def train(data_dic, drl_lib, env, agent, **kwargs):
             
 if __name__ == '__main__':    
     #fetch data
-    from neo_finrl.data_processors.processor_alpaca import AlpacaEngineer as AE
+    from neo_finrl.data_processors.processor_alpaca import AlpacaEngineer as Alpaca
+    #please input your alpaca account info
     API_KEY = ""
     API_SECRET = ""
     APCA_API_BASE_URL = 'https://paper-api.alpaca.markets'
-    AE = AE(API_KEY,
+    Alpaca = Alpaca(API_KEY,
             API_SECRET,
             APCA_API_BASE_URL)
     stock_list = ['FB',  'AMZN', 'AAPL', 'NFLX', 'GOOG']
@@ -111,14 +112,14 @@ if __name__ == '__main__':
     tech_indicator_list = [
             'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',
             'close_30_sma', 'close_60_sma']
-    data = AE.data_fetch(stock_list, start_date, end_date, time_interval = '1Min')
-    data = AE.clean_data(data)
+    data = Alpaca.data_fetch(stock_list, start_date, end_date, time_interval = '1Min')
+    data = Alpaca.clean_data(data)
     print(data)
-    data = AE.add_technical_indicators(data)
+    data = Alpaca.add_technical_indicators(data, tech_indicator_list)
     print(data)
-    data = AE.add_turbulence(data)
+    data = Alpaca.add_turbulence(data)
     print(data)
-    price_ary, tech_ary, turb_ary = AE.df_to_ary(data, tech_indicator_list)
+    price_ary, tech_ary, turb_ary = Alpaca.df_to_ary(data, tech_indicator_list)
     data_dic = {'price_ary':price_ary, 'tech_ary':tech_ary, 'turbulence_ary':turb_ary}
     #construct environment
     from neo_finrl.env_stock_trading.env_stock_alpaca import StockTradingEnv
