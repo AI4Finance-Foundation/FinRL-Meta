@@ -3,22 +3,22 @@ from elegantrl.run import *
 import torch 
 import ray
 
-def train(data_dic, drl_lib, env, agent, **kwargs):
-    if 'price_ary' in data_dic and 'tech_ary' in data_dic and 'turbulence_ary'\
-    in data_dic:
-        price_ary = data_dic['price_ary']
-        tech_ary = data_dic['tech_ary']
-        turbulence_ary = data_dic['turbulence_ary']
-    elif 'price_ary' in data_dic and 'tech_ary' in data_dic and 'turbulence_ary'\
-    not in data_dic:
-        price_ary = data_dic['price_ary']
-        tech_ary = data_dic['tech_ary']
+def train(data_dict, drl_lib, env, agent, **kwargs):
+    if 'price_array' in data_dict and 'tech_array' in data_dict and 'turbulence_array'\
+    in data_dict:
+        price_array = data_dict['price_array']
+        tech_array = data_dict['tech_array']
+        turbulence_array = data_dic['turbulence_array']
+    elif 'price_array' in data_dict and 'tech_array' in data_dict and 'turbulence_array'\
+    not in data_dict:
+        price_array = data_dict['price_array']
+        tech_array = data_dict['tech_array']
     else:
-        raise ValueError('Invalid input data_dic!')
+        raise ValueError('Invalid input data_dict!')
     
-    env_config = {'price_ary':price_ary,
-            'tech_ary':tech_ary,
-            'turbulence_ary':turbulence_ary,
+    env_config = {'price_array':price_array,
+            'tech_array':tech_array,
+            'turbulence_array':turbulence_array,
             'if_train':True}
     env_instance = env(config=env_config)
     
@@ -29,7 +29,9 @@ def train(data_dic, drl_lib, env, agent, **kwargs):
     total_timesteps = kwargs.get('total_timesteps', 1e6)
     net_dimension = kwargs.get('net_dimension', 2**7)
     cwd = kwargs.get('cwd','./'+str(agent))
+    
     if drl_lib == 'elegantrl':
+        
         if agent == 'ppo':
             args = Arguments(agent=AgentPPO(), env=env_instance, if_on_policy=True)
         else:
@@ -53,6 +55,7 @@ def train(data_dic, drl_lib, env, agent, **kwargs):
             args.net_dimension = 2**7
             
         train_and_evaluate(args)
+        
     elif drl_lib == 'rllib':
         ray.init(ignore_reinit_error=True)
         if agent == 'ppo':
@@ -80,6 +83,7 @@ def train(data_dic, drl_lib, env, agent, **kwargs):
                  supported yet.')
             
     elif drl_lib == 'stable_baselines3':
+        
         if agent == 'ppo':
             from stable_baselines3 import PPO
             from stable_baselines3.common.vec_env import DummyVecEnv
@@ -119,20 +123,20 @@ if __name__ == '__main__':
     print(data)
     data = Alpaca.add_turbulence(data)
     print(data)
-    price_ary, tech_ary, turb_ary = Alpaca.df_to_ary(data, tech_indicator_list)
-    data_dic = {'price_ary':price_ary, 'tech_ary':tech_ary, 'turbulence_ary':turb_ary}
+    price_array, tech_array, turb_array = Alpaca.df_to_array(data, tech_indicator_list)
+    data_dict = {'price_array':price_array, 'tech_array':tech_array, 'turbulence_ary':turb_array}
     #construct environment
     from neo_finrl.env_stock_trading.env_stock_alpaca import StockTradingEnv
     env = StockTradingEnv
     
     #demo for elegantrl
-    train(data_dic, drl_lib='elegantrl', env=env, agent='ppo', cwd='./test_ppo'
+    train(data_dict, drl_lib='elegantrl', env=env, agent='ppo', cwd='./test_ppo'
               ,total_timesteps=3e5)
     
     #demo for rllib
-    train(data_dic, drl_lib='rllib', env=env, agent='ppo', cwd='./test_ppo'
+    train(data_dict, drl_lib='rllib', env=env, agent='ppo', cwd='./test_ppo'
               ,total_episodes=1000)
     
     #demo for stable-baselines3
-    train(data_dic, drl_lib='stable_baselines3', env=env, agent='ppo', cwd='./test_ppo'
+    train(data_dict, drl_lib='stable_baselines3', env=env, agent='ppo', cwd='./test_ppo'
               ,total_timesteps=3e5)
