@@ -124,7 +124,7 @@ if __name__ == '__main__':
     data = Alpaca.add_turbulence(data)
     print(data)
     price_array, tech_array, turb_array = Alpaca.df_to_array(data, tech_indicator_list)
-    data_dict = {'price_array':price_array, 'tech_array':tech_array, 'turbulence_ary':turb_array}
+    data_dict = {'price_array':price_array, 'tech_array':tech_array, 'turbulence_array':turb_array}
     #construct environment
     from neo_finrl.env_stock_trading.env_stock_alpaca import StockTradingEnv
     env = StockTradingEnv
