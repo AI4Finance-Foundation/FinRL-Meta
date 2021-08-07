@@ -173,22 +173,22 @@ class AlpacaEngineer():
         df = df.sort_values(["date", "tic"]).reset_index(drop=True)
         return df
 
-    def df_to_ary(self,df,tech_indicator_list):
+    def df_to_array(self,df,tech_indicator_list):
         unique_ticker = df.tic.unique()
         print(unique_ticker)
         if_first_time = True
         for tic in unique_ticker:
             if if_first_time:
-                price_ary = df[df.tic==tic][['close']].values
+                price_array = df[df.tic==tic][['close']].values
                 #price_ary = df[df.tic==tic]['close'].values
-                tech_ary = df[df.tic==tic][tech_indicator_list].values
-                turbulence_ary = df[df.tic==tic]['turbulence'].values
+                tech_array = df[df.tic==tic][tech_indicator_list].values
+                turbulence_array = df[df.tic==tic]['turbulence'].values
                 if_first_time = False
             else:
-                price_ary = np.hstack([price_ary, df[df.tic==tic][['close']].values])
-                tech_ary = np.hstack([tech_ary, df[df.tic==tic][tech_indicator_list].values])
+                price_arary = np.hstack([price_array, df[df.tic==tic][['close']].values])
+                tech_array = np.hstack([tech_array, df[df.tic==tic][tech_indicator_list].values])
         print('Successfully transformed into array')
-        return price_ary,tech_ary,turbulence_ary
+        return price_array,tech_array,turbulence_array
     
     def get_trading_days(self, start, end):
         nyse = tc.get_calendar('NYSE')
