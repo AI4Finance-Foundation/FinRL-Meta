@@ -4,18 +4,22 @@ import torch
 import ray
 
 def train(data_dict, drl_lib, env, agent, **kwargs):
+    #load data
     if 'price_array' in data_dict and 'tech_array' in data_dict and 'turbulence_array'\
     in data_dict:
         price_array = data_dict['price_array']
         tech_array = data_dict['tech_array']
         turbulence_array = data_dic['turbulence_array']
+        
     elif 'price_array' in data_dict and 'tech_array' in data_dict and 'turbulence_array'\
     not in data_dict:
         price_array = data_dict['price_array']
         tech_array = data_dict['tech_array']
+        
     else:
         raise ValueError('Invalid input data_dict!')
     
+    #read parameters
     env_config = {'price_array':price_array,
             'tech_array':tech_array,
             'turbulence_array':turbulence_array,
@@ -30,6 +34,7 @@ def train(data_dict, drl_lib, env, agent, **kwargs):
     net_dimension = kwargs.get('net_dimension', 2**7)
     cwd = kwargs.get('cwd','./'+str(agent))
     
+    #train using different libraries
     if drl_lib == 'elegantrl':
         
         if agent == 'ppo':
@@ -109,7 +114,7 @@ if __name__ == '__main__':
     APCA_API_BASE_URL = 'https://paper-api.alpaca.markets'
     Alpaca = Alpaca(API_KEY,
             API_SECRET,
-            APCA_API_BASE_URL)
+            APCA_API_BASE_URL) #log in alpaca account
     stock_list = ['FB',  'AMZN', 'AAPL', 'NFLX', 'GOOG']
     start_date = '2021-01-01'
     end_date = '2021-01-10'
@@ -125,6 +130,7 @@ if __name__ == '__main__':
     print(data)
     price_array, tech_array, turb_array = Alpaca.df_to_array(data, tech_indicator_list)
     data_dict = {'price_array':price_array, 'tech_array':tech_array, 'turbulence_array':turb_array}
+    
     #construct environment
     from neo_finrl.env_stock_trading.env_stock_alpaca import StockTradingEnv
     env = StockTradingEnv
