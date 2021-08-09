@@ -5,7 +5,7 @@ from stockstats import StockDataFrame as Sdf
 import trading_calendars as tc
 import pytz
 
-class AlpacaEngineer():
+class AlpacaProcessor():
     def __init__(self, API_KEY=None, API_SECRET=None, APCA_API_BASE_URL=None, api=None):
         if api == None:
             try:
@@ -15,8 +15,8 @@ class AlpacaEngineer():
         else:
             self.api = api
             
-    def data_fetch(self,stock_list=['AAPL'], start_date='2021-05-10',
-                   end_date='2021-05-10',time_interval='15Min') -> pd.DataFrame:
+    def fetch_data(self,stock_list, start_date, end_date, 
+                   time_interval) -> pd.DataFrame:
         
         self.start = start_date
         self.end = end_date
