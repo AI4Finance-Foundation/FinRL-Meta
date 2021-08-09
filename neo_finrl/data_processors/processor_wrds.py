@@ -7,12 +7,12 @@ import numpy as np
 from stockstats import StockDataFrame as Sdf
 pd.options.mode.chained_assignment = None 
 
-class WrdsEngineer():
+class WrdsProcessor():
     def __init__(self,if_offline=False):
         if not if_offline:
             self.db = wrds.Connection()
 
-    def data_fetch_ohlcv(self, start, end, stock_list, time_interval, if_save_tempfile=False,
+    def download_data(self, start, end, ticker_list, time_interval, if_save_tempfile=False,
                          filter_shares=0):
         
     
@@ -52,7 +52,7 @@ class WrdsEngineer():
         print(dates)
         first_time = True
         empty = True
-        stock_set = tuple(stock_list)
+        stock_set = tuple(ticker_list)
         for i in dates:            
             x = data_fetch_wrds(i, stock_set, 
                                   time_interval)
@@ -112,7 +112,7 @@ class WrdsEngineer():
                 final_df = final_df.append(data_ohlc.reset_index(),ignore_index=True)
         return final_df
     
-    def data_clean(self, df):
+    def clean_data(self, df):
         df = df[['time', 'open', 'high', 'low', 'close', 'volume', 'tic']]
         # remove 16:00 data
         tic_list = np.unique(df['tic'].values)
@@ -262,22 +262,22 @@ class WrdsEngineer():
         df = df.sort_values(["date", "tic"]).reset_index(drop=True)
         return df
 
-    def df_to_ary(self,df,tech_indicator_list):
+    def df_to_array(self,df,tech_indicator_list):
         unique_ticker = df.tic.unique()
         print(unique_ticker)
         if_first_time = True
         for tic in unique_ticker:
             if if_first_time:
-                price_ary = df[df.tic==tic][['close']].values
+                price_array = df[df.tic==tic][['close']].values
                 #price_ary = df[df.tic==tic]['close'].values
-                tech_ary = df[df.tic==tic][tech_indicator_list].values
-                turbulence_ary = df[df.tic==tic]['turbulence'].values
+                tech_array = df[df.tic==tic][tech_indicator_list].values
+                turbulence_array = df[df.tic==tic]['turbulence'].values
                 if_first_time = False
             else:
-                price_ary = np.hstack([price_ary, df[df.tic==tic][['close']].values])
-                tech_ary = np.hstack([tech_ary, df[df.tic==tic][tech_indicator_list].values])
+                price_array = np.hstack([price_array, df[df.tic==tic][['close']].values])
+                tech_array = np.hstack([tech_array, df[df.tic==tic][tech_indicator_list].values])
         print('Successfully transformed into array')
-        return price_ary,tech_ary,turbulence_ary
+        return price_array, tech_array, turbulence_array
     
 
         
