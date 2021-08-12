@@ -17,18 +17,18 @@ class DataProcessor():
             except:
                 raise ValueError('Please input correct account info for alpaca!')
                 
-        elif data_source == 'ccxt':
-            self.processor = Alpaca
-            
         elif data_source == 'wrds':
             self.processor = Wrds
             
         elif data_source == 'yahoofinance':
             self.processor = YahooFinance
+        
+        else:
+            raise ValueError('Data source input is NOT supported yet.')
     
     def download_data(self, ticker_list, start_date, end_date, 
                       time_interval='1D') -> pd.DataFrame:
-        df = self.processor.data_fetch(self, ticker_list, start_date, end_date,
+        df = self.processor.download_data(ticker_list, start_date, end_date,
                                        time_interval)
         return df
     
