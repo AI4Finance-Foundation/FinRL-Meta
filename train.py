@@ -2,22 +2,21 @@ from elegantrl.agent import *
 from elegantrl.run import *
 import torch 
 import ray
+from neo_finrl.data_processor import DataProcessor
 
-def train(data_dict, drl_lib, env, agent, **kwargs):
-    #load data
-    if 'price_array' in data_dict and 'tech_array' in data_dict and 'turbulence_array'\
-    in data_dict:
-        price_array = data_dict['price_array']
-        tech_array = data_dict['tech_array']
-        turbulence_array = data_dic['turbulence_array']
-        
-    elif 'price_array' in data_dict and 'tech_array' in data_dict and 'turbulence_array'\
-    not in data_dict:
-        price_array = data_dict['price_array']
-        tech_array = data_dict['tech_array']
-        
-    else:
-        raise ValueError('Invalid input data_dict!')
+def train(start_date, end_date, ticker_list, data_source, time_interval, 
+          technical_indicator_list, drl_lib, env, agent, if_vix = True,
+          **kwargs):
+    
+    #fetch data
+    DP = DataProcessor(data_source, **kwargs)
+    data = DP.download_data(ticker_list, start_date, end_date, time_interval)
+    data = DP.clean_data(data)
+    data = DP.add_technical_indicator(data, technical_indicator_list)
+    if if_vix:
+        data = DP.add_vix(data)
+    print(data)
+    price_array, tech_array, turbulence_array = DP.df_to_array(data, if_vix)
     
     #read parameters
     env_config = {'price_array':price_array,
@@ -106,43 +105,33 @@ def train(data_dict, drl_lib, env, agent, **kwargs):
         raise ValueError('DRL library input is NOT supported. Please check.')
             
 if __name__ == '__main__':    
-    #fetch data
-    from neo_finrl.data_processors.processor_alpaca import AlpacaEngineer as Alpaca
-    #please input your alpaca account info
-    API_KEY = ""
-    API_SECRET = ""
-    APCA_API_BASE_URL = 'https://paper-api.alpaca.markets'
-    Alpaca = Alpaca(API_KEY,
-            API_SECRET,
-            APCA_API_BASE_URL) #log in alpaca account
-    stock_list = ['FB',  'AMZN', 'AAPL', 'NFLX', 'GOOG']
-    start_date = '2021-01-01'
-    end_date = '2021-01-10'
-    tech_indicator_list = [
-            'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',
-            'close_30_sma', 'close_60_sma']
-    data = Alpaca.data_fetch(stock_list, start_date, end_date, time_interval = '1Min')
-    data = Alpaca.clean_data(data)
-    print(data)
-    data = Alpaca.add_technical_indicators(data, tech_indicator_list)
-    print(data)
-    data = Alpaca.add_turbulence(data)
-    print(data)
-    price_array, tech_array, turb_array = Alpaca.df_to_array(data, tech_indicator_list)
-    data_dict = {'price_array':price_array, 'tech_array':tech_array, 'turbulence_array':turb_array}
+    
+    from neo_finrl.config import FAANG_TICKER
+    from neo_finrl.config import TECHNICAL_INDICATORS_LIST
+    from neo_finrl.config import TEST_START_DATE
+    from neo_finrl.config import TEST_END_DATE
     
     #construct environment
     from neo_finrl.env_stock_trading.env_stock_alpaca import StockTradingEnv
     env = StockTradingEnv
-    
+
     #demo for elegantrl
-    train(data_dict, drl_lib='elegantrl', env=env, agent='ppo', cwd='./test_ppo'
-              ,total_timesteps=3e5)
+    train(start_date = TEST_START_DATE, end_date = TEST_END_DATE,
+          ticker_list = FAANG_TICKER, data_source = 'yahoofinance',
+          time_interval= '1D', technical_indicator_list= TECHNICAL_INDICATORS_LIST,
+          drl_lib='elegantrl', env=env, agent='ppo', cwd='./test_ppo'
+          ,total_timesteps=3e5)
     
     #demo for rllib
-    train(data_dict, drl_lib='rllib', env=env, agent='ppo', cwd='./test_ppo'
-              ,total_episodes=1000)
+    train(start_date = TEST_START_DATE, end_date = TEST_END_DATE,
+          ticker_list = FAANG_TICKER, data_source = 'yahoofinance',
+          time_interval= '1D', technical_indicator_list= TECHNICAL_INDICATORS_LIST,
+          drl_lib='rllib', env=env, agent='ppo', cwd='./test_ppo'
+          ,total_episodes=1000)
     
     #demo for stable-baselines3
-    train(data_dict, drl_lib='stable_baselines3', env=env, agent='ppo', cwd='./test_ppo'
-              ,total_timesteps=3e5)
+    train(start_date = TEST_START_DATE, end_date = TEST_END_DATE,
+          ticker_list = FAANG_TICKER, data_source = 'yahoofinance',
+          time_interval= '1D', technical_indicator_list= TECHNICAL_INDICATORS_LIST,
+          drl_lib='stable_baselines3', env=env, agent='ppo', cwd='./test_ppo'
+          ,total_timesteps=3e5)
