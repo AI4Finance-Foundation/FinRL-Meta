@@ -2,7 +2,7 @@ from elegantrl.agent import *
 from elegantrl.run import *
 import torch 
 
-def trade(data_dic, drl_lib, env, agent, **kwargs, mode='backtesting'):
+def trade(data_dic, drl_lib, env, agent, mode='backtesting', **kwargs):
     
     if mode == 'backtesting':
         if 'price_ary' in data_dic and 'tech_ary' in data_dic and 'turbulence_ary'\
@@ -71,6 +71,8 @@ def trade(data_dic, drl_lib, env, agent, **kwargs, mode='backtesting'):
             #return episode returns on testing data
             return episode_returns
 
+    elif mode == 'paper_trading':
+        
         #trade using rllib
         elif drl_lib == 'rllib':
             #load agent

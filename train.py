@@ -15,7 +15,6 @@ def train(start_date, end_date, ticker_list, data_source, time_interval,
     data = DP.add_technical_indicator(data, technical_indicator_list)
     if if_vix:
         data = DP.add_vix(data)
-    print(data)
     price_array, tech_array, turbulence_array = DP.df_to_array(data, if_vix)
     
     #read parameters
@@ -112,7 +111,7 @@ if __name__ == '__main__':
     from neo_finrl.config import TEST_END_DATE
     
     #construct environment
-    from neo_finrl.env_stock_trading.env_stock_alpaca import StockTradingEnv
+    from neo_finrl.env_stock_trading.env_stock_trading import StockTradingEnv
     env = StockTradingEnv
 
     #demo for elegantrl

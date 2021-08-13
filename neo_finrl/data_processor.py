@@ -13,23 +13,25 @@ class DataProcessor():
                 API_SECRET= kwargs.get('API_SECRET')
                 APCA_API_BASE_URL= kwargs.get('APCA_API_BASE_URL')
                 self.processor = Alpaca(API_KEY, API_SECRET, APCA_API_BASE_URL)
-                print('alpaca successfully connect')
+                print('Alpaca successfully connected')
             except:
                 raise ValueError('Please input correct account info for alpaca!')
                 
         elif data_source == 'wrds':
-            self.processor = Wrds
+            self.processor = Wrds()
             
         elif data_source == 'yahoofinance':
-            self.processor = YahooFinance
+            self.processor = YahooFinance()
         
         else:
             raise ValueError('Data source input is NOT supported yet.')
     
     def download_data(self, ticker_list, start_date, end_date, 
-                      time_interval='1D') -> pd.DataFrame:
-        df = self.processor.download_data(ticker_list, start_date, end_date,
-                                       time_interval)
+                      time_interval) -> pd.DataFrame:
+        df = self.processor.download_data(ticker_list = ticker_list, 
+                                          start_date = start_date, 
+                                          end_date = end_date,
+                                          time_interval = time_interval)
         return df
     
     def clean_data(self, df) -> pd.DataFrame:
@@ -37,7 +39,8 @@ class DataProcessor():
         
         return df
     
-    def add_technical_indicators(self, df, tech_indicator_list) -> pd.DataFrame:
+    def add_technical_indicator(self, df, tech_indicator_list) -> pd.DataFrame:
+        self.tech_indicator_list = tech_indicator_list
         df = self.processor.add_technical_indicator(df, tech_indicator_list)
         
         return df
@@ -47,8 +50,15 @@ class DataProcessor():
         
         return df
     
-    def df_to_array(self, df) -> np.array:
-        price_array,tech_array,turbulence_array = self.df_to_array(df)
+    def add_vix(self, df) -> pd.DataFrame:
+        df = self.processor.add_vix(df)
+        
+        return df
+    
+    def df_to_array(self, df, if_vix) -> np.array:
+        price_array,tech_array,turbulence_array = self.processor.df_to_array(df,
+                                                self.tech_indicator_list,
+                                                if_vix)
         
         return price_array,tech_array,turbulence_array
         

@@ -12,11 +12,14 @@ class WrdsProcessor():
         if not if_offline:
             self.db = wrds.Connection()
 
-    def download_data(self, start, end, ticker_list, time_interval, if_save_tempfile=False,
+    def download_data(self, start_date, end_date, ticker_list, time_interval, if_save_tempfile=False,
                          filter_shares=0):
         
     
-    
+        self.start = start_date
+        self.end = end_date
+        self.time_interval = time_interval
+        
         def get_trading_days(start, end):
             nyse = tc.get_calendar('NYSE')
             df = nyse.sessions_in_range(pd.Timestamp(start,tz=pytz.UTC),
@@ -47,7 +50,7 @@ class WrdsProcessor():
                 if_empty = True
                 return None, if_empty
             
-        dates = get_trading_days(start, end)
+        dates = get_trading_days(start_date, end_date)
         print('Trading days: ')
         print(dates)
         first_time = True
@@ -179,7 +182,7 @@ class WrdsProcessor():
         print('Data clean finished')
         return df
     
-    def add_technical_indicators(self, df, tech_indicator_list = [
+    def add_technical_indicator(self, df, tech_indicator_list = [
             'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',
             'close_30_sma', 'close_60_sma']):
         df = df.rename(columns={'time':'date'})
@@ -260,6 +263,17 @@ class WrdsProcessor():
         turbulence_index = self.calculate_turbulence(df, time_period=time_period)
         df = df.merge(turbulence_index, on="date")
         df = df.sort_values(["date", "tic"]).reset_index(drop=True)
+        return df
+
+    def add_vix(self, data):
+        vix_df = self.download_data(['vix'], self.start, self.end_date, self.time_interval)
+        cleaned_vix = self.clean_data(vix_df)
+        vix = cleaned_vix[['date','close']]
+        
+        df = data.copy()
+        df = df.merge(vix, on="date")
+        df = df.sort_values(["date", "tic"]).reset_index(drop=True)
+        
         return df
 
     def df_to_array(self,df,tech_indicator_list):
