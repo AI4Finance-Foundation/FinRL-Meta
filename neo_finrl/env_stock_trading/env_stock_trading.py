@@ -53,6 +53,7 @@ class StockTradingEnv(gym.Env):
         self.stocks_cd = None
         self.action_dim = stock_dim
         self.max_step = self.price_ary.shape[0] - 1
+        self.if_train = if_train
         self.if_discrete = False
         self.target_return = 2.2
         self.episode_return = 0.0
@@ -63,10 +64,15 @@ class StockTradingEnv(gym.Env):
     def reset(self):
         self.day = 0
         price = self.price_ary[self.day]
-
-        self.stocks = (self.initial_stocks + rd.randint(0, 64, size=self.initial_stocks.shape)).astype(np.float32)
-        self.stocks_cd = np.zeros_like(self.stocks)
-        self.amount = self.initial_capital * rd.uniform(0.95, 1.05) - (self.stocks * price).sum()
+        
+        if self.if_train:
+            self.stocks = (self.initial_stocks + rd.randint(0, 64, size=self.initial_stocks.shape)).astype(np.float32)
+            self.stocks_cd = np.zeros_like(self.stocks)
+            self.amount = self.initial_capital * rd.uniform(0.95, 1.05) - (self.stocks * price).sum()
+        else:
+            self.stocks = self.initial_stocks.astype(np.float32)
+            self.stocks_cd = np.zeros_like(self.stocks)
+            self.amount = self.initial_capital
 
         self.total_asset = self.amount + (self.stocks * price).sum()
         self.initial_total_asset = self.total_asset

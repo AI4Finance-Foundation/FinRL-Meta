@@ -107,29 +107,29 @@ if __name__ == '__main__':
     
     from neo_finrl.config import FAANG_TICKER
     from neo_finrl.config import TECHNICAL_INDICATORS_LIST
-    from neo_finrl.config import TEST_START_DATE
-    from neo_finrl.config import TEST_END_DATE
+    from neo_finrl.config import TRAIN_START_DATE
+    from neo_finrl.config import TRAIN_END_DATE
     
     #construct environment
     from neo_finrl.env_stock_trading.env_stock_trading import StockTradingEnv
     env = StockTradingEnv
 
     #demo for elegantrl
-    train(start_date = TEST_START_DATE, end_date = TEST_END_DATE,
+    train(start_date = TRAIN_START_DATE, end_date = TRAIN_END_DATE,
           ticker_list = FAANG_TICKER, data_source = 'yahoofinance',
           time_interval= '1D', technical_indicator_list= TECHNICAL_INDICATORS_LIST,
           drl_lib='elegantrl', env=env, agent='ppo', cwd='./test_ppo'
           ,total_timesteps=3e5)
     
     #demo for rllib
-    train(start_date = TEST_START_DATE, end_date = TEST_END_DATE,
+    train(start_date = TRAIN_START_DATE, end_date = TRAIN_END_DATE,
           ticker_list = FAANG_TICKER, data_source = 'yahoofinance',
           time_interval= '1D', technical_indicator_list= TECHNICAL_INDICATORS_LIST,
           drl_lib='rllib', env=env, agent='ppo', cwd='./test_ppo'
           ,total_episodes=1000)
     
     #demo for stable-baselines3
-    train(start_date = TEST_START_DATE, end_date = TEST_END_DATE,
+    train(start_date = TRAIN_START_DATE, end_date = TRAIN_END_DATE,
           ticker_list = FAANG_TICKER, data_source = 'yahoofinance',
           time_interval= '1D', technical_indicator_list= TECHNICAL_INDICATORS_LIST,
           drl_lib='stable_baselines3', env=env, agent='ppo', cwd='./test_ppo'

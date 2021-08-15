@@ -1,31 +1,26 @@
 from elegantrl.agent import *
 from elegantrl.run import *
 import torch 
+from neo_finrl.data_processor import DataProcessor
 
-def test(data_dic, drl_lib, env, agent, **kwargs):
-    if 'price_ary' in data_dic and 'tech_ary' in data_dic and 'turbulence_ary'\
-    in data_dic:
-        price_ary = data_dic['price_ary']
-        tech_ary = data_dic['tech_ary']
-        turbulence_ary = data_dic['turbulence_ary']
-    elif 'price_ary' in data_dic and 'tech_ary' in data_dic and 'turbulence_ary'\
-    not in data_dic:
-        price_ary = data_dic['price_ary']
-        tech_ary = data_dic['tech_ary']
-    else:
-        raise ValueError('Invalid input data_dic!')
+def test(start_date, end_date, ticker_list, data_source, time_interval, 
+         technical_indicator_list, drl_lib, env, agent, if_vix = True,
+         **kwargs):
+    #fetch data
+    DP = DataProcessor(data_source, **kwargs)
+    data = DP.download_data(ticker_list, start_date, end_date, time_interval)
+    data = DP.clean_data(data)
+    data = DP.add_technical_indicator(data, technical_indicator_list)
+    if if_vix:
+        data = DP.add_vix(data)
+    price_array, tech_array, turbulence_array = DP.df_to_array(data, if_vix)
     
-    env_config = {'price_ary':price_ary,
-            'tech_ary':tech_ary,
-            'turbulence_ary':turbulence_ary,
+    env_config = {'price_ary':price_array,
+            'tech_ary':tech_array,
+            'turbulence_ary':turbulence_array,
             'if_train':False}
     env_instance = env(config=env_config)
     
-    learning_rate = kwargs.get('learning_rate', 0.00025)
-    batch_size = kwargs.get('batch_size', 2**7)
-    gamma = kwargs.get('gamma', 0.99)
-    seed = kwargs.get('seed', 312)
-    total_timesteps = kwargs.get('total_timesteps', 1e6)
     net_dimension = kwargs.get('net_dimension', 2**7)
     cwd = kwargs.get('cwd','./'+str(agent))
 
@@ -83,9 +78,9 @@ def test(data_dic, drl_lib, env, agent, **kwargs):
         config = ppo.DEFAULT_CONFIG.copy()
         config['env'] = env
         config["log_level"] = "WARN"
-        config['env_config'] = {'price_ary':price_ary,
-                                'tech_ary':tech_ary,
-                                'turbulence_ary':turbulence_ary,
+        config['env_config'] = {'price_ary':price_array,
+                                'tech_ary':tech_array,
+                                'turbulence_ary':turbulence_array,
                                 'if_train':False}
         
         trainer = PPOTrainer(env=env, config=config)
@@ -141,42 +136,32 @@ def test(data_dic, drl_lib, env, agent, **kwargs):
         raise ValueError('DRL library input is NOT supported yet. Please check.')
             
 if __name__ == '__main__':    
-    #fetch data
-    from neo_finrl.data_processors.processor_alpaca import AlpacaEngineer as AE
-    API_KEY = ""
-    API_SECRET = ""
-    APCA_API_BASE_URL = 'https://paper-api.alpaca.markets'
-    AE = AE(API_KEY,
-            API_SECRET,
-            APCA_API_BASE_URL)
-    stock_list = ['FB',  'AMZN', 'AAPL', 'NFLX', 'GOOG']
-    start_date = '2021-01-10'
-    end_date = '2021-01-20'
-    tech_indicator_list = [
-            'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',
-            'close_30_sma', 'close_60_sma']
-    data = AE.data_fetch(stock_list, start_date, end_date, time_interval = '1Min')
-    data = AE.clean_data(data)
-    print(data)
-    data = AE.add_technical_indicators(data)
-    print(data)
-    data = AE.add_turbulence(data)
-    print(data)
-    price_ary, tech_ary, turb_ary = AE.df_to_ary(data, tech_indicator_list)
-    data_dic = {'price_ary':price_ary, 'tech_ary':tech_ary, 'turbulence_ary':turb_ary}
+    from neo_finrl.config import FAANG_TICKER
+    from neo_finrl.config import TECHNICAL_INDICATORS_LIST
+    from neo_finrl.config import TEST_START_DATE
+    from neo_finrl.config import TEST_END_DATE
     
     #construct environment
-    from neo_finrl.env_stock_trading.env_stock_alpaca import StockTradingEnv
+    from neo_finrl.env_stock_trading.env_stock_trading import StockTradingEnv
     env = StockTradingEnv
     
     #demo for elegantrl
-    test(data_dic, drl_lib='elegantrl', env=env, agent='ppo', 
-    cwd='./test_ppo', net_dimension = 2 ** 9)
+    test(start_date = TEST_START_DATE, end_date = TEST_END_DATE,
+         ticker_list = FAANG_TICKER, data_source = 'yahoofinance',
+         time_interval= '1D', technical_indicator_list= TECHNICAL_INDICATORS_LIST,
+         drl_lib='elegantrl', env=env, agent='ppo', 
+         cwd='./test_ppo', net_dimension = 2 ** 9)
     
     #demo for rllib 
-    test(data_dic, drl_lib='rllib', env=env, agent='ppo', 
-    cwd='./test_ppo/checkpoint_000010/checkpoint-10')
+    test(start_date = TEST_START_DATE, end_date = TEST_END_DATE,
+         ticker_list = FAANG_TICKER, data_source = 'yahoofinance',
+         time_interval= '1D', technical_indicator_list= TECHNICAL_INDICATORS_LIST,
+         drl_lib='rllib', env=env, agent='ppo', 
+         cwd='./test_ppo/checkpoint_000010/checkpoint-10')
 
     #demo for stable baselines3 
-    test(data_dic, drl_lib='stable_baselines3', env=env, agent='ppo', 
-    cwd='./test_ppo.zip')
+    test(start_date = TEST_START_DATE, end_date = TEST_END_DATE,
+         ticker_list = FAANG_TICKER, data_source = 'yahoofinance',
+         time_interval= '1D', technical_indicator_list= TECHNICAL_INDICATORS_LIST, 
+         drl_lib='stable_baselines3', env=env, agent='ppo', 
+         cwd='./test_ppo.zip')
