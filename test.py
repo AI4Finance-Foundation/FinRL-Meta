@@ -78,9 +78,9 @@ def test(start_date, end_date, ticker_list, data_source, time_interval,
         config = ppo.DEFAULT_CONFIG.copy()
         config['env'] = env
         config["log_level"] = "WARN"
-        config['env_config'] = {'price_ary':price_array,
-                                'tech_ary':tech_array,
-                                'turbulence_ary':turbulence_array,
+        config['env_config'] = {'price_array':price_array,
+                                'tech_array':tech_array,
+                                'turbulence_array':turbulence_array,
                                 'if_train':False}
         
         trainer = PPOTrainer(env=env, config=config)
@@ -157,7 +157,7 @@ if __name__ == '__main__':
          ticker_list = FAANG_TICKER, data_source = 'yahoofinance',
          time_interval= '1D', technical_indicator_list= TECHNICAL_INDICATORS_LIST,
          drl_lib='rllib', env=env, agent='ppo', 
-         cwd='./test_ppo/checkpoint_000010/checkpoint-10')
+         cwd='./test_ppo/checkpoint_000100/checkpoint-100')
 
     #demo for stable baselines3 
     test(start_date = TEST_START_DATE, end_date = TEST_END_DATE,
