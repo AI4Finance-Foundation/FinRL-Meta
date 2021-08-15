@@ -15,9 +15,9 @@ def test(start_date, end_date, ticker_list, data_source, time_interval,
         data = DP.add_vix(data)
     price_array, tech_array, turbulence_array = DP.df_to_array(data, if_vix)
     
-    env_config = {'price_ary':price_array,
-            'tech_ary':tech_array,
-            'turbulence_ary':turbulence_array,
+    env_config = {'price_array':price_array,
+            'tech_array':tech_array,
+            'turbulence_array':turbulence_array,
             'if_train':False}
     env_instance = env(config=env_config)
     
