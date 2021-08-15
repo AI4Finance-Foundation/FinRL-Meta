@@ -18,7 +18,7 @@ def trade(start_date, end_date, ticker_list, data_source, time_interval,
         price_array, tech_array, turbulence_array = DP.df_to_array(data, if_vix)
         
         env_config = {'price_array':price_array,
-                'tech_arary':tech_array,
+                'tech_array':tech_array,
                 'turbulence_array':turbulence_array,
                 'if_train':False}
         env_instance = env(config=env_config)
@@ -161,19 +161,19 @@ if __name__ == '__main__':
           drl_lib='elegantrl', env=env, agent='ppo', 
           cwd='./test_ppo', net_dimension = 2 ** 9)
     
-    #demo for rllib
+    #demo for rllib 
     trade(start_date = TRADE_START_DATE, end_date = TRADE_END_DATE,
-          ticker_list = FAANG_TICKER, data_source = 'yahoofinance',
-          time_interval= '1D', technical_indicator_list= TECHNICAL_INDICATORS_LIST,
-          drl_lib='rllib', env=env, agent='ppo', 
-          cwd='./test_ppo', net_dimension = 2 ** 9)
+         ticker_list = FAANG_TICKER, data_source = 'yahoofinance',
+         time_interval= '1D', technical_indicator_list= TECHNICAL_INDICATORS_LIST,
+         drl_lib='rllib', env=env, agent='ppo', 
+         cwd='./test_ppo/checkpoint_000100/checkpoint-100')
     
     #demo for stable-baselines3
     trade(start_date = TRADE_START_DATE, end_date = TRADE_END_DATE,
           ticker_list = FAANG_TICKER, data_source = 'yahoofinance',
           time_interval= '1D', technical_indicator_list= TECHNICAL_INDICATORS_LIST,
-          drl_lib='stable_baseline3', env=env, agent='ppo', 
-          cwd='./test_ppo', net_dimension = 2 ** 9)
+          drl_lib='stable_baselines3', env=env, agent='ppo', 
+          cwd='./test_ppo.zip', net_dimension = 2 ** 9)
 
 
 
