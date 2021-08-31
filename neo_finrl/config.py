@@ -5,7 +5,7 @@ TEST_START_DATE = '2020-01-01'
 TEST_END_DATE = '2020-12-31'
 
 TRADE_START_DATE = '2021-01-01'
-TRADE_END_DATE = '2021-07-31'
+TRADE_START_DATE = '2021-07-31'
 
 TECHNICAL_INDICATORS_LIST = ['macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',
                              'close_30_sma', 'close_60_sma']
@@ -14,6 +14,39 @@ FAANG_TICKER = ['FB',  'AMZN', 'AAPL', 'NFLX', 'GOOG']
 
 # Dow 30 constituents at 2019/01
 DOW_30_TICKER = [
+    "AXP",
+    "AMGN",
+    "AAPL",
+    "BA",
+    "CAT",
+    "CSCO",
+    "CVX",
+    "GS",
+    "HD",
+    "HON",
+    "IBM",
+    "INTC",
+    "JNJ",
+    "KO",
+    "JPM",
+    "MCD",
+    "MMM",
+    "MRK",
+    "MSFT",
+    "NKE",
+    "PG",
+    "TRV",
+    "UNH",
+    "CRM",
+    "VZ",
+    "V",
+    "WBA",
+    "WMT",
+    "DIS",
+    "DOW"
+]
+
+DOW_30_TICKER_2019 = [
     "AAPL",
     "MSFT",
     "JPM",
