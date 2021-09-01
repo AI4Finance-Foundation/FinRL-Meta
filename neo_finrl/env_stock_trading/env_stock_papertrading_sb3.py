@@ -9,7 +9,7 @@ import torch
 import sys
 import os
 
-class AlpacaPaperTrading():
+class AlpacaPaperTrading_sb3():
 
     def __init__(self,ticker_list, time_interval, agent, cwd, net_dim, 
                  state_dim, action_dim, API_KEY, API_SECRET, 

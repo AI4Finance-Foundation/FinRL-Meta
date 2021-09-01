@@ -8,46 +8,24 @@ import numpy as np
 import torch
 import sys
 import os
-import gym 
 
-class StockEnvEmpty(gym.Env):
-    #Empty Env used for loading rllib agent
-    def __init__(self,config):
-      state_dim = config['state_dim']
-      action_dim = config['action_dim']
-      self.observation_space = gym.spaces.Box(low=-3000, high=3000, shape=(state_dim,), dtype=np.float32)
-      self.action_space = gym.spaces.Box(low=-1, high=1, shape=(action_dim,), dtype=np.float32)
-        
-    def reset(self):
-        return 
-
-    def step(self, actions):
-        return
-    
-class AlpacaPaperTrading_rllib():
+class AlpacaPaperTrading_erl():
 
     def __init__(self,ticker_list, time_interval, agent, cwd, net_dim, 
                  state_dim, action_dim, API_KEY, API_SECRET, 
-                 APCA_API_BASE_URL, tech_indicator_list, turbulence_thresh=30, max_stock=1e2):
+                 APCA_API_BASE_URL, tech_indicator_list, turbulence_thresh=30, 
+                 max_stock=1e2, latency = None):
         #load agent
-        print('agent', agent)
         if agent =='ppo':
-            #load agent
-            from ray.rllib.agents import ppo
-            from ray.rllib.agents.ppo.ppo import PPOTrainer
-            config = ppo.DEFAULT_CONFIG.copy()
-            config['env'] = StockEnvEmpty
-            config["log_level"] = "WARN"
-            config['env_config'] = {'state_dim':state_dim,
-                        'action_dim':action_dim,}
-            trainer = PPOTrainer(env=StockEnvEmpty, config=config)
-            trainer.restore(cwd)
             try:
-                trainer.restore(cwd)
-                self.agent = trainer
-                print("Restoring from checkpoint path", cwd)
+                from elegantrl.agent import AgentPPO
+                agent = AgentPPO()
+                agent.init(net_dim, state_dim, action_dim)
+                agent.save_load_model(cwd=cwd, if_save=False)
+                self.act = agent.act
+                self.device = agent.device
             except:
-                raise ValueError('Fail to load agent!')
+                raise ValueError('Fail to load the agent! Please check path, state dimension and action_dimension.')
                 
         else:
             raise ValueError('Agent input is NOT supported yet.')
@@ -87,6 +65,18 @@ class AlpacaPaperTrading_rllib():
         self.stockUniverse = ticker_list
         self.turbulence_bool = 0
         self.equities = []
+        
+    def test_latency(self, test_times = 10):
+        total_time = 0
+        for i in range(0, test_times):
+            time0 = time.time()
+            self.get_state()
+            time1 = time.time()
+            temp_time = time1 - time0
+            total_time += temp_time
+        latency = total_time/test_times
+        print('latency for data processing: ', latency)
+        return latency
         
     def run(self):
         orders = self.alpaca.list_orders(status="open")
@@ -138,7 +128,6 @@ class AlpacaPaperTrading_rllib():
             last_equity = float(self.alpaca.get_account().last_equity)
             cur_time = time.time()
             self.equities.append([cur_time,last_equity])
-            np.save('paper_trading_records.npy', np.asarray(self.equities, dtype = float))
             time.sleep(self.time_interval)
             
     def awaitMarketOpen(self):
@@ -154,7 +143,11 @@ class AlpacaPaperTrading_rllib():
     
     def trade(self):
         state = self.get_state()
-        action = self.agent.compute_single_action(state)
+        with torch.no_grad():
+            s_tensor = torch.as_tensor((state,), device=self.device)
+            a_tensor = self.act(s_tensor)  
+            action = a_tensor.detach().cpu().numpy()[0]  
+            
         action = (action * self.max_stock).astype(int)
         
         self.stocks_cd += 1
