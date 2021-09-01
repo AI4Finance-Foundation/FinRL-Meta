@@ -8,26 +8,46 @@ import numpy as np
 import torch
 import sys
 import os
+import gym 
 
+class StockEnvEmpty(gym.Env):
+    #Empty Env used for loading rllib agent
+    def __init__(self,config):
+      state_dim = config['state_dim']
+      action_dim = config['action_dim']
+      self.observation_space = gym.spaces.Box(low=-3000, high=3000, shape=(state_dim,), dtype=np.float32)
+      self.action_space = gym.spaces.Box(low=-1, high=1, shape=(action_dim,), dtype=np.float32)
+        
+    def reset(self):
+        return 
+
+    def step(self, actions):
+        return
+    
 class AlpacaPaperTrading():
 
-    def __init__(self,ticker_list, time_interval, agent, cwd, train_env, net_dim, 
+    def __init__(self,ticker_list, time_interval, agent, cwd, net_dim, 
                  state_dim, action_dim, API_KEY, API_SECRET, 
                  APCA_API_BASE_URL, tech_indicator_list, turbulence_thresh=30, max_stock=1e2):
         #load agent
+        print('agent', agent)
         if agent =='ppo':
             #load agent
             from ray.rllib.agents import ppo
             from ray.rllib.agents.ppo.ppo import PPOTrainer
             config = ppo.DEFAULT_CONFIG.copy()
-            trainer = PPOTrainer(env=train_env, config=config)
+            config['env'] = StockEnvEmpty
+            config["log_level"] = "WARN"
+            config['env_config'] = {'state_dim':state_dim,
+                        'action_dim':action_dim,}
+            trainer = PPOTrainer(env=StockEnvEmpty, config=config)
             trainer.restore(cwd)
-        try:
-            trainer.restore(cwd)
-            self.agent = trainer
-            print("Restoring from checkpoint path", cwd)
-        except:
-            raise ValueError('Fail to load agent!')
+            try:
+                trainer.restore(cwd)
+                self.agent = trainer
+                print("Restoring from checkpoint path", cwd)
+            except:
+                raise ValueError('Fail to load agent!')
                 
         else:
             raise ValueError('Agent input is NOT supported yet.')
