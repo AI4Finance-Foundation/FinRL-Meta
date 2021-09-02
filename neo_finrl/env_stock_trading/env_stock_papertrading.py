@@ -13,7 +13,8 @@ class AlpacaPaperTrading():
 
     def __init__(self,ticker_list, time_interval, agent, cwd, net_dim, 
                  state_dim, action_dim, API_KEY, API_SECRET, 
-                 APCA_API_BASE_URL, tech_indicator_list, turbulence_thresh=30, max_stock=1e2):
+                 APCA_API_BASE_URL, tech_indicator_list, turbulence_thresh=30, 
+                 max_stock=1e2, latency = None):
         #load agent
         if agent =='ppo':
             try:
@@ -65,6 +66,18 @@ class AlpacaPaperTrading():
         self.turbulence_bool = 0
         self.equities = []
         
+    def test_latency(self, test_times = 10):
+        total_time = 0
+        for i in range(0, test_times):
+            time0 = time.time()
+            self.get_state()
+            time1 = time.time()
+            temp_time = time1 - time0
+            total_time += temp_time
+        latency = total_time/test_times
+        print('latency for data processing: ', latency)
+        return latency
+        
     def run(self):
         orders = self.alpaca.list_orders(status="open")
         for order in orders:
@@ -115,7 +128,6 @@ class AlpacaPaperTrading():
             last_equity = float(self.alpaca.get_account().last_equity)
             cur_time = time.time()
             self.equities.append([cur_time,last_equity])
-            np.save('paper_trading_records2.npy', np.asarray(self.equities, dtype = float))
             time.sleep(self.time_interval)
             
     def awaitMarketOpen(self):

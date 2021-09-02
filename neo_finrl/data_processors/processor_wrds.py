@@ -285,13 +285,13 @@ class WrdsProcessor():
                 price_array = df[df.tic==tic][['close']].values
                 #price_ary = df[df.tic==tic]['close'].values
                 tech_array = df[df.tic==tic][tech_indicator_list].values
-                turbulence_array = df[df.tic==tic]['turbulence'].values
+                risk_array = df[df.tic==tic]['turbulence'].values
                 if_first_time = False
             else:
                 price_array = np.hstack([price_array, df[df.tic==tic][['close']].values])
                 tech_array = np.hstack([tech_array, df[df.tic==tic][tech_indicator_list].values])
         print('Successfully transformed into array')
-        return price_array, tech_array, turbulence_array
+        return price_array, tech_array, risk_array
     
 
         

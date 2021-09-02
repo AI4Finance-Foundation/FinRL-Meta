@@ -5,11 +5,11 @@ import calendar
 from datetime import datetime
 from stockstats import StockDataFrame as Sdf
 
-class CCXTEngineer():
+class CCXTProcessor():
     def __init__(self):
         self.binance = ccxt.binance()
         
-    def data_fetch(self,start, end, pair_list = ['BTC/USDT'], period = '1m'):
+    def download_data(self,start_date, end_date, ticker_list = ['BTC/USDT'], time_interval = '1m'):
         def min_ohlcv(dt, pair, limit):
             since = calendar.timegm(dt.utctimetuple())*1000
             ohlcv = self.binance.fetch_ohlcv(symbol=pair, timeframe='1m', since=since, limit=limit)
@@ -18,18 +18,18 @@ class CCXTEngineer():
         def ohlcv(dt, pair, period='1d'):
             ohlcv = []
             limit = 1000
-            if period == '1m':
+            if period == '1Min':
                 limit = 720
-            elif period == '1d':
+            elif period == '1D':
                 limit = 1
-            elif period == '1h':
+            elif period == '1H':
                 limit = 24
-            elif period == '5m':
+            elif period == '5Min':
                 limit = 288
             for i in dt:
                 start_dt = i
                 since = calendar.timegm(start_dt.utctimetuple())*1000
-                if period == '1m':
+                if period == '1Min':
                     ohlcv.extend(min_ohlcv(start_dt, pair, limit))
                 else:
                     ohlcv.extend(self.binance.fetch_ohlcv(symbol=pair, timeframe=period, since=since, limit=limit))
@@ -43,24 +43,24 @@ class CCXTEngineer():
             return df
         
         
-        crypto_column = pd.MultiIndex.from_product([pair_list,['open','high','low','close','volume']])
+        crypto_column = pd.MultiIndex.from_product([ticker_list,['open','high','low','close','volume']])
         first_time = True
-        for pair in pair_list:
-            start_dt = datetime.strptime(start, "%Y%m%d %H:%M:%S")
-            end_dt = datetime.strptime(end, "%Y%m%d %H:%M:%S")
+        for ticker in ticker_list:
+            start_dt = datetime.strptime(start_date, "%Y%m%d %H:%M:%S")
+            end_dt = datetime.strptime(end_date, "%Y%m%d %H:%M:%S")
             start_timestamp = calendar.timegm(start_dt.utctimetuple())
             end_timestamp = calendar.timegm(end_dt.utctimetuple())
-            if period == '1m':
+            if time_interval == '1Min':
                 date_list = [datetime.utcfromtimestamp(float(time)) \
                              for time in range(start_timestamp, end_timestamp, 60*720)]
             else:
                 date_list = [datetime.utcfromtimestamp(float(time)) \
                              for time in range(start_timestamp, end_timestamp, 60*1440)]
-            df = ohlcv(date_list, pair, period)
+            df = ohlcv(date_list, ticker, time_interval)
             if first_time:
                 dataset = pd.DataFrame(columns=crypto_column,index=df['time'].values)
                 first_time = False
-            temp_col = pd.MultiIndex.from_product([[pair],['open','high','low','close','volume']])
+            temp_col = pd.MultiIndex.from_product([[ticker],['open','high','low','close','volume']])
             dataset[temp_col] = df[['open','high','low','close','volume']].values
         print('Actual end time: ' + str(df['time'].values[-1]))
         return dataset

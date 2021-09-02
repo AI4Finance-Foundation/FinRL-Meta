@@ -274,17 +274,17 @@ class YahooFinanceProcessor():
                 #price_ary = df[df.tic==tic]['close'].values
                 tech_array = df[df.tic==tic][tech_indicator_list].values
                 if if_vix:
-                    turbulence_array = df[df.tic==tic]['vix'].values 
+                    risk_array = df[df.tic==tic]['vix'].values 
                 else:
-                    turbulence_array = df[df.tic==tic]['turbulence'].values 
+                    risk_array = df[df.tic==tic]['turbulence'].values 
                 if_first_time = False
             else:
                 price_array = np.hstack([price_array, df[df.tic==tic][['adjcp']].values])
                 tech_array = np.hstack([tech_array, df[df.tic==tic][tech_indicator_list].values])
         assert price_array.shape[0] == tech_array.shape[0]
-        assert tech_array.shape[0] == turbulence_array.shape[0]
+        assert tech_array.shape[0] == risk_array.shape[0]
         print('Successfully transformed into array')
-        return price_array, tech_array, turbulence_array
+        return price_array, tech_array, risk_array
         
 
     def get_trading_days(self, start, end):
