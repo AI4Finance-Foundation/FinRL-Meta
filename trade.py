@@ -15,11 +15,11 @@ def trade(start_date, end_date, ticker_list, data_source, time_interval,
         data = DP.add_technical_indicator(data, technical_indicator_list)
         if if_vix:
             data = DP.add_vix(data)
-        price_array, tech_array, turbulence_array = DP.df_to_array(data, if_vix)
+        price_array, tech_array, risk_array = DP.df_to_array(data, if_vix)
         
         env_config = {'price_array':price_array,
-                'tech_array':tech_array,
-                'turbulence_array':turbulence_array,
+                'tech_arary':tech_array,
+                'risk_array':risk_array,
                 'if_train':False}
         env_instance = env(config=env_config)
         
@@ -82,7 +82,7 @@ def trade(start_date, end_date, ticker_list, data_source, time_interval,
             config["log_level"] = "WARN"
             config['env_config'] = {'price_array':price_array,
                                     'tech_array':tech_array,
-                                    'turbulence_array':turbulence_array,
+                                    'risk_array':risk_array,
                                     'if_train':False}
             
             trainer = PPOTrainer(env=env, config=config)
@@ -161,19 +161,19 @@ if __name__ == '__main__':
           drl_lib='elegantrl', env=env, agent='ppo', 
           cwd='./test_ppo', net_dimension = 2 ** 9)
     
-    #demo for rllib 
+    #demo for rllib
     trade(start_date = TRADE_START_DATE, end_date = TRADE_END_DATE,
-         ticker_list = FAANG_TICKER, data_source = 'yahoofinance',
-         time_interval= '1D', technical_indicator_list= TECHNICAL_INDICATORS_LIST,
-         drl_lib='rllib', env=env, agent='ppo', 
-         cwd='./test_ppo/checkpoint_000100/checkpoint-100')
+          ticker_list = FAANG_TICKER, data_source = 'yahoofinance',
+          time_interval= '1D', technical_indicator_list= TECHNICAL_INDICATORS_LIST,
+          drl_lib='rllib', env=env, agent='ppo', 
+          cwd='./test_ppo', net_dimension = 2 ** 9)
     
     #demo for stable-baselines3
     trade(start_date = TRADE_START_DATE, end_date = TRADE_END_DATE,
           ticker_list = FAANG_TICKER, data_source = 'yahoofinance',
           time_interval= '1D', technical_indicator_list= TECHNICAL_INDICATORS_LIST,
-          drl_lib='stable_baselines3', env=env, agent='ppo', 
-          cwd='./test_ppo.zip', net_dimension = 2 ** 9)
+          drl_lib='stable_baseline3', env=env, agent='ppo', 
+          cwd='./test_ppo', net_dimension = 2 ** 9)
 
 
 
