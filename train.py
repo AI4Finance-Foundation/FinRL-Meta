@@ -15,12 +15,12 @@ def train(start_date, end_date, ticker_list, data_source, time_interval,
     data = DP.add_technical_indicator(data, technical_indicator_list)
     if if_vix:
         data = DP.add_vix(data)
-    price_array, tech_array, turbulence_array = DP.df_to_array(data, if_vix)
+    price_array, tech_array, risk_array = DP.df_to_array(data, if_vix)
     
     #read parameters
     env_config = {'price_array':price_array,
             'tech_array':tech_array,
-            'turbulence_array':turbulence_array,
+            'risk_array':risk_array,
             'if_train':True}
     env_instance = env(config=env_config)
     
@@ -60,7 +60,9 @@ def train(start_date, end_date, ticker_list, data_source, time_interval,
         train_and_evaluate(args)
         
     elif drl_lib == 'rllib':
-        ray.init(ignore_reinit_error=True)
+        #ray.init(num_gpus=1, local_mode = True)
+        ray.init()
+        assert ray.is_initialized() == True
         if agent == 'ppo':
             from ray.rllib.agents import ppo
             from ray.rllib.agents.ppo.ppo import PPOTrainer
@@ -74,7 +76,7 @@ def train(start_date, end_date, ticker_list, data_source, time_interval,
             config["log_level"] = "WARN"
             config['env_config'] = {'price_array':price_array,
                                     'tech_array':tech_array,
-                                    'turbulence_array':turbulence_array,
+                                    'risk_array':risk_array,
                                     'if_train':True}
             trainer = PPOTrainer(env=env, config=config)
             for i in range(total_episodes):
