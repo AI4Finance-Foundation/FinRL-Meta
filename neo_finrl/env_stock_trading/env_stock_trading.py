@@ -6,22 +6,22 @@ from numpy import random as rd
 class StockTradingEnv(gym.Env):
 
     def __init__(self, config, initial_account=1e6,
-                 gamma=0.99, turbulence_thresh=30, min_stock_rate=0.1,
+                 gamma=0.99, risk_thresh=30, min_stock_rate=0.1,
                  max_stock=1e2, initial_capital=1e6, buy_cost_pct=1e-3, 
                  sell_cost_pct=1e-3,reward_scaling=2 ** -11,  initial_stocks=None,
                  ):
         price_ary = config['price_array']
         tech_ary = config['tech_array']
-        turbulence_ary = config['turbulence_array']
+        risk_ary = config['risk_array']
         if_train = config['if_train']
         n = price_ary.shape[0]
         self.price_ary =  price_ary.astype(np.float32)
         self.tech_ary = tech_ary.astype(np.float32)
-        self.turbulence_ary = turbulence_ary
+        self.risk_ary = risk_ary
         
         self.tech_ary = self.tech_ary * 2 ** -7
-        self.turbulence_bool = (turbulence_ary > turbulence_thresh).astype(np.float32)
-        self.turbulence_ary = (self.sigmoid_sign(turbulence_ary, turbulence_thresh) * 2 ** -5).astype(np.float32)
+        self.risk_bool = (risk_ary > risk_thresh).astype(np.float32)
+        self.risk_ary = (self.sigmoid_sign(risk_ary, risk_thresh) * 2 ** -5).astype(np.float32)
 
         stock_dim = self.price_ary.shape[1]
         self.gamma = gamma
@@ -83,7 +83,7 @@ class StockTradingEnv(gym.Env):
         price = self.price_ary[self.day]
         self.stocks_cd += 1
 
-        if self.turbulence_bool[self.day] == 0:
+        if self.risk_bool[self.day] == 0:
             min_action = int(self.max_stock * self.min_stock_rate)  # stock_cd
             for index in np.where(actions < -min_action)[0]:  # sell_index:
                 if price[index] > 0:  # Sell only if current asset is > 0
@@ -120,8 +120,8 @@ class StockTradingEnv(gym.Env):
         amount = np.array(max(self.amount, 1e4) * (2 ** -12), dtype=np.float32)
         scale = np.array(2 ** -6, dtype=np.float32)
         return np.hstack((amount,
-                          self.turbulence_ary[self.day],
-                          self.turbulence_bool[self.day],
+                          self.risk_ary[self.day],
+                          self.risk_bool[self.day],
                           price * scale,
                           self.stocks * scale,
                           self.stocks_cd,
