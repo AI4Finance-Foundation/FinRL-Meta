@@ -1,3 +1,5 @@
+'''From https://github.com/AI4Finance-Foundation/ElegantRL'''
+
 from elegantrl.env import *
 
 
