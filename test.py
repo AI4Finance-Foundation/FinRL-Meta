@@ -29,7 +29,10 @@ def test(start_date, end_date, ticker_list, data_source, time_interval,
         
         #select agent
         if agent == 'ppo':
-            args = Arguments(agent=AgentPPO(), env=env_instance, if_on_policy=True)
+            args = Arguments(if_on_policy=True)
+            args.agent = AgentPPO()
+            args.env = env_instance
+            args.agent.if_use_cri_target = True
         else:
             raise ValueError('Invalid agent input or the agent input is not \
                              supported yet.')
@@ -43,7 +46,7 @@ def test(start_date, end_date, ticker_list, data_source, time_interval,
             net_dim = net_dimension
     
             agent.init(net_dim, state_dim, action_dim)
-            agent.save_load_model(cwd=cwd, if_save=False)
+            agent.save_or_load_agent(cwd=cwd, if_save=False)
             act = agent.act
             device = agent.device
     

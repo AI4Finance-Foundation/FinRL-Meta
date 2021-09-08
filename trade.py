@@ -8,7 +8,6 @@ def trade(start_date, end_date, ticker_list, data_source, time_interval,
           if_vix = True, **kwargs):
     
     if mode == 'backtesting':
-        #fetch data
         DP = DataProcessor(data_source, **kwargs)
         data = DP.download_data(ticker_list, start_date, end_date, time_interval)
         data = DP.clean_data(data)
@@ -18,7 +17,7 @@ def trade(start_date, end_date, ticker_list, data_source, time_interval,
         price_array, tech_array, risk_array = DP.df_to_array(data, if_vix)
         
         env_config = {'price_array':price_array,
-                'tech_arary':tech_array,
+                'tech_array':tech_array,
                 'risk_array':risk_array,
                 'if_train':False}
         env_instance = env(config=env_config)
@@ -31,7 +30,10 @@ def trade(start_date, end_date, ticker_list, data_source, time_interval,
             
             #select agent
             if agent == 'ppo':
-                args = Arguments(agent=AgentPPO(), env=env_instance, if_on_policy=True)
+                args = Arguments(if_on_policy=True)
+                args.agent = AgentPPO()
+                args.env = env_instance
+                args.agent.if_use_cri_target = True
             else:
                 raise ValueError('Invalid agent input or the agent input is not \
                                  supported yet.')
@@ -45,10 +47,10 @@ def trade(start_date, end_date, ticker_list, data_source, time_interval,
                 net_dim = net_dimension
         
                 agent.init(net_dim, state_dim, action_dim)
-                agent.save_load_model(cwd=cwd, if_save=False)
+                agent.save_or_load_agent(cwd=cwd, if_save=False)
                 act = agent.act
                 device = agent.device
-        
+    
             except:
                 raise ValueError('Fail to load agent!')
             

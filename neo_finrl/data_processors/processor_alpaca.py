@@ -83,11 +83,12 @@ class AlpacaProcessor():
             tmp_df = tmp_df.astype(float)
             tmp_df['tic'] = tic
             new_df = new_df.append(tmp_df)
+            print('Data clean for ', str(tic), ' is finished.')
         
         new_df = new_df.reset_index()
         new_df = new_df.rename(columns={'index':'time'})
         
-        print('Data clean finished!')
+        print('Data clean all finished!')
         
         return new_df
       
