@@ -4,7 +4,7 @@ A suite of universal near real-market environments for DRL in quant finance.
 
 **Why NeoFinRL (FinRL-Gym): Motivation**
 
-● To close the sim-reality gap: existing academic AI+Finance papers use backtesting on historical data, the reported performance (annualized return, shape ratio, max dropdown, etc.) may be quite different when we apply the algorithms to a paper/live trading, or real markets.
+● To reduce the sim-reality gap: existing papers use backtesting on historical data, the reported performance may be quite different when we apply the algorithms to a paper/live trading, or real markets.
 
 ● To reduce the data pre-processing burden, so that quants can focus on developing their strategies.
 
