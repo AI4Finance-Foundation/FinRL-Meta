@@ -1,5 +1,6 @@
-# NeoFinRL
-A suite of universal near real-market environments for DRL in quant finance.
+# NeoFinRL: Tens of market environments for quant finance.
+
+**N**ear real-market **E**nvironments f**o**r data-driven **Fin**ancial **R**einforcement **L**earning. 
 
 
 **Why NeoFinRL (FinRL-Gym)**
