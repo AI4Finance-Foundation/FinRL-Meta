@@ -3,33 +3,33 @@
 **N**ear real-market **E**nvironments f**o**r data-driven **Fin**ancial **R**einforcement **L**earning. 
 
 
-**Why NeoFinRL (FinRL-Gym)**
+# Our goals:
 
-● To reduce the simulation-reality gap: existing work use backtesting on historical data, the real performances may be quite different when we apply the algorithms to a paper/live trading, or real stock markets.
++ To reduce the simulation-reality gap: existing work use backtesting on historical data, the real performances may be quite different when we apply the algorithms to a paper/live trading, or real stock markets.
 
-● To reduce the data pre-processing burden, so that quants can focus on developing their strategies.
++ To reduce the data pre-processing burden, so that quants can focus on developing their strategies.
 
-● To facilitate fair comparisons or benchmark performances, providing a standardized environment will allow researchers to evaluate different strategies in some way. Also, it would help researchers to better understand the “black-box” algorithm.
++ To facilitate fair comparisons or benchmark performances, providing a standardized environment will allow researchers to evaluate different strategies in some way. Also, it would help researchers to better understand the “black-box” algorithm.
 
 **Design Principles**
 
-● Plug-and-Play (PnP): Modularity○Handle different markets (say T0 vs. T+1)
++ Plug-and-Play (PnP): Modularity○Handle different markets (say T0 vs. T+1)
 
-● Avoid hard-coded parameters
++ Avoid hard-coded parameters
 
-● Closing the sim-real gap by “simulation-validation-trading”: simulation for training and connecting real-time APIs for trading;  here a “virtual env” may be a good solution.
++ Closing the sim-real gap by “simulation-validation-trading”: simulation for training and connecting real-time APIs for trading;  here a “virtual env” may be a good solution.
 
-● Efficient sampling: accelerate sampling is key! Here, we can learn ideas from the ElegantRL project. Note that multi-processing is a key to reducing training time (scheduling between CPU + GPU).
++ Efficient sampling: accelerate sampling is key! Here, we can learn ideas from the ElegantRL project. Note that multi-processing is a key to reducing training time (scheduling between CPU + GPU).
 
-● Transparency: a virtual env that is invisible to the upper layer
++ Transparency: a virtual env that is invisible to the upper layer
 
-● Completeness and universal:
++ Completeness and universal:
    
   Multiple markets;
  
  Various data sources (API, Excel, etc)○User-friendly variables (complete and allow user-define): may use the heritage of class
 
-● Flexibility and extensibility: Inheritance might be helpful here
++ Flexibility and extensibility: Inheritance might be helpful here
 
 **What is Gym?**
 
