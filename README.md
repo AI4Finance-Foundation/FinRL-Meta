@@ -26,7 +26,7 @@
 + Flexibility and extensibility: Inheritance might be helpful here
 
 ## Overview 
-![Overview image of NeoFinRL](https://github.com/rayrui312/update_temp/blob/main/overview.png)
+![Overview image of NeoFinRL](https://github.com/AI4Finance-Foundation/NeoFinRL/blob/main/figs/neofinrl_overview.png)
 We adopt a layered structure for DRL in finance in NeoFinRL, as shown in the figure above. NeoFinRL consists of three layers: data layer, environment layer, and agent layer. Each layer executes its functions and is relatively independent. Meanwhile, layers interact through end-to-end interfaces to implement the complete workflow of algorithm trading.
 
 ## Plug-and-Play
@@ -34,5 +34,5 @@ In the development pipeline, we separate market environments from the data layer
 
 A demonstration notebook for plug-and-play with ElegantRL, Stable-baselines3 and RLlib: [NeoFinRL: Plug-and-Play with DRL libraries](https://colab.research.google.com/drive/1zd10aPKT7fE9lr3G2hozT-SeRRYRU2rg?usp=sharing)
 
-## Training-Validation-Testing
-We employ a training-validation-testing pipeline. The DRL agent first learns from the training environment and is then validated in the validation environment for further adjustment. Finally, the validated agent will be evaluated in paper trading or live trading markets. First, this pipeline solves the information leakage problem because the trading data are never leaked when adjusting agents. Second, a unified pipeline allows fair comparisons among different algorithms and strategies. 
+## Training-Testing-Trading
+We employ a training-testing-trading pipeline. The DRL agent first learns from the training environment and is then validated in the validation environment for further adjustment. Then the validated agent is tested in historical datasets. Finally, the tested agent will be deployed in paper trading or live trading markets. First, this pipeline solves the information leakage problem because the trading data are never leaked when adjusting agents. Second, a unified pipeline allows fair comparisons among different algorithms and strategies. 
