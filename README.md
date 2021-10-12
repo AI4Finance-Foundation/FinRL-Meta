@@ -1,6 +1,6 @@
 # NeoFinRL: Tens of Market Environments for Financial Reinforcement Learning. 
 
-**N**ear real-market **E**nvironments f**o**r data-driven **Fin**ancial **R**einforcement **L**earning (**NeoFinRL**) is an open-source framework that provides tens of standard market environments for various trading tasks and a standard API to connect different financial data sources, market environments and DRL algorithms.
+**N**ear real-market **E**nvironments f**o**r data-driven **Fin**ancial **R**einforcement **L**earning (**NeoFinRL**) is an open-source framework that provides tens of standard market environments for various trading tasks and standard APIs to connect with different financial data sources, trading platforms and DRL algorithms.
 
 ## Outline
 - [Our Goals](#our-goals)
@@ -10,19 +10,18 @@
 - [Training-Validation-Testing](#training-validation-testing)
 
 ## Our Goals
-+ To reduce the simulation-reality gap: existing work use backtesting on historical data, the real performances may be quite different when we apply the algorithms to paper/live trading, or real stock markets.
-+ To reduce the data pre-processing burden, so that quants can focus on developing their strategies.
-+ To provide benchmark performance and facilitate fair comparisons, providing a standardized environment will allow researchers to evaluate different strategies in some way. Also, it would help researchers to better understand the “black-box” algorithm.
++ To reduce the simulation-reality gap: existing works use backtesting on historical data, while the real performance may be quite different when applying the algorithms to paper/live trading.
++ To reduce the data pre-processing burden, so that quants can focus on developing and optimizing strategies.
++ To provide benchmark performance and facilitate fair comparisons, providing a standardized environment will allow researchers to evaluate different strategies in the same way. Also, it would help researchers to better understand the “black-box” nature (deep neural network-based) of DRL algorithms.
 
 ## Design Principles
-+ Plug-and-Play (PnP): Modularity○Handle different markets (say T0 vs. T+1)
++ Plug-and-Play (PnP): Modularity; Handle different markets (say T0 vs. T+1)
 + Avoid hard-coded parameters
-+ Closing the sim-real gap by “simulation-validation-trading”: simulation for training and connecting real-time APIs for trading;  here a “virtual env” may be a good solution.
-+ Efficient sampling: accelerate sampling is key! Here, we can learn ideas from the ElegantRL project. Note that multi-processing is a key to reducing training time (scheduling between CPU + GPU).
++ Closing the sim-real gap by the “training-testing-trading” pipeline: simulation for training and connecting real-time APIs for testing/trading;  here a “virtual env” may be the solution.
++ Efficient sampling: accelerate the data sampling process is the key!  From the ElegantRL project. we know that multi-processing is a key to reducing training time (scheduling between CPU + GPU).
 + Transparency: a virtual env that is invisible to the upper layer
 + Completeness and universal:
-  Multiple markets;
-  Various data sources (API, Excel, etc)○User-friendly variables (complete and allow user-define): may use the heritage of class
+  Multiple markets; Various data sources (APIs, Excel, etc); User-friendly variables (complete and allow user-define): may use the heritage of class
 + Flexibility and extensibility: Inheritance might be helpful here
 
 ## Overview 
