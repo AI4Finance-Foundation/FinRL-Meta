@@ -7,7 +7,7 @@
 - [Design Principles](#design-principles)
 - [Overview](#overview)
 - [Plug-and-Play](#plug-and-play)
-- [Training-Validation-Testing](#training-validation-testing)
+- [Training-Testing-Trading](#training-testing-trading)
 
 ## Our Goals
 + To reduce the simulation-reality gap: existing works use backtesting on historical data, while the real performance may be quite different when applying the algorithms to paper/live trading.
