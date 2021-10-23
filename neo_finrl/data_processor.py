@@ -64,4 +64,16 @@ class DataProcessor():
         tech_array[tech_nan_positions] = 0
         
         return price_array,tech_array,turbulence_array
-        
+    
+    def run(self, ticker_list, start_date, end_date, time_interval, 
+            technical_indicator_list, if_vix):
+        data = self.processor.download_data(ticker_list, start_date, end_date, time_interval)
+        data = self.processor.clean_data(data)
+        data = self.processor.add_technical_indicator(data, technical_indicator_list)
+        if if_vix:
+            data = self.processor.add_vix(data)
+        price_array, tech_array, turbulence_array = self.processor.df_to_array(data, if_vix)
+        data_config = {'price_array':price_array,
+                  'tech_array':tech_array,
+                  'turbulence_array':turbulence_array}
+        return data_config
