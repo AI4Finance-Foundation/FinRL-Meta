@@ -31,7 +31,7 @@ We adopt a layered structure for DRL in finance in NeoFinRL, as shown in the fig
 ## Plug-and-Play
 In the development pipeline, we separate market environments from the data layer and the agent layer. Any DRL agent can be directly plugged into our environments, then trained and tested. Different agents/algorithms can be compared by running on the same benchmark environment to achieve fair evaluations. 
 
-A demonstration notebook for plug-and-play with ElegantRL, Stable-baselines3 and RLlib: [NeoFinRL: Plug-and-Play with DRL libraries](https://colab.research.google.com/drive/1zd10aPKT7fE9lr3G2hozT-SeRRYRU2rg?usp=sharing)
+A demonstration notebook for plug-and-play with ElegantRL, Stable Baselines3 and RLlib: [NeoFinRL: Plug-and-Play with DRL libraries](https://colab.research.google.com/drive/1zd10aPKT7fE9lr3G2hozT-SeRRYRU2rg?usp=sharing)
 
 ## Training-Testing-Trading
 We employ a training-testing-trading pipeline. The DRL agent first learns from the training environment and is then validated in the validation environment for further adjustment. Then the validated agent is tested in historical datasets. Finally, the tested agent will be deployed in paper trading or live trading markets. First, this pipeline solves the information leakage problem because the trading data are never leaked when adjusting agents. Second, a unified pipeline allows fair comparisons among different algorithms and strategies. 
