@@ -47,7 +47,6 @@ def train(start_date, end_date, ticker_list, data_source, time_interval,
         model_config['train_batch_size'] = rllib_params['train_batch_size']
         model_config['gamma'] = rllib_params['gamma']
 
-        #ray.shutdown()
         trained_model = agent_rllib.train_model(model=model, 
                                           model_name=model_name,
                                           model_config=model_config,
