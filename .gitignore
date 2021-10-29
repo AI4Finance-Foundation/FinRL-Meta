@@ -129,3 +129,6 @@ dmypy.json
 .pyre/
 test_new.py
 debug_test.py
+testing.py
+crypto_test.py
+crypto_data_test.py

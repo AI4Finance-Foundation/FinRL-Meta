@@ -1,8 +1,8 @@
-from elegantrl.agent import *
-from elegantrl.run import *
-import torch
-import ray
+from drl_agents.elegantrl_models import DRLAgent as DRLAgent_erl
+from drl_agents.rllib_models import DRLAgent as DRLAgent_rllib
+from drl_agents.stablebaselines3_models import DRLAgent as DRLAgent_sb3
 from neo_finrl.data_processor import DataProcessor
+
 
 def train(start_date, end_date, ticker_list, data_source, time_interval, 
           technical_indicator_list, drl_lib, env, model_name, if_vix = True,
@@ -10,8 +10,13 @@ def train(start_date, end_date, ticker_list, data_source, time_interval,
     
     #process data using unified data processor
     DP = DataProcessor(data_source,  **kwargs)
-    data_config = DP.run(ticker_list, start_date, end_date, time_interval, 
-                         technical_indicator_list, if_vix)
+    price_array, tech_array, turbulence_array = DP.run(ticker_list, start_date
+                                                       , end_date, time_interval, 
+                                                       technical_indicator_list, 
+                                                       if_vix)
+    data_config = {'price_array':price_array,
+                   'tech_array':tech_array,
+                   'turbulence_array':turbulence_array}
     #build environment using processed data
     env_instance = env(config=data_config)
 
