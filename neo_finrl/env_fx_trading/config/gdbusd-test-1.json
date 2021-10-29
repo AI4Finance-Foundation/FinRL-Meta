@@ -1,0 +1,70 @@
+{
+    "env": {
+        "observation_list": [
+            "Open",
+            "High",
+            "Low",
+            "Close",
+            "minute",
+            "hour",
+            "day",
+            "macd",
+            "boll_ub",
+            "boll_lb",
+            "rsi_30",
+            "dx_30",
+            "close_30_sma",
+            "close_60_sma"
+        ],
+        "over_night_cash_penalty": 100,
+        "balance": 10000,
+        "asset_col": "symbol",
+        "time_col": "time",
+        "random_start": true,
+        "log_filename": "./data/log/log_",
+        "title":"GBPUSD EURUSD 5M",
+        "description":"testing sma, rsi and boll input in weekly with GBPUSD EURUSD"
+    },
+    "symbol": {
+        "GBPUSD": {
+            "point": 100000,
+            "max_spread": 50,
+            "transaction_fee": 10,
+            "over_night_penalty": 10,
+            "stop_loss_max": 300,
+            "profit_taken_max": 2500,
+            "max_current_holding": 10,
+            "limit_order": true,
+            "limit_order_expiration": 5
+        },
+        "EURUSD": {
+            "point": 100000,
+            "max_spread": 50,
+            "transaction_fee": 10,
+            "over_night_penalty": 10,
+            "stop_loss_max": 200,
+            "profit_taken_max": 2500,
+            "max_current_holding": 10,
+            "limit_order": false,
+            "limit_order_expiration": 5
+
+        }
+    },
+    "trading_hour":{
+        "Sydney":{"from":0,"to":0},
+        "Tokyo":{"from":0,"to":0},
+        "London":{"from":0,"to":0},
+        "New York":{"from":0,"to":0}
+    },
+    "ploting":{
+        "buy":{"color":"red","shape":""},
+        "sell":{"color":"green","shape":""},
+        "macd":{"color":"yellow","shape":""},
+        "boll_ub":{"color":"blue","shape":""},
+        "boll_lb":{"color":"purple","shape":""},
+        "rsi_30":{"color":"white","shape":""},
+        "dx_30":{"color":"pink","shape":""},
+        "close_30_sma":{"color":"orange","shape":""},
+        "close_60_sma":{"color":"grey","shape":""}        
+    }
+}
