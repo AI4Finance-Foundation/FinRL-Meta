@@ -6,7 +6,7 @@ from drl_agents.elegantrl_models import DRLAgent as DRLAgent_erl
 # import data processor
 from neo_finrl.data_processor import DataProcessor
 
-def testing(start_date, end_date, ticker_list, data_source, time_interval,
+def test(start_date, end_date, ticker_list, data_source, time_interval,
             technical_indicator_list, drl_lib, env, model_name, if_vix=True,
             **kwargs):
     #process data using unified data processor
