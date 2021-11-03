@@ -12,7 +12,7 @@ TECHNICAL_INDICATORS_LIST = ['macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',
 
 FAANG_TICKER = ['FB',  'AMZN', 'AAPL', 'NFLX', 'GOOG']
 
-# Dow 30 constituents at 2019/01
+# Dow 30 constituents in 2021/10
 DOW_30_TICKER = [
     "AXP",
     "AMGN",
@@ -46,7 +46,7 @@ DOW_30_TICKER = [
     "DOW"
 ]
 
-DOW_30_TICKER_2019 = [
+'''DOW_30_TICKER_2019 = [
     "AAPL",
     "MSFT",
     "JPM",
@@ -77,7 +77,7 @@ DOW_30_TICKER_2019 = [
     "PFE",
     "WBA",
     "DD",
-]
+]'''
 
 # Nasdaq 100 constituents at 2019/01
 NAS_100_TICKER = [
