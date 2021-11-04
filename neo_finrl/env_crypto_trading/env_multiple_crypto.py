@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 class CryptoEnv:  # custom env
     def __init__(self, config, lookback=1, initial_capital=1e6, 
@@ -92,11 +93,13 @@ class CryptoEnv:  # custom env
         pass
 
     def _generate_action_normalizer(self):
+        #normalize action to adjust for large price differences in cryptocurrencies
         action_norm_vector = []
-        price_0 = self.price_array[0]
+        price_0 = self.price_array[0] #Use row 0 prices to normalize
         for price in price_0:
-            x = len(str(price)) - 7
-            action_norm_vector.append(1/((10)**x))
-        
+            x = math.floor(math.log(price, 10)) #the order of magnitude 
+            action_norm_vector.append(1/((10)**x)) 
+            
+        action_norm_vector = np.asarray(action_norm_vector) * 10000 #roughly control the maximum transaction amount for each action
         self.action_norm_vector = np.asarray(action_norm_vector)
         
