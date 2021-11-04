@@ -59,5 +59,18 @@ To create your own data, you can use `data_process` base class which can be foun
 The tgym (trading environment) is inherited from OpenAI Gym. We aim to entirely base it upon OpenAI Gym architecture and propose Trading Gym as an additional OpenAI environment.
 
 ## Examples
+```shell
 . ./neo_finrl/env_fx_trading/env.sh
 ppo_test.ipynb
+```
+## Download Datasets from Dukascopy
+```shell
+duka EURUSD -s 2010-01-01 -e 2012-12-31 -c M5 
+duka GBPUSD -s 2010-01-01 -e 2012-12-31 -c M5
+duka USDJPY -s 2010-01-01 -e 2012-12-31 -c M5
+duka EURJPY -s 2010-01-01 -e 2012-12-31 -c M5
+duka AUDUSD -s 2010-01-01 -e 2012-12-31 -c M5
+duka NZDUSD -s 2010-01-01 -e 2012-12-31 -c M5
+duka USDCAD -s 2010-01-01 -e 2012-12-31 -c M5
+duka USDCHF -s 2010-01-01 -e 2012-12-31 -c M5
+duka XAGUSD -s 2010-01-01 -e 2012-12-31 -c M5

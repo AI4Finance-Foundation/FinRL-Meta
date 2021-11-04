@@ -70,6 +70,19 @@ def split_timeserious(df, key_ts='dt', freq='W', symbol=''):
         g.to_csv(fn)
         count += 1
     return 
+
+def merge_two_dataframes_based_on_time_index(df1,symbol1, df2,symbol2):
+    """merge two dataframes based on time index
+    Args:
+        df1 (pandas df with timestamp is part of multi index): 
+        df2 (pandas df with timestamp is part of multi index): 
+    """
+    df1['symbol'] = symbol1
+    df2['symbol'] = symbol2
+    df = pd.concat([df1,df2], axis=1)
+    df.sort_index(inplace=True)
+    return df
+
 """
 python ./neo_finrl/data_processors/processor_fx.py GBPUSD W ./data/raw/GBPUSD_raw.csv
 symbol="GBPUSD"
@@ -86,5 +99,6 @@ if __name__ == '__main__':
         exit(0)
     df = add_time_feature(df, symbol=symbol,dt_col_name='time')
     df = tech_indictors(df)
+    
     split_timeserious(df,freq=freq, symbol=symbol)
     print(f'Done!')
