@@ -1,6 +1,8 @@
-# NeoFinRL: Hundreds of Market Environments for Financial Reinforcement Learning
+# FinRL-Metaverse: A Univese of Market Environments.
 
-**N**ear real-market **E**nvironments f**o**r data-driven **Fin**ancial **R**einforcement **L**earning (**NeoFinRL**) is an open-source framework that provides tens of standard market environments for various trading tasks and standard APIs to connect with different financial data sources, trading platforms and DRL algorithms.
+Previously called **Neo_FinRL**: Hundreds of Market Environments for Financial Reinforcement Learning. 
+
+**N**ear real-market **E**nvironments f**o**r data-driven **Fin**ancial **R**einforcement **L**earning (**NeoFinRL**).
 
 ## Outline
 - [Our Goals](#our-goals)
