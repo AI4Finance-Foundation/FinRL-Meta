@@ -2,7 +2,7 @@
 
 Previously called **Neo_FinRL**: Hundreds of Market Environments for Financial Reinforcement Learning. 
 
-**N**ear real-market **E**nvironments f**o**r data-driven **Fin**ancial **R**einforcement **L**earning (**NeoFinRL**).
+**N**ear real-market **E**nvironments f**o**r data-driven **Fin**ancial **R**einforcement **L**earning (**Neo_FinRL**).
 
 ## Outline
 - [Our Goals](#our-goals)
