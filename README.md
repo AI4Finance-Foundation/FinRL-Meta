@@ -40,6 +40,7 @@ A demonstration notebook for plug-and-play with ElegantRL, Stable Baselines3 and
 A DRL agent learns by interacting with the training environment, is validated in the validation environment for parameter tuning. Then, the agent is tested in historical datasets (backtesting).  Finally, the agent will be deployed in paper trading or live trading markets. 
 
 This pipeline solves the **information leakage problem** because the trading data are never leaked when training/tuning the agents. 
-Second, such a unified pipeline allows fair comparisons among different algorithms and strategies. 
+
+Such a unified pipeline allows fair comparisons among different algorithms and strategies. 
 
 
