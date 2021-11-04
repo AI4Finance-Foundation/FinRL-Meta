@@ -1,43 +1,25 @@
-import ray
-from neofinrl.config import (
-    DOW_30_TICKER,
-    TECHNICAL_INDICATORS_LIST,
-    TEST_END_DATE,
-    TEST_START_DATE,
-)
-from neo_finrl.env_stock_trading.env_stocktrading import StockTradingEnv
+# import DRL agents
+from drl_agents.stablebaselines3_models import DRLAgent as DRLAgent_sb3
+from drl_agents.rllib_models import DRLAgent as DRLAgent_rllib
+from drl_agents.elegantrl_models import DRLAgent as DRLAgent_erl
 
-def test(
-    start_date,
-    end_date,
-    ticker_list,
-    data_source,
-    time_interval,
-    technical_indicator_list,
-    drl_lib,
-    env,
-    model_name,
-    if_vix=True,
-    **kwargs
-):
+# import data processor
+from neo_finrl.data_processor import DataProcessor
 
-    # import DRL agents
-    from drl_agents.stablebaselines3.models import DRLAgent as DRLAgent_sb3
-    from drl_agents.rllib.models import DRLAgent as DRLAgent_rllib
-    from drl_agents.elegantrl.models import DRLAgent as DRLAgent_erl
-
-    # import data processor
-    from neo_finrl.data_processor import DataProcessor
-
-    # fetch data
-    DP = DataProcessor(data_source, **kwargs)
-    data = DP.download_data(ticker_list, start_date, end_date, time_interval)
-    data = DP.clean_data(data)
-    data = DP.add_technical_indicator(data, technical_indicator_list)
-
-    if if_vix:
-        data = DP.add_vix(data)
-    price_array, tech_array, turbulence_array = DP.df_to_array(data, if_vix)
+def test(start_date, end_date, ticker_list, data_source, time_interval,
+            technical_indicator_list, drl_lib, env, model_name, if_vix=True,
+            **kwargs):
+    #process data using unified data processor
+    DP = DataProcessor(data_source,  **kwargs)
+    price_array, tech_array, turbulence_array = DP.run(ticker_list, start_date
+                                                       , end_date, time_interval, 
+                                                       technical_indicator_list, 
+                                                       if_vix)
+    data_config = {'price_array':price_array,
+                   'tech_array':tech_array,
+                   'turbulence_array':turbulence_array}
+    #build environment using processed data
+    env_instance = env(config=data_config)
 
     env_config = {
         "price_array": price_array,

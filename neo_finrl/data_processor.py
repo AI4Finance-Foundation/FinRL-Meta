@@ -1,6 +1,7 @@
 from neo_finrl.data_processors.processor_alpaca import AlpacaProcessor as Alpaca
 from neo_finrl.data_processors.processor_wrds import WrdsProcessor as Wrds
 from neo_finrl.data_processors.processor_yahoofinance import YahooFinanceProcessor as YahooFinance
+from neo_finrl.data_processors.processor_binance import BinanceProcessor as Binance
 import pandas as pd
 import numpy as np
 
@@ -23,6 +24,9 @@ class DataProcessor():
         elif data_source == 'yahoofinance':
             self.processor = YahooFinance()
         
+        elif data_source =='binance':
+            self.processor = Binance()
+            
         else:
             raise ValueError('Data source input is NOT supported yet.')
     
@@ -63,7 +67,7 @@ class DataProcessor():
         tech_nan_positions = np.isnan(tech_array)
         tech_array[tech_nan_positions] = 0
         
-        return price_array,tech_array,turbulence_array
+        return price_array, tech_array, turbulence_array
     
     def run(self, ticker_list, start_date, end_date, time_interval, 
             technical_indicator_list, if_vix):
@@ -73,7 +77,7 @@ class DataProcessor():
         if if_vix:
             data = self.processor.add_vix(data)
         price_array, tech_array, turbulence_array = self.processor.df_to_array(data, if_vix)
-        data_config = {'price_array':price_array,
-                  'tech_array':tech_array,
-                  'turbulence_array':turbulence_array}
-        return data_config
+        tech_nan_positions = np.isnan(tech_array)
+        tech_array[tech_nan_positions] = 0
+
+        return price_array, tech_array, turbulence_array

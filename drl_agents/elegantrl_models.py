@@ -62,6 +62,8 @@ class DRLAgent:
                 model.gamma = model_kwargs["gamma"]
                 model.seed = model_kwargs["seed"]
                 model.net_dim = model_kwargs["net_dimension"]
+                model.target_step = model_kwargs["target_step"]
+                model.eval_gap = model_kwargs["eval_time_gap"]
             except BaseException:
                 raise ValueError(
                     "Fail to read arguments, please check 'model_kwargs' input."
@@ -120,9 +122,9 @@ class DRLAgent:
                 state, reward, done, _ = environment.step(action)
 
                 total_asset = (
-                    environment.amount
+                    environment.cash
                     + (
-                        environment.price_ary[environment.day] * environment.stocks
+                        environment.price_array[environment.time] * environment.stocks
                     ).sum()
                 )
                 episode_total_assets.append(total_asset)
