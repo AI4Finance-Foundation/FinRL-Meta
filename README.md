@@ -35,7 +35,11 @@ In the development pipeline, we separate market environments from the data layer
 
 A demonstration notebook for plug-and-play with ElegantRL, Stable Baselines3 and RLlib: [Play and Play with DRL Agents](https://colab.research.google.com/github/AI4Finance-Foundation/NeoFinRL/blob/main/NeoFinRL_Plug_and_Play_with_DRL_Libraries.ipynb)
 
-## Training-Testing-Trading
-We employ a training-testing-trading pipeline. The DRL agent first learns from the training environment and is then validated in the validation environment for further adjustment. Then the validated agent is tested in historical datasets. Finally, the tested agent will be deployed in paper trading or live trading markets. First, this pipeline solves the information leakage problem because the trading data are never leaked when adjusting agents. Second, a unified pipeline allows fair comparisons among different algorithms and strategies. 
+## "Training-Testing-Trading" Pipeline
+
+A DRL agent learns by interacting with the training environment, is validated in the validation environment for parameter tuning. Then, the agent is tested in historical datasets (backtesting).  Finally, the agent will be deployed in paper trading or live trading markets. 
+
+This pipeline solves the **information leakage problem** because the trading data are never leaked when training/tuning the agents. 
+Second, such a unified pipeline allows fair comparisons among different algorithms and strategies. 
 
 
