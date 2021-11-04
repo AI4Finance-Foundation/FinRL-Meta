@@ -18,12 +18,12 @@ Previously called **Neo_FinRL**: Hundreds of Market Environments for Financial R
 
 ## Design Principles
 + Plug-and-Play (PnP): Modularity; Handle different markets (say T0 vs. T+1)
-+ Avoid hard-coded parameters
-+ Closing the sim-real gap by the “training-testing-trading” pipeline: simulation for training and connecting real-time APIs for testing/trading;  here a “virtual env” may be the solution.
-+ Efficient sampling: accelerate the data sampling process is the key!  From the ElegantRL project. we know that multi-processing is a key to reducing training time (scheduling between CPU + GPU).
-+ Transparency: a virtual env that is invisible to the upper layer
 + Completeness and universal:
-  Multiple markets; Various data sources (APIs, Excel, etc); User-friendly variables (complete and allow user-define): may use the heritage of class
+  Multiple markets; Various data sources (APIs, Excel, etc); User-friendly variables.
++ Avoid hard-coded parameters
++ Closing the sim-real gap using the “training-testing-trading” pipeline: simulation for training and connecting real-time APIs for testing/trading.
++ Efficient data sampling: accelerate the data sampling process is the key of DRL training!  From the ElegantRL project. we know that multi-processing is powerful to reduce the training time (scheduling between CPU + GPU).
++ Transparency: a virtual env that is invisible to the upper layer
 + Flexibility and extensibility: Inheritance might be helpful here
 
 ## Overview 
