@@ -307,6 +307,7 @@ class tgym(gym.Env):
     def step(self, actions):
         # Execute one time step within the environment
         self.current_step += 1
+        print(f"step:{self.current_step}, action:{actions}")
         done = (self.balance <= 0
                 or self.current_step == len(self.dt_datetime) - 1)
         if done:
