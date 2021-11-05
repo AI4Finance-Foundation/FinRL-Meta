@@ -14,6 +14,9 @@ from neo_finrl.env_fx_trading.util.read_config import EnvConfig
 
 class tgym(gym.Env):
     """forex/future/option trading gym environment
+    
+    For env parameters, please refer to configure file and readme.md
+
     1. Three action space (0 Buy, 1 Sell, 2 Nothing)
     2. Multiple trading pairs (EURUSD, GBPUSD...) under same time frame
     3. Timeframe from 1 min to daily as long as use candlestick bar (Open, High, Low, Close)
@@ -48,8 +51,6 @@ class tgym(gym.Env):
         to consider the price action leading up to the current price, as well as their 
         own portfolio’s status in order to make an informed decision for the next action.
     16. reward is forex trading unit Point, it can be configure for each trading pair
-
-    For env parameters, please refer to configure file
 
     """
     metadata = {'render.modes': ['graph', 'human', 'file']}
