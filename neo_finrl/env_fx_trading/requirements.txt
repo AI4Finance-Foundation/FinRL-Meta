@@ -8,3 +8,4 @@ stable_baselines3
 quantstats
 mplfinance
 jupyterlab
+duka

@@ -32,27 +32,29 @@ class tgym(gym.Env):
         human -- display each steps realized reward on console
         file -- create a transaction log
         graph -- create transaction in graph (under development)
-    14.
-    15. Reward, we want to incentivize profit that is sustained over long periods of time. 
+
+    14. Reward, we want to incentivize profit that is sustained over long periods of time. 
         At each step, we will set the reward to the account balance multiplied by 
         some fraction of the number of time steps so far.The purpose of this is to delay 
         rewarding the agent too fast in the early stages and allow it to explore 
         sufficiently before optimizing a single strategy too deeply. 
         It will also reward agents that maintain a higher balance for longer, 
         rather than those who rapidly gain money using unsustainable strategies.
-    16. Observation_space contains all of the input variables we want our agent 
+    15. Observation_space contains all of the input variables we want our agent 
         to consider before making, or not making a trade. We want our agent to “see” 
         the forex data points (Open price, High, Low, Close, time serial, TA) in the game window, 
         as well a couple other data points like its account balance, current positions, 
         and current profit.The intuition here is that for each time step, we want our agent 
         to consider the price action leading up to the current price, as well as their 
         own portfolio’s status in order to make an informed decision for the next action.
-    17. reward is forex trading unit Point, it can be configure for each trading pair
+    16. reward is forex trading unit Point, it can be configure for each trading pair
+
+    For env parameters, please refer to configure file
+
     """
-    metadata = {'render.modes': ['graph', 'human', 'file', 'none']}
+    metadata = {'render.modes': ['graph', 'human', 'file']}
 
     def __init__(self, df, env_config_file='./neo_finrl/env_fx_trading/config/gdbusd-test-1.json') -> None:
-        assert df.ndim == 2
         super(tgym, self).__init__()
         self.cf = EnvConfig(env_config_file)
         self.observation_list = self.cf.env_parameters("observation_list")
@@ -62,8 +64,8 @@ class tgym(gym.Env):
         self.asset_col = self.cf.env_parameters("asset_col")
         self.time_col = self.cf.env_parameters("time_col")
         self.random_start = self.cf.env_parameters("random_start")
-        self.log_filename = self.cf.env_parameters("log_filename") + datetime.datetime.now(
-            ).strftime('%Y%m%d%H%M%S') + '.csv'
+        self.log_filename = self.cf.env_parameters("log_filename") + \
+            datetime.datetime.now().strftime('%Y%m%d%H%M%S') + '.csv'
         
         self.df = df
         self.df["_time"] = df[self.time_col]
@@ -120,8 +122,7 @@ class tgym(gym.Env):
     def _seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
-    def _history_df(self, i):
-        pass
+    
     def _take_action(self, actions, done):
         # action = math.floor(x),
         # profit_taken = math.ceil((x- math.floor(x)) * profit_taken_max - stop_loss_max )
