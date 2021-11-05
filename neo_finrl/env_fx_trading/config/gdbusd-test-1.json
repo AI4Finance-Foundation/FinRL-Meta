@@ -16,8 +16,8 @@
             "close_30_sma",
             "close_60_sma"
         ],
-        "over_night_cash_penalty": 100,
-        "balance": 10000,
+        "over_night_cash_penalty": 5,
+        "balance": 1000,
         "asset_col": "symbol",
         "time_col": "time",
         "random_start": true,
@@ -29,11 +29,11 @@
         "GBPUSD": {
             "point": 100000,
             "max_spread": 50,
-            "transaction_fee": 10,
-            "over_night_penalty": 10,
+            "transaction_fee": 5,
+            "over_night_penalty": 1,
             "stop_loss_max": 300,
             "profit_taken_max": 2500,
-            "max_current_holding": 10,
+            "max_current_holding": 5,
             "limit_order": true,
             "limit_order_expiration": 5
         },
