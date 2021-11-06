@@ -5,12 +5,12 @@ TEST_START_DATE = '2020-01-01'
 TEST_END_DATE = '2020-12-31'
 
 TRADE_START_DATE = '2021-01-01'
-TRADE_START_DATE = '2021-07-31'
+TRADE_START_DATE = '2021-10-31'
 
 TECHNICAL_INDICATORS_LIST = ['macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',
                              'close_30_sma', 'close_60_sma']
 
-FAANG_TICKER = ['FB',  'AMZN', 'AAPL', 'NFLX', 'GOOG']
+FAANG_TICKER = ["FB", "AMZN", "AAPL", "NFLX", "GOOG"]
 
 # Dow 30 constituents in 2021/10
 DOW_30_TICKER = [
