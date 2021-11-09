@@ -104,7 +104,8 @@ class tgym(gym.Env):
         self.cached_time_serial = ((self.df[["_time", "_day"]].sort_values("_time"))\
             .drop_duplicates()).values.tolist()
         
-        self.reward_range = (-np.inf, np.inf)
+        # self.reward_range = (-np.inf, np.inf)
+        self.reward_range = (-200,800)
         self.action_space = spaces.Box(low=-1,
                                        high=1,
                                        shape=(len(self.assets),), dtype=np.float32)
