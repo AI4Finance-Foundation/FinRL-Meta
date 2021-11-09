@@ -1,4 +1,4 @@
-# FinRL-Meta: A Univese of Market Environments.
+# FinRL-Meta: A Universe of Market Environments.
 
 Previously called **Neo_FinRL**: Hundreds of Market Environments for Financial Reinforcement Learning. 
 
