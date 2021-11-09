@@ -1,6 +1,7 @@
 import mplfinance as mpf
 import pandas as pd
 import datetime
+from neo_finrl.env_fx_trading.util.action_enum import ActionEnum
 
 class TradingChart():
     """An ohlc trading visualization using matplotlib made to render tgym environment"""
@@ -23,7 +24,7 @@ class TradingChart():
                 rd = tr['Reward']  
                 rewards += rd
                 if tr['ClosePrice'] > 0 :
-                    if tr['Type'] == 0 :
+                    if tr['Type'] == ActionEnum.BUY :
                         if rd > 0 :
                             _wlines.append([(tr['ActionTime'],tr['ActionPrice']),(tr['CloseTime'],tr['ClosePrice'])])
                             _wcolors.append('c')
@@ -31,7 +32,7 @@ class TradingChart():
                         else:
                             _llines.append([(tr['ActionTime'],tr['ActionPrice']),(tr['CloseTime'],tr['ClosePrice'])])
                             _lcolors.append('c')
-                    elif tr['Type'] == 1 :
+                    elif tr['Type'] == ActionEnum.SELL :
                         if rd > 0 :
                             _wlines.append([(tr['ActionTime'],tr['ActionPrice']),(tr['CloseTime'],tr['ClosePrice'])])
                             _wcolors.append('k')

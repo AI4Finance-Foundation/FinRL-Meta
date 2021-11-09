@@ -10,8 +10,10 @@ register(
     kwargs={'df': df,
             'env_config_file':'./neo_finrl/env_fx_trading/config/gdbusd-test-1.json'
         },
-    max_episode_steps = 1440,
-    reward_threshold=20000.0,
+    max_episode_steps = 1440, #  (Optional[int]): The maximum number of steps that an episode can consist of
+    reward_threshold=20000.0, #  (Optional[int]): The reward threshold before the task is considered solved
+    nondeterministic=False, #  (bool): Whether this environment is non-deterministic even after seeding
+    # order_enforce = True, # (Optional[int]): Whether to wrap the environment in an orderEnforcing wrapper
 )
 
 register(
@@ -22,4 +24,5 @@ register(
         },
     max_episode_steps = 1440 * 5,
     reward_threshold=30000.0,
+    nondeterministic=False,
 )
