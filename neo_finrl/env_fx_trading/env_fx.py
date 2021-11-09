@@ -11,7 +11,7 @@ from stable_baselines3.common.vec_env import DummyVecEnv,SubprocVecEnv
 from neo_finrl.env_fx_trading.util.plot_chart import TradingChart
 from neo_finrl.env_fx_trading.util.log_render import render_to_file
 from neo_finrl.env_fx_trading.util.read_config import EnvConfig
-from neo_finrl.env_fx_trading.util.action_enum import ActionEnum
+from neo_finrl.env_fx_trading.util.action_enum import ActionEnum, form_action
 
 class tgym(gym.Env):
     """forex/future/option trading gym environment
@@ -105,9 +105,9 @@ class tgym(gym.Env):
             .drop_duplicates()).values.tolist()
         
         self.reward_range = (-np.inf, np.inf)
-        self.action_space = spaces.Box(low=0,
-                                       high=3,
-                                       shape=(len(self.assets), ))
+        self.action_space = spaces.Box(low=-1,
+                                       high=1,
+                                       shape=(len(self.assets),), dtype=np.float32)
         # first two 3 = balance,current_holding, max_draw_down_pct
         _space = 3 + len(self.assets) \
                  + len(self.assets) * len(self.observation_list)
@@ -144,15 +144,14 @@ class tgym(gym.Env):
             self._c = self.get_observation(self.current_step, i, "Close")
             self._t = self.get_observation(self.current_step, i, "_time")
             self._day = self.get_observation(self.current_step, i,"_day")
-            _action = math.floor(x)
+            _action, pt_ratio, _ = form_action(x)
             rewards[i] = self._calculate_reward(i, done)
             if self.cf.symbol(self.assets[i],"limit_order"):
                 self._limit_order_process(i, _action, done)
             if _action in (ActionEnum.BUY, ActionEnum.SELL) and not done \
                 and self.current_holding[i] < self.cf.symbol(self.assets[i],"max_current_holding"):
                 # generating PT based on action fraction
-                _profit_taken = math.ceil(
-                    (x - _action) * self.cf.symbol(self.assets[i],"profit_taken_max")) + self.cf.symbol(self.assets[i],"stop_loss_max")
+                _profit_taken = pt_ratio * self.cf.symbol(self.assets[i],"profit_taken_max") + self.cf.symbol(self.assets[i],"stop_loss_max")
                 self.ticket_id += 1
                 if self.cf.symbol(self.assets[i],"limit_order"):
                     transaction = {

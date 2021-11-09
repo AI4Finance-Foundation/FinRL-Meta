@@ -32,10 +32,10 @@
             "max_spread": 50,
             "transaction_fee": 5,
             "over_night_penalty": 100,
-            "stop_loss_max": 300,
-            "profit_taken_max": 2500,
+            "stop_loss_max": 200,
+            "profit_taken_max": 800,
             "max_current_holding": 5,
-            "limit_order": true,
+            "limit_order": false,
             "limit_order_expiration": 5
         },
         "EURUSD": {
