@@ -7,5 +7,7 @@ finta
 stable_baselines3
 quantstats
 mplfinance
+tensorboard
+wandb
 jupyterlab
 duka

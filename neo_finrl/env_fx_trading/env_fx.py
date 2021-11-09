@@ -11,6 +11,7 @@ from stable_baselines3.common.vec_env import DummyVecEnv,SubprocVecEnv
 from neo_finrl.env_fx_trading.util.plot_chart import TradingChart
 from neo_finrl.env_fx_trading.util.log_render import render_to_file
 from neo_finrl.env_fx_trading.util.read_config import EnvConfig
+from neo_finrl.env_fx_trading.util.action_enum import ActionEnum, form_action
 
 class tgym(gym.Env):
     """forex/future/option trading gym environment
@@ -65,6 +66,7 @@ class tgym(gym.Env):
         self.asset_col = self.cf.env_parameters("asset_col")
         self.time_col = self.cf.env_parameters("time_col")
         self.random_start = self.cf.env_parameters("random_start")
+        self.do_nothing = self.cf.env_parameters("do_nothing")
         self.log_filename = self.cf.env_parameters("log_filename") + \
             datetime.datetime.now().strftime('%Y%m%d%H%M%S') + '.csv'
         
@@ -103,9 +105,9 @@ class tgym(gym.Env):
             .drop_duplicates()).values.tolist()
         
         self.reward_range = (-np.inf, np.inf)
-        self.action_space = spaces.Box(low=0,
-                                       high=3,
-                                       shape=(len(self.assets), ))
+        self.action_space = spaces.Box(low=-1,
+                                       high=1,
+                                       shape=(len(self.assets),), dtype=np.float32)
         # first two 3 = balance,current_holding, max_draw_down_pct
         _space = 3 + len(self.assets) \
                  + len(self.assets) * len(self.observation_list)
@@ -142,15 +144,14 @@ class tgym(gym.Env):
             self._c = self.get_observation(self.current_step, i, "Close")
             self._t = self.get_observation(self.current_step, i, "_time")
             self._day = self.get_observation(self.current_step, i,"_day")
-            _action = math.floor(x)
+            _action, pt_ratio, _ = form_action(x)
             rewards[i] = self._calculate_reward(i, done)
             if self.cf.symbol(self.assets[i],"limit_order"):
                 self._limit_order_process(i, _action, done)
-            if _action in (0, 1) and not done \
+            if _action in (ActionEnum.BUY, ActionEnum.SELL) and not done \
                 and self.current_holding[i] < self.cf.symbol(self.assets[i],"max_current_holding"):
                 # generating PT based on action fraction
-                _profit_taken = math.ceil(
-                    (x - _action) * self.cf.symbol(self.assets[i],"profit_taken_max")) + self.cf.symbol(self.assets[i],"stop_loss_max")
+                _profit_taken = pt_ratio * self.cf.symbol(self.assets[i],"profit_taken_max") + self.cf.symbol(self.assets[i],"stop_loss_max")
                 self.ticket_id += 1
                 if self.cf.symbol(self.assets[i],"limit_order"):
                     transaction = {
@@ -201,7 +202,8 @@ class tgym(gym.Env):
                     self.tranaction_open_this_step.append(transaction)
                     self.balance -= self.cf.symbol(self.assets[i],"transaction_fee")
                     self.transaction_live.append(transaction)
-
+            elif _action == ActionEnum.HOLD and self.do_nothing > 0:
+                rewards[i] += self.do_nothing
         return sum(rewards)
 
     def _calculate_reward(self, i, done):
@@ -215,7 +217,7 @@ class tgym(gym.Env):
                     tr["DateDuration"] = self._day
                     tr["Reward"] -= self.cf.symbol(self.assets[i],"over_night_penalty")
 
-                if tr["Type"] == 0:  #buy
+                if tr["Type"] == ActionEnum.BUY:  #buy
                     #stop loss trigger
                     _sl_price = tr["ActionPrice"] - tr["SL"] / _point
                     _pt_price = tr["ActionPrice"] + tr["PT"] / _point
@@ -234,12 +236,13 @@ class tgym(gym.Env):
                     else:  # still open
                         self.current_draw_downs[i] = int(
                             (self._l - tr["ActionPrice"]) * _point)
+                        # _total_reward += self.current_draw_downs[i]
                         _max_draw_down += self.current_draw_downs[i]
                         if self.current_draw_downs[i] < 0:
                             if tr["MaxDD"] > self.current_draw_downs[i]:
                                 tr["MaxDD"] = self.current_draw_downs[i]
 
-                elif tr["Type"] == 1:  # sell
+                elif tr["Type"] == ActionEnum.SELL:  # sell
                     #stop loss trigger
                     _sl_price = tr["ActionPrice"] + tr["SL"] / _point
                     _pt_price = tr["ActionPrice"] - tr["PT"] / _point
@@ -258,6 +261,7 @@ class tgym(gym.Env):
                     else:
                         self.current_draw_downs[i] = int(
                             (tr["ActionPrice"] - self._h) * _point)
+                        # _total_reward += self.current_draw_downs[i]
                         _max_draw_down += self.current_draw_downs[i]
                         if self.current_draw_downs[i] < 0:
                             if tr["MaxDD"] > self.current_draw_downs[i]:
@@ -319,8 +323,9 @@ class tgym(gym.Env):
         if self.balance != 0:
             self.max_draw_down_pct = abs(
                 sum(self.max_draw_downs) / self.balance * 100)
-
-            # no action anymore
+        
+        # no action anymore
+        # print(f"step:{self.current_step}, action:{actions}, reward :{reward}, balance: {self.balance} {self.max_draw_down_pct}")
         obs = ([self.balance, self.max_draw_down_pct] +
                self.current_holding +
                self.current_draw_downs +
