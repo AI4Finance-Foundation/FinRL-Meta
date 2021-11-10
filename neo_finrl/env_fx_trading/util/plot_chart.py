@@ -19,12 +19,14 @@ class TradingChart():
         _lcolors=[]
 
         rewards = 0
+        b_count, s_count = 0, 0
         for tr in self.transaction_history:
             if tr["Symbol"] == symbol : 
                 rd = tr['Reward']  
                 rewards += rd
                 if tr['ClosePrice'] > 0 :
                     if tr['Type'] == ActionEnum.BUY :
+                        b_count += 1
                         if rd > 0 :
                             _wlines.append([(tr['ActionTime'],tr['ActionPrice']),(tr['CloseTime'],tr['ClosePrice'])])
                             _wcolors.append('c')
@@ -33,18 +35,18 @@ class TradingChart():
                             _llines.append([(tr['ActionTime'],tr['ActionPrice']),(tr['CloseTime'],tr['ClosePrice'])])
                             _lcolors.append('c')
                     elif tr['Type'] == ActionEnum.SELL :
+                        s_count += 1
                         if rd > 0 :
                             _wlines.append([(tr['ActionTime'],tr['ActionPrice']),(tr['CloseTime'],tr['ClosePrice'])])
                             _wcolors.append('k')
                         else:
                             _llines.append([(tr['ActionTime'],tr['ActionPrice']),(tr['CloseTime'],tr['ClosePrice'])])
                             _lcolors.append('k')
-        return _wlines, _wcolors,_llines, _lcolors, rewards
+        return _wlines, _wcolors,_llines, _lcolors, rewards, b_count, s_count
     
     def plot(self):
-            
         for s in self.symbols:
-            _wlines, _wcolors,_llines, _lcolors, rewards = self.transaction_line(s)
+            _wlines, _wcolors,_llines, _lcolors, rewards, b_count, s_count = self.transaction_line(s)
             _wseq = dict(alines=_wlines, colors=_wcolors)
             _lseq = dict(alines=_llines, colors=_lcolors, linestyle='--')
             _ohlc = self.ohlc.query(f'symbol=="{s}"')
@@ -52,8 +54,9 @@ class TradingChart():
             fig = mpf.figure(style=_style,figsize=(40,20))
             ax1 = fig.subplot()
             ax2 = ax1.twinx()
+            title = f'{s} reward:{rewards} Buy:{b_count} Sell:{s_count}'
             mpf.plot(_ohlc, alines=_lseq ,mav=(10,20), ax=ax1,type='ohlc',style='default')
-            mpf.plot(_ohlc,alines=_wseq, ax=ax2,type='candle',style='yahoo',axtitle=f'{s} reward: {rewards}')
+            mpf.plot(_ohlc,alines=_wseq, ax=ax2,type='candle',style='yahoo',axtitle=title)
             fig.savefig(f'./data/log/{s}-{datetime.datetime.now().strftime("%Y%m%d%H%M%S")}')
             
   
