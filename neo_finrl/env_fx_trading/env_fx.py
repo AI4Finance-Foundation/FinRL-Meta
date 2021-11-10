@@ -18,7 +18,8 @@ class tgym(gym.Env):
     
     For env parameters, please refer to configure file and readme.md
 
-    1. Three action space (0 Buy, 1 Sell, 2 Nothing)
+    1. Three action space (-1 Sell, 1 Buy, 0 Nothing) after range its continuous value.
+       [SELL: {-1 .. -0.5} .. BUY: {0.5 .. 1}]
     2. Multiple trading pairs (EURUSD, GBPUSD...) under same time frame
     3. Timeframe from 1 min to daily as long as use candlestick bar (Open, High, Low, Close)
     4. Use StopLose, ProfitTaken to realize rewards. each pair can configure it own SL and PT in configure file
@@ -52,7 +53,10 @@ class tgym(gym.Env):
         to consider the price action leading up to the current price, as well as their 
         own portfolio’s status in order to make an informed decision for the next action.
     16. reward is forex trading unit Point, it can be configure for each trading pair
-
+    17. observation and reward normalization are done by SB3 wrapper 
+        env = VecNormalize(env, norm_obs=True, norm_reward=True, clip_obs=10.)
+    18. off policy learning as it is not SARSA, but Q-learning, if we do not apply shaping reward.
+    19. add timelimit wrapper as we train on a fixed time frame (weekly, monthly, daily)
     """
     metadata = {'render.modes': ['graph', 'human', 'file']}
 
@@ -296,7 +300,6 @@ class tgym(gym.Env):
                         self.transaction_limit_order.remove(tr)
                         self.transaction_history.append(tr)
                         
-
     def _manage_tranaction(self, tr, _p, close_price, status=1):
         self.transaction_live.remove(tr)
         tr["ClosePrice"] = close_price
