@@ -1,6 +1,6 @@
 # FinRL-Meta: A Universe of Market Environments.
 
-Previously called **Neo_FinRL**: Hundreds of Market Environments for Financial Reinforcement Learning. 
+Also called **Neo_FinRL**: Hundreds of Market Environments for Financial Reinforcement Learning. 
 
 **N**ear real-market **E**nvironments f**o**r data-driven **Fin**ancial **R**einforcement **L**earning (**Neo_FinRL**).
 
