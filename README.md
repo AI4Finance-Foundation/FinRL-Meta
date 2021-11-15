@@ -43,7 +43,7 @@ This pipeline solves the **information leakage problem** because the trading dat
 
 Such a unified pipeline allows fair comparisons among different algorithms and strategies. 
 
-## Citing FinRL
+## Citing FinRL-Meta
 ```
 @article{finrl_meta_2021,
     author = {Liu, Xiao-Yang and Rui, Jingyang and Gao, Jiechao and Yang, Liuqing and Yang, Hongyang and Wang, Zhaoran and Wang, Christina Dan and Guo Jian},
