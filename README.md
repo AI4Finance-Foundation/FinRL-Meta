@@ -23,7 +23,7 @@ Also called **Neo_FinRL**: Hundreds of Market Environments for Financial Reinfor
   Multiple markets; Various data sources (APIs, Excel, etc); User-friendly variables.
 + Avoid hard-coded parameters
 + Closing the sim-real gap using the “training-testing-trading” pipeline: simulation for training and connecting real-time APIs for testing/trading.
-+ Efficient data sampling: accelerate the data sampling process is the key of DRL training!  From the ElegantRL project. we know that multi-processing is powerful to reduce the training time (scheduling between CPU + GPU).
++ Efficient data sampling: accelerate the data sampling process is the key to DRL training!  From the ElegantRL project. we know that multi-processing is powerful to reduce the training time (scheduling between CPU + GPU).
 + Transparency: a virtual env that is invisible to the upper layer
 + Flexibility and extensibility: Inheritance might be helpful here
 
