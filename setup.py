@@ -16,7 +16,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="FinRL­-Meta",
-    version="0.3.1",
+    version="0.3.0",
     include_package_data=True,
     author="Xiaoyang Liu, Jingyang Rui, Hongyang Yang",
     author_email="hy2500@columbia.edu",
