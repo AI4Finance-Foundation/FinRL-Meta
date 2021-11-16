@@ -9,8 +9,8 @@ Also called **Neo_FinRL**: Hundreds of Market Environments for Financial Reinfor
 - [Design Principles](#design-principles)
 - [Overview](#overview)
 - [Plug-and-Play](#plug-and-play)
-- [Training-Testing-Trading](#training-testing-trading)
-- [Our Vision](#our_vision)
+- [Training-Testing-Trading](#training-testing-trading-pipeline)
+- [Our Vision](#our-vision)
 
 ## Our Goals
 + To reduce the simulation-reality gap: existing works use backtesting on historical data, while the real performance may be quite different when applying the algorithms to paper/live trading.
