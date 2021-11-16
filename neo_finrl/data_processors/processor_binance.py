@@ -4,9 +4,14 @@ import json
 from datetime import datetime,timedelta
 from talib.abstract import MACD, RSI, CCI, DX
 import numpy as np
+from neo_finrl.data_processors.basic_processor import BasicProcessor
 
 class BinanceProcessor():
-    def __init__(self):
+    # def __init__(self):
+    #     self.url = "https://api.binance.com/api/v3/klines"
+
+    def __init__(self, data_source: str, **kwargs):
+        BasicProcessor.__init__(self, data_source, **kwargs)
         self.url = "https://api.binance.com/api/v3/klines"
     
     #main functions
@@ -34,50 +39,8 @@ class BinanceProcessor():
         df = df.dropna()
         
         return df
-    
-    def add_technical_indicator(self, df, tech_indicator_list):
-        print('Adding self-defined technical indicators is NOT supported yet.')
-        print('Use default: MACD, RSI, CCI, DX.')
-        self.tech_indicator_list = ['open', 'high', 'low', 'close', 'volume', 
-                                         'macd', 'macd_signal', 'macd_hist', 
-                                         'rsi', 'cci', 'dx']
-        final_df = pd.DataFrame()
-        for i in df.tic.unique():
-            tic_df = df[df.tic==i] 
-            tic_df['macd'], tic_df['macd_signal'], tic_df['macd_hist'] = MACD(tic_df['close'], fastperiod=12, slowperiod=26, signalperiod=9)
-            tic_df['rsi'] = RSI(tic_df['close'], timeperiod=14)
-            tic_df['cci'] = CCI(tic_df['high'], tic_df['low'], tic_df['close'], timeperiod=14)
-            tic_df['dx'] = DX(tic_df['high'], tic_df['low'], tic_df['close'], timeperiod=14)
-            final_df = final_df.append(tic_df)
-        
-        return final_df
-    
-    def add_turbulence(self, df):
-        print('Turbulence not supported yet. Return original DataFrame.')
-        
-        return df
-    
-    def add_vix(self, df):
-        print('VIX is not applicable for cryptocurrencies. Return original DataFrame')
-        
-        return df
-    
-    def df_to_array(self, df, if_vix):
-        unique_ticker = df.tic.unique()
-        if_first_time = True
-        for tic in unique_ticker:
-            if if_first_time:
-                price_array = df[df.tic==tic][['close']].values
-                #price_ary = df[df.tic==tic]['close'].values
-                tech_array = df[df.tic==tic][self.tech_indicator_list].values
-                if_first_time = False
-            else:
-                price_array = np.hstack([price_array, df[df.tic==tic][['close']].values])
-                tech_array = np.hstack([tech_array, df[df.tic==tic][self.tech_indicator_list].values])
-                
-        assert price_array.shape[0] == tech_array.shape[0]
-        
-        return price_array, tech_array, np.array([])
+
+
     # helper functions
     def stringify_dates(self, date:datetime):
         return str(int(date.timestamp()*1000))

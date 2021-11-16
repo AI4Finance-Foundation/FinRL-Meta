@@ -1,9 +1,10 @@
 import numpy as np
 import pandas as pd
+from neo_finrl.data_processors.basic_processor import BasicProcessor
+class QuantconnectProcessor(BasicProcessor):
+    def __init__(self, data_source: str, **kwargs):
+        BasicProcessor.__init__(self, data_source, **kwargs)
 
-class QuantConnectEngineer():
-    def __init__(self):
-        pass
     def data_fetch(start_time, end_time, stock_list, resolution=Resolution.Daily) :
         #resolution: Daily, Hour, Minute, Second
         qb = QuantBook()

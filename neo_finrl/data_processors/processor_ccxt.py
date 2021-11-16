@@ -4,10 +4,12 @@ import ccxt
 import calendar
 from datetime import datetime
 from stockstats import StockDataFrame as Sdf
-
-class CCXTProcessor():
-    def __init__(self):
-        self.binance = ccxt.binance()
+from neo_finrl.data_processors.basic_processor import BasicProcessor
+class CcxtProcessor():
+    # def __init__(self):
+    #     self.binance = ccxt.binance()
+    def __init__(self, data_source: str, **kwargs):
+        BasicProcessor.__init__(self, data_source, **kwargs)
         
     def download_data(self,start_date, end_date, ticker_list = ['BTC/USDT'], time_interval = '1m'):
         def min_ohlcv(dt, pair, limit):
@@ -64,27 +66,27 @@ class CCXTProcessor():
             dataset[temp_col] = df[['open','high','low','close','volume']].values
         print('Actual end time: ' + str(df['time'].values[-1]))
         return dataset
-    
-    def add_technical_indicators(self, df, pair_list, tech_indicator_list = [
-        'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',
-        'close_30_sma', 'close_60_sma']):
-        df = df.dropna()
-        df = df.copy()
-        column_list = [pair_list, ['open','high','low','close','volume']+(tech_indicator_list)]
-        column = pd.MultiIndex.from_product(column_list)
-        index_list = df.index
-        dataset = pd.DataFrame(columns=column,index=index_list)
-        for pair in pair_list:
-            pair_column = pd.MultiIndex.from_product([[pair],['open','high','low','close','volume']])
-            dataset[pair_column] = df[pair]
-            temp_df = df[pair].reset_index().sort_values(by=['index'])
-            temp_df = temp_df.rename(columns={'index':'date'})
-            crypto_df = Sdf.retype(temp_df.copy())  
-            for indicator in tech_indicator_list:
-                temp_indicator = crypto_df[indicator].values.tolist()
-                dataset[(pair,indicator)] = temp_indicator
-        print('Succesfully add technical indicators')
-        return dataset
+
+    # def add_technical_indicators(self, df, pair_list, tech_indicator_list = [
+    #     'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',
+    #     'close_30_sma', 'close_60_sma']):
+    #     df = df.dropna()
+    #     df = df.copy()
+    #     column_list = [pair_list, ['open','high','low','close','volume']+(tech_indicator_list)]
+    #     column = pd.MultiIndex.from_product(column_list)
+    #     index_list = df.index
+    #     dataset = pd.DataFrame(columns=column,index=index_list)
+    #     for pair in pair_list:
+    #         pair_column = pd.MultiIndex.from_product([[pair],['open','high','low','close','volume']])
+    #         dataset[pair_column] = df[pair]
+    #         temp_df = df[pair].reset_index().sort_values(by=['index'])
+    #         temp_df = temp_df.rename(columns={'index':'date'})
+    #         crypto_df = Sdf.retype(temp_df.copy())
+    #         for indicator in tech_indicator_list:
+    #             temp_indicator = crypto_df[indicator].values.tolist()
+    #             dataset[(pair,indicator)] = temp_indicator
+    #     print('Succesfully add technical indicators')
+    #     return dataset
     
     def df_to_ary(self, df, pair_list, tech_indicator_list=[
         'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',
