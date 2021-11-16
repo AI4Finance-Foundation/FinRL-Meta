@@ -15,7 +15,7 @@ from setuptools import find_packages, setup
 #     REQUIRES = list()
 
 setup(
-    name="FinRL­-Meta",
+    name="finrl_meta",
     version="0.3.0",
     include_package_data=True,
     author="Xiaoyang Liu, Jingyang Rui, Hongyang Yang",
