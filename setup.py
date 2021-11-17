@@ -1,4 +1,4 @@
-from setuptools import find_packages, setup
+from setuptools import  setup
 
 # Read requirements.txt, ignore comments
 # try:
@@ -17,7 +17,6 @@ from setuptools import find_packages, setup
 setup(
     name="finrl_meta",
     version="0.3.0",
-    include_package_data=True,
     author="Xiaoyang Liu, Jingyang Rui, Hongyang Yang",
     author_email="hy2500@columbia.edu",
     url="https://github.com/AI4Finance-Foundation/FinRL-Meta",
