@@ -24,9 +24,7 @@ setup(
     # dependency_links=['git+https://github.com/quantopian/pyfolio.git#egg=pyfolio-0.9.2'],
     # install_requires=REQUIRES,
     description="FinRL­-Meta: A Universe of Near Real­ Market En­vironments for Data­-Driven Financial Reinforcement Learning",
-    long_description="FinRL­-Meta is a Python framework that builds a universe of market environments for data-driven financial reinforcement learning, \
-    it is developed by `AI4Finance-Foundation`_. \
-    _AI4Finance: https://github.com/AI4Finance-Foundation",
+    long_description="FinRL­-Meta: A Universe of Near Real­ Market En­vironments for Data­-Driven Financial Reinforcement Learning",
     classifiers=[
         # Trove classifiers
         # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
