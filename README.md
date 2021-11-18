@@ -56,6 +56,9 @@ This pipeline solves the **information leakage problem** because the trading dat
 
 Such a unified pipeline allows fair comparisons among different algorithms and strategies. 
 
+![FinRL-Meta Vision](https://github.com/AI4Finance-Foundation/FinRL-Meta/blob/main/figs/timeline.png)
+
+
 ## Our Vision
 
 For future work, we plan to build a multi-agent based market simulator that consists of over ten thousands of agents, namely, a FinRL-Metaverse. First, FinRL-Metaverse aims to build a universe of market environments, like the Xland environment ([source](https://deepmind.com/research/publications/2021/open-ended-learning-leads-to-generally-capable-agents)) and planet-scale climate forecast ([source](https://www.nature.com/articles/s41586-021-03854-z)) by DeepMind. To improve the performance for large-scale markets, we will employ GPU-based massive parallel simulation as Isaac Gym ([source](https://arxiv.org/abs/2108.10470)). Moreover, it will be interesting to explore the deep evolutionary RL framework ([source](https://doaj.org/article/4dd31838732842439cc1301e52613d1c)) to simulate the markets. Our final goal is to provide insights into complex market phenomena and offer guidance for financial regulations through FinRL-Metaverse.
