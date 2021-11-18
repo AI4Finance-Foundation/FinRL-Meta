@@ -133,3 +133,4 @@ testing.py
 crypto_test.py
 crypto_data_test.py
 neo_finrl/env_crypto_trading/env_multiple_crypto_0.py
+.DS_Store
