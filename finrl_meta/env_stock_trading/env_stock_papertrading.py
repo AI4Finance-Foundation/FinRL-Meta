@@ -1,6 +1,6 @@
 import datetime
 import threading
-from finrl.neo_finrl.data_processors.processor_alpaca import AlpacaProcessor
+from finrl_meta.data_processors.processor_alpaca import AlpacaProcessor
 from elegantrl.run import *
 import alpaca_trade_api as tradeapi
 import time
