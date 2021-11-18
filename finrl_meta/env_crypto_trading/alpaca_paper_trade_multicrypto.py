@@ -29,7 +29,7 @@
 # SOFTWARE.
 
 from datetime import datetime, timedelta
-from finrl.neo_finrl.data_processors.processor_ccxt import CCXTEngineer
+from finrl_meta.data_processors.processor_ccxt import CCXTEngineer
 import math
 import threading
 import alpaca_trade_api as tradeapi
