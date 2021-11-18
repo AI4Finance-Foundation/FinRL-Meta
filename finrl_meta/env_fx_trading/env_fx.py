@@ -8,9 +8,9 @@ from gym.utils import seeding
 import numpy as np
 import pandas as pd
 from stable_baselines3.common.vec_env import DummyVecEnv,SubprocVecEnv
-from neo_finrl.env_fx_trading.util.plot_chart import TradingChart
-from neo_finrl.env_fx_trading.util.log_render import render_to_file
-from neo_finrl.env_fx_trading.util.read_config import EnvConfig
+from finrl_meta.env_fx_trading.util.plot_chart import TradingChart
+from finrl_meta.env_fx_trading.util.log_render import render_to_file
+from finrl_meta.env_fx_trading.util.read_config import EnvConfig
 
 class tgym(gym.Env):
     """forex/future/option trading gym environment
