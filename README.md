@@ -67,7 +67,7 @@ Such a unified pipeline allows fair comparisons among different algorithms and s
 
 
 <div align="center">
-<img align="center" src=figs/timeline.png width="600">
+<img align="center" src=figs/timeline.png width="800">
 </div>
 	
 
