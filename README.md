@@ -56,8 +56,11 @@ This pipeline solves the **information leakage problem** because the trading dat
 
 Such a unified pipeline allows fair comparisons among different algorithms and strategies. 
 
-![FinRL-Meta Vision](https://github.com/AI4Finance-Foundation/FinRL-Meta/blob/main/figs/timeline.png)
 
+<div align="center">
+<img align="center" src=figs/timeline.png width="600">
+</div>
+	
 
 ## Our Vision
 
