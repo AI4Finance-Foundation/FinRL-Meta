@@ -1,7 +1,7 @@
-from neo_finrl.data_processors.processor_alpaca import AlpacaProcessor as Alpaca
-from neo_finrl.data_processors.processor_wrds import WrdsProcessor as Wrds
-from neo_finrl.data_processors.processor_yahoofinance import YahooFinanceProcessor as YahooFinance
-from neo_finrl.data_processors.processor_binance import BinanceProcessor as Binance
+from finrl_meta.data_processors.processor_alpaca import AlpacaProcessor as Alpaca
+from finrl_meta.data_processors.processor_wrds import WrdsProcessor as Wrds
+from finrl_meta.data_processors.processor_yahoofinance import YahooFinanceProcessor as YahooFinance
+from finrl_meta.data_processors.processor_binance import BinanceProcessor as Binance
 import pandas as pd
 import numpy as np
 
