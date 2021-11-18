@@ -1,5 +1,12 @@
 # FinRL-Meta: A Universe of Market Environments.
 
+
+[![Downloads](https://pepy.tech/badge/finrl_meta)](https://pepy.tech/project/finrl_meta)
+[![Downloads](https://pepy.tech/badge/finrl_meta/week)](https://pepy.tech/project/finrl_meta)
+[![Python 3.6](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/downloads/release/python-360/)
+[![PyPI](https://img.shields.io/pypi/v/finrl_meta.svg)](https://pypi.org/project/finrl_meta/)
+
+
 Also called **Neo_FinRL**: Hundreds of Market Environments for Financial Reinforcement Learning. 
 
 **N**ear real-market **E**nvironments f**o**r data-driven **Fin**ancial **R**einforcement **L**earning (**Neo_FinRL**).
