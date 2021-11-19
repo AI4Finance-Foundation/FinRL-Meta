@@ -1,0 +1,32 @@
+{
+    "root":{
+        "level":"debug",
+        "async":false,
+        "sinks":[
+            {
+                "type":"basic_file_sink",
+                "filename":"outputs_bt/logs/runner.log",
+                "pattern":"[%Y.%m.%d %H:%M:%S,%f - %-5l] %v",
+                "truncate":true
+            },
+            {
+                "type":"ostream_sink",
+                "pattern":"[%Y.%m.%d %H:%M:%S,%f - %-5l] %v"
+            }
+        ]
+    },
+    "dyn_pattern":{
+        "strategy":{
+            "level":"debug",
+            "async":false,
+            "sinks":[
+                {
+                    "type":"basic_file_sink",
+                    "filename":"outputs_bt/logs/strategy/%s.log",
+                    "pattern":"[%Y.%m.%d %H:%M:%S,%f - %-5l] %v",
+                    "truncate":true
+                }
+            ]
+        }
+    }
+}

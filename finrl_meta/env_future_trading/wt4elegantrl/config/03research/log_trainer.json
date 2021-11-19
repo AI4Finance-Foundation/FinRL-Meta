@@ -1,0 +1,14 @@
+{
+    "root":{
+        "level":"info",
+        "async":false,
+        "sinks":[]
+    },
+    "dyn_pattern":{
+        "strategy":{
+            "level":"info",
+            "async":false,
+            "sinks":[]
+        }
+    }
+}

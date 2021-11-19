@@ -1,0 +1,20 @@
+{
+    "replayer":{
+        "mode":"bin",
+        "path":"./dataset/",
+        "path1":"D:/Github/test/Storage",
+        "tick":false,
+        "basefiles":{
+            "session":"./config/01commom/sessions.json",
+            "commodity":"./config/01commom/commodities.json",
+            "contract":"./config/01commom/contracts.json",
+            "holiday":"./config/01commom/holidays.json",
+            "hot":"./config/01commom/hots.json"
+        },
+        "fees":"./config/01commom/fees.json"
+    },
+    "env":{
+        "mocker":"cta"
+    },
+    "bspolicy":"./config/01commom/actpolicy.json"
+}

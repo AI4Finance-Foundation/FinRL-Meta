@@ -1,0 +1,21 @@
+{
+    "root":{
+        "level":"info",
+        "async":false,
+        "sinks":[]
+    },
+    "dyn_pattern":{
+        "strategy":{
+            "level":"info",
+            "async":false,
+            "sinks":[
+                {
+                    "type":"basic_file_sink",
+                    "filename":"outputs_bt/logs/strategy/%s.log",
+                    "pattern":"[%Y.%m.%d %H:%M:%S,%f - %-5l] %v",
+                    "truncate":true
+                }
+            ]
+        }
+    }
+}
