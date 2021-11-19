@@ -48,7 +48,19 @@ DataOps is a series of principles and practices to improve the quality and reduc
 <div align="center">
 <img align="center" src=figs/finrl_meta_dataops.png width="800">
 </div>
-	
+
+
+Supported Data Sources: 
+|Data Source |Type |Range and Frequency |Request Limits|Raw Data|Preprocessed Data|
+|  ----  |  ----  |  ----  |  ----  |  ----  |  ----  |
+|Yahoo! Finance| US Securities| Frequency-specific, 1min| 2,000/hour| OHLCV | Prices&Indicators|
+|CCXT| Cryptocurrency| API-specific, 1min| API-specific| OHLCV| Prices&Indicators|
+|WRDS.TAQ| US Securities| 2003-now, 1ms| 5 requests each time| Intraday Trades|Prices&Indicators|
+|Alpaca| US Stocks, ETFs| 2015-now, 1min| Account-specific| OHLCV| Prices&Indicators|
+|RiceQuant| CN Securities| 2005-now, 1ms| Account-specific| OHLCV| Prices&Indicators|
+|JoinQuant| CN Securities| 2005-now, 1min| 3 requests each time| OHLCV| Prices&Indicators|
+|QuantConnect| US Securities| 1998-now, 1s| NA| OHLCV| Prices&Indicators|
+
 
 ## Plug-and-Play
 In the development pipeline, we separate market environments from the data layer and the agent layer. Any DRL agent can be directly plugged into our environments, then trained and tested. Different agents/algorithms can be compared by running on the same benchmark environment for fair evaluations. 
