@@ -53,7 +53,7 @@ DataOps is a series of principles and practices to improve the quality and reduc
 ## Plug-and-Play
 In the development pipeline, we separate market environments from the data layer and the agent layer. Any DRL agent can be directly plugged into our environments, then trained and tested. Different agents/algorithms can be compared by running on the same benchmark environment for fair evaluations. 
 
-A demonstration notebook for plug-and-play with ElegantRL, Stable Baselines3 and RLlib: [Play and Play with DRL Agents](https://colab.research.google.com/github/AI4Finance-Foundation/NeoFinRL/blob/main/NeoFinRL_Plug_and_Play_with_DRL_Libraries.ipynb)
+A demonstration notebook for plug-and-play with ElegantRL, Stable Baselines3 and RLlib: [Play and Play with DRL Agents](https://colab.research.google.com/github/AI4Finance-Foundation/FinRL-Meta/blob/main/Demo_Plug_and_Play_with_DRL_Libraries.ipynb)
 
 ## "Training-Testing-Trading" Pipeline
 
