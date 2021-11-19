@@ -82,7 +82,7 @@ For future work, we plan to build a multi-agent-based market simulator that cons
 ```
 @article{finrl_meta_2021,
     author = {Liu, Xiao-Yang and Rui, Jingyang and Gao, Jiechao and Yang, Liuqing and Yang, Hongyang and Wang, Zhaoran and Wang, Christina Dan and Guo Jian},
-    title   = {{FinRL-Meta:}: Data-Driven Deep ReinforcementLearning in Quantitative Finance},
+    title   = {{FinRL-Meta}: Data-Driven Deep ReinforcementLearning in Quantitative Finance},
     journal = {Data-Centric AI Workshop, NeurIPS},
     year    = {2021}
 }
