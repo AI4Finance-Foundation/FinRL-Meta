@@ -2,13 +2,13 @@ from finrl_meta.data_processors.processor_alpaca import AlpacaProcessor as Alpac
 from finrl_meta.data_processors.processor_wrds import WrdsProcessor as Wrds
 from finrl_meta.data_processors.processor_yahoofinance import YahooFinanceProcessor as YahooFinance
 from finrl_meta.data_processors.processor_binance import BinanceProcessor as Binance
+from finrl_meta.data_processors.processor_ricequant import RiceQuantProcessor as RiceQuant
 import pandas as pd
 import numpy as np
 
 class DataProcessor():
     def __init__(self, data_source, **kwargs):
         if data_source == 'alpaca':
-            
             try:
                 API_KEY= kwargs.get('API_KEY')
                 API_SECRET= kwargs.get('API_SECRET')
@@ -18,6 +18,14 @@ class DataProcessor():
             except:
                 raise ValueError('Please input correct account info for alpaca!')
                 
+        elif data_source =='ricequant':
+            try:
+                username = kwargs.get('username')
+                password = kwargs.get('password')
+                self.processor = RiceQuant(username, password)
+            except:
+                self.processor = RiceQuant()
+                
         elif data_source == 'wrds':
             self.processor = Wrds()
             
@@ -26,7 +34,7 @@ class DataProcessor():
         
         elif data_source =='binance':
             self.processor = Binance()
-            
+        
         else:
             raise ValueError('Data source input is NOT supported yet.')
     
@@ -76,7 +84,9 @@ class DataProcessor():
         data = self.processor.add_technical_indicator(data, technical_indicator_list)
         if if_vix:
             data = self.processor.add_vix(data)
-        price_array, tech_array, turbulence_array = self.processor.df_to_array(data, if_vix)
+        price_array, tech_array, turbulence_array = self.processor.df_to_array(data, 
+                                                                   technical_indicator_list, 
+                                                                   if_vix)
         tech_nan_positions = np.isnan(tech_array)
         tech_array[tech_nan_positions] = 0
 

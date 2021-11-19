@@ -1,7 +1,7 @@
 from drl_agents.elegantrl_models import DRLAgent as DRLAgent_erl
 from drl_agents.rllib_models import DRLAgent as DRLAgent_rllib
 from drl_agents.stablebaselines3_models import DRLAgent as DRLAgent_sb3
-from neo_finrl.data_processor import DataProcessor
+from finrl_meta.data_processor import DataProcessor
 
 
 def train(start_date, end_date, ticker_list, data_source, time_interval, 

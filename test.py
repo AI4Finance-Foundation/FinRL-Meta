@@ -4,7 +4,7 @@ from drl_agents.rllib_models import DRLAgent as DRLAgent_rllib
 from drl_agents.elegantrl_models import DRLAgent as DRLAgent_erl
 
 # import data processor
-from neo_finrl.data_processor import DataProcessor
+from finrl_meta.data_processor import DataProcessor
 
 def test(start_date, end_date, ticker_list, data_source, time_interval,
             technical_indicator_list, drl_lib, env, model_name, if_vix=True,
