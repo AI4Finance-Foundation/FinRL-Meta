@@ -137,3 +137,4 @@ neo_finrl/env_crypto_trading/env_multiple_crypto_0.py
 ricequant_test.py
 future_trading_wt_test.py
 train_new.py
+execution_optimizing_test.py
