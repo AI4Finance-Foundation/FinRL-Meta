@@ -29,9 +29,9 @@ class BasicProcessor:
         :return: (df) pandas dataframe
         """
         df = data.copy()
-        df = df.reset_index(drop=False)
-        df = df.drop(columns=["level_1"])
-        df = df.rename(columns={"level_0": "tic", "date": "time"})
+        # df = df.reset_index(drop=False)
+        # df = df.drop(columns=["level_1"])
+        # df = df.rename(columns={"level_0": "tic", "date": "time"})
         stock = Sdf.retype(df.copy())
         unique_ticker = stock.tic.unique()
 
@@ -54,6 +54,7 @@ class BasicProcessor:
                 indicator_df[["tic", "time", indicator]], on=["tic", "time"], how="left"
             )
         df = df.sort_values(by=["time", "tic"])
+        df = df.dropna()
         return df
 
     def add_turbulence(self, data: pd.DataFrame) \
@@ -64,6 +65,10 @@ class BasicProcessor:
         :return: (df) pandas dataframe
         """
         df = data.copy()
+        if "date" in df.columns:
+            df = df.reset_index(drop=False)
+            df = df.drop(columns=["level_1"])
+            df = df.rename(columns={"level_0": "tic", "date": "time"})
         turbulence_index = self.calculate_turbulence(df)
         df = df.merge(turbulence_index, on="time")
         df = df.sort_values(["time", "tic"]).reset_index(drop=True)

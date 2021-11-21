@@ -57,7 +57,7 @@ class DataProcessor():
     def add_technical_indicator(self, df, tech_indicator_list) -> pd.DataFrame:
         self.tech_indicator_list = tech_indicator_list
         df = self.processor.add_technical_indicator(df, tech_indicator_list)
-        
+
         return df
     
     def add_turbulence(self, df) -> pd.DataFrame:
@@ -114,9 +114,10 @@ def test_joinquant():
 
     data2 = p.download_data(ticker_list=ticker_list, start_date=TRADE_START_DATE, end_date=TRADE_END_DATE, time_interval='1D')
     # data3 = e.clean_data(data2)
-    data4 = p.add_technical_indicator(data2, ['macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30', 'close_30_sma', 'close_60_sma'])
+    data4 = p.add_turbulence(data2)
+    data6 = p.add_technical_indicator(data4, ['macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30', 'close_30_sma', 'close_60_sma'])
     # data5 = e.add_vix(data4)
-    data6 = p.add_turbulence(data4)
+
     pass
 
 if __name__ == "__main__":
