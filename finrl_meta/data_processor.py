@@ -3,9 +3,10 @@ from finrl_meta.data_processors.processor_wrds import WrdsProcessor as Wrds
 from finrl_meta.data_processors.processor_yahoofinance import YahooFinanceProcessor as YahooFinance
 from finrl_meta.data_processors.processor_binance import BinanceProcessor as Binance
 from finrl_meta.data_processors.processor_ricequant import RiceQuantProcessor as RiceQuant
+from finrl_meta.data_processors.processor_joinquant import JoinquantProcessor
 import pandas as pd
 import numpy as np
-from finrl_meta.data_processors.processor_joinquant import JoinquantProcessor
+
 
 class DataProcessor():
     def __init__(self, data_source, **kwargs):
