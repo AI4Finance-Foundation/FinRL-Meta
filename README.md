@@ -104,5 +104,5 @@ For future work, we plan to build a multi-agent-based market simulator that cons
 ## Collaborattions
 
 <div align="center">
-<img align="center" src=figs/ width="800">
+<img align="center" src=figs/Columbia_logo.jpg width="800">
 </div>
