@@ -101,14 +101,11 @@ For future work, we plan to build a multi-agent-based market simulator that cons
 
 ```
 
-## Collaborattions
+## Collaborators
 
 <div align="center">
 <img align="center" src=figs/Columbia_logo.jpg width="200">
-</div>
-<div align="center">
 <img align="center" src=figs/IDEA_Logo.png width="200">
-</div>
-<div align="center">
-<img align="center" src=figs/Northwestern_University.png width="200">	
+<img align="center" src=figs/Northwestern_University.png width="200">
+<img align="center" src=figs/NYU_Shanghai_Logo.png width="200">	
 </div>
