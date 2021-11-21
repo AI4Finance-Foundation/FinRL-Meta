@@ -1,10 +1,11 @@
 from finrl_meta.data_processors.processor_alpaca import AlpacaProcessor as Alpaca
 from finrl_meta.data_processors.processor_wrds import WrdsProcessor as Wrds
 from finrl_meta.data_processors.processor_yahoofinance import YahooFinanceProcessor as YahooFinance
-from finrl_meta.data_processors.processor_binance import BinanceProcessor as Binance
-from finrl_meta.data_processors.processor_ricequant import RiceQuantProcessor as RiceQuant
+# from finrl_meta.data_processors.processor_binance import BinanceProcessor as Binance
+# from finrl_meta.data_processors.processor_ricequant import RiceQuantProcessor as RiceQuant
 import pandas as pd
 import numpy as np
+from finrl_meta.data_processors.processor_joinquant import JoinquantProcessor
 
 class DataProcessor():
     def __init__(self, data_source, **kwargs):
@@ -17,7 +18,9 @@ class DataProcessor():
                 print('Alpaca successfully connected')
             except:
                 raise ValueError('Please input correct account info for alpaca!')
-                
+        elif data_source == "joinquant":
+            self.processor = JoinquantProcessor(data_source, **kwargs)
+
         elif data_source =='ricequant':
             try:
                 username = kwargs.get('username')
@@ -89,3 +92,33 @@ class DataProcessor():
         tech_array[tech_nan_positions] = 0
 
         return price_array, tech_array, turbulence_array
+
+def test_joinquant():
+    path_of_data = "../data"
+
+    TRADE_START_DATE = "2019-09-01"
+    TRADE_END_DATE = "2021-09-11"
+    READ_DATA_FROM_LOCAL = 0
+
+    kwargs = {}
+    kwargs['username'] = "xxx"  # should input your username
+    kwargs['password'] = "xxx"  # should input your password
+    p = DataProcessor(data_source='joinquant', **kwargs)
+
+    # trade_days = p.calc_trade_days_by_joinquant(TRADE_START_DATE, TRADE_END_DATE)
+    # stocknames = ["000612.XSHE", "601808.XSHG"]
+    # data = p.download_data_for_stocks(
+    #     stocknames, trade_days[0], trade_days[-1], READ_DATA_FROM_LOCAL, path_of_data
+    # )
+    ticker_list = ["000612.XSHE", "601808.XSHG"]
+
+    data2 = p.download_data(ticker_list=ticker_list, start_date=TRADE_START_DATE, end_date=TRADE_END_DATE, time_interval='1D')
+    # data3 = e.clean_data(data2)
+    data4 = p.add_technical_indicator(data2, ['macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30', 'close_30_sma', 'close_60_sma'])
+    # data5 = e.add_vix(data4)
+    data6 = p.add_turbulence(data4)
+    pass
+
+if __name__ == "__main__":
+    test_joinquant()
+    pass
