@@ -1,7 +1,12 @@
 # RL models from elegantrl
 import torch
-from elegantrl.agent import AgentDDPG, AgentPPO, AgentSAC, AgentTD3, AgentA2C
-from elegantrl.run import Arguments, train_and_evaluate
+from elegantrl.agents.AgentDDPG import AgentDDPG
+from elegantrl.agents.AgentPPO import AgentPPO
+from elegantrl.agents.AgentSAC import AgentSAC
+from elegantrl.agents.AgentTD3 import AgentTD3
+from elegantrl.agents.AgentA2C import AgentA2C
+from elegantrl.train.config import Arguments
+from elegantrl.train.run_tutorial import train_and_evaluate
 
 MODELS = {"ddpg": AgentDDPG, "td3": AgentTD3, "sac": AgentSAC, "ppo": AgentPPO, "a2c": AgentA2C}
 OFF_POLICY_MODELS = ["ddpg", "td3", "sac"]
@@ -73,7 +78,7 @@ class DRLAgent:
     def train_model(self, model, cwd, total_timesteps=5000):
         model.cwd = cwd
         model.break_step = total_timesteps
-        train_and_evaluate(model)
+        train_and_evaluate(args=model)
 
     @staticmethod
     def DRL_prediction(model_name, cwd, net_dimension, environment):

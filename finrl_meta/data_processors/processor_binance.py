@@ -62,14 +62,14 @@ class BinanceProcessor():
         
         return df
     
-    def df_to_array(self, df, if_vix):
+    def df_to_array(self, df, tech_indicator_list, if_vix):
         unique_ticker = df.tic.unique()
         if_first_time = True
         for tic in unique_ticker:
             if if_first_time:
                 price_array = df[df.tic==tic][['close']].values
                 #price_ary = df[df.tic==tic]['close'].values
-                tech_array = df[df.tic==tic][self.tech_indicator_list].values
+                tech_array = df[df.tic==tic][tech_indicator_list].values
                 if_first_time = False
             else:
                 price_array = np.hstack([price_array, df[df.tic==tic][['close']].values])
