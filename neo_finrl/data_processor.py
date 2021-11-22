@@ -6,7 +6,6 @@ from neo_finrl.data_processors.processor_joinquant import JoinquantProcessor
 from neo_finrl.data_processors.processor_wrds import WrdsProcessor
 from neo_finrl.data_processors.processor_yahoofinance import YahooFinanceProcessor
 from typing import List
-from neo_finrl.data_processors.func import add_hyphen_for_date
 TIME_INTERVAL = '1D'
 class DataProcessor:
     def __init__(self, data_source, **kwargs):

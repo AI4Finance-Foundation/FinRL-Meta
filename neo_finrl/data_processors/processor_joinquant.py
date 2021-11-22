@@ -17,7 +17,7 @@ class JoinQuantEngineer():
         def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str
                           ) -> pd.DataFrame:
             unit = None
-            # joinquant supports: '1m', '5m', '15m', '30m', '60m', '120m', '1d', '1w', '1M'。'1w' 表示一周，‘1M' 表示一月。
+            # joinquant supports: '1m', '5m', '15m', '30m', '60m', '120m', '1d', '1w', '1M'。'1w' denotes one week，‘1M' denotes one month。
             if time_interval == '1D':
                 unit = '1d'
             elif time_interval == '1Min':
