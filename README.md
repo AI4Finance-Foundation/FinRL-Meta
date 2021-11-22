@@ -6,7 +6,7 @@
 [![Python 3.6](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/downloads/release/python-360/)
 [![PyPI](https://img.shields.io/pypi/v/finrl_meta.svg)](https://pypi.org/project/finrl_meta/)
 
-FinRL-Meta is a universe of market environments for data-driven financial reinforcement learning. FinRL-Meta is part of FinRL. Any user can use FinRL-Meta as the metaverse of their financial market environments.
+FinRL-Meta is a universe of market environments for data-driven financial reinforcement learning.  Users can use FinRL-Meta as the metaverse of their financial market environments.
 
 1. FinRL-Meta separates financial data processing from the design pipeline of DRL-based strategy and provides open-source data engineering tools for financial big data.
 2. FinRL-Meta provides hundreds of market environments for various trading tasks.
