@@ -6,7 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 
-import finrl_meta.env_execution_optimizing.env_execution_optimizing as sca
+import finrl_meta.env_execution_optimizing.liquidation.env_execution_optimizing as sca
 
 from statsmodels.iolib.table import SimpleTable
 from statsmodels.compat.python import zip_longest

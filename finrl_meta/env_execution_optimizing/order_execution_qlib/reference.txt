@@ -1,0 +1,11 @@
+All the codes of this file (finrl_meta/env_execution_optimizing/order_execution_qlib) are collected from https://github.com/microsoft/qlib/tree/high-freq-execution/examples/trade/
+
+@misc{fang2021universal,
+      title={Universal Trading for Order Execution with Oracle Policy Distillation}, 
+      author={Yuchen Fang and Kan Ren and Weiqing Liu and Dong Zhou and Weinan Zhang and Jiang Bian and Yong Yu and Tie-Yan Liu},
+      year={2021},
+      eprint={2103.10860},
+      archivePrefix={arXiv},
+      primaryClass={q-fin.TR}
+}
+
