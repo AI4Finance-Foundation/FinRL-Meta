@@ -7,6 +7,18 @@ from neo_finrl.data_processors.processor_wrds import WrdsProcessor
 from neo_finrl.data_processors.processor_yahoofinance import YahooFinanceProcessor
 from typing import List
 TIME_INTERVAL = '1D'
+# www.csindex.com.cn, for SSE and CSI adjustments
+# SSE 50 Index constituents at 2019
+SSE_50_TICKER = [
+    "600000.XSHG",
+    "600036.XSHG",
+]
+
+# CSI 300 Index constituents at 2019
+CSI_300_TICKER = [
+    "600000.XSHG",
+    "002120.XSHE",
+]
 class DataProcessor:
     def __init__(self, data_source, **kwargs):
         self.time_interval = TIME_INTERVAL
@@ -87,8 +99,8 @@ def test_joinquant():
     TRADE_END_DATE = "2021-09-10"
     READ_DATA_FROM_LOCAL = 1
 
-    username = "xxx"  # should input your username
-    password = "xxx"  # should input your password
+    username = "18117580099"  # should input your username
+    password = "Bl2020quant"  # should input your password
     kwargs = {'username': username, 'password': password}
     e = DataProcessor(data_source="joinquant", **kwargs)
 
@@ -98,8 +110,8 @@ def test_joinquant():
     #     stocknames, trade_days[0], trade_days[-1], READ_DATA_FROM_LOCAL, path_of_data
     # )
 
-    data2 = e.download_data(ticker_list=["000612.XSHE", "601808.XSHG"], start_date=TRADE_START_DATE, end_date=TRADE_END_DATE, time_interval='1D')
-    # data3 = e.clean_data(data2)
+    data2 = e.download_data(ticker_list=CSI_300_TICKER, start_date=TRADE_START_DATE, end_date=TRADE_END_DATE, time_interval='1D')
+    data3 = e.clean_data(data2)
     data4 = e.add_technical_indicator(data2, ['macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30', 'close_30_sma', 'close_60_sma'])
     # data5 = e.add_vix(data4)
     data6 = e.add_turbulence(data4)
