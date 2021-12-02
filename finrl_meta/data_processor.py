@@ -72,9 +72,9 @@ class DataProcessor():
         return df
     
     def df_to_array(self, df, if_vix) -> np.array:
-        price_array,tech_array,turbulence_array = self.processor.df_to_array(df,
-                                                self.tech_indicator_list,
-                                                if_vix)
+        price_array, tech_array, turbulence_array = self.processor.df_to_array(df,
+                                                    self.tech_indicator_list,
+                                                    if_vix)
         #fill nan with 0 for technical indicators
         tech_nan_positions = np.isnan(tech_array)
         tech_array[tech_nan_positions] = 0
@@ -122,5 +122,14 @@ def test_joinquant():
     pass
 
 if __name__ == "__main__":
-    test_joinquant()
-    pass
+    DP = DataProcessor('binance')
+    ticker_list = ['BTCUSDT', 'BNBUSDT', 'CAKEUSDT']
+    start_date = '2021-11-21'
+    end_date = '2021-11-25'
+    time_interval = '1h'
+    technical_indicator_list = ['macd','rsi','cci','dx'] #self-defined technical indicator list is NOT supported yet
+    if_vix = False
+    price_array, tech_array, turbulence_array = DP.run(ticker_list, start_date, end_date, 
+                                                       time_interval, technical_indicator_list, 
+                                                       if_vix)
+    print(price_array.shape, tech_array.shape)
