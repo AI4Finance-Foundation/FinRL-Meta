@@ -1,9 +1,10 @@
+from datetime import datetime, timedelta
+
+import numpy as np
 import pandas as pd
 import requests
-import json
-from datetime import datetime,timedelta
-from talib.abstract import MACD, RSI, CCI, DX
-import numpy as np
+from talib.abstract import CCI, DX, MACD, RSI
+
 
 class BinanceProcessor():
     def __init__(self):
@@ -23,28 +24,29 @@ class BinanceProcessor():
         final_df = pd.DataFrame()
         for i in ticker_list:
             hist_data = self.dataframe_with_limit(symbol=i)
-            df = hist_data.iloc[:-1]
-            df = df.dropna()
+            df = hist_data.iloc[:-1].dropna()
             df['tic'] = i
             final_df = final_df.append(df)
         
         return final_df
     
+
     def clean_data(self, df):
         df = df.dropna()
-        
         return df
     
+
     def add_technical_indicator(self, df, tech_indicator_list):
         print('Adding self-defined technical indicators is NOT supported yet.')
         print('Use default: MACD, RSI, CCI, DX.')
         self.tech_indicator_list = ['open', 'high', 'low', 'close', 'volume', 
-                                         'macd', 'macd_signal', 'macd_hist', 
-                                         'rsi', 'cci', 'dx']
+                                    'macd', 'macd_signal', 'macd_hist', 
+                                    'rsi', 'cci', 'dx']
         final_df = pd.DataFrame()
         for i in df.tic.unique():
             tic_df = df[df.tic==i] 
-            tic_df['macd'], tic_df['macd_signal'], tic_df['macd_hist'] = MACD(tic_df['close'], fastperiod=12, slowperiod=26, signalperiod=9)
+            tic_df['macd'], tic_df['macd_signal'], tic_df['macd_hist'] = MACD(tic_df['close'], fastperiod=12, 
+                                                                                slowperiod=26, signalperiod=9)
             tic_df['rsi'] = RSI(tic_df['close'], timeperiod=14)
             tic_df['cci'] = CCI(tic_df['high'], tic_df['low'], tic_df['close'], timeperiod=14)
             tic_df['dx'] = DX(tic_df['high'], tic_df['low'], tic_df['close'], timeperiod=14)
@@ -52,78 +54,77 @@ class BinanceProcessor():
         
         return final_df
     
+
     def add_turbulence(self, df):
         print('Turbulence not supported yet. Return original DataFrame.')
         
         return df
     
+
     def add_vix(self, df):
         print('VIX is not applicable for cryptocurrencies. Return original DataFrame')
         
         return df
     
+
     def df_to_array(self, df, tech_indicator_list, if_vix):
         unique_ticker = df.tic.unique()
-        if_first_time = True
-        for tic in unique_ticker:
-            if if_first_time:
-                price_array = df[df.tic==tic][['close']].values
-                #price_ary = df[df.tic==tic]['close'].values
-                tech_array = df[df.tic==tic][tech_indicator_list].values
-                if_first_time = False
-            else:
-                price_array = np.hstack([price_array, df[df.tic==tic][['close']].values])
-                tech_array = np.hstack([tech_array, df[df.tic==tic][self.tech_indicator_list].values])
-                
+        price_array = np.column_stack([df[df.tic==tic].close for tic in unique_ticker])
+        tech_array = np.hstack([df.loc[(df.tic==tic), self.tech_indicator_list] for tic in unique_ticker])       
         assert price_array.shape[0] == tech_array.shape[0]
-        
         return price_array, tech_array, np.array([])
+    
+
     # helper functions
     def stringify_dates(self, date:datetime):
         return str(int(date.timestamp()*1000))
 
+
     def get_binance_bars(self, last_datetime, symbol):
+        '''
+        klines api returns data in the following order:
+        open_time, open_price, high_price, low_price, close_price, 
+        volume, close_time, quote_asset_volume, n_trades, 
+        taker_buy_base_asset_volume, taker_buy_quote_asset_volume, 
+        ignore
+        '''
         req_params = {"symbol": symbol, 'interval': self.interval,
-                      'startTime': last_datetime, 'endTime': self.end_time, 'limit': self.limit}
+                      'startTime': last_datetime, 'endTime': self.end_time, 
+                      'limit': self.limit}
         # For debugging purposes, uncomment these lines and if they throw an error
         # then you may have an error in req_params
         # r = requests.get(self.url, params=req_params)
         # print(r.text) 
-        df = pd.DataFrame(json.loads(requests.get(self.url, params=req_params).text))
-        if (len(df.index) == 0):
+        df = pd.DataFrame(requests.get(self.url, params=req_params).json())
+        
+        if df.empty:
             return None
         
-        df = df.iloc[:,0:6]
+        df = df.iloc[:, 0:6]
         df.columns = ['datetime','open','high','low','close','volume']
 
-        df.open = df.open.astype("float")
-        df.high = df.high.astype("float")
-        df.low = df.low.astype("float")
-        df.close = df.close.astype("float")
-        df.volume = df.volume.astype("float")
+        df[['open','high','low','close','volume']] = df[['open','high','low','close','volume']].astype(float)
 
-        # No stock split and dividend announcement, hence close is same as adjusted close
+        # No stock split and dividend announcement, hence adjusted close is the same as close
         df['adj_close'] = df['close']
-        df['datetime'] = [datetime.fromtimestamp(
-            x / 1000.0) for x in df.datetime
-        ]
-        df.index = [x for x in range(len(df))]
+        df['datetime'] = df.datetime.apply(lambda x: datetime.fromtimestamp(x/1000.0))
+        df.reset_index(drop=True, inplace=True)
+
         return df
     
+
     def dataframe_with_limit(self, symbol):
-        df_list = []
+        final_df = pd.DataFrame()
         last_datetime = self.start_time
         while True:
             new_df = self.get_binance_bars(last_datetime, symbol)
             if new_df is None:
                 break
-            df_list.append(new_df)
+            final_df = final_df.append(new_df)
             last_datetime = max(new_df.datetime) + timedelta(days=1)
             last_datetime = self.stringify_dates(last_datetime)
             
-        final_df = pd.concat(df_list)
-        date_value = [x.strftime('%Y-%m-%d %H:%M:%S') for x in final_df['datetime']]
-        final_df.insert(0,'time',date_value)
-        final_df.drop('datetime',inplace=True,axis=1)
-        
+        date_value = final_df['datetime'].apply(lambda x: x.strftime('%Y-%m-%d %H:%M:%S'))
+        final_df.insert(0, 'time', date_value)
+        final_df.drop('datetime', inplace=True, axis=1)
         return final_df
