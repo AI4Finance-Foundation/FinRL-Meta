@@ -86,17 +86,20 @@ class DataProcessor():
             technical_indicator_list, if_vix, cache=False):
         
         cache_csv = '_'.join(ticker_list + [self.data_source, start_date, end_date, time_interval]) + '.csv'
-        cache_path = os.path.join('./cache', cache_csv)
+        cache_dir = './cache'
+        cache_path = os.path.join(cache_dir, cache_csv)
 
         if cache and os.path.isfile(cache_path):
             print('Using cached file {}'.format(cache_path))
             self.tech_indicator_list = technical_indicator_list
             data = pd.read_csv(cache_path)
-
+        
         else:
             data = self.download_data(ticker_list, start_date, end_date, time_interval)
             data = self.clean_data(data)
             if cache:
+                if not os.path.exists(cache_dir):
+                    os.mkdir(cache_dir)
                 data.to_csv(cache_path)
         data = self.add_technical_indicator(data, technical_indicator_list)
         if if_vix:
