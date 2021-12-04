@@ -6,11 +6,12 @@ from finrl_meta.data_processors.processor_ricequant import RiceQuantProcessor as
 from finrl_meta.data_processors.processor_joinquant import JoinquantProcessor
 import pandas as pd
 import numpy as np
-
+import os
 
 class DataProcessor():
     def __init__(self, data_source, **kwargs):
-        if data_source == 'alpaca':
+        self.data_source = data_source
+        if self.data_source == 'alpaca':
             try:
                 API_KEY= kwargs.get('API_KEY')
                 API_SECRET= kwargs.get('API_SECRET')
@@ -19,10 +20,10 @@ class DataProcessor():
                 print('Alpaca successfully connected')
             except:
                 raise ValueError('Please input correct account info for alpaca!')
-        elif data_source == "joinquant":
+        elif self.data_source == "joinquant":
             self.processor = JoinquantProcessor(data_source, **kwargs)
 
-        elif data_source =='ricequant':
+        elif self.data_source =='ricequant':
             try:
                 username = kwargs.get('username')
                 password = kwargs.get('password')
@@ -30,13 +31,13 @@ class DataProcessor():
             except:
                 self.processor = RiceQuant()
                 
-        elif data_source == 'wrds':
+        elif self.data_source == 'wrds':
             self.processor = Wrds()
             
-        elif data_source == 'yahoofinance':
+        elif self.data_source == 'yahoofinance':
             self.processor = YahooFinance()
         
-        elif data_source =='binance':
+        elif self.data_source =='binance':
             self.processor = Binance()
         
         else:
@@ -82,12 +83,28 @@ class DataProcessor():
         return price_array, tech_array, turbulence_array
     
     def run(self, ticker_list, start_date, end_date, time_interval, 
-            technical_indicator_list, if_vix):
-        data = self.download_data(ticker_list, start_date, end_date, time_interval)
-        data = self.clean_data(data)
+            technical_indicator_list, if_vix, cache=False):
+        
+        cache_csv = '_'.join(ticker_list + [self.data_source, start_date, end_date, time_interval]) + '.csv'
+        cache_dir = './cache'
+        cache_path = os.path.join(cache_dir, cache_csv)
+
+        if cache and os.path.isfile(cache_path):
+            print('Using cached file {}'.format(cache_path))
+            self.tech_indicator_list = technical_indicator_list
+            data = pd.read_csv(cache_path)
+        
+        else:
+            data = self.download_data(ticker_list, start_date, end_date, time_interval)
+            data = self.clean_data(data)
+            if cache:
+                if not os.path.exists(cache_dir):
+                    os.mkdir(cache_dir)
+                data.to_csv(cache_path)
         data = self.add_technical_indicator(data, technical_indicator_list)
         if if_vix:
             data = self.add_vix(data)
+
         price_array, tech_array, turbulence_array = self.df_to_array(data, if_vix)
         tech_nan_positions = np.isnan(tech_array)
         tech_array[tech_nan_positions] = 0
@@ -131,5 +148,5 @@ if __name__ == "__main__":
     if_vix = False
     price_array, tech_array, turbulence_array = DP.run(ticker_list, start_date, end_date, 
                                                        time_interval, technical_indicator_list, 
-                                                       if_vix)
+                                                       if_vix, cache=True)
     print(price_array.shape, tech_array.shape)
