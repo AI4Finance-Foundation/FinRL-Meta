@@ -21,7 +21,7 @@ def train(start_date, end_date, ticker_list, data_source, time_interval,
     env_instance = env(config=data_config)
 
     #read parameters and load agents
-    cwd = kwargs.get('cwd','./'+str(model_name))
+    cwd = kwargs.get('cwd','./'+str(model_name)) #cwd: current_working_dir
 
     if drl_lib == 'elegantrl':
         break_step = kwargs.get('break_step', 1e6)
@@ -35,7 +35,7 @@ def train(start_date, end_date, ticker_list, data_source, time_interval,
         model = agent.get_model(model_name, model_kwargs = erl_params)
         trained_model = agent.train_model(model=model, 
                                           cwd=cwd,
-                                          total_timesteps=break_step)
+                                          total_timesteps=break_step) #erl model is automated saved in cwd
       
     elif drl_lib == 'rllib':
         total_episodes = kwargs.get('total_episodes', 100)
