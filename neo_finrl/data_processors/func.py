@@ -12,6 +12,7 @@ TIME_ZONE_SELFDEFINED = 'xxx'  # If neither of the above is your time zone, you 
 USE_TIME_ZONE_SELFDEFINED = 0  # 0 (default) or 1 (use the self defined)
 
 
+
 def calc_time_zone(ticker_list: List[str], time_zone_selfdefined, use_time_zone_selfdefined) -> str:
     time_zone = ''
     if use_time_zone_selfdefined == 1:
