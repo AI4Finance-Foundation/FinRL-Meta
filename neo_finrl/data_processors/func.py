@@ -1,6 +1,35 @@
 import copy
 import datetime
 import os
+from typing import List
+
+TIME_ZONE_SHANGHAI = 'Asia/Shanghai'  ## Hang Seng HSI, SSE, CSI
+TIME_ZONE_USEASTERN = 'US/Eastern'  # Dow, Nasdaq, SP
+TIME_ZONE_PARIS = 'Europe/Paris'  # CAC,
+TIME_ZONE_BERLIN = 'Europe/Berlin'  # DAX, TECDAX, MDAX, SDAX
+TIME_ZONE_JAKARTA = 'Asia/Jakarta'  # LQ45
+TIME_ZONE_SELFDEFINED = 'xxx'  # If neither of the above is your time zone, you should define it, and set USE_TIME_ZONE_SELFDEFINED 1.
+USE_TIME_ZONE_SELFDEFINED = 0  # 0 (default) or 1 (use the self defined)
+
+
+def calc_time_zone(ticker_list: List[str], time_zone_selfdefined, use_time_zone_selfdefined) -> str:
+    time_zone = ''
+    if use_time_zone_selfdefined == 1:
+        time_zone = time_zone_selfdefined
+    elif ticker_list in [HSI_50_TICKER, SSE_50_TICKER, CSI_300_TICKER]:
+        time_zone = TIME_ZONE_SHANGHAI
+    elif ticker_list in [DOW_30_TICKER, NAS_100_TICKER, SP_500_TICKER]:
+        time_zone = TIME_ZONE_USEASTERN
+    elif ticker_list == CAC_40_TICKER:
+        time_zone = TIME_ZONE_PARIS
+    elif ticker_list in [DAX_30_TICKER, TECDAX_TICKER, MDAX_50_TICKER, SDAX_50_TICKER]:
+        time_zone = TIME_ZONE_BERLIN
+    elif ticker_list == LQ45_TICKER:
+        time_zone = TIME_ZONE_JAKARTA
+    else:
+        raise ValueError("Time zone is wrong.")
+    return time_zone
+
 
 # e.g., '20210911' -> '2021-09-11'
 def add_hyphen_for_date(d: str) -> str:
