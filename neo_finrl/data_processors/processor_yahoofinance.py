@@ -7,6 +7,15 @@ from stockstats import StockDataFrame as Sdf
 import trading_calendars as tc
 import pytz
 from neo_finrl.data_processors.basic_processor import BasicProcessor
+from func import calc_time_zone
+
+TIME_ZONE_SHANGHAI = 'Asia/Shanghai'  ## Hang Seng HSI, SSE, CSI
+TIME_ZONE_USEASTERN = 'US/Eastern'  # Dow, Nasdaq, SP
+TIME_ZONE_PARIS = 'Europe/Paris'  # CAC,
+TIME_ZONE_BERLIN = 'Europe/Berlin'  # DAX, TECDAX, MDAX, SDAX
+TIME_ZONE_JAKARTA = 'Asia/Jakarta'  # LQ45
+TIME_ZONE_SELFDEFINED = 'xxx'  # If neither of the above is your time zone, you should define it, and set USE_TIME_ZONE_SELFDEFINED 1.
+USE_TIME_ZONE_SELFDEFINED = 0  # 0 (default) or 1 (use the self defined)
 
 class YahooFinanceProcessor():
     """Provides methods for retrieving daily stock data from
@@ -43,7 +52,8 @@ class YahooFinanceProcessor():
         self.start = start_date
         self.end = end_date
         self.time_interval = time_interval
-        
+        self.time_zone = calc_time_zone(ticker_list, TIME_ZONE_SELFDEFINED, USE_TIME_ZONE_SELFDEFINED)
+
         # Download and save the data in a pandas DataFrame:
         data_df = pd.DataFrame()
         for tic in ticker_list:
@@ -95,8 +105,7 @@ class YahooFinanceProcessor():
         elif time_interval == '1Min':
             times = []
             for day in trading_days:
-                NY = 'America/New_York'
-                current_time = pd.Timestamp(day+' 09:30:00').tz_localize(NY)
+                current_time = pd.Timestamp(day+' 09:30:00').tz_localize(self.time_zone)
                 for i in range(390):
                     times.append(current_time)
                     current_time += pd.Timedelta(minutes=1)

@@ -13,7 +13,7 @@ USE_TIME_ZONE_SELFDEFINED = 0  # 0 (default) or 1 (use the self defined)
 
 
 
-def calc_time_zone(ticker_list: List[str], time_zone_selfdefined, use_time_zone_selfdefined) -> str:
+def calc_time_zone(ticker_list: List[str], time_zone_selfdefined: str, use_time_zone_selfdefined: int) -> str:
     time_zone = ''
     if use_time_zone_selfdefined == 1:
         time_zone = time_zone_selfdefined
