@@ -9,6 +9,7 @@ class BasicProcessor:
         assert data_source in ["alpaca", "ccxt", "joinquant", "quantconnect", "ricequant", "wrds", "yahoofinance", ], "Data source input is NOT supported yet."
         self.data_source = data_source
         self.time_interval = TIME_INTERVAL
+        self.time_zone = ''
 
     def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str) \
             -> pd.DataFrame:
