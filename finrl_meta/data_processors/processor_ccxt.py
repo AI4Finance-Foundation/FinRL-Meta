@@ -9,7 +9,7 @@ class CCXTProcessor():
     def __init__(self):
         self.binance = ccxt.binance()
         
-    def download_data(self,start_date, end_date, ticker_list = ['BTC/USDT'], time_interval = '1m'):
+    def download_data(self,start_date, end_date, ticker_list = ['BTC/USDT'], time_interval = '1m') -> pd.DataFrame:
         def min_ohlcv(dt, pair, limit):
             since = calendar.timegm(dt.utctimetuple())*1000
             ohlcv = self.binance.fetch_ohlcv(symbol=pair, timeframe='1m', since=since, limit=limit)
