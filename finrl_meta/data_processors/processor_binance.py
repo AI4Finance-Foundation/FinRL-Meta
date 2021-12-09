@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-
+from typing import List
 import numpy as np
 import pandas as pd
 import requests
@@ -11,8 +11,7 @@ class BinanceProcessor():
         self.url = "https://api.binance.com/api/v3/klines"
     
     #main functions
-    def download_data(self, ticker_list, start_date, end_date, 
-                      time_interval):
+    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str) -> pd.DataFrame:
         startTime = datetime.strptime(start_date, '%Y-%m-%d')
         endTime = datetime.strptime(end_date, '%Y-%m-%d')
         

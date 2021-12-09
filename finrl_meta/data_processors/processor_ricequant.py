@@ -2,6 +2,7 @@ import rqdatac as ricequant
 import pandas as pd
 from stockstats import StockDataFrame as Sdf
 import numpy as np
+from typing import List
 
 class RiceQuantProcessor():
     def __init__(self, username = None, password = None):
@@ -11,8 +12,7 @@ class RiceQuantProcessor():
         else:
             ricequant.init(username, password) #init with username and password
             
-    def download_data(self, ticker_list, start_date, end_date, 
-                   time_interval) -> pd.DataFrame:
+    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str) -> pd.DataFrame:
         # download data by calling RiceQuant API
         dataframe = ricequant.get_price(ticker_list, frequency = time_interval, 
                             start_date = start_date, end_date = end_date)
