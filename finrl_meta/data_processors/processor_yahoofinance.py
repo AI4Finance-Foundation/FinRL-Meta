@@ -5,6 +5,7 @@ import yfinance as yf
 import numpy as np
 from stockstats import StockDataFrame as Sdf
 import trading_calendars as tc
+from typing import List
 import pytz
 from func import calc_time_zone
 
@@ -35,8 +36,7 @@ class YahooFinanceProcessor():
     def __init__(self):
         pass
     
-    def download_data(self, start_date: str, end_date: str, ticker_list: list,
-                      time_interval: str) -> pd.DataFrame:
+    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str) -> pd.DataFrame:
         """Fetches data from Yahoo API
         Parameters
         ----------

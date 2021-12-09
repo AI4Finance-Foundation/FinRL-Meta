@@ -4,6 +4,7 @@ import pandas as pd
 import trading_calendars as tc
 import pytz
 import numpy as np
+from typing import List
 from stockstats import StockDataFrame as Sdf
 pd.options.mode.chained_assignment = None 
 
@@ -12,7 +13,7 @@ class WrdsProcessor():
         if not if_offline:
             self.db = wrds.Connection()
 
-    def download_data(self, start_date, end_date, ticker_list, time_interval, if_save_tempfile=False,
+    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str, if_save_tempfile=False,
                          filter_shares=0):
         
     
