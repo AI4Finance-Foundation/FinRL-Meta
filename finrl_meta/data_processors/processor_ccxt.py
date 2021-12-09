@@ -3,13 +3,14 @@ import pandas as pd
 import ccxt
 import calendar
 from datetime import datetime
+from typing import List
 from stockstats import StockDataFrame as Sdf
 
 class CCXTProcessor():
     def __init__(self):
         self.binance = ccxt.binance()
         
-    def download_data(self,start_date, end_date, ticker_list = ['BTC/USDT'], time_interval = '1m') -> pd.DataFrame:
+    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str = '1m') -> pd.DataFrame:
         def min_ohlcv(dt, pair, limit):
             since = calendar.timegm(dt.utctimetuple())*1000
             ohlcv = self.binance.fetch_ohlcv(symbol=pair, timeframe='1m', since=since, limit=limit)
