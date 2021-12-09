@@ -19,6 +19,7 @@ class BinanceProcessor():
         self.end_time = self.stringify_dates(endTime)
         self.interval = time_interval
         self.limit = 1440
+        self.time_zone = calc_time_zone(ticker_list, TIME_ZONE_SELFDEFINED, USE_TIME_ZONE_SELFDEFINED)
         
         final_df = pd.DataFrame()
         for i in ticker_list:
