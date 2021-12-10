@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import pytz
 from typing import List
-from func import calc_time_zone
+from finrl_meta.data_processors.func import calc_time_zone
 import exchange_calendars as tc
 from stockstats import StockDataFrame as Sdf
 

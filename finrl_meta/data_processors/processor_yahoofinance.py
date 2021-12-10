@@ -7,7 +7,7 @@ from stockstats import StockDataFrame as Sdf
 import trading_calendars as tc
 from typing import List
 import pytz
-from func import calc_time_zone
+from finrl_meta.data_processors.func import calc_time_zone
 
 TIME_ZONE_SHANGHAI = 'Asia/Shanghai'  ## Hang Seng HSI, SSE, CSI
 TIME_ZONE_USEASTERN = 'US/Eastern'  # Dow, Nasdaq, SP
