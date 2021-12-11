@@ -13,7 +13,7 @@ class DataProcessor():
         self.data_source = data_source
         if self.data_source == 'alpaca':
             try:
-                # users should input values: kwargs['api_key'], kwargs['api_secret'], kwargs['apca_api_base_url'], kwargs['api']
+                # users should input values: kwargs['API_KEY'], kwargs['API_SECRET'], kwargs['APCA_API_BASE_URL'], kwargs['API']
                 self.processor = Alpaca(data_source, **kwargs)
                 print('Alpaca successfully connected')
             except:
