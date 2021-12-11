@@ -5,9 +5,13 @@ import calendar
 from datetime import datetime
 from typing import List
 from stockstats import StockDataFrame as Sdf
+# from basic_processor import BasicProcessor
+from finrl_meta.data_processors.basic_processor import BasicProcessor
 
-class CCXTProcessor():
-    def __init__(self):
+
+class CCXTProcessor(BasicProcessor):
+    def __init__(self, data_source: str, **kwargs):
+        BasicProcessor.__init__(self, data_source, **kwargs)
         self.binance = ccxt.binance()
         
     def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str) -> pd.DataFrame:
