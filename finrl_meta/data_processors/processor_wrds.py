@@ -17,7 +17,7 @@ class WrdsProcessor(BasicProcessor):
     #         self.db = wrds.Connection()
     def __init__(self, data_source: str, **kwargs):
         BasicProcessor.__init__(self, data_source, **kwargs)
-        if not kwargs['if_offline']:
+        if 'if_offline' in kwargs.keys() and not kwargs['if_offline']:
             self.db = wrds.Connection()
 
     def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str, if_save_tempfile=False,

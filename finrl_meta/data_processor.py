@@ -19,26 +19,35 @@ class DataProcessor():
             except:
                 raise ValueError('Please input correct account info for alpaca!')
         elif self.data_source == "joinquant":
-            # users should input values: kwargs['username'], kwargs['password']
-            self.processor = JoinquantProcessor(data_source, **kwargs)
-
+            try:
+                # users should input values: kwargs['username'], kwargs['password']
+                self.processor = JoinquantProcessor(data_source, **kwargs)
+            except:
+                raise ValueError('Please input correct account info for joinquant!')
         elif self.data_source =='ricequant':
             try:
-                username = kwargs.get('username')
-                password = kwargs.get('password')
-                self.processor = RiceQuant(username, password)
+                # users should input values: kwargs['username'], kwargs['password']
+                self.processor = RiceQuant(data_source, **kwargs)
             except:
-                self.processor = RiceQuant()
-                
+                raise ValueError('Please input correct account info for ricequant!')
         elif self.data_source == 'wrds':
-            self.processor = Wrds()
+            try:
+                # users should input values: kwargs['if_offline']
+                self.processor = Wrds(data_source, **kwargs)
+            except:
+                raise ValueError('Please input correct account info for wrds!')
             
         elif self.data_source == 'yahoofinance':
-            self.processor = YahooFinance()
+            try:
+                self.processor = YahooFinance(data_source, **kwargs)
+            except:
+                raise ValueError('Please input correct account info for yahoofinance!')
         
         elif self.data_source =='binance':
-            self.processor = Binance()
-        
+            try:
+                self.processor = Binance(data_source, **kwargs)
+            except:
+                raise ValueError('Please input correct account info for binance!')
         else:
             raise ValueError('Data source input is NOT supported yet.')
     
