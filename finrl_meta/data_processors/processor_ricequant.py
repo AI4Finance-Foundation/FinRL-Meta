@@ -5,6 +5,7 @@ import numpy as np
 from typing import List
 # from basic_processor import BasicProcessor
 from finrl_meta.data_processors.basic_processor import BasicProcessor
+
 class RiceQuantProcessor(BasicProcessor):
     # def __init__(self, username = None, password = None):
     #     # initialize ricequant
