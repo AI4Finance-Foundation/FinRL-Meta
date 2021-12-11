@@ -4,10 +4,11 @@ import numpy as np
 import pandas as pd
 import requests
 from talib.abstract import CCI, DX, MACD, RSI
+from basic_processor import BasicProcessor
 
-
-class BinanceProcessor():
-    def __init__(self):
+class BinanceProcessor(BasicProcessor):
+    def __init__(self, data_source: str, **kwargs):
+        BasicProcessor.__init__(self, data_source, **kwargs)
         self.url = "https://api.binance.com/api/v3/klines"
     
     #main functions
