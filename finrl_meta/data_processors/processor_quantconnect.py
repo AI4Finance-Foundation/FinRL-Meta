@@ -1,9 +1,9 @@
 import numpy as np
 import pandas as pd
-
-class QuantConnectEngineer():
-    def __init__(self):
-        pass
+from basic_processor import BasicProcessor
+class QuantConnectEngineer(BasicProcessor):
+    def __init__(self, data_source: str, **kwargs):
+        BasicProcessor.__init__(self, data_source, **kwargs)
     def data_fetch(start_time, end_time, stock_list, resolution=Resolution.Daily) :
         #resolution: Daily, Hour, Minute, Second
         qb = QuantBook()
