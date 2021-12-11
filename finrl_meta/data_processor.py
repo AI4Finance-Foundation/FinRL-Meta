@@ -151,4 +151,5 @@ if __name__ == "__main__":
     #                                                    if_vix, cache=True)
     # print(price_array.shape, tech_array.shape)
 
+
     test_joinquant()
