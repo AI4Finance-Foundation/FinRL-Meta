@@ -6,7 +6,8 @@ from typing import List
 from finrl_meta.data_processors.func import calc_time_zone
 import exchange_calendars as tc
 from stockstats import StockDataFrame as Sdf
-from basic_processor import BasicProcessor
+# from basic_processor import BasicProcessor
+from finrl_meta.data_processors.basic_processor import BasicProcessor
 TIME_ZONE_SHANGHAI = 'Asia/Shanghai'  ## Hang Seng HSI, SSE, CSI
 TIME_ZONE_USEASTERN = 'US/Eastern'  # Dow, Nasdaq, SP
 TIME_ZONE_PARIS = 'Europe/Paris'  # CAC,
