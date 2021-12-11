@@ -2,7 +2,7 @@ import os
 import sys
 import pandas as pd
 from finta import TA
-from basic_processor import BasicProcessor
+from finrl_meta.data_processors.basic_processor import BasicProcessor
 
 def add_time_feature(df,symbol, dt_col_name = 'time'):
     """read csv into df and index on time
