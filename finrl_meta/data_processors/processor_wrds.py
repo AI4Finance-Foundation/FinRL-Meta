@@ -10,6 +10,7 @@ from stockstats import StockDataFrame as Sdf
 from finrl_meta.data_processors.basic_processor import BasicProcessor
 pd.options.mode.chained_assignment = None 
 
+
 class WrdsProcessor(BasicProcessor):
     # def __init__(self,if_offline=False):
     #     if not if_offline:
