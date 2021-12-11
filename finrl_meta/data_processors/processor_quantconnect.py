@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 # from basic_processor import BasicProcessor
 from finrl_meta.data_processors.basic_processor import BasicProcessor
+
 class QuantConnectEngineer(BasicProcessor):
     def __init__(self, data_source: str, **kwargs):
         BasicProcessor.__init__(self, data_source, **kwargs)
