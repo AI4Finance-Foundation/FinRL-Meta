@@ -4,6 +4,7 @@ from typing import List
 from stockstats import StockDataFrame as Sdf
 TIME_INTERVAL = '1D'
 
+
 class BasicProcessor:
     def __init__(self, data_source: str, **kwargs):
         assert data_source in ["alpaca", "ccxt", "joinquant", "quantconnect", "ricequant", "wrds", "yahoofinance", ], "Data source input is NOT supported yet."
