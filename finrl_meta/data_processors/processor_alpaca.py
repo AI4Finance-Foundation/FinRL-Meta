@@ -16,6 +16,7 @@ TIME_ZONE_JAKARTA = 'Asia/Jakarta'  # LQ45
 TIME_ZONE_SELFDEFINED = 'xxx'  # If neither of the above is your time zone, you should define it, and set USE_TIME_ZONE_SELFDEFINED 1.
 USE_TIME_ZONE_SELFDEFINED = 0  # 0 (default) or 1 (use the self defined)
 
+
 class AlpacaProcessor(BasicProcessor):
     # def __init__(self, API_KEY=None, API_SECRET=None, APCA_API_BASE_URL=None, api=None):
     #     if api is None:
