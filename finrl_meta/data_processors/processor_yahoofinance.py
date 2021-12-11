@@ -8,6 +8,7 @@ import trading_calendars as tc
 from typing import List
 import pytz
 from finrl_meta.data_processors.func import calc_time_zone
+from basic_processor import BasicProcessor
 
 TIME_ZONE_SHANGHAI = 'Asia/Shanghai'  ## Hang Seng HSI, SSE, CSI
 TIME_ZONE_USEASTERN = 'US/Eastern'  # Dow, Nasdaq, SP
@@ -16,7 +17,7 @@ TIME_ZONE_BERLIN = 'Europe/Berlin'  # DAX, TECDAX, MDAX, SDAX
 TIME_ZONE_JAKARTA = 'Asia/Jakarta'  # LQ45
 TIME_ZONE_SELFDEFINED = 'xxx'  # If neither of the above is your time zone, you should define it, and set USE_TIME_ZONE_SELFDEFINED 1.
 USE_TIME_ZONE_SELFDEFINED = 0  # 0 (default) or 1 (use the self defined)
-class YahooFinanceProcessor():
+class YahooFinanceProcessor(BasicProcessor):
     """Provides methods for retrieving daily stock data from
     Yahoo Finance API
     Attributes
@@ -33,8 +34,8 @@ class YahooFinanceProcessor():
         Fetches data from yahoo API
     """
 
-    def __init__(self):
-        pass
+    def __init__(self, data_source: str, **kwargs):
+        BasicProcessor.__init__(self, data_source, **kwargs)
     
     def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str) -> pd.DataFrame:
         """Fetches data from Yahoo API
