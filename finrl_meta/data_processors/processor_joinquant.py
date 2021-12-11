@@ -10,6 +10,7 @@ from finrl_meta.data_processors.func import remove_hyphen_for_date
 # from basic_processor import BasicProcessor
 from finrl_meta.data_processors.basic_processor import BasicProcessor
 
+
 class JoinquantProcessor(BasicProcessor):
     def __init__(self, data_source: str, **kwargs):
         BasicProcessor.__init__(self, data_source, **kwargs)
