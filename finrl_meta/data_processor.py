@@ -22,30 +22,33 @@ class DataProcessor():
             try:
                 # users should input values: kwargs['username'], kwargs['password']
                 self.processor = JoinquantProcessor(data_source, **kwargs)
+                print('Joinquant successfully connected')
             except:
                 raise ValueError('Please input correct account info for joinquant!')
         elif self.data_source =='ricequant':
             try:
                 # users should input values: kwargs['username'], kwargs['password']
                 self.processor = RiceQuant(data_source, **kwargs)
+                print('Ricequant successfully connected')
             except:
                 raise ValueError('Please input correct account info for ricequant!')
         elif self.data_source == 'wrds':
             try:
                 # users should input values: kwargs['if_offline']
                 self.processor = Wrds(data_source, **kwargs)
+                print('Wrds successfully connected')
             except:
                 raise ValueError('Please input correct account info for wrds!')
-            
         elif self.data_source == 'yahoofinance':
             try:
                 self.processor = YahooFinance(data_source, **kwargs)
+                print('Yahoofinance successfully connected')
             except:
                 raise ValueError('Please input correct account info for yahoofinance!')
-        
         elif self.data_source =='binance':
             try:
                 self.processor = Binance(data_source, **kwargs)
+                print('Binance successfully connected')
             except:
                 raise ValueError('Please input correct account info for binance!')
         else:
