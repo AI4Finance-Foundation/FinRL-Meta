@@ -139,16 +139,14 @@ def test_joinquant():
     pass
 
 if __name__ == "__main__":
-    # DP = DataProcessor('binance')
-    # ticker_list = ['BTCUSDT', 'BNBUSDT', 'CAKEUSDT']
-    # start_date = '2021-11-21'
-    # end_date = '2021-11-25'
-    # time_interval = '1h'
-    # technical_indicator_list = ['macd','rsi','cci','dx'] #self-defined technical indicator list is NOT supported yet
-    # if_vix = False
-    # price_array, tech_array, turbulence_array = DP.run(ticker_list, start_date, end_date,
-    #                                                    time_interval, technical_indicator_list,
-    #                                                    if_vix, cache=True)
-    # print(price_array.shape, tech_array.shape)
-
-    test_joinquant()
+    DP = DataProcessor('binance')
+    ticker_list = ['BTCUSDT', 'BNBUSDT', 'CAKEUSDT']
+    start_date = '2021-11-21'
+    end_date = '2021-11-25'
+    time_interval = '1h'
+    technical_indicator_list = ['macd','rsi','cci','dx'] #self-defined technical indicator list is NOT supported yet
+    if_vix = False
+    price_array, tech_array, turbulence_array = DP.run(ticker_list, start_date, end_date, 
+                                                       time_interval, technical_indicator_list, 
+                                                       if_vix, cache=True)
+    print(price_array.shape, tech_array.shape)

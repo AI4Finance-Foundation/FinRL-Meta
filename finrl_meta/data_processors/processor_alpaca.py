@@ -6,8 +6,7 @@ from typing import List
 from finrl_meta.data_processors.func import calc_time_zone
 import exchange_calendars as tc
 from stockstats import StockDataFrame as Sdf
-# from basic_processor import BasicProcessor
-from finrl_meta.data_processors.basic_processor import BasicProcessor
+
 TIME_ZONE_SHANGHAI = 'Asia/Shanghai'  ## Hang Seng HSI, SSE, CSI
 TIME_ZONE_USEASTERN = 'US/Eastern'  # Dow, Nasdaq, SP
 TIME_ZONE_PARIS = 'Europe/Paris'  # CAC,
@@ -16,25 +15,16 @@ TIME_ZONE_JAKARTA = 'Asia/Jakarta'  # LQ45
 TIME_ZONE_SELFDEFINED = 'xxx'  # If neither of the above is your time zone, you should define it, and set USE_TIME_ZONE_SELFDEFINED 1.
 USE_TIME_ZONE_SELFDEFINED = 0  # 0 (default) or 1 (use the self defined)
 
-class AlpacaProcessor(BasicProcessor):
-    # def __init__(self, API_KEY=None, API_SECRET=None, APCA_API_BASE_URL=None, api=None):
-    #     if api is None:
-    #         try:
-    #             self.api = tradeapi.REST(API_KEY, API_SECRET, APCA_API_BASE_URL, "v2")
-    #         except BaseException:
-    #             raise ValueError("Wrong Account Info!")
-    #     else:
-    #         self.api = api
-    def __init__(self, data_source: str, **kwargs):
-        BasicProcessor.__init__(self, data_source, **kwargs)
-        if kwargs['api'] is None:
+class AlpacaProcessor:
+    def __init__(self, API_KEY=None, API_SECRET=None, APCA_API_BASE_URL=None, api=None):
+        if api is None:
             try:
-                self.api = tradeapi.REST(kwargs['api_key'], kwargs['api_secret'], kwargs['apca_api_base_url'], "v2")
+                self.api = tradeapi.REST(API_KEY, API_SECRET, APCA_API_BASE_URL, "v2")
             except BaseException:
                 raise ValueError("Wrong Account Info!")
         else:
-            self.api = kwargs['api']
-            
+            self.api = api
+
     def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str) -> pd.DataFrame:
         self.start = start_date
         self.end = end_date

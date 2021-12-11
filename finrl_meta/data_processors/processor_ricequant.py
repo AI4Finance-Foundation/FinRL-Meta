@@ -3,21 +3,14 @@ import pandas as pd
 from stockstats import StockDataFrame as Sdf
 import numpy as np
 from typing import List
-# from basic_processor import BasicProcessor
-from finrl_meta.data_processors.basic_processor import BasicProcessor
-class RiceQuantProcessor(BasicProcessor):
-    # def __init__(self, username = None, password = None):
-    #     # initialize ricequant
-    #     if username== None or password == None:
-    #         ricequant.init()   #if the lisence is already set, you can init without username and password
-    #     else:
-    #         ricequant.init(username, password) #init with username and password
-    def __init__(self, data_source: str, **kwargs):
-        BasicProcessor.__init__(self, data_source, **kwargs)
-        if kwargs['username']== None or kwargs['password'] == None:
-            ricequant.init()   #if the lisence is already set, you can init without username and password
+
+class RiceQuantProcessor():
+    def __init__(self, username = None, password = None):
+        # initialize ricequant
+        if username== None or password == None:
+            ricequant.init()   #if the lisence is already set, you can init without username and password 
         else:
-            ricequant.init(kwargs['username'], kwargs['password']) #init with username and password
+            ricequant.init(username, password) #init with username and password
             
     def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str) -> pd.DataFrame:
         # download data by calling RiceQuant API

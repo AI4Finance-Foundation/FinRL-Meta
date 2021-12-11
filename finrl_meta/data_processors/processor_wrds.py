@@ -6,17 +6,11 @@ import pytz
 import numpy as np
 from typing import List
 from stockstats import StockDataFrame as Sdf
-# from basic_processor import BasicProcessor
-from finrl_meta.data_processors.basic_processor import BasicProcessor
 pd.options.mode.chained_assignment = None 
 
-class WrdsProcessor(BasicProcessor):
-    # def __init__(self,if_offline=False):
-    #     if not if_offline:
-    #         self.db = wrds.Connection()
-    def __init__(self, data_source: str, **kwargs):
-        BasicProcessor.__init__(self, data_source, **kwargs)
-        if not kwargs['if_offline']:
+class WrdsProcessor():
+    def __init__(self,if_offline=False):
+        if not if_offline:
             self.db = wrds.Connection()
 
     def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str, if_save_tempfile=False,
