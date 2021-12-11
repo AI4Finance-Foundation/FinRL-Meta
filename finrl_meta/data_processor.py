@@ -13,14 +13,13 @@ class DataProcessor():
         self.data_source = data_source
         if self.data_source == 'alpaca':
             try:
-                API_KEY= kwargs.get('API_KEY')
-                API_SECRET= kwargs.get('API_SECRET')
-                APCA_API_BASE_URL= kwargs.get('APCA_API_BASE_URL')
-                self.processor = Alpaca(API_KEY, API_SECRET, APCA_API_BASE_URL)
+                # users should input values: kwargs['api_key'], kwargs['api_secret'], kwargs['apca_api_base_url'], kwargs['api']
+                self.processor = Alpaca(data_source, **kwargs)
                 print('Alpaca successfully connected')
             except:
                 raise ValueError('Please input correct account info for alpaca!')
         elif self.data_source == "joinquant":
+            # users should input values: kwargs['username'], kwargs['password']
             self.processor = JoinquantProcessor(data_source, **kwargs)
 
         elif self.data_source =='ricequant':
