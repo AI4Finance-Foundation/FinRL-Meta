@@ -25,7 +25,6 @@ class QuantConnectEngineer(BasicProcessor):
     #     history = qb.History(qb.Securities.Keys, start_time, end_time, resolution)
     #     return history
 
-
     def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str) -> pd.DataFrame:
         self.start = start_date
         self.end = end_date
