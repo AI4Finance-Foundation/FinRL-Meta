@@ -13,6 +13,7 @@ class QuantConnectEngineer(BasicProcessor):
             qb.AddEquity(stock)
         history = qb.History(qb.Securities.Keys, start_time, end_time, resolution)
         return history
+
     def preprocess(df, stock_list):
         df = df[['open','high','low','close','volume']]
         if_first_time = True
