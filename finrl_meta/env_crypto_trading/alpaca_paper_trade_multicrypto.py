@@ -221,10 +221,7 @@ class AlpacaPaperTradingMultiCrypto():
 
         print('fetching latest ' + str(self.previous_candles) + ' candles..')
         CCXT_instance = CCXTEngineer()
-        data = CCXT_instance.data_fetch(start_date,
-                                        end_date,
-                                        self.ticker_list,
-                                        self.CCTX_time_interval)
+        data = CCXT_instance.download_data(self.ticker_list, start_date, end_date, self.CCTX_time_interval)
 
         data = CCXT_instance.add_technical_indicators(data,
                                                       self.ticker_list,

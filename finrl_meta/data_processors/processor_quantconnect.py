@@ -29,10 +29,10 @@ class QuantConnectEngineer(BasicProcessor):
         self.start = start_date
         self.end = end_date
         self.time_interval = time_interval
-        self.time_zone = calc_time_zone(ticker_list, TIME_ZONE_SELFDEFINED, USE_TIME_ZONE_SELFDEFINED)
+        # self.time_zone = calc_time_zone(ticker_list, TIME_ZONE_SELFDEFINED, USE_TIME_ZONE_SELFDEFINED)
 
-        start_date = pd.Timestamp(start_date, tz=self.time_zone)
-        end_date = pd.Timestamp(end_date, tz=self.time_zone) + pd.Timedelta(days=1)
+        # start_date = pd.Timestamp(start_date, tz=self.time_zone)
+        # end_date = pd.Timestamp(end_date, tz=self.time_zone) + pd.Timedelta(days=1)
         qb = QuantBook()
         for stock in ticker_list:
             qb.AddEquity(stock)
