@@ -29,7 +29,7 @@
 # SOFTWARE.
 
 from datetime import datetime, timedelta
-from finrl_meta.data_processors.processor_ccxt import CCXTEngineer
+from finrl_meta.data_processors.processor_ccxt import CCXTProcessor
 import math
 import threading
 import alpaca_trade_api as tradeapi
@@ -220,7 +220,7 @@ class AlpacaPaperTradingMultiCrypto():
             end_date = datetime.today().strftime("%Y%m%d %H:%M:%S")
 
         print('fetching latest ' + str(self.previous_candles) + ' candles..')
-        CCXT_instance = CCXTEngineer()
+        CCXT_instance = CCXTProcessor()
         data = CCXT_instance.download_data(self.ticker_list, start_date, end_date, self.CCTX_time_interval)
 
         data = CCXT_instance.add_technical_indicators(data,
