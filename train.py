@@ -24,8 +24,8 @@ def train(start_date, end_date, ticker_list, data_source, time_interval,
     cwd = kwargs.get('cwd','./'+str(model_name)) #cwd: current_working_dir
 
     if drl_lib == 'elegantrl':
-        break_step = kwargs.get('break_step', 1e6)
-        erl_params = kwargs.get('erl_params')
+        break_step = kwargs.get('break_step', 1e6) #total_training_steps
+        erl_params = kwargs.get('erl_params') #see notebooks for examples. 
 
         agent = DRLAgent_erl(env = env,
                              price_array = price_array,
@@ -38,7 +38,7 @@ def train(start_date, end_date, ticker_list, data_source, time_interval,
                                           total_timesteps=break_step) #erl model is automated saved in cwd
       
     elif drl_lib == 'rllib':
-        total_episodes = kwargs.get('total_episodes', 100)
+        total_episodes = kwargs.get('total_episodes', 100) #rllib uses total training episodes instead of steps.
         rllib_params = kwargs.get('rllib_params')
 
         agent_rllib = DRLAgent_rllib(env = env,
@@ -48,7 +48,7 @@ def train(start_date, end_date, ticker_list, data_source, time_interval,
 
         model,model_config = agent_rllib.get_model(model_name)
 
-        model_config['lr'] = rllib_params['lr']
+        model_config['lr'] = rllib_params['lr'] #learning_rate
         model_config['train_batch_size'] = rllib_params['train_batch_size']
         model_config['gamma'] = rllib_params['gamma']
 
