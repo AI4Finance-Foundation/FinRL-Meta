@@ -39,4 +39,4 @@ pre-commit
 
 
 # FinRL-meta
-trading-calendars==2.1.1 
+pandas_market_calendars==3.2
