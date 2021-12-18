@@ -103,7 +103,7 @@ class IEXCloudProcessor(BasicProcessor):
         return price_data
 
     def get_trading_days(self, start: str, end: str) -> List[str]:
-        """Retrieves every training day between two dates.
+        """Retrieves every trading day between two dates.
 
         Args:
             start (str): Oldest date of the range.
