@@ -7,7 +7,7 @@ TIME_INTERVAL = '1D'
 
 class BasicProcessor:
     def __init__(self, data_source: str, **kwargs):
-        assert data_source in ["alpaca", "ccxt", "joinquant", "quantconnect", "ricequant", "wrds", "yahoofinance", ], "Data source input is NOT supported yet."
+        assert data_source in ["alpaca", "ccxt", "joinquant", "quantconnect", "ricequant", "wrds", "yahoofinance", "iexcloud", ], "Data source input is NOT supported yet."
         self.data_source = data_source
         self.time_interval = TIME_INTERVAL
         self.time_zone = ''
