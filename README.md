@@ -16,12 +16,20 @@ FinRL-Meta is a universe of market environments for data-driven financial reinfo
 Also called **Neo_FinRL**: **N**ear real-market **E**nvironments f**o**r data-driven **Fin**ancial **R**einforcement **L**earning.
 
 ## Outline
+- [News and Tutorials](#news-and-tutorials)
 - [Our Goals](#our-goals)
 - [Design Principles](#design-principles)
 - [Overview](#overview)
 - [Plug-and-Play](#plug-and-play)
 - [Training-Testing-Trading](#training-testing-trading-pipeline)
 - [Our Vision](#our-vision)
+
+## News and Tutorials
+
++ [DataDrivenInvestor] [FinRL-Meta: A Universe of Near Real-Market En­vironments for Data­-Driven Financial Reinforcement Learning](https://medium.datadriveninvestor.com/finrl-meta-a-universe-of-near-real-market-en-vironments-for-data-driven-financial-reinforcement-e1894e1ebfbd)
++ [央广网] [2021 IDEA大会于福田圆满落幕：群英荟萃论道AI 多项目发布亮点纷呈](http://tech.cnr.cn/techph/20211123/t20211123_525669092.shtml)
++ [央广网] [2021 IDEA大会开启AI思想盛宴 沈向洋理事长发布六大前沿产品](https://baijiahao.baidu.com/s?id=1717101783873523790&wfr=spider&for=pc)
++ [知乎] [FinRL-Meta基于数据驱动的强化学习金融元宇宙](https://zhuanlan.zhihu.com/p/437804814)
 
 ## Our Goals
 + To reduce the simulation-reality gap: existing works use backtesting on historical data, while the real performance may be quite different when applying the algorithms to paper/live trading.
