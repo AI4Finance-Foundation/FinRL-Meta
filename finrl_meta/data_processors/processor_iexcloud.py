@@ -46,8 +46,8 @@ class IEXCloudProcessor(BasicProcessor):
             date, tic, open, high, low, close, adjcp, volume.
 
         Examples:
-            kwargs['mode'] = 'xxx'
-            kwargs['token'] = 'xxx'
+            kwargs['mode'] = 'sandbox'
+            kwargs['token'] = 'Tsk_d633e2ff10d463...'
             >>> iex_dloader = IEXCloudProcessor(data_source='iexcloud', **kwargs)
             >>> iex_dloader.download_data(ticker_list=["AAPL", "NVDA"],
                                         start_date='2014-01-01',
