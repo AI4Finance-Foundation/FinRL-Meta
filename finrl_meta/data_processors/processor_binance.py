@@ -3,8 +3,8 @@ from typing import List
 import numpy as np
 import pandas as pd
 import requests
-# from talib.abstract import CCI, DX, MACD, RSI
-# from basic_processor import BasicProcessor
+from talib.abstract import CCI, DX, MACD, RSI
+from basic_processor import BasicProcessor
 from finrl_meta.data_processors.basic_processor import BasicProcessor
 
 
