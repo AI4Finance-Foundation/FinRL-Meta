@@ -24,37 +24,38 @@ class IEXCloudProcessor(BasicProcessor):
     def __init__(
         self,
         data_source: str = None,
-        mode: str = None,
-        token: str = None,
         **kwargs,
     ):
         BasicProcessor.__init__(self, data_source, **kwargs)
-        self.base_url = self._get_base_url(mode=mode)
-        self.token = token or os.environ.get("IEX_TOKEN")
+        self.base_url = self._get_base_url(mode=kwargs['mode'])
+        self.token = kwargs['token'] or os.environ.get("IEX_TOKEN")
 
     def download_data(
-        self, ticker: List[str], start_date: str, end_date: str
+        self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str
     ) -> pd.DataFrame:
         """Returns end of day historical data for up to 15 years.
 
         Args:
-            ticker (List[str]): List of the tickers to retrieve information.
+            ticker_list (List[str]): List of the tickers to retrieve information.
             start_date (str): Oldest date of the range.
             end_date (str): Latest date of the range.
 
         Returns:
             pd.DataFrame: A pandas dataframe with end of day historical data
             for the specified tickers with the following columns:
-            date, ticker, open, high, low, close, fclose, volume.
+            date, tic, open, high, low, close, adjcp, volume.
 
         Examples:
-            >>> iex_dloader = IEXCloudProcessor(data_source='iexcloud',
-                                                mode='sandbox',
-                                                token='Tsk_d633e2ff10d463...')
-            >>> iex_dloader.download_data(ticker=["AAPL", "NVDA"],
+            kwargs['mode'] = 'sandbox'
+            kwargs['token'] = 'Tsk_d633e2ff10d463...'
+            >>> iex_dloader = IEXCloudProcessor(data_source='iexcloud', **kwargs)
+            >>> iex_dloader.download_data(ticker_list=["AAPL", "NVDA"],
                                         start_date='2014-01-01',
-                                        end_date='2021-12-12')
+                                        end_date='2021-12-12',
+                                        time_interval = '1D')
         """
+        assert time_interval == 'D'  # one day
+
         price_data = pd.DataFrame()
 
         query_params = {
@@ -65,7 +66,7 @@ class IEXCloudProcessor(BasicProcessor):
             query_params["from"] = start_date
             query_params["to"] = end_date
 
-        for stock in ticker:
+        for stock in ticker_list:
             end_point = (
                 f"{self.base_url}/stable/time-series/HISTORICAL_PRICES/{stock}"
             )
@@ -93,6 +94,7 @@ class IEXCloudProcessor(BasicProcessor):
                 "volume",
             ]
         ]
+        price_data = price_data.rename(columns={"ticker": "tic", "date": "time", "fclose": "adjcp"})
 
         price_data.date = price_data.date.map(
             lambda x: datetime.fromtimestamp(x / 1000, pytz.UTC).strftime(
