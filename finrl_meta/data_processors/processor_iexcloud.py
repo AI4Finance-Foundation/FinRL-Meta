@@ -43,16 +43,19 @@ class IEXCloudProcessor(BasicProcessor):
         Returns:
             pd.DataFrame: A pandas dataframe with end of day historical data
             for the specified tickers with the following columns:
-            date, ticker, open, high, low, close, fclose, volume.
+            date, tic, open, high, low, close, adjcp, volume.
 
         Examples:
-            >>> iex_dloader = IEXCloudProcessor(data_source='iexcloud',
-                                                mode='sandbox',
-                                                token='Tsk_d633e2ff10d463...')
-            >>> iex_dloader.download_data(ticker=["AAPL", "NVDA"],
+            kwargs['mode'] = 'xxx'
+            kwargs['token'] = 'xxx'
+            >>> iex_dloader = IEXCloudProcessor(data_source='iexcloud', **kwargs)
+            >>> iex_dloader.download_data(ticker_list=["AAPL", "NVDA"],
                                         start_date='2014-01-01',
-                                        end_date='2021-12-12')
+                                        end_date='2021-12-12',
+                                        time_interval = '1D')
         """
+        assert time_interval == 'D'  # one day
+
         price_data = pd.DataFrame()
 
         query_params = {
