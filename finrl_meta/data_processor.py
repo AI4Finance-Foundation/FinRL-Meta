@@ -96,6 +96,9 @@ class DataProcessor():
     def run(self, ticker_list, start_date, end_date, time_interval, 
             technical_indicator_list, if_vix, cache=False):
         
+        if time_interval == "1s" and self.data_source != "binance":
+            raise ValueError("Currently 1s interval data is only supported with 'binance' as data source")
+
         cache_csv = '_'.join(ticker_list + [self.data_source, start_date, end_date, time_interval]) + '.csv'
         cache_dir = './cache'
         cache_path = os.path.join(cache_dir, cache_csv)
