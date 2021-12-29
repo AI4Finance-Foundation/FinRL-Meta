@@ -48,7 +48,7 @@ Also called **Neo_FinRL**: **N**ear real-market **E**nvironments f**o**r data-dr
 + Flexibility and extensibility: Inheritance might be helpful here
 
 ## Overview 
-![Overview image of NeoFinRL](https://github.com/AI4Finance-Foundation/NeoFinRL/blob/main/figs/neofinrl_overview.png)
+![Overview image of FinRL-Meta](https://github.com/AI4Finance-Foundation/FinRL-Meta/blob/master/figs/neofinrl_overview.png)
 We utilize a layered structure in FinRL-metaverse, as shown in the figure above. FinRL-metaverse consists of three layers: data layer, environment layer, and agent layer. Each layer executes its functions and is independent. Meanwhile, layers interact through end-to-end interfaces to implement the complete workflow of algorithm trading.
 
 ## DataOps
