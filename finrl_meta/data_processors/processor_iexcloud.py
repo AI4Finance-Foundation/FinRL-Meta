@@ -54,7 +54,7 @@ class IEXCloudProcessor(BasicProcessor):
                                         end_date='2021-12-12',
                                         time_interval = '1D')
         """
-        assert time_interval == 'D'  # one day
+        assert time_interval == '1D'  # one day
 
         price_data = pd.DataFrame()
 
