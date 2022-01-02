@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 from typing import List
 from stockstats import StockDataFrame as Sdf
+from talib.abstract import CCI, DX, MACD, RSI
+
 TIME_INTERVAL = '1D'
 
 
@@ -23,7 +25,8 @@ class BasicProcessor:
     def get_trading_days(self, start: str, end: str) -> List[str]:
         pass
 
-    def add_technical_indicator(self, data: pd.DataFrame, tech_indicator_list: List[str]) \
+    # use_stockstats: True (stockstats), or False (use talib)
+    def add_technical_indicator(self, data: pd.DataFrame, tech_indicator_list: List[str], use_stockstats: bool=True) \
             -> pd.DataFrame:
         """
         calculate technical indicators
@@ -32,32 +35,48 @@ class BasicProcessor:
         :return: (df) pandas dataframe
         """
         df = data.copy()
+        if "date" in df.columns.to_list:
+            df = df.rename(columns={"date": "time"})
+
+
         # df = df.reset_index(drop=False)
         # df = df.drop(columns=["level_1"])
         # df = df.rename(columns={"level_0": "tic", "date": "time"})
-        stock = Sdf.retype(df.copy())
-        unique_ticker = stock.tic.unique()
+        if use_stockstats:  # use stockstats
+            stock = Sdf.retype(df.copy())
+            unique_ticker = stock.tic.unique()
+            for indicator in tech_indicator_list:
+                indicator_df = pd.DataFrame()
+                for i in range(len(unique_ticker)):
+                    try:
+                        temp_indicator = stock[stock.tic == unique_ticker[i]][indicator]
+                        temp_indicator = pd.DataFrame(temp_indicator)
+                        temp_indicator["tic"] = unique_ticker[i]
+                        temp_indicator["time"] = df[df.tic == unique_ticker[i]][
+                            "time"
+                        ].to_list()
+                        indicator_df = indicator_df.append(
+                            temp_indicator, ignore_index=True
+                        )
+                    except Exception as e:
+                        print(e)
+                df = df.merge(
+                    indicator_df[["tic", "time", indicator]], on=["tic", "time"], how="left"
+                )
+        else: # use talib
+            final_df = pd.DataFrame()
+            for i in df.tic.unique():
+                tic_df = df[df.tic == i]
+                tic_df['macd'], tic_df['macd_signal'], tic_df['macd_hist'] = MACD(tic_df['close'], fastperiod=12,
+                                                                                  slowperiod=26, signalperiod=9)
+                tic_df['rsi'] = RSI(tic_df['close'], timeperiod=14)
+                tic_df['cci'] = CCI(tic_df['high'], tic_df['low'], tic_df['close'], timeperiod=14)
+                tic_df['dx'] = DX(tic_df['high'], tic_df['low'], tic_df['close'], timeperiod=14)
+                final_df = final_df.append(tic_df)
 
-        for indicator in tech_indicator_list:
-            indicator_df = pd.DataFrame()
-            for i in range(len(unique_ticker)):
-                try:
-                    temp_indicator = stock[stock.tic == unique_ticker[i]][indicator]
-                    temp_indicator = pd.DataFrame(temp_indicator)
-                    temp_indicator["tic"] = unique_ticker[i]
-                    temp_indicator["time"] = df[df.tic == unique_ticker[i]][
-                        "time"
-                    ].to_list()
-                    indicator_df = indicator_df.append(
-                        temp_indicator, ignore_index=True
-                    )
-                except Exception as e:
-                    print(e)
-            df = df.merge(
-                indicator_df[["tic", "time", indicator]], on=["tic", "time"], how="left"
-            )
         df = df.sort_values(by=["time", "tic"])
         df = df.dropna()
+        print("Succesfully add technical indicators")
         return df
 
     def add_turbulence(self, data: pd.DataFrame) \
