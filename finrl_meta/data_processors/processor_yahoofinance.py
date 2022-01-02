@@ -165,34 +165,34 @@ class YahooFinanceProcessor(BasicProcessor):
         
         return new_df
     
-    def add_technical_indicator(self, data, tech_indicator_list):
-        """
-        calculate technical indicators
-        use stockstats package to add technical inidactors
-        :param data: (df) pandas dataframe
-        :return: (df) pandas dataframe
-        """
-        df = data.copy()
-        df = df.sort_values(by=['tic','time'])
-        stock = Sdf.retype(df.copy())
-        unique_ticker = stock.tic.unique()
-
-        for indicator in tech_indicator_list:
-            indicator_df = pd.DataFrame()
-            for i in range(len(unique_ticker)):
-                try:
-                    temp_indicator = stock[stock.tic == unique_ticker[i]][indicator]
-                    temp_indicator = pd.DataFrame(temp_indicator)
-                    temp_indicator['tic'] = unique_ticker[i]
-                    temp_indicator['time'] = df[df.tic == unique_ticker[i]]['time'].to_list()
-                    indicator_df = indicator_df.append(
-                        temp_indicator, ignore_index=True
-                    )
-                except Exception as e:
-                    print(e)
-            df = df.merge(indicator_df[['tic','time',indicator]],on=['tic','time'],how='left')
-        df = df.sort_values(by=['time','tic'])
-        return df
+    # def add_technical_indicator(self, data, tech_indicator_list):
+    #     """
+    #     calculate technical indicators
+    #     use stockstats package to add technical inidactors
+    #     :param data: (df) pandas dataframe
+    #     :return: (df) pandas dataframe
+    #     """
+    #     df = data.copy()
+    #     df = df.sort_values(by=['tic','time'])
+    #     stock = Sdf.retype(df.copy())
+    #     unique_ticker = stock.tic.unique()
+    #
+    #     for indicator in tech_indicator_list:
+    #         indicator_df = pd.DataFrame()
+    #         for i in range(len(unique_ticker)):
+    #             try:
+    #                 temp_indicator = stock[stock.tic == unique_ticker[i]][indicator]
+    #                 temp_indicator = pd.DataFrame(temp_indicator)
+    #                 temp_indicator['tic'] = unique_ticker[i]
+    #                 temp_indicator['time'] = df[df.tic == unique_ticker[i]]['time'].to_list()
+    #                 indicator_df = indicator_df.append(
+    #                     temp_indicator, ignore_index=True
+    #                 )
+    #             except Exception as e:
+    #                 print(e)
+    #         df = df.merge(indicator_df[['tic','time',indicator]],on=['tic','time'],how='left')
+    #     df = df.sort_values(by=['time','tic'])
+    #     return df
 
     def add_turbulence(self, data):
         """
