@@ -26,7 +26,7 @@ class BasicProcessor:
         pass
 
     # use_stockstats: True (stockstats), or False (use talib)
-    def add_technical_indicator(self, data: pd.DataFrame, tech_indicator_list: List[str], use_stockstats: bool=True) \
+    def add_technical_indicator(self, data: pd.DataFrame, tech_indicator_list: List[str], use_stockstats: bool = True) \
             -> pd.DataFrame:
         """
         calculate technical indicators
@@ -36,8 +36,10 @@ class BasicProcessor:
         """
         df = data.copy()
         if "date" in df.columns.to_list:
-            df = df.rename(columns={"date": "time"})
+            df = df.rename(columns={'date': 'time'})
 
+        if self.data_source == "ccxt":
+            df = df.rename(columns={'index': 'time'})
 
         # df = df.reset_index(drop=False)
         # df = df.drop(columns=["level_1"])
@@ -63,7 +65,7 @@ class BasicProcessor:
                 df = df.merge(
                     indicator_df[["tic", "time", indicator]], on=["tic", "time"], how="left"
                 )
-        else: # use talib
+        else:  # use talib
             final_df = pd.DataFrame()
             for i in df.tic.unique():
                 tic_df = df[df.tic == i]
@@ -96,7 +98,7 @@ class BasicProcessor:
         df = df.sort_values(["time", "tic"]).reset_index(drop=True)
         return df
 
-    def calculate_turbulence(self, data: pd.DataFrame, time_period: int=252) \
+    def calculate_turbulence(self, data: pd.DataFrame, time_period: int = 252) \
             -> pd.DataFrame:
         """calculate turbulence index based on dow 30"""
         # can add other market assets
@@ -117,11 +119,11 @@ class BasicProcessor:
             hist_price = df_price_pivot[
                 (df_price_pivot.index < unique_date[i])
                 & (df_price_pivot.index >= unique_date[i - time_period])
-            ]
+                ]
             # Drop tickers which has number missing values more than the "oldest" ticker
             filtered_hist_price = hist_price.iloc[
-                hist_price.isna().sum().min() :
-            ].dropna(axis=1)
+                                  hist_price.isna().sum().min():
+                                  ].dropna(axis=1)
 
             cov_temp = filtered_hist_price.cov()
             current_temp = current_price[[x for x in filtered_hist_price]] - np.mean(
@@ -149,7 +151,7 @@ class BasicProcessor:
         )
         return turbulence_index
 
-    def add_vix(self, data: pd.DataFrame)\
+    def add_vix(self, data: pd.DataFrame) \
             -> pd.DataFrame:
         """
         add vix from yahoo finance
