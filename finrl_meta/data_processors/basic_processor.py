@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from typing import List
-from stockstats import StockDataFrame as Sdf
+import stockstats
 from talib.abstract import CCI, DX, MACD, RSI
 
 TIME_INTERVAL = '1D'
@@ -26,7 +26,7 @@ class BasicProcessor:
         pass
 
     # use_stockstats: True (stockstats), or False (use talib)
-    def add_technical_indicator(self, data: pd.DataFrame, tech_indicator_list: List[str], use_stockstats: bool = True) \
+    def add_technical_indicator(self, data: pd.DataFrame, tech_indicator_list: List[str], use_stockstats: bool=True) \
             -> pd.DataFrame:
         """
         calculate technical indicators
@@ -45,7 +45,7 @@ class BasicProcessor:
         # df = df.drop(columns=["level_1"])
         # df = df.rename(columns={"level_0": "tic", "date": "time"})
         if use_stockstats:  # use stockstats
-            stock = Sdf.retype(df.copy())
+            stock = stockstats.StockDataFrame.retype(df.copy())
             unique_ticker = stock.tic.unique()
             for indicator in tech_indicator_list:
                 indicator_df = pd.DataFrame()
