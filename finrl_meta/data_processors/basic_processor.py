@@ -25,7 +25,7 @@ class BasicProcessor:
     def get_trading_days(self, start: str, end: str) -> List[str]:
         pass
 
-    # use_stockstats: True (stockstats), or False (use talib)
+    # use_stockstats: True (stockstats), or False (use talib). Users can choose the method.
     def add_technical_indicator(self, data: pd.DataFrame, tech_indicator_list: List[str], use_stockstats: bool=True) \
             -> pd.DataFrame:
         """
