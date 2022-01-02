@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from typing import List
 import stockstats
-from talib.abstract import CCI, DX, MACD, RSI
+# from talib.abstract import CCI, DX, MACD, RSI
 
 TIME_INTERVAL = '1D'
 
@@ -30,12 +30,12 @@ class BasicProcessor:
             -> pd.DataFrame:
         """
         calculate technical indicators
-        use stockstats package to add technical inidactors
+        use stockstats/talib package to add technical inidactors
         :param data: (df) pandas dataframe
         :return: (df) pandas dataframe
         """
         df = data.copy()
-        if "date" in df.columns.to_list:
+        if "date" in df.columns.values.tolist():
             df = df.rename(columns={'date': 'time'})
 
         if self.data_source == "ccxt":
