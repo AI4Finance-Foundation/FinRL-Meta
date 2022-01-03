@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import requests
 import urllib, json
-from talib.abstract import CCI, DX, MACD, RSI
+# from talib.abstract import CCI, DX, MACD, RSI
 from finrl_meta.data_processors.basic_processor import BasicProcessor
 from .func import download_n_unzip_file, convert_to_date_object, get_path
 
@@ -44,23 +44,23 @@ class BinanceProcessor(BasicProcessor):
         return df
     
 
-    def add_technical_indicator(self, df, tech_indicator_list):
-        print('Adding self-defined technical indicators is NOT supported yet.')
-        print('Use default: MACD, RSI, CCI, DX.')
-        self.tech_indicator_list = ['open', 'high', 'low', 'close', 'volume', 
-                                    'macd', 'macd_signal', 'macd_hist', 
-                                    'rsi', 'cci', 'dx']
-        final_df = pd.DataFrame()
-        for i in df.tic.unique():
-            tic_df = df[df.tic==i] 
-            tic_df['macd'], tic_df['macd_signal'], tic_df['macd_hist'] = MACD(tic_df['close'], fastperiod=12, 
-                                                                                slowperiod=26, signalperiod=9)
-            tic_df['rsi'] = RSI(tic_df['close'], timeperiod=14)
-            tic_df['cci'] = CCI(tic_df['high'], tic_df['low'], tic_df['close'], timeperiod=14)
-            tic_df['dx'] = DX(tic_df['high'], tic_df['low'], tic_df['close'], timeperiod=14)
-            final_df = final_df.append(tic_df)
-        
-        return final_df
+    # def add_technical_indicator(self, df, tech_indicator_list):
+    #     print('Adding self-defined technical indicators is NOT supported yet.')
+    #     print('Use default: MACD, RSI, CCI, DX.')
+    #     self.tech_indicator_list = ['open', 'high', 'low', 'close', 'volume',
+    #                                 'macd', 'macd_signal', 'macd_hist',
+    #                                 'rsi', 'cci', 'dx']
+    #     final_df = pd.DataFrame()
+    #     for i in df.tic.unique():
+    #         tic_df = df[df.tic==i]
+    #         tic_df['macd'], tic_df['macd_signal'], tic_df['macd_hist'] = MACD(tic_df['close'], fastperiod=12,
+    #                                                                             slowperiod=26, signalperiod=9)
+    #         tic_df['rsi'] = RSI(tic_df['close'], timeperiod=14)
+    #         tic_df['cci'] = CCI(tic_df['high'], tic_df['low'], tic_df['close'], timeperiod=14)
+    #         tic_df['dx'] = DX(tic_df['high'], tic_df['low'], tic_df['close'], timeperiod=14)
+    #         final_df = final_df.append(tic_df)
+    #
+    #     return final_df
     
 
     def add_turbulence(self, df):

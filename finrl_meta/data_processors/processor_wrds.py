@@ -190,32 +190,32 @@ class WrdsProcessor(BasicProcessor):
         print('Data clean finished')
         return df
     
-    def add_technical_indicator(self, df, tech_indicator_list = [
-            'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',
-            'close_30_sma', 'close_60_sma']):
-        df = df.rename(columns={'time':'date'})
-        df = df.copy()
-        df = df.sort_values(by=['tic', 'date'])
-        stock = Sdf.retype(df.copy())
-        unique_ticker = stock.tic.unique()
-        tech_indicator_list = tech_indicator_list
-        
-        for indicator in tech_indicator_list:
-            indicator_df = pd.DataFrame()
-            for i in range(len(unique_ticker)):
-                # print(unique_ticker[i], i)
-                temp_indicator = stock[stock.tic == unique_ticker[i]][indicator]
-                temp_indicator = pd.DataFrame(temp_indicator)
-                temp_indicator['tic'] = unique_ticker[i]
-                # print(len(df[df.tic == unique_ticker[i]]['date'].to_list()))
-                temp_indicator['date'] = df[df.tic == unique_ticker[i]]['date'].to_list()
-                indicator_df = indicator_df.append(
-                    temp_indicator, ignore_index=True
-                )
-            df = df.merge(indicator_df[['tic', 'date', indicator]], on=['tic', 'date'], how='left')
-        df = df.sort_values(by=['date', 'tic'])
-        print('Succesfully add technical indicators')
-        return df
+    # def add_technical_indicator(self, df, tech_indicator_list = [
+    #         'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',
+    #         'close_30_sma', 'close_60_sma']):
+    #     df = df.rename(columns={'time':'date'})
+    #     df = df.copy()
+    #     df = df.sort_values(by=['tic', 'date'])
+    #     stock = Sdf.retype(df.copy())
+    #     unique_ticker = stock.tic.unique()
+    #     tech_indicator_list = tech_indicator_list
+    #
+    #     for indicator in tech_indicator_list:
+    #         indicator_df = pd.DataFrame()
+    #         for i in range(len(unique_ticker)):
+    #             # print(unique_ticker[i], i)
+    #             temp_indicator = stock[stock.tic == unique_ticker[i]][indicator]
+    #             temp_indicator = pd.DataFrame(temp_indicator)
+    #             temp_indicator['tic'] = unique_ticker[i]
+    #             # print(len(df[df.tic == unique_ticker[i]]['date'].to_list()))
+    #             temp_indicator['date'] = df[df.tic == unique_ticker[i]]['date'].to_list()
+    #             indicator_df = indicator_df.append(
+    #                 temp_indicator, ignore_index=True
+    #             )
+    #         df = df.merge(indicator_df[['tic', 'date', indicator]], on=['tic', 'date'], how='left')
+    #     df = df.sort_values(by=['date', 'tic'])
+    #     print('Succesfully add technical indicators')
+    #     return df
     
     def calculate_turbulence(self,data, time_period=252):
         # can add other market assets
