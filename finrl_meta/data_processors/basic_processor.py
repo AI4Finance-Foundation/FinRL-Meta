@@ -75,6 +75,7 @@ class BasicProcessor:
                 tic_df['cci'] = CCI(tic_df['high'], tic_df['low'], tic_df['close'], timeperiod=14)
                 tic_df['dx'] = DX(tic_df['high'], tic_df['low'], tic_df['close'], timeperiod=14)
                 final_df = final_df.append(tic_df)
+            df = final_df
 
         df = df.sort_values(by=["time", "tic"])
         df = df.dropna()
