@@ -78,7 +78,7 @@ class BinanceProcessor(BasicProcessor):
     def df_to_array(self, df, tech_indicator_list, if_vix):
         unique_ticker = df.tic.unique()
         price_array = np.column_stack([df[df.tic==tic].close for tic in unique_ticker])
-        tech_array = np.hstack([df.loc[(df.tic==tic), self.tech_indicator_list] for tic in unique_ticker])       
+        tech_array = np.hstack([df.loc[(df.tic==tic), tech_indicator_list] for tic in unique_ticker])       
         assert price_array.shape[0] == tech_array.shape[0]
         return price_array, tech_array, np.array([])
     
