@@ -30,10 +30,19 @@ class BasicProcessor:
             df = df.rename(columns={'index': 'time'})
 
         if self.data_source == 'ricequant':
+            ''' RiceQuant data is already cleaned, we only need to transform data format here.
+                No need for filling NaN data'''
             df = df.rename(columns={'order_book_id': 'tic'})
+            # raw df uses multi-index (tic,time), reset it to single index (time)
+            df = df.reset_index(level=[0, 1])
+            # check if there is NaN values
+            assert not df.isnull().values.any()
 
         df2 = df.dropna()
-        return df2
+        if 'adjcp' not in df2.columns:
+            df2['adjcp'] = df2['close']
+        final_df = df2[['tic', 'time', 'open', 'high', 'low', 'close', 'adjcp', 'volume']]
+        return final_df
 
     def get_trading_days(self, start: str, end: str) -> List[str]:
         pass

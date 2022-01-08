@@ -27,20 +27,20 @@ class RiceQuantProcessor(BasicProcessor):
         
         return dataframe
     
-    def clean_data(self, df) -> pd.DataFrame:
-        ''' RiceQuant data is already cleaned, we only need to transform data format here.
-        No need for filling NaN data'''
-        df = df.copy()
-        # raw df uses multi-index (tic,time), reset it to single index (time) 
-        df = df.reset_index(level=[0,1])
-        # rename column order_book_id to tic
-        # df = df.rename(columns={'order_book_id':'tic', 'datetime':'time'})
-        # reserve columns needed
-        df = df[['tic','time','open','high','low','close','volume']]
-        # check if there is NaN values
-        assert not df.isnull().values.any()
-        
-        return df 
+    # def clean_data(self, df) -> pd.DataFrame:
+    #     ''' RiceQuant data is already cleaned, we only need to transform data format here.
+    #     No need for filling NaN data'''
+    #     df = df.copy()
+    #     # raw df uses multi-index (tic,time), reset it to single index (time)
+    #     df = df.reset_index(level=[0,1])
+    #     # rename column order_book_id to tic
+    #     df = df.rename(columns={'order_book_id':'tic', 'datetime':'time'})
+    #     # reserve columns needed
+    #     df = df[['tic','time','open','high','low','close','volume']]
+    #     # check if there is NaN values
+    #     assert not df.isnull().values.any()
+    #
+    #     return df
     
     # def add_technical_indicator(self, df, tech_indicator_list = [
     #         'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',
