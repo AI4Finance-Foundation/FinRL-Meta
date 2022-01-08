@@ -20,7 +20,31 @@ class BasicProcessor:
         pass
 
     def clean_data(self, df: pd.DataFrame) -> pd.DataFrame:
-        pass
+        if "date" in df.columns.values.tolist():
+            df = df.rename(columns={'date': 'time'})
+
+        if "datetime" in df.columns.values.tolist():
+            df = df.rename(columns={'datetime': 'time'})
+
+        if self.data_source == "ccxt":
+            df = df.rename(columns={'index': 'time'})
+
+        if self.data_source == 'ricequant':
+            ''' RiceQuant data is already cleaned, we only need to transform data format here.
+                No need for filling NaN data'''
+            df = df.rename(columns={'order_book_id': 'tic'})
+            # raw df uses multi-index (tic,time), reset it to single index (time)
+            df = df.reset_index(level=[0, 1])
+            # check if there is NaN values
+            assert not df.isnull().values.any()
+
+        df2 = df.dropna()
+        # adj_close: adjusted close price
+        if 'adj_close' not in df2.columns.values.tolist():
+            df2['adj_close'] = df2['close']
+        df2 = df2.sort_values(by=['time', 'tic'])
+        final_df = df2[['tic', 'time', 'open', 'high', 'low', 'close', 'adj_close', 'volume']]
+        return final_df
 
     def get_trading_days(self, start: str, end: str) -> List[str]:
         pass
@@ -35,11 +59,11 @@ class BasicProcessor:
         :return: (df) pandas dataframe
         """
         df = data.copy()
-        if "date" in df.columns.values.tolist():
-            df = df.rename(columns={'date': 'time'})
-
-        if self.data_source == "ccxt":
-            df = df.rename(columns={'index': 'time'})
+        # if "date" in df.columns.values.tolist():
+        #     df = df.rename(columns={'date': 'time'})
+        #
+        # if self.data_source == "ccxt":
+        #     df = df.rename(columns={'index': 'time'})
 
         # df = df.reset_index(drop=False)
         # df = df.drop(columns=["level_1"])
