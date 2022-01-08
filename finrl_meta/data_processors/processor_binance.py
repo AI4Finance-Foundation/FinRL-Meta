@@ -39,9 +39,9 @@ class BinanceProcessor(BasicProcessor):
             return final_df
     
 
-    def clean_data(self, df):
-        df = df.dropna()
-        return df
+    # def clean_data(self, df):
+    #     df = df.dropna()
+    #     return df
     
 
     # def add_technical_indicator(self, df, tech_indicator_list):

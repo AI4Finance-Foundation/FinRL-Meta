@@ -34,7 +34,7 @@ class RiceQuantProcessor(BasicProcessor):
         # raw df uses multi-index (tic,time), reset it to single index (time) 
         df = df.reset_index(level=[0,1])
         # rename column order_book_id to tic
-        df = df.rename(columns={'order_book_id':'tic', 'datetime':'time'})
+        # df = df.rename(columns={'order_book_id':'tic', 'datetime':'time'})
         # reserve columns needed
         df = df[['tic','time','open','high','low','close','volume']]
         # check if there is NaN values

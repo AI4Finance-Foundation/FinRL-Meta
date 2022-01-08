@@ -20,7 +20,20 @@ class BasicProcessor:
         pass
 
     def clean_data(self, df: pd.DataFrame) -> pd.DataFrame:
-        pass
+        if "date" in df.columns.values.tolist():
+            df = df.rename(columns={'date': 'time'})
+
+        if "datetime" in df.columns.values.tolist():
+            df = df.rename(columns={'datetime': 'time'})
+
+        if self.data_source == "ccxt":
+            df = df.rename(columns={'index': 'time'})
+
+        if self.data_source == 'ricequant':
+            df = df.rename(columns={'order_book_id': 'tic'})
+
+        df2 = df.dropna()
+        return df2
 
     def get_trading_days(self, start: str, end: str) -> List[str]:
         pass
@@ -35,11 +48,11 @@ class BasicProcessor:
         :return: (df) pandas dataframe
         """
         df = data.copy()
-        if "date" in df.columns.values.tolist():
-            df = df.rename(columns={'date': 'time'})
-
-        if self.data_source == "ccxt":
-            df = df.rename(columns={'index': 'time'})
+        # if "date" in df.columns.values.tolist():
+        #     df = df.rename(columns={'date': 'time'})
+        #
+        # if self.data_source == "ccxt":
+        #     df = df.rename(columns={'index': 'time'})
 
         # df = df.reset_index(drop=False)
         # df = df.drop(columns=["level_1"])
