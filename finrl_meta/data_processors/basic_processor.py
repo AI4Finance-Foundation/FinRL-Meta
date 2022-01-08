@@ -6,7 +6,6 @@ from talib.abstract import CCI, DX, MACD, RSI
 
 TIME_INTERVAL = '1D'
 
-
 class BasicProcessor:
     def __init__(self, data_source: str, **kwargs):
 
