@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from typing import List
 from stockstats import StockDataFrame as Sdf
-TIME_INTERVAL = '1D'
+TIME_INTERVAL = '5m'
 
 
 class BasicProcessor:
