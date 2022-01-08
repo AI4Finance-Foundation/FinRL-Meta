@@ -24,7 +24,6 @@ class BasicProcessor:
             df = df.rename(columns={'date': 'time'})
         if "datetime" in df.columns.values.tolist():
             df = df.rename(columns={'datetime': 'time'})
-
         if self.data_source == "ccxt":
             df = df.rename(columns={'index': 'time'})
 
