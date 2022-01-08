@@ -34,7 +34,6 @@ class BasicProcessor:
             df = df.reset_index(level=[0, 1])
             # check if there is NaN values
             assert not df.isnull().values.any()
-
         df2 = df.dropna()
         # adj_close: adjusted close price
         if 'adj_close' not in df2.columns.values.tolist():
