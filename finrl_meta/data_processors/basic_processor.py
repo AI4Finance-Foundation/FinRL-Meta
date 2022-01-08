@@ -39,7 +39,7 @@ class BasicProcessor:
             assert not df.isnull().values.any()
 
         df2 = df.dropna()
-        if 'adjcp' not in df2.columns:
+        if 'adjcp' not in df2.columns.values.tolist():
             df2['adjcp'] = df2['close']
         final_df = df2[['tic', 'time', 'open', 'high', 'low', 'close', 'adjcp', 'volume']]
         return final_df
