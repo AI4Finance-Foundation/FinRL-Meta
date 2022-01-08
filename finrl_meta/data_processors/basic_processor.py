@@ -26,8 +26,7 @@ class BasicProcessor:
             df = df.rename(columns={'datetime': 'time'})
         if self.data_source == "ccxt":
             df = df.rename(columns={'index': 'time'})
-
-        if self.data_source == 'ricequant':
+        elif self.data_source == 'ricequant':
             ''' RiceQuant data is already cleaned, we only need to transform data format here.
                 No need for filling NaN data'''
             df = df.rename(columns={'order_book_id': 'tic'})
