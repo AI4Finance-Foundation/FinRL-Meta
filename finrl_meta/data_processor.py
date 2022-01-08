@@ -150,7 +150,6 @@ def test_joinquant():
     data4 = p.add_turbulence(data3)
     data6 = p.add_technical_indicator(data4, ['macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30', 'close_30_sma', 'close_60_sma'])
     # data5 = e.add_vix(data4)
-
     pass
 
 if __name__ == "__main__":
