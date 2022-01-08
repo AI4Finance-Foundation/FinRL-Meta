@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from typing import List
 import stockstats
-# from talib.abstract import CCI, DX, MACD, RSI
+from talib.abstract import CCI, DX, MACD, RSI
 
 TIME_INTERVAL = '1D'
 
