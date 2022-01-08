@@ -22,7 +22,6 @@ class BasicProcessor:
     def clean_data(self, df: pd.DataFrame) -> pd.DataFrame:
         if "date" in df.columns.values.tolist():
             df = df.rename(columns={'date': 'time'})
-
         if "datetime" in df.columns.values.tolist():
             df = df.rename(columns={'datetime': 'time'})
 
