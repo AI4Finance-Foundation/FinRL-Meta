@@ -75,6 +75,7 @@ Supported Data Sources:
 
 
 OHLCV: open, high, low, close, volume
+adj_close: adjusted close price
 
 ## Plug-and-Play
 In the development pipeline, we separate market environments from the data layer and the agent layer. Any DRL agent can be directly plugged into our environments, then trained and tested. Different agents/algorithms can be compared by running on the same benchmark environment for fair evaluations. 
