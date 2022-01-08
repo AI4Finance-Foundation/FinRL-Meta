@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from typing import List
 import stockstats
-from talib.abstract import CCI, DX, MACD, RSI
+# from talib.abstract import CCI, DX, MACD, RSI
 
 TIME_INTERVAL = '1D'
 
@@ -39,9 +39,10 @@ class BasicProcessor:
             assert not df.isnull().values.any()
 
         df2 = df.dropna()
-        if 'adjcp' not in df2.columns.values.tolist():
-            df2['adjcp'] = df2['close']
-        final_df = df2[['tic', 'time', 'open', 'high', 'low', 'close', 'adjcp', 'volume']]
+        if 'adj_close' not in df2.columns.values.tolist():
+            df2['adj_close'] = df2['close']
+        df2 = df2.sort_values(by=['time', 'tic'])
+        final_df = df2[['tic', 'time', 'open', 'high', 'low', 'close', 'adj_close', 'volume']]
         return final_df
 
     def get_trading_days(self, start: str, end: str) -> List[str]:

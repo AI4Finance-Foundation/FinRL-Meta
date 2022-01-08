@@ -36,7 +36,7 @@ class JoinquantProcessor(BasicProcessor):
             fields=["date", "open", "high", "low", "close", "volume"],
             end_dt=end_date,
         )
-
+        df = df.reset_index().rename(columns={'level_0': 'tic'})
         return df
 
     def data_fetch(self,stock_list, num, unit, end_dt):
