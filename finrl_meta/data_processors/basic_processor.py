@@ -199,11 +199,11 @@ class BasicProcessor:
             ticker_list = ["vix"]
         vix_df = self.download_data(ticker_list, self.start, self.end, self.time_interval)
         cleaned_vix = self.clean_data(vix_df)
-        vix = cleaned_vix[["time", "close"]]
-        vix = vix.rename(columns={"close": "VIXY"})
+        # vix = cleaned_vix[["time", "close"]]
+        # vix = vix.rename(columns={"close": "VIXY"})
 
         df = data.copy()
-        df = df.merge(vix, on="time")
+        df = df.merge(cleaned_vix, on="time")
         df = df.sort_values(["time", "tic"]).reset_index(drop=True)
         return df
 
