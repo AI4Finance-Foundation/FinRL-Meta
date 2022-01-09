@@ -4,6 +4,7 @@ from finrl_meta.data_processors.processor_yahoofinance import YahooFinanceProces
 from finrl_meta.data_processors.processor_binance import BinanceProcessor as Binance
 from finrl_meta.data_processors.processor_ricequant import RiceQuantProcessor as RiceQuant
 from finrl_meta.data_processors.processor_joinquant import JoinquantProcessor
+from finrl_meta.data_processors.processor_tusharepro import TushareProProcessor as Tusharepro
 import pandas as pd
 import numpy as np
 import os
@@ -51,6 +52,13 @@ class DataProcessor():
                 print('Binance successfully connected')
             except:
                 raise ValueError('Please input correct account info for binance!')
+        elif self.data_source == "tusharepro":
+            try:
+                # users should input values: kwargs['token'], choose to input values: kwargs['adj']
+                self.processor = Tusharepro(data_source, **kwargs)
+                print('tusharepro successfully connected')
+            except:
+                raise ValueError('Please input correct account info for tusharepro!')
         else:
             raise ValueError('Data source input is NOT supported yet.')
     
