@@ -68,10 +68,10 @@ class BinanceProcessor(BasicProcessor):
         return df
     
 
-    def add_vix(self, df):
-        print('VIX is not applicable for cryptocurrencies. Return original DataFrame')
-        
-        return df
+    # def add_vix(self, df):
+    #     print('VIX is not applicable for cryptocurrencies. Return original DataFrame')
+    #
+    #     return df
     
 
     def df_to_array(self, df, tech_indicator_list, if_vix):

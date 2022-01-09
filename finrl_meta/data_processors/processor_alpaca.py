@@ -176,16 +176,16 @@ class AlpacaProcessor(BasicProcessor):
     #     print("Succesfully add technical indicators")
     #     return df
 
-    def add_vix(self, data):
-        vix_df = self.download_data(["VIXY"], self.start, self.end, self.time_interval)
-        cleaned_vix = self.clean_data(vix_df)
-        vix = cleaned_vix[["time", "close"]]
-        vix = vix.rename(columns={"close": "VIXY"})
-
-        df = data.copy()
-        df = df.merge(vix, on="time")
-        df = df.sort_values(["time", "tic"]).reset_index(drop=True)
-        return df
+    # def add_vix(self, data):
+    #     vix_df = self.download_data(["VIXY"], self.start, self.end, self.time_interval)
+    #     cleaned_vix = self.clean_data(vix_df)
+    #     vix = cleaned_vix[["time", "close"]]
+    #     vix = vix.rename(columns={"close": "VIXY"})
+    #
+    #     df = data.copy()
+    #     df = df.merge(vix, on="time")
+    #     df = df.sort_values(["time", "tic"]).reset_index(drop=True)
+    #     return df
 
     def calculate_turbulence(self, data, time_period=252):
         # can add other market assets

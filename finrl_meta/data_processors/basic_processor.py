@@ -110,10 +110,6 @@ class BasicProcessor:
         :return: (df) pandas dataframe
         """
         df = data.copy()
-        if "date" in df.columns:
-            df = df.reset_index(drop=False)
-            df = df.drop(columns=["level_1"])
-            df = df.rename(columns={"level_0": "tic", "date": "time"})
         turbulence_index = self.calculate_turbulence(df)
         df = df.merge(turbulence_index, on="time")
         df = df.sort_values(["time", "tic"]).reset_index(drop=True)
@@ -175,22 +171,60 @@ class BasicProcessor:
     def add_vix(self, data: pd.DataFrame) \
             -> pd.DataFrame:
         """
-        add vix from yahoo finance
+        add vix from processors
         :param data: (df) pandas dataframe
         :return: (df) pandas dataframe
         """
-        df = data.copy()
-        df_vix = self.download_data(
-            start_date=df.time.min(),
-            end_date=df.time.max(),
-            ticker_list=["^VIX"],
-            time_interval=self.time_interval,
-        )
-        df_vix = self.clean_data(df_vix)
-        vix = df_vix[["time", "adjcp"]]
-        vix.columns = ["time", "vix"]
+        if self.data_source in ['binance', 'ccxt', 'iexcloud', 'joinquant', 'quantconnect', 'ricequant']:
+            print('VIX is not applicable for {}. Return original DataFrame'.format(self.data_source))
+            return data
 
-        df = df.merge(vix, on="time")
+        # if self.data_source == 'yahoofinance':
+        #     df = data.copy()
+        #     df_vix = self.download_data(
+        #         start_date=df.time.min(),
+        #         end_date=df.time.max(),
+        #         ticker_list=["^VIX"],
+        #         time_interval=self.time_interval,
+        #     )
+        #     df_vix = self.clean_data(df_vix)
+        #     vix = df_vix[["time", "adj_close"]]
+        #     vix.columns = ["time", "vix"]
+        #
+        #     df = df.merge(vix, on="time")
+        #     df = df.sort_values(["time", "tic"]).reset_index(drop=True)
+        # elif self.data_source == 'alpaca':
+        #     vix_df = self.download_data(["VIXY"], self.start, self.end, self.time_interval)
+        #     cleaned_vix = self.clean_data(vix_df)
+        #     vix = cleaned_vix[["time", "close"]]
+        #     vix = vix.rename(columns={"close": "VIXY"})
+        #
+        #     df = data.copy()
+        #     df = df.merge(vix, on="time")
+        #     df = df.sort_values(["time", "tic"]).reset_index(drop=True)
+        # elif self.data_source == 'wrds':
+        #     vix_df = self.download_data(['vix'], self.start, self.end_date, self.time_interval)
+        #     cleaned_vix = self.clean_data(vix_df)
+        #     vix = cleaned_vix[['date', 'close']]
+        #
+        #     df = data.copy()
+        #     df = df.merge(vix, on="date")
+        #     df = df.sort_values(["date", "tic"]).reset_index(drop=True)
+
+        if self.data_source == 'yahoofinance':
+            ticker = "^VIX"
+        elif self.data_source == 'alpaca':
+            ticker = "VIXY"
+        elif self.data_source == 'wrds':
+            ticker = "vix"
+        vix_df = self.download_data([ticker], self.start, self.end, self.time_interval)
+        cleaned_vix = self.clean_data(vix_df)
+        # vix = cleaned_vix[["time", "close"]]
+        # vix = vix.rename(columns={"close": "VIXY"})
+        cleaned_vix = cleaned_vix.rename(columns={ticker: "vix"})
+
+        df = data.copy()
+        df = df.merge(cleaned_vix, on="time")
         df = df.sort_values(["time", "tic"]).reset_index(drop=True)
         return df
 
@@ -204,7 +238,7 @@ class BasicProcessor:
         if_first_time = True
         for tic in unique_ticker:
             if if_first_time:
-                price_array = df[df.tic == tic][["adjcp"]].values
+                price_array = df[df.tic == tic][["adj_close"]].values
                 # price_ary = df[df.tic==tic]['close'].values
                 tech_array = df[df.tic == tic][tech_indicator_list].values
                 if if_vix:
@@ -214,7 +248,7 @@ class BasicProcessor:
                 if_first_time = False
             else:
                 price_array = np.hstack(
-                    [price_array, df[df.tic == tic][["adjcp"]].values]
+                    [price_array, df[df.tic == tic][["adj_close"]].values]
                 )
                 tech_array = np.hstack(
                     [tech_array, df[df.tic == tic][tech_indicator_list].values]

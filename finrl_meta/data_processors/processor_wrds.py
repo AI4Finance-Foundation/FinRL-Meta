@@ -273,16 +273,16 @@ class WrdsProcessor(BasicProcessor):
         df = df.sort_values(["date", "tic"]).reset_index(drop=True)
         return df
 
-    def add_vix(self, data):
-        vix_df = self.download_data(['vix'], self.start, self.end_date, self.time_interval)
-        cleaned_vix = self.clean_data(vix_df)
-        vix = cleaned_vix[['date','close']]
-        
-        df = data.copy()
-        df = df.merge(vix, on="date")
-        df = df.sort_values(["date", "tic"]).reset_index(drop=True)
-        
-        return df
+    # def add_vix(self, data):
+    #     vix_df = self.download_data(['vix'], self.start, self.end_date, self.time_interval)
+    #     cleaned_vix = self.clean_data(vix_df)
+    #     vix = cleaned_vix[['date','close']]
+    #
+    #     df = data.copy()
+    #     df = df.merge(vix, on="date")
+    #     df = df.sort_values(["date", "tic"]).reset_index(drop=True)
+    #
+    #     return df
 
     def df_to_array(self,df,tech_indicator_list):
         unique_ticker = df.tic.unique()
