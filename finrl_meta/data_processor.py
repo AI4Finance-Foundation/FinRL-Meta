@@ -146,11 +146,10 @@ def test_joinquant():
     ticker_list = ["000612.XSHE", "601808.XSHG"]
 
     data2 = p.download_data(ticker_list=ticker_list, start_date=TRADE_START_DATE, end_date=TRADE_END_DATE, time_interval='1D')
-    # data3 = e.clean_data(data2)
-    data4 = p.add_turbulence(data2)
-    data6 = p.add_technical_indicator(data4, ['macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30', 'close_30_sma', 'close_60_sma'])
-    # data5 = e.add_vix(data4)
-
+    data3 = p.clean_data(data2)
+    data4 = p.add_turbulence(data3)
+    data5 = p.add_technical_indicator(data4, ['macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30', 'close_30_sma', 'close_60_sma'])
+    # data6 = e.add_vix(data5)
     pass
 
 if __name__ == "__main__":
