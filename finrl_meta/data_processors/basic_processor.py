@@ -90,10 +90,6 @@ class BasicProcessor:
         :return: (df) pandas dataframe
         """
         df = data.copy()
-        if "date" in df.columns:
-            df = df.reset_index(drop=False)
-            df = df.drop(columns=["level_1"])
-            df = df.rename(columns={"level_0": "tic", "date": "time"})
         turbulence_index = self.calculate_turbulence(df)
         df = df.merge(turbulence_index, on="time")
         df = df.sort_values(["time", "tic"]).reset_index(drop=True)
@@ -167,7 +163,7 @@ class BasicProcessor:
             time_interval=self.time_interval,
         )
         df_vix = self.clean_data(df_vix)
-        vix = df_vix[["time", "adjcp"]]
+        vix = df_vix[["time", "adj_close"]]
         vix.columns = ["time", "vix"]
 
         df = df.merge(vix, on="time")
@@ -184,7 +180,7 @@ class BasicProcessor:
         if_first_time = True
         for tic in unique_ticker:
             if if_first_time:
-                price_array = df[df.tic == tic][["adjcp"]].values
+                price_array = df[df.tic == tic][["adj_close"]].values
                 # price_ary = df[df.tic==tic]['close'].values
                 tech_array = df[df.tic == tic][tech_indicator_list].values
                 if if_vix:
@@ -194,7 +190,7 @@ class BasicProcessor:
                 if_first_time = False
             else:
                 price_array = np.hstack(
-                    [price_array, df[df.tic == tic][["adjcp"]].values]
+                    [price_array, df[df.tic == tic][["adj_close"]].values]
                 )
                 tech_array = np.hstack(
                     [tech_array, df[df.tic == tic][tech_indicator_list].values]

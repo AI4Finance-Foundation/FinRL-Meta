@@ -43,7 +43,7 @@ class IEXCloudProcessor(BasicProcessor):
         Returns:
             pd.DataFrame: A pandas dataframe with end of day historical data
             for the specified tickers with the following columns:
-            date, tic, open, high, low, close, adjcp, volume.
+            date, tic, open, high, low, close, adj_close, volume.
 
         Examples:
             kwargs['mode'] = 'sandbox'
@@ -94,7 +94,7 @@ class IEXCloudProcessor(BasicProcessor):
                 "volume",
             ]
         ]
-        price_data = price_data.rename(columns={"ticker": "tic", "date": "time", "fclose": "adjcp"})
+        price_data = price_data.rename(columns={"ticker": "tic", "date": "time", "fclose": "adj_close"})
 
         price_data.date = price_data.date.map(
             lambda x: datetime.fromtimestamp(x / 1000, pytz.UTC).strftime(
