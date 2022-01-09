@@ -192,15 +192,16 @@ class BasicProcessor:
         #     df = df.sort_values(["date", "tic"]).reset_index(drop=True)
 
         if self.data_source == 'yahoofinance':
-            ticker_list = ["^VIX"]
+            ticker = "^VIX"
         elif self.data_source == 'alpaca':
-            ticker_list = ["VIXY"]
+            ticker = "VIXY"
         elif self.data_source == 'wrds':
-            ticker_list = ["vix"]
-        vix_df = self.download_data(ticker_list, self.start, self.end, self.time_interval)
+            ticker = "vix"
+        vix_df = self.download_data([ticker], self.start, self.end, self.time_interval)
         cleaned_vix = self.clean_data(vix_df)
         # vix = cleaned_vix[["time", "close"]]
         # vix = vix.rename(columns={"close": "VIXY"})
+        cleaned_vix = cleaned_vix.rename(columns={ticker: 'vix'})
 
         df = data.copy()
         df = df.merge(cleaned_vix, on="time")
