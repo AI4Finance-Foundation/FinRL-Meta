@@ -139,10 +139,11 @@ def test_joinquant():
     TRADE_START_DATE = "2019-09-01"
     TRADE_END_DATE = "2021-09-11"
     READ_DATA_FROM_LOCAL = 0
-
+    TIME_INTERVAL = '1D'
+    TECHNICAL_INDICATOR = ['macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30', 'close_30_sma', 'close_60_sma']
     kwargs = {}
-    kwargs['username'] = "xxx"  # should input your username
-    kwargs['password'] = "xxx"  # should input your password
+    kwargs['username'] = "18117580099"  # should input your username
+    kwargs['password'] = "Bl2020quant"  # should input your password
     p = DataProcessor(data_source='joinquant', **kwargs)
 
 
@@ -153,11 +154,15 @@ def test_joinquant():
     # )
     ticker_list = ["000612.XSHE", "601808.XSHG"]
 
-    data2 = p.download_data(ticker_list=ticker_list, start_date=TRADE_START_DATE, end_date=TRADE_END_DATE, time_interval='1D')
+    data2 = p.download_data(ticker_list=ticker_list, start_date=TRADE_START_DATE, end_date=TRADE_END_DATE, time_interval=TIME_INTERVAL)
     data3 = p.clean_data(data2)
     data4 = p.add_turbulence(data3)
-    data5 = p.add_technical_indicator(data4, ['macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30', 'close_30_sma', 'close_60_sma'])
-    # data6 = e.add_vix(data5)
+    data5 = p.add_technical_indicator(data4, TECHNICAL_INDICATOR)
+    data6 = p.add_vix(data5)
+
+    price_array, tech_array, turbulence_array = p.run(ticker_list, TRADE_START_DATE, TRADE_END_DATE,
+                                                       TIME_INTERVAL, TECHNICAL_INDICATOR,
+                                                       if_vix=False, cache=True)
     pass
 
 if __name__ == "__main__":
