@@ -1,18 +1,10 @@
 import rqdatac as ricequant
 import pandas as pd
-from stockstats import StockDataFrame as Sdf
 import numpy as np
 from typing import List
-# from basic_processor import BasicProcessor
 from finrl_meta.data_processors.basic_processor import BasicProcessor
 
 class RiceQuantProcessor(BasicProcessor):
-    # def __init__(self, username = None, password = None):
-    #     # initialize ricequant
-    #     if username== None or password == None:
-    #         ricequant.init()   #if the lisence is already set, you can init without username and password
-    #     else:
-    #         ricequant.init(username, password) #init with username and password
     def __init__(self, data_source: str, **kwargs):
         BasicProcessor.__init__(self, data_source, **kwargs)
         if kwargs['username']== None or kwargs['password'] == None:
@@ -27,49 +19,21 @@ class RiceQuantProcessor(BasicProcessor):
         
         return dataframe
     
-    # def clean_data(self, df) -> pd.DataFrame:
-    #     ''' RiceQuant data is already cleaned, we only need to transform data format here.
-    #     No need for filling NaN data'''
-    #     df = df.copy()
-    #     # raw df uses multi-index (tic,time), reset it to single index (time)
-    #     df = df.reset_index(level=[0,1])
-    #     # rename column order_book_id to tic
-    #     df = df.rename(columns={'order_book_id':'tic', 'datetime':'time'})
-    #     # reserve columns needed
-    #     df = df[['tic','time','open','high','low','close','volume']]
-    #     # check if there is NaN values
-    #     assert not df.isnull().values.any()
-    #
-    #     return df
-    
-    # def add_technical_indicator(self, df, tech_indicator_list = [
-    #         'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',
-    #         'close_30_sma', 'close_60_sma']):
-    #     df = df.copy()
-    #     df = df.rename(columns={'time':'date'})
-    #     df = df.sort_values(by=['tic', 'date'])
-    #     stock = Sdf.retype(df.copy())
-    #     unique_ticker = stock.tic.unique()
-    #     tech_indicator_list = tech_indicator_list
-    #
-    #     for indicator in tech_indicator_list:
-    #         indicator_df = pd.DataFrame()
-    #         for i in range(len(unique_ticker)):
-    #             # print(unique_ticker[i], i)
-    #             temp_indicator = stock[stock.tic == unique_ticker[i]][indicator]
-    #             temp_indicator = pd.DataFrame(temp_indicator)
-    #             temp_indicator['tic'] = unique_ticker[i]
-    #             # print(len(df[df.tic == unique_ticker[i]]['date'].to_list()))
-    #             temp_indicator['date'] = df[df.tic == unique_ticker[i]]['date'].to_list()
-    #             indicator_df = indicator_df.append(
-    #                 temp_indicator, ignore_index=True
-    #             )
-    #         df = df.merge(indicator_df[['tic', 'date', indicator]], on=['tic', 'date'], how='left')
-    #     df = df.sort_values(by=['date', 'tic'])
-    #     df = df.rename(columns={'date':'time'})
-    #     print('Succesfully add technical indicators')
-    #     return df
-    
+    def clean_data(self, df) -> pd.DataFrame:
+        ''' RiceQuant data is already cleaned, we only need to transform data format here.
+        No need for filling NaN data'''
+        df = df.copy()
+        # raw df uses multi-index (tic,time), reset it to single index (time)
+        df = df.reset_index(level=[0,1])
+        # rename column order_book_id to tic
+        df = df.rename(columns={'order_book_id':'tic', 'datetime':'time'})
+        # reserve columns needed
+        df = df[['tic','time','open','high','low','close','volume']]
+        # check if there is NaN values
+        assert not df.isnull().values.any()
+           
+        return df
+        
     def add_vix(self, data):
         print('VIX is NOT applicable to China A-shares')
         return data
