@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 import requests
 import urllib, json
-# from talib.abstract import CCI, DX, MACD, RSI
 from finrl_meta.data_processors.basic_processor import BasicProcessor
 from .func import download_n_unzip_file, convert_to_date_object, get_path
 
@@ -39,9 +38,9 @@ class BinanceProcessor(BasicProcessor):
             return final_df
     
 
-    def clean_data(self, df):
-        df = df.dropna()
-        return df
+    # def clean_data(self, df):
+    #     df = df.dropna()
+    #     return df
     
 
     # def add_technical_indicator(self, df, tech_indicator_list):
