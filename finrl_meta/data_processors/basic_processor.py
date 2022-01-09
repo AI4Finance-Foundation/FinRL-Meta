@@ -201,7 +201,7 @@ class BasicProcessor:
         cleaned_vix = self.clean_data(vix_df)
         # vix = cleaned_vix[["time", "close"]]
         # vix = vix.rename(columns={"close": "VIXY"})
-        cleaned_vix = cleaned_vix.rename(columns={ticker: 'vix'})
+        cleaned_vix = cleaned_vix.rename(columns={ticker: "vix"})
 
         df = data.copy()
         df = df.merge(cleaned_vix, on="time")
