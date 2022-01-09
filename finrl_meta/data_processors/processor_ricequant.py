@@ -80,7 +80,7 @@ class RiceQuantProcessor(BasicProcessor):
         )
         return turbulence_index
     
-    def add_turbulence(self,data, time_period=252):
+    def add_turbulence(self, data, time_period=252):
         """
         add turbulence index from a precalcualted dataframe
         :param data: (df) pandas dataframe
