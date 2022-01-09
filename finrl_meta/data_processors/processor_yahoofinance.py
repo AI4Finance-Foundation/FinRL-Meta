@@ -254,24 +254,24 @@ class YahooFinanceProcessor(BasicProcessor):
         )
         return turbulence_index
     
-    def add_vix(self, data):
-        """
-        add vix from yahoo finance
-        :param data: (df) pandas dataframe
-        :return: (df) pandas dataframe
-        """
-        df = data.copy()
-        df_vix = self.download_data(start_date= df.time.min(), 
-                                    end_date= df.time.max(),
-                                    ticker_list = ["^VIX"],
-                                    time_interval = self.time_interval)
-        df_vix = self.clean_data(df_vix)
-        vix = df_vix[['time','adj_close']]
-        vix.columns = ['time','vix']
-
-        df = df.merge(vix, on="time")
-        df = df.sort_values(["time", "tic"]).reset_index(drop=True)
-        return df
+    # def add_vix(self, data):
+    #     """
+    #     add vix from yahoo finance
+    #     :param data: (df) pandas dataframe
+    #     :return: (df) pandas dataframe
+    #     """
+    #     df = data.copy()
+    #     df_vix = self.download_data(start_date= df.time.min(),
+    #                                 end_date= df.time.max(),
+    #                                 ticker_list = ["^VIX"],
+    #                                 time_interval = self.time_interval)
+    #     df_vix = self.clean_data(df_vix)
+    #     vix = df_vix[['time','adj_close']]
+    #     vix.columns = ['time','vix']
+    #
+    #     df = df.merge(vix, on="time")
+    #     df = df.sort_values(["time", "tic"]).reset_index(drop=True)
+    #     return df
     
     def df_to_array(self, df, tech_indicator_list, if_vix):
         """transform final df to numpy arrays"""

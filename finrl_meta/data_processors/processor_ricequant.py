@@ -40,8 +40,8 @@ class RiceQuantProcessor(BasicProcessor):
         # check if there is NaN values
         assert not df.isnull().values.any()
         
-        return df 
-    
+        return df
+
     # def add_technical_indicator(self, df, tech_indicator_list = [
     #         'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',
     #         'close_30_sma', 'close_60_sma']):
@@ -70,9 +70,9 @@ class RiceQuantProcessor(BasicProcessor):
     #     print('Succesfully add technical indicators')
     #     return df
     
-    def add_vix(self, data):
-        print('VIX is NOT applicable to China A-shares')
-        return data
+    # def add_vix(self, data):
+    #     print('VIX is NOT applicable to China A-shares')
+    #     return data
     
     def calculate_turbulence(self, data, time_period=252):
         # can add other market assets

@@ -155,7 +155,7 @@ class BasicProcessor:
         :param data: (df) pandas dataframe
         :return: (df) pandas dataframe
         """
-        if self.data_source in ['binance', ]:
+        if self.data_source in ['binance', 'ccxt', 'iexcloud', 'joinquant', 'quantconnect', 'ricequant']:
             print('VIX is not applicable for this data processor. Return original DataFrame')
             return data
 
@@ -182,6 +182,14 @@ class BasicProcessor:
             df = data.copy()
             df = df.merge(vix, on="time")
             df = df.sort_values(["time", "tic"]).reset_index(drop=True)
+        elif self.data_source == 'wrds':
+            vix_df = self.download_data(['vix'], self.start, self.end_date, self.time_interval)
+            cleaned_vix = self.clean_data(vix_df)
+            vix = cleaned_vix[['date', 'close']]
+
+            df = data.copy()
+            df = df.merge(vix, on="date")
+            df = df.sort_values(["date", "tic"]).reset_index(drop=True)
         return df
 
     # tech_array: technical indicator
