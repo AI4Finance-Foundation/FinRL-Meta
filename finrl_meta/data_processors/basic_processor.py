@@ -151,23 +151,37 @@ class BasicProcessor:
     def add_vix(self, data: pd.DataFrame) \
             -> pd.DataFrame:
         """
-        add vix from yahoo finance
+        add vix from processors
         :param data: (df) pandas dataframe
         :return: (df) pandas dataframe
         """
-        df = data.copy()
-        df_vix = self.download_data(
-            start_date=df.time.min(),
-            end_date=df.time.max(),
-            ticker_list=["^VIX"],
-            time_interval=self.time_interval,
-        )
-        df_vix = self.clean_data(df_vix)
-        vix = df_vix[["time", "adj_close"]]
-        vix.columns = ["time", "vix"]
+        if self.data_source in ['binance', ]:
+            print('VIX is not applicable for this data processor. Return original DataFrame')
+            return data
 
-        df = df.merge(vix, on="time")
-        df = df.sort_values(["time", "tic"]).reset_index(drop=True)
+        if self.data_source == 'yahoofinance':
+            df = data.copy()
+            df_vix = self.download_data(
+                start_date=df.time.min(),
+                end_date=df.time.max(),
+                ticker_list=["^VIX"],
+                time_interval=self.time_interval,
+            )
+            df_vix = self.clean_data(df_vix)
+            vix = df_vix[["time", "adj_close"]]
+            vix.columns = ["time", "vix"]
+
+            df = df.merge(vix, on="time")
+            df = df.sort_values(["time", "tic"]).reset_index(drop=True)
+        elif self.data_source == 'alpaca':
+            vix_df = self.download_data(["VIXY"], self.start, self.end, self.time_interval)
+            cleaned_vix = self.clean_data(vix_df)
+            vix = cleaned_vix[["time", "close"]]
+            vix = vix.rename(columns={"close": "VIXY"})
+
+            df = data.copy()
+            df = df.merge(vix, on="time")
+            df = df.sort_values(["time", "tic"]).reset_index(drop=True)
         return df
 
     # tech_array: technical indicator

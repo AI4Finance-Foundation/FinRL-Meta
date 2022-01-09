@@ -48,7 +48,7 @@ class YahooFinanceProcessor(BasicProcessor):
             7 columns: A date, open, high, low, close, volume and tick symbol
             for the specified stock ticker
         """
-        
+
         self.start = start_date
         self.end = end_date
         self.time_interval = time_interval
