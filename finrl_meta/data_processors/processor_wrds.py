@@ -1,7 +1,7 @@
 import wrds
 import datetime
 import pandas as pd
-import trading_calendars as tc
+import exchange_calendars as tc
 import pytz
 import numpy as np
 from typing import List
