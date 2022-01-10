@@ -4,7 +4,7 @@ import pandas as pd
 import yfinance as yf
 import numpy as np
 from stockstats import StockDataFrame as Sdf
-import trading_calendars as tc
+import exchange_calendars as tc
 from typing import List
 import pytz
 from finrl_meta.data_processors.func import calc_time_zone
