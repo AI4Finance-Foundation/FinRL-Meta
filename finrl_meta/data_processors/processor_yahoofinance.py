@@ -4,7 +4,7 @@ import pandas as pd
 import yfinance as yf
 import numpy as np
 from stockstats import StockDataFrame as Sdf
-import trading_calendars as tc
+import exchange_calendars as tc
 from typing import List
 import pytz
 from finrl_meta.data_processors.func import calc_time_zone
@@ -48,7 +48,7 @@ class YahooFinanceProcessor(BasicProcessor):
             7 columns: A date, open, high, low, close, volume and tick symbol
             for the specified stock ticker
         """
-        
+
         self.start = start_date
         self.end = end_date
         self.time_interval = time_interval
@@ -70,7 +70,7 @@ class YahooFinanceProcessor(BasicProcessor):
                 "high",
                 "low",
                 "close",
-                "adjcp",
+                "adj_close",
                 "volume",
                 "tic",
             ]
@@ -118,14 +118,14 @@ class YahooFinanceProcessor(BasicProcessor):
             print (('Clean data for ') + tic)
             #create empty DataFrame using complete time index
             tmp_df = pd.DataFrame(columns=['open','high','low','close',
-                                           'adjcp','volume'], 
+                                           'adj_close','volume'],
                                   index=times)
             #get data for current ticker
             tic_df = df[df.tic == tic]
             #fill empty DataFrame using orginal data
             for i in range(tic_df.shape[0]):
                 tmp_df.loc[tic_df.iloc[i]['time']] = tic_df.iloc[i]\
-                    [['open','high','low','close','adjcp','volume']]
+                    [['open','high','low','close','adj_close','volume']]
             
             #if close on start date is NaN, fill data with first valid close 
             #and set volume to 0.
@@ -134,7 +134,7 @@ class YahooFinanceProcessor(BasicProcessor):
                 for i in range(tmp_df.shape[0]):
                     if str(tmp_df.iloc[i]['close']) != 'nan':
                         first_valid_close = tmp_df.iloc[i]['close']
-                        first_valid_adjclose = tmp_df.iloc[i]['adjcp']
+                        first_valid_adjclose = tmp_df.iloc[i]['adj_close']
                         
                 tmp_df.iloc[0] = [first_valid_close, first_valid_close, 
                                   first_valid_close, first_valid_close,
@@ -144,11 +144,11 @@ class YahooFinanceProcessor(BasicProcessor):
             for i in range(tmp_df.shape[0]):
                 if str(tmp_df.iloc[i]['close']) == 'nan':
                     previous_close = tmp_df.iloc[i-1]['close']
-                    previous_adjcp = tmp_df.iloc[i-1]['adjcp']
+                    previous_adj_close = tmp_df.iloc[i-1]['adj_close']
                     if str(previous_close) == 'nan':
                         raise ValueError
                     tmp_df.iloc[i] = [previous_close, previous_close, previous_close,
-                                      previous_close, previous_adjcp, 0.0]
+                                      previous_close, previous_adj_close, 0.0]
             
             #merge single ticker data to new DataFrame
             tmp_df = tmp_df.astype(float)
@@ -165,34 +165,34 @@ class YahooFinanceProcessor(BasicProcessor):
         
         return new_df
     
-    def add_technical_indicator(self, data, tech_indicator_list):
-        """
-        calculate technical indicators
-        use stockstats package to add technical inidactors
-        :param data: (df) pandas dataframe
-        :return: (df) pandas dataframe
-        """
-        df = data.copy()
-        df = df.sort_values(by=['tic','time'])
-        stock = Sdf.retype(df.copy())
-        unique_ticker = stock.tic.unique()
-
-        for indicator in tech_indicator_list:
-            indicator_df = pd.DataFrame()
-            for i in range(len(unique_ticker)):
-                try:
-                    temp_indicator = stock[stock.tic == unique_ticker[i]][indicator]
-                    temp_indicator = pd.DataFrame(temp_indicator)
-                    temp_indicator['tic'] = unique_ticker[i]
-                    temp_indicator['time'] = df[df.tic == unique_ticker[i]]['time'].to_list()
-                    indicator_df = indicator_df.append(
-                        temp_indicator, ignore_index=True
-                    )
-                except Exception as e:
-                    print(e)
-            df = df.merge(indicator_df[['tic','time',indicator]],on=['tic','time'],how='left')
-        df = df.sort_values(by=['time','tic'])
-        return df
+    # def add_technical_indicator(self, data, tech_indicator_list):
+    #     """
+    #     calculate technical indicators
+    #     use stockstats package to add technical inidactors
+    #     :param data: (df) pandas dataframe
+    #     :return: (df) pandas dataframe
+    #     """
+    #     df = data.copy()
+    #     df = df.sort_values(by=['tic','time'])
+    #     stock = Sdf.retype(df.copy())
+    #     unique_ticker = stock.tic.unique()
+    #
+    #     for indicator in tech_indicator_list:
+    #         indicator_df = pd.DataFrame()
+    #         for i in range(len(unique_ticker)):
+    #             try:
+    #                 temp_indicator = stock[stock.tic == unique_ticker[i]][indicator]
+    #                 temp_indicator = pd.DataFrame(temp_indicator)
+    #                 temp_indicator['tic'] = unique_ticker[i]
+    #                 temp_indicator['time'] = df[df.tic == unique_ticker[i]]['time'].to_list()
+    #                 indicator_df = indicator_df.append(
+    #                     temp_indicator, ignore_index=True
+    #                 )
+    #             except Exception as e:
+    #                 print(e)
+    #         df = df.merge(indicator_df[['tic','time',indicator]],on=['tic','time'],how='left')
+    #     df = df.sort_values(by=['time','tic'])
+    #     return df
 
     def add_turbulence(self, data):
         """
@@ -254,24 +254,24 @@ class YahooFinanceProcessor(BasicProcessor):
         )
         return turbulence_index
     
-    def add_vix(self, data):
-        """
-        add vix from yahoo finance
-        :param data: (df) pandas dataframe
-        :return: (df) pandas dataframe
-        """
-        df = data.copy()
-        df_vix = self.download_data(start_date= df.time.min(), 
-                                    end_date= df.time.max(),
-                                    ticker_list = ["^VIX"],
-                                    time_interval = self.time_interval)
-        df_vix = self.clean_data(df_vix)
-        vix = df_vix[['time','adjcp']]
-        vix.columns = ['time','vix']
-
-        df = df.merge(vix, on="time")
-        df = df.sort_values(["time", "tic"]).reset_index(drop=True)
-        return df
+    # def add_vix(self, data):
+    #     """
+    #     add vix from yahoo finance
+    #     :param data: (df) pandas dataframe
+    #     :return: (df) pandas dataframe
+    #     """
+    #     df = data.copy()
+    #     df_vix = self.download_data(start_date= df.time.min(),
+    #                                 end_date= df.time.max(),
+    #                                 ticker_list = ["^VIX"],
+    #                                 time_interval = self.time_interval)
+    #     df_vix = self.clean_data(df_vix)
+    #     vix = df_vix[['time','adj_close']]
+    #     vix.columns = ['time','vix']
+    #
+    #     df = df.merge(vix, on="time")
+    #     df = df.sort_values(["time", "tic"]).reset_index(drop=True)
+    #     return df
     
     def df_to_array(self, df, tech_indicator_list, if_vix):
         """transform final df to numpy arrays"""
@@ -280,7 +280,7 @@ class YahooFinanceProcessor(BasicProcessor):
         if_first_time = True
         for tic in unique_ticker:
             if if_first_time:
-                price_array = df[df.tic==tic][['adjcp']].values
+                price_array = df[df.tic==tic][['adj_close']].values
                 #price_ary = df[df.tic==tic]['close'].values
                 tech_array = df[df.tic==tic][tech_indicator_list].values
                 if if_vix:
@@ -289,7 +289,7 @@ class YahooFinanceProcessor(BasicProcessor):
                     risk_array = df[df.tic==tic]['turbulence'].values 
                 if_first_time = False
             else:
-                price_array = np.hstack([price_array, df[df.tic==tic][['adjcp']].values])
+                price_array = np.hstack([price_array, df[df.tic==tic][['adj_close']].values])
                 tech_array = np.hstack([tech_array, df[df.tic==tic][tech_indicator_list].values])
         assert price_array.shape[0] == tech_array.shape[0]
         assert tech_array.shape[0] == risk_array.shape[0]

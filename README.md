@@ -6,7 +6,7 @@
 [![Python 3.6](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/downloads/release/python-360/)
 [![PyPI](https://img.shields.io/pypi/v/finrl_meta.svg)](https://pypi.org/project/finrl_meta/)
 
-FinRL-Meta is a universe of market environments for data-driven financial reinforcement learning.  Users can use FinRL-Meta as the metaverse of their financial  environments.
+FinRL-Meta is a universe of market environments for data-driven financial reinforcement learning. Users can use FinRL-Meta as the metaverse of their financial  environments.
 
 1. FinRL-Meta separates financial data processing from the design pipeline of DRL-based strategy and provides open-source data engineering tools for financial big data.
 2. FinRL-Meta provides hundreds of market environments for various trading tasks.
@@ -16,12 +16,21 @@ FinRL-Meta is a universe of market environments for data-driven financial reinfo
 Also called **Neo_FinRL**: **N**ear real-market **E**nvironments f**o**r data-driven **Fin**ancial **R**einforcement **L**earning.
 
 ## Outline
+- [News and Tutorials](#news-and-tutorials)
 - [Our Goals](#our-goals)
 - [Design Principles](#design-principles)
 - [Overview](#overview)
 - [Plug-and-Play](#plug-and-play)
 - [Training-Testing-Trading](#training-testing-trading-pipeline)
 - [Our Vision](#our-vision)
+
+## News and Tutorials
+
++ [DataDrivenInvestor] [FinRL-Meta: A Universe of Near Real-Market En­vironments for Data­-Driven Financial Reinforcement Learning](https://medium.datadriveninvestor.com/finrl-meta-a-universe-of-near-real-market-en-vironments-for-data-driven-financial-reinforcement-e1894e1ebfbd)
++ [央广网] [2021 IDEA大会于福田圆满落幕：群英荟萃论道AI 多项目发布亮点纷呈](http://tech.cnr.cn/techph/20211123/t20211123_525669092.shtml)
++ [央广网] [2021 IDEA大会开启AI思想盛宴 沈向洋理事长发布六大前沿产品](https://baijiahao.baidu.com/s?id=1717101783873523790&wfr=spider&for=pc)
++ [IDEA新闻] [2021 IDEA大会发布产品FinRL-Meta——基于数据驱动的强化学习金融风险模拟系统](https://idea.edu.cn/news/20211213143128.html)
++ [知乎] [FinRL-Meta基于数据驱动的强化学习金融元宇宙](https://zhuanlan.zhihu.com/p/437804814)
 
 ## Our Goals
 + To reduce the simulation-reality gap: existing works use backtesting on historical data, while the real performance may be quite different when applying the algorithms to paper/live trading.
@@ -39,7 +48,7 @@ Also called **Neo_FinRL**: **N**ear real-market **E**nvironments f**o**r data-dr
 + Flexibility and extensibility: Inheritance might be helpful here
 
 ## Overview 
-![Overview image of NeoFinRL](https://github.com/AI4Finance-Foundation/NeoFinRL/blob/main/figs/neofinrl_overview.png)
+![Overview image of FinRL-Meta](https://github.com/AI4Finance-Foundation/FinRL-Meta/blob/master/figs/neofinrl_overview.png)
 We utilize a layered structure in FinRL-metaverse, as shown in the figure above. FinRL-metaverse consists of three layers: data layer, environment layer, and agent layer. Each layer executes its functions and is independent. Meanwhile, layers interact through end-to-end interfaces to implement the complete workflow of algorithm trading.
 
 ## DataOps
@@ -54,19 +63,27 @@ DataOps is a series of principles and practices to improve the quality and reduc
 Supported Data Sources: 
 |Data Source |Type |Range and Frequency |Request Limits|Raw Data|Preprocessed Data|
 |  ----  |  ----  |  ----  |  ----  |  ----  |  ----  |
-|Yahoo! Finance| US Securities| Frequency-specific, 1min| 2,000/hour| OHLCV | Prices&Indicators|
-|CCXT| Cryptocurrency| API-specific, 1min| API-specific| OHLCV| Prices&Indicators|
-|WRDS.TAQ| US Securities| 2003-now, 1ms| 5 requests each time| Intraday Trades|Prices&Indicators|
 |Alpaca| US Stocks, ETFs| 2015-now, 1min| Account-specific| OHLCV| Prices&Indicators|
-|RiceQuant| CN Securities| 2005-now, 1ms| Account-specific| OHLCV| Prices&Indicators|
+|Binance| Cryptocurrency| API-specific, 1s, 1min| API-specific| Tick-level daily aggegrated trades, OHLCV| Prices&Indicators|
+|CCXT| Cryptocurrency| API-specific, 1min| API-specific| OHLCV| Prices&Indicators|
+|IEXCloud| NMS US securities|1970-now, 1 day|100 per second per IP|OHLCV| Prices&Indicators|
 |JoinQuant| CN Securities| 2005-now, 1min| 3 requests each time| OHLCV| Prices&Indicators|
 |QuantConnect| US Securities| 1998-now, 1s| NA| OHLCV| Prices&Indicators|
+|RiceQuant| CN Securities| 2005-now, 1ms| Account-specific| OHLCV| Prices&Indicators|
+|tusharepro| CN Securities| -now, 1 min| Account-specific| OHLCV| Prices&Indicators|
+|WRDS.TAQ| US Securities| 2003-now, 1ms| 5 requests each time| Intraday Trades|Prices&Indicators|
+|Yahoo! Finance| US Securities| Frequency-specific, 1min| 2,000/hour| OHLCV | Prices&Indicators|
 
+
+
+OHLCV: open, high, low, close, volume 
+
+adj_close: adjusted close price
 
 ## Plug-and-Play
 In the development pipeline, we separate market environments from the data layer and the agent layer. Any DRL agent can be directly plugged into our environments, then trained and tested. Different agents/algorithms can be compared by running on the same benchmark environment for fair evaluations. 
 
-A demonstration notebook for plug-and-play with ElegantRL, Stable Baselines3 and RLlib: [Play and Play with DRL Agents](https://colab.research.google.com/github/AI4Finance-Foundation/FinRL-Meta/blob/main/Demo_Plug_and_Play_with_DRL_Libraries.ipynb)
+A demonstration notebook for plug-and-play with ElegantRL, Stable Baselines3 and RLlib: [Plug and Play with DRL Agents](https://colab.research.google.com/github/AI4Finance-Foundation/FinRL-Meta/blob/main/Demo_Plug_and_Play_with_DRL_Libraries.ipynb)
 
 ## "Training-Testing-Trading" Pipeline
 
@@ -84,7 +101,7 @@ Such a unified pipeline allows fair comparisons among different algorithms and s
 
 ## Our Vision
 
-For future work, we plan to build a multi-agent-based market simulator that consists of over ten thousands of agents, namely, a FinRL-Metaverse. First, FinRL-Metaverse aims to build a universe of market environments, like the XLand environment ([source](https://deepmind.com/research/publications/2021/open-ended-learning-leads-to-generally-capable-agents)) and planet-scale climate forecast ([source](https://www.nature.com/articles/s41586-021-03854-z)) by DeepMind. To improve the performance for large-scale markets, we will employ GPU-based massive parallel simulation as Isaac Gym ([source](https://arxiv.org/abs/2108.10470)). Moreover, it will be interesting to explore the deep evolutionary RL framework ([source](https://doaj.org/article/4dd31838732842439cc1301e52613d1c)) to simulate the markets. Our final goal is to provide insights into complex market phenomena and offer guidance for financial regulations through FinRL-Metaverse.
+For future work, we plan to build a multi-agent-based market simulator that consists of over ten thousands of agents, namely, a FinRL-Metaverse. First, FinRL-Metaverse aims to build a universe of market environments, like the XLand environment ([source](https://deepmind.com/research/publications/2021/open-ended-learning-leads-to-generally-capable-agents)) and planet-scale climate forecast ([source](https://www.nature.com/articles/s41586-021-03854-z)) by DeepMind. To improve the performance for large-scale markets, we will employ GPU-based massive parallel simulation just as Isaac Gym ([source](https://arxiv.org/abs/2108.10470)). Moreover, it will be interesting to explore the deep evolutionary RL framework ([source](https://doaj.org/article/4dd31838732842439cc1301e52613d1c)) to simulate the markets. Our final goal is to provide insights into complex market phenomena and offer guidance for financial regulations through FinRL-Metaverse.
 
 <div align="center">
 <img align="center" src=figs/finrl_metaverse.png width="800">

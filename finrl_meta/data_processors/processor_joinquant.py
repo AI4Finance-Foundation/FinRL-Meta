@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import copy
 import os
+import datetime
 from typing import List
 from finrl_meta.data_processors.func import calc_all_filenames, date2str, remove_all_files
 from finrl_meta.data_processors.func import add_hyphen_for_date
@@ -35,7 +36,7 @@ class JoinquantProcessor(BasicProcessor):
             fields=["date", "open", "high", "low", "close", "volume"],
             end_dt=end_date,
         )
-
+        df = df.reset_index().rename(columns={'level_0': 'tic'})
         return df
 
     def data_fetch(self,stock_list, num, unit, end_dt):
@@ -60,7 +61,11 @@ class JoinquantProcessor(BasicProcessor):
     # output: list of str_of_trade_day, e.g., ['2021-09-01', '2021-09-02']
     def calc_trade_days_by_joinquant(self, start_day: str, end_day: str) -> List[str]:
         dates = jq.get_trade_days(start_day, end_day)
-        str_dates = [date2str(dt) for dt in dates]
+        str_dates = []
+        for d in dates:
+            tmp = datetime.date.strftime(d, "%Y-%m-%d")
+            str_dates.append(tmp)
+        # str_dates = [date2str(dt) for dt in dates]
         return str_dates
 
     # start_day: str

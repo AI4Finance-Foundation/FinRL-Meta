@@ -136,56 +136,56 @@ class AlpacaProcessor(BasicProcessor):
 
         return new_df
 
-    def add_technical_indicator(
-        self,
-        df,
-        tech_indicator_list=[
-            "macd",
-            "boll_ub",
-            "boll_lb",
-            "rsi_30",
-            "dx_30",
-            "close_30_sma",
-            "close_60_sma",
-        ],
-    ):
-        df = df.rename(columns={"time": "date"})
-        df = df.copy()
-        df = df.sort_values(by=["tic", "date"])
-        stock = Sdf.retype(df.copy())
-        unique_ticker = stock.tic.unique()
-        tech_indicator_list = tech_indicator_list
+    # def add_technical_indicator(
+    #     self,
+    #     df,
+    #     tech_indicator_list=[
+    #         "macd",
+    #         "boll_ub",
+    #         "boll_lb",
+    #         "rsi_30",
+    #         "dx_30",
+    #         "close_30_sma",
+    #         "close_60_sma",
+    #     ],
+    # ):
+    #     df = df.rename(columns={"time": "date"})
+    #     df = df.copy()
+    #     df = df.sort_values(by=["tic", "date"])
+    #     stock = Sdf.retype(df.copy())
+    #     unique_ticker = stock.tic.unique()
+    #     tech_indicator_list = tech_indicator_list
+    #
+    #     for indicator in tech_indicator_list:
+    #         indicator_df = pd.DataFrame()
+    #         for i in range(len(unique_ticker)):
+    #             # print(unique_ticker[i], i)
+    #             temp_indicator = stock[stock.tic == unique_ticker[i]][indicator]
+    #             temp_indicator = pd.DataFrame(temp_indicator)
+    #             temp_indicator["tic"] = unique_ticker[i]
+    #             # print(len(df[df.tic == unique_ticker[i]]['date'].to_list()))
+    #             temp_indicator["date"] = df[df.tic == unique_ticker[i]][
+    #                 "date"
+    #             ].to_list()
+    #             indicator_df = indicator_df.append(temp_indicator, ignore_index=True)
+    #         df = df.merge(
+    #             indicator_df[["tic", "date", indicator]], on=["tic", "date"], how="left"
+    #         )
+    #     df = df.sort_values(by=["date", "tic"])
+    #     df = df.rename(columns={"date": "time"})
+    #     print("Succesfully add technical indicators")
+    #     return df
 
-        for indicator in tech_indicator_list:
-            indicator_df = pd.DataFrame()
-            for i in range(len(unique_ticker)):
-                # print(unique_ticker[i], i)
-                temp_indicator = stock[stock.tic == unique_ticker[i]][indicator]
-                temp_indicator = pd.DataFrame(temp_indicator)
-                temp_indicator["tic"] = unique_ticker[i]
-                # print(len(df[df.tic == unique_ticker[i]]['date'].to_list()))
-                temp_indicator["date"] = df[df.tic == unique_ticker[i]][
-                    "date"
-                ].to_list()
-                indicator_df = indicator_df.append(temp_indicator, ignore_index=True)
-            df = df.merge(
-                indicator_df[["tic", "date", indicator]], on=["tic", "date"], how="left"
-            )
-        df = df.sort_values(by=["date", "tic"])
-        df = df.rename(columns={"date": "time"})
-        print("Succesfully add technical indicators")
-        return df
-
-    def add_vix(self, data):
-        vix_df = self.download_data(["VIXY"], self.start, self.end, self.time_interval)
-        cleaned_vix = self.clean_data(vix_df)
-        vix = cleaned_vix[["time", "close"]]
-        vix = vix.rename(columns={"close": "VIXY"})
-
-        df = data.copy()
-        df = df.merge(vix, on="time")
-        df = df.sort_values(["time", "tic"]).reset_index(drop=True)
-        return df
+    # def add_vix(self, data):
+    #     vix_df = self.download_data(["VIXY"], self.start, self.end, self.time_interval)
+    #     cleaned_vix = self.clean_data(vix_df)
+    #     vix = cleaned_vix[["time", "close"]]
+    #     vix = vix.rename(columns={"close": "VIXY"})
+    #
+    #     df = data.copy()
+    #     df = df.merge(vix, on="time")
+    #     df = df.sort_values(["time", "tic"]).reset_index(drop=True)
+    #     return df
 
     def calculate_turbulence(self, data, time_period=252):
         # can add other market assets
