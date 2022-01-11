@@ -109,7 +109,7 @@ class BasicProcessor:
         :return: (df) pandas dataframe
         """
         if self.data_source in ["binance", "ccxt", "iexcloud", "joinquant", "quantconnect"]:
-            print('Turbulence not supported for {} yet. Return original DataFrame.'.format(self.data_source))
+            print("Turbulence not supported for {} yet. Return original DataFrame.".format(self.data_source))
             return data
 
         if self.data_source in ["alpaca", "ricequant", "tusharepro", "wrds", "yahoofinance"]:
