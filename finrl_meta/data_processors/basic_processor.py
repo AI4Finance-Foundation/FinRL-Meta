@@ -102,18 +102,22 @@ class BasicProcessor:
         print("Succesfully add technical indicators")
         return df
 
-    def add_turbulence(self, data: pd.DataFrame) \
-            -> pd.DataFrame:
+    def add_turbulence(self, data: pd.DataFrame) -> pd.DataFrame:
         """
         add turbulence index from a precalcualted dataframe
         :param data: (df) pandas dataframe
         :return: (df) pandas dataframe
         """
-        df = data.copy()
-        turbulence_index = self.calculate_turbulence(df)
-        df = df.merge(turbulence_index, on="time")
-        df = df.sort_values(["time", "tic"]).reset_index(drop=True)
-        return df
+        if self.data_source in ["binance", "ccxt", "iexcloud", "joinquant", "quantconnect"]:
+            print('Turbulence not supported for {} yet. Return original DataFrame.'.format(self.data_source))
+            return data
+
+        if self.data_source in ["alpaca", "ricequant", "tusharepro", "wrds", "yahoofinance"]:
+            df = data.copy()
+            turbulence_index = self.calculate_turbulence(df)
+            df = df.merge(turbulence_index, on="time")
+            df = df.sort_values(["time", "tic"]).reset_index(drop=True)
+            return df
 
     def calculate_turbulence(self, data: pd.DataFrame, time_period: int = 252) \
             -> pd.DataFrame:
