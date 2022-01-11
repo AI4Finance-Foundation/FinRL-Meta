@@ -1,16 +1,16 @@
 # RL models from elegantrl
 import torch
-from elegantrl.agents.AgentDDPG import AgentDDPG
-from elegantrl.agents.AgentPPO import AgentPPO
-from elegantrl.agents.AgentSAC import AgentSAC
-from elegantrl.agents.AgentTD3 import AgentTD3
-from elegantrl.agents.AgentA2C import AgentA2C
-from elegantrl.train.config import Arguments
-from elegantrl.train.run import train_and_evaluate
-
-MODELS = {"ddpg": AgentDDPG, "td3": AgentTD3, "sac": AgentSAC, "ppo": AgentPPO, "a2c": AgentA2C}
+from elegantrl.agent import AgentDDPG
+from elegantrl.agent import AgentPPO
+from elegantrl.agent import AgentSAC
+from elegantrl.agent import AgentTD3
+#from elegantrl.agent import AgentA2C
+from elegantrl.run import Arguments, train_and_evaluate, init_agent
+MODELS = {"ddpg": AgentDDPG, "td3": AgentTD3, "sac": AgentSAC, "ppo": AgentPPO}
+#MODELS = {"ddpg": AgentDDPG, "td3": AgentTD3, "sac": AgentSAC, "ppo": AgentPPO, "a2c": AgentA2C}
 OFF_POLICY_MODELS = ["ddpg", "td3", "sac"]
-ON_POLICY_MODELS = ["ppo", "a2c"]
+ON_POLICY_MODELS = ["ppo"]
+#ON_POLICY_MODELS = ["ppo", "a2c"]
 """MODEL_KWARGS = {x: config.__dict__[f"{x.upper()}_PARAMS"] for x in MODELS.keys()}
 
 NOISE = {
@@ -51,7 +51,7 @@ class DRLAgent:
         }
         env = self.env(config=env_config)
         env.env_num = 1
-        agent = MODELS[model_name]()
+        agent = MODELS[model_name]
         if model_name not in MODELS:
             raise NotImplementedError("NotImplementedError")
         model = Arguments(agent=agent, env=env)
@@ -69,6 +69,7 @@ class DRLAgent:
                 model.net_dim = model_kwargs["net_dimension"]
                 model.target_step = model_kwargs["target_step"]
                 model.eval_gap = model_kwargs["eval_time_gap"]
+                model.eval_times = model_kwargs["eval_times"]
             except BaseException:
                 raise ValueError(
                     "Fail to read arguments, please check 'model_kwargs' input."
@@ -84,30 +85,16 @@ class DRLAgent:
     def DRL_prediction(model_name, cwd, net_dimension, environment):
         if model_name not in MODELS:
             raise NotImplementedError("NotImplementedError")
-        model = MODELS[model_name]()
+        agent = MODELS[model_name]
         environment.env_num = 1
-        args = Arguments(env=environment, agent=model)
-        if model_name in OFF_POLICY_MODELS:
-            args.if_off_policy = True
-        else:
-            args.if_off_policy = False
-        args.agent = model
-        args.env = environment
-        #args.agent.if_use_cri_target = True  ##Not needed for test
-
+        args = Arguments(agent=agent, env=environment)
+        args.cwd = cwd
+        args.net_dim = net_dimension
         # load agent
         try:
-            state_dim = environment.state_dim
-            action_dim = environment.action_dim
-
-            agent = args.agent
-            net_dim = net_dimension
-
-            agent.init(net_dim, state_dim, action_dim)
-            agent.save_or_load_agent(cwd=cwd, if_save=False)
+            agent = init_agent(args, gpu_id = 0)
             act = agent.act
             device = agent.device
-
         except BaseException:
             raise ValueError("Fail to load agent!")
 

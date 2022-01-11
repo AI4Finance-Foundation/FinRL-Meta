@@ -6,8 +6,7 @@ import time
 import pandas as pd
 import numpy as np
 import torch
-import sys
-import os
+import gym
 
 class AlpacaPaperTrading_erl():
 
@@ -17,15 +16,21 @@ class AlpacaPaperTrading_erl():
                  max_stock=1e2, latency = None):
         #load agent
         if agent =='ppo':
+            from elegantrl.agent import AgentPPO
+            from elegantrl.run import Arguments, init_agent
+            #load agent
+            config = {'state_dim':state_dim,
+                        'action_dim':action_dim,}
+            args = Arguments(agent=AgentPPO, env=StockEnvEmpty(config))
+            args.cwd = cwd
+            args.net_dim = net_dim
+            # load agent
             try:
-                from elegantrl.agent import AgentPPO
-                agent = AgentPPO()
-                agent.init(net_dim, state_dim, action_dim)
-                agent.save_load_model(cwd=cwd, if_save=False)
+                agent = init_agent(args, gpu_id = 0)
                 self.act = agent.act
                 self.device = agent.device
-            except:
-                raise ValueError('Fail to load the agent! Please check path, state dimension and action_dimension.')
+            except BaseException:
+                raise ValueError("Fail to load agent!")
                 
         else:
             raise ValueError('Agent input is NOT supported yet.')
@@ -249,3 +254,24 @@ class AlpacaPaperTrading_erl():
             return 1 / (1 + np.exp(-x * np.e)) - 0.5
 
         return sigmoid(ary / thresh) * thresh
+
+class StockEnvEmpty(gym.Env):
+    #Empty Env used for loading rllib agent
+    def __init__(self,config):
+      state_dim = config['state_dim']
+      action_dim = config['action_dim']
+      self.env_num = 1
+      self.max_step = 10000
+      self.env_name = 'StockEnvEmpty'
+      self.state_dim = state_dim  
+      self.action_dim = action_dim
+      self.if_discrete = False  
+      self.target_return = 9999
+      self.observation_space = gym.spaces.Box(low=-3000, high=3000, shape=(state_dim,), dtype=np.float32)
+      self.action_space = gym.spaces.Box(low=-1, high=1, shape=(action_dim,), dtype=np.float32)
+        
+    def reset(self):
+        return 
+
+    def step(self, actions):
+        return

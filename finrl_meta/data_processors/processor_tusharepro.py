@@ -197,15 +197,15 @@ class TushareProProcessor(BasicProcessor):
         print('not supported currently!')
         return ['not supported currently!']
     
-    def add_turbulence(self, data: pd.DataFrame) \
-            -> pd.DataFrame:
-        print('not supported currently!')
-        return pd.DataFrame(['not supported currently!'])
-
-    def calculate_turbulence(self, data: pd.DataFrame, time_period: int = 252) \
-            -> pd.DataFrame:
-        print('not supported currently!')
-        return pd.DataFrame(['not supported currently!'])
+    # def add_turbulence(self, data: pd.DataFrame) \
+    #         -> pd.DataFrame:
+    #     print('not supported currently!')
+    #     return pd.DataFrame(['not supported currently!'])
+    #
+    # def calculate_turbulence(self, data: pd.DataFrame, time_period: int = 252) \
+    #         -> pd.DataFrame:
+    #     print('not supported currently!')
+    #     return pd.DataFrame(['not supported currently!'])
     
     def add_vix(self, data: pd.DataFrame) \
             -> pd.DataFrame:
