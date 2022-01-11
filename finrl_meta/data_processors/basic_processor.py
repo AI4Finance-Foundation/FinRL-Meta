@@ -45,8 +45,8 @@ class BasicProcessor:
     def get_trading_days(self, start: str, end: str) -> List[str]:
         pass
 
-    # use_stockstats: True (stockstats), or False (use talib). Users can choose the method.
-    def add_technical_indicator(self, data: pd.DataFrame, tech_indicator_list: List[str], use_stockstats: bool=True) \
+    # use_stockstats_or_talib: 0 (stockstats), or 1 (use talib). Users can choose the method.
+    def add_technical_indicator(self, data: pd.DataFrame, tech_indicator_list: List[str], use_stockstats_or_talib: int=0) \
             -> pd.DataFrame:
         """
         calculate technical indicators
@@ -64,7 +64,8 @@ class BasicProcessor:
         # df = df.reset_index(drop=False)
         # df = df.drop(columns=["level_1"])
         # df = df.rename(columns={"level_0": "tic", "date": "time"})
-        if use_stockstats:  # use stockstats
+        assert use_stockstats_or_talib in [0, 1]
+        if use_stockstats_or_talib == 0:  # use stockstats
             stock = stockstats.StockDataFrame.retype(df.copy())
             unique_ticker = stock.tic.unique()
             for indicator in tech_indicator_list:
