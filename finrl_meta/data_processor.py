@@ -142,8 +142,8 @@ def test_joinquant():
     TIME_INTERVAL = '1D'
     TECHNICAL_INDICATOR = ['macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30', 'close_30_sma', 'close_60_sma']
     kwargs = {}
-    kwargs['username'] = "18117580099"  # should input your username
-    kwargs['password'] = "Bl2020quant"  # should input your password
+    kwargs['username'] = "xxx"  # should input your username
+    kwargs['password'] = "xxx"  # should input your password
     p = DataProcessor(data_source='joinquant', **kwargs)
 
 
