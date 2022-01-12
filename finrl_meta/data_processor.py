@@ -140,6 +140,9 @@ def test_joinquant():
     TRADE_END_DATE = "2021-09-11"
     READ_DATA_FROM_LOCAL = 0
 
+    TIME_INTERVAL = '1D'
+    TECHNICAL_INDICATOR = ['macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30', 'close_30_sma', 'close_60_sma']
+
     kwargs = {}
     kwargs['username'] = "xxx"  # should input your username
     kwargs['password'] = "xxx"  # should input your password
@@ -153,24 +156,34 @@ def test_joinquant():
     # )
     ticker_list = ["000612.XSHE", "601808.XSHG"]
 
-    data2 = p.download_data(ticker_list=ticker_list, start_date=TRADE_START_DATE, end_date=TRADE_END_DATE, time_interval='1D')
+    data2 = p.download_data(ticker_list=ticker_list, start_date=TRADE_START_DATE, end_date=TRADE_END_DATE, time_interval=TIME_INTERVAL)
+
     data3 = p.clean_data(data2)
     data4 = p.add_turbulence(data3)
-    data5 = p.add_technical_indicator(data4, ['macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30', 'close_30_sma', 'close_60_sma'])
-    # data6 = e.add_vix(data5)
+    data5 = p.add_technical_indicator(data4, TECHNICAL_INDICATOR)
+    data6 = p.add_vix(data5)
+
+    price_array, tech_array, turbulence_array = p.run(ticker_list, TRADE_START_DATE, TRADE_END_DATE,
+                                                      TIME_INTERVAL, TECHNICAL_INDICATOR,
+                                                      if_vix=False, cache=True)
     pass
 
-if __name__ == "__main__":
+
+def test_binance():
     DP = DataProcessor('binance')
-    ticker_list = ['BTCUSDT','ETHUSDT','ADAUSDT','BNBUSDT']
+    ticker_list = ['BTCUSDT', 'ETHUSDT', 'ADAUSDT', 'BNBUSDT']
     start_date = '2021-09-01'
     end_date = '2021-09-20'
     time_interval = '5m'
-    technical_indicator_list = ['macd','rsi','cci','dx'] #self-defined technical indicator list is NOT supported yet
+    technical_indicator_list = ['macd', 'rsi', 'cci', 'dx']  # self-defined technical indicator list is NOT supported yet
     if_vix = False
     price_array, tech_array, turbulence_array = DP.run(ticker_list, start_date, end_date,
                                                        time_interval, technical_indicator_list,
                                                        if_vix, cache=True)
     print(price_array.shape, tech_array.shape)
 
+if __name__ == "__main__":
+
+
     # test_joinquant()
+    test_binance()
