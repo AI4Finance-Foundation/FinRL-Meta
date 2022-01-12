@@ -122,11 +122,11 @@ class DataProcessor():
             if cache:
                 if not os.path.exists(cache_dir):
                     os.mkdir(cache_dir)
-                data.to_csv(cache_path)
+                data.to_csv(cache_path, index=False)
+
         data = self.add_technical_indicator(data, technical_indicator_list)
         if if_vix:
             data = self.add_vix(data)
-
         price_array, tech_array, turbulence_array = self.df_to_array(data, if_vix)
         tech_nan_positions = np.isnan(tech_array)
         tech_array[tech_nan_positions] = 0
@@ -161,16 +161,16 @@ def test_joinquant():
     pass
 
 if __name__ == "__main__":
-    # DP = DataProcessor('binance')
-    # ticker_list = ['BTCUSDT', 'BNBUSDT', 'CAKEUSDT']
-    # start_date = '2021-11-21'
-    # end_date = '2021-11-25'
-    # time_interval = '1h'
-    # technical_indicator_list = ['macd','rsi','cci','dx'] #self-defined technical indicator list is NOT supported yet
-    # if_vix = False
-    # price_array, tech_array, turbulence_array = DP.run(ticker_list, start_date, end_date,
-    #                                                    time_interval, technical_indicator_list,
-    #                                                    if_vix, cache=True)
-    # print(price_array.shape, tech_array.shape)
+    DP = DataProcessor('binance')
+    ticker_list = ['BTCUSDT','ETHUSDT','ADAUSDT','BNBUSDT']
+    start_date = '2021-09-01'
+    end_date = '2021-09-20'
+    time_interval = '5m'
+    technical_indicator_list = ['macd','rsi','cci','dx'] #self-defined technical indicator list is NOT supported yet
+    if_vix = False
+    price_array, tech_array, turbulence_array = DP.run(ticker_list, start_date, end_date,
+                                                       time_interval, technical_indicator_list,
+                                                       if_vix, cache=True)
+    print(price_array.shape, tech_array.shape)
 
-    test_joinquant()
+    # test_joinquant()
