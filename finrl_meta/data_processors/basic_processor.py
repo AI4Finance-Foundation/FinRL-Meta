@@ -245,7 +245,10 @@ class BasicProcessor:
                 if if_vix:
                     turbulence_array = df[df.tic == tic]["vix"].values
                 else:
-                    turbulence_array = df[df.tic == tic]["turbulence"].values
+                    if "turbulence" in df.columns:
+                        turbulence_array = df[df.tic == tic]["turbulence"].values
+                    else:
+                        turbulence_array = []
                 if_first_time = False
             else:
                 price_array = np.hstack(

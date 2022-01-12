@@ -185,5 +185,5 @@ def test_binance():
 if __name__ == "__main__":
 
 
-    # test_joinquant()
-    test_binance()
+    test_joinquant()
+    # test_binance()
