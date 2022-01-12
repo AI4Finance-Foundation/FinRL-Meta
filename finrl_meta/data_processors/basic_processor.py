@@ -98,7 +98,8 @@ class BasicProcessor:
             df = final_df
 
         df = df.sort_values(by=["time", "tic"])
-        df = df.dropna()
+        time_to_drop = df[df.isna().any(axis=1)].time.unique()
+        df = df[~df.time.isin(time_to_drop)]
         print("Succesfully add technical indicators")
         return df
 
