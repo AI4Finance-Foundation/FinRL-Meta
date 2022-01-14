@@ -9,6 +9,7 @@ import pandas as pd
 import numpy as np
 import os
 
+
 class DataProcessor():
     def __init__(self, data_source, **kwargs):
         self.data_source = data_source
@@ -26,7 +27,7 @@ class DataProcessor():
                 print('Joinquant successfully connected')
             except:
                 raise ValueError('Please input correct account info for joinquant!')
-        elif self.data_source =='ricequant':
+        elif self.data_source == 'ricequant':
             try:
                 # users should input values: kwargs['username'], kwargs['password']
                 self.processor = RiceQuant(data_source, **kwargs)
@@ -46,7 +47,7 @@ class DataProcessor():
                 print('Yahoofinance successfully connected')
             except:
                 raise ValueError('Please input correct account info for yahoofinance!')
-        elif self.data_source =='binance':
+        elif self.data_source == 'binance':
             try:
                 self.processor = Binance(data_source, **kwargs)
                 print('Binance successfully connected')
@@ -61,49 +62,49 @@ class DataProcessor():
                 raise ValueError('Please input correct account info for tusharepro!')
         else:
             raise ValueError('Data source input is NOT supported yet.')
-    
-    def download_data(self, ticker_list, start_date, end_date, 
+
+    def download_data(self, ticker_list, start_date, end_date,
                       time_interval) -> pd.DataFrame:
-        df = self.processor.download_data(ticker_list = ticker_list, 
-                                          start_date = start_date, 
-                                          end_date = end_date,
-                                          time_interval = time_interval)
+        df = self.processor.download_data(ticker_list=ticker_list,
+                                          start_date=start_date,
+                                          end_date=end_date,
+                                          time_interval=time_interval)
         return df
-    
+
     def clean_data(self, df) -> pd.DataFrame:
         df = self.processor.clean_data(df)
-        
+
         return df
-    
+
     def add_technical_indicator(self, df, tech_indicator_list) -> pd.DataFrame:
         self.tech_indicator_list = tech_indicator_list
         df = self.processor.add_technical_indicator(df, tech_indicator_list)
 
         return df
-    
+
     def add_turbulence(self, df) -> pd.DataFrame:
         df = self.processor.add_turbulence(df)
-        
+
         return df
-    
+
     def add_vix(self, df) -> pd.DataFrame:
         df = self.processor.add_vix(df)
-        
+
         return df
-    
+
     def df_to_array(self, df, if_vix) -> np.array:
         price_array, tech_array, turbulence_array = self.processor.df_to_array(df,
-                                                    self.tech_indicator_list,
-                                                    if_vix)
-        #fill nan with 0 for technical indicators
+                                                                               self.tech_indicator_list,
+                                                                               if_vix)
+        # fill nan with 0 for technical indicators
         tech_nan_positions = np.isnan(tech_array)
         tech_array[tech_nan_positions] = 0
-        
+
         return price_array, tech_array, turbulence_array
-    
-    def run(self, ticker_list, start_date, end_date, time_interval, 
+
+    def run(self, ticker_list, start_date, end_date, time_interval,
             technical_indicator_list, if_vix, cache=False):
-        
+
         if time_interval == "1s" and self.data_source != "binance":
             raise ValueError("Currently 1s interval data is only supported with 'binance' as data source")
 
@@ -115,7 +116,7 @@ class DataProcessor():
             print('Using cached file {}'.format(cache_path))
             self.tech_indicator_list = technical_indicator_list
             data = pd.read_csv(cache_path)
-        
+
         else:
             data = self.download_data(ticker_list, start_date, end_date, time_interval)
             data = self.clean_data(data)
@@ -133,6 +134,7 @@ class DataProcessor():
 
         return price_array, tech_array, turbulence_array
 
+
 def test_joinquant():
     path_of_data = "../data"
 
@@ -147,7 +149,6 @@ def test_joinquant():
     kwargs['username'] = "xxx"  # should input your username
     kwargs['password'] = "xxx"  # should input your password
     p = DataProcessor(data_source='joinquant', **kwargs)
-
 
     # trade_days = p.calc_trade_days_by_joinquant(TRADE_START_DATE, TRADE_END_DATE)
     # stocknames = ["000612.XSHE", "601808.XSHG"]
@@ -182,8 +183,7 @@ def test_binance():
                                                        if_vix, cache=True)
     print(price_array.shape, tech_array.shape)
 
+
 if __name__ == "__main__":
-
-
     test_joinquant()
     # test_binance()

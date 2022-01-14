@@ -219,10 +219,10 @@ class TushareProProcessor(BasicProcessor):
         print('not supported currently!')
         return pd.DataFrame(['not supported currently!'])
 
-    def df_to_array(self, df: pd.DataFrame, tech_indicator_list: List[str], if_vix: bool) \
-            -> List[np.array]:
-        print('not supported currently!')
-        return pd.DataFrame(['not supported currently!'])
+    # def df_to_array(self, df: pd.DataFrame, tech_indicator_list: List[str], if_vix: bool) \
+    #         -> List[np.array]:
+    #     print('not supported currently!')
+    #     return pd.DataFrame(['not supported currently!'])
 
     def data_split(self, df, start, end, target_date_col="date"):
         """

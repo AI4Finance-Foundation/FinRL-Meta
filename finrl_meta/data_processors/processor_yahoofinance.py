@@ -273,28 +273,28 @@ class YahooFinanceProcessor(BasicProcessor):
     #     df = df.sort_values(["time", "tic"]).reset_index(drop=True)
     #     return df
     
-    def df_to_array(self, df, tech_indicator_list, if_vix):
-        """transform final df to numpy arrays"""
-        unique_ticker = df.tic.unique()
-        print(unique_ticker)
-        if_first_time = True
-        for tic in unique_ticker:
-            if if_first_time:
-                price_array = df[df.tic==tic][['adj_close']].values
-                #price_ary = df[df.tic==tic]['close'].values
-                tech_array = df[df.tic==tic][tech_indicator_list].values
-                if if_vix:
-                    risk_array = df[df.tic==tic]['vix'].values 
-                else:
-                    risk_array = df[df.tic==tic]['turbulence'].values 
-                if_first_time = False
-            else:
-                price_array = np.hstack([price_array, df[df.tic==tic][['adj_close']].values])
-                tech_array = np.hstack([tech_array, df[df.tic==tic][tech_indicator_list].values])
-        assert price_array.shape[0] == tech_array.shape[0]
-        assert tech_array.shape[0] == risk_array.shape[0]
-        print('Successfully transformed into array')
-        return price_array, tech_array, risk_array
+    # def df_to_array(self, df, tech_indicator_list, if_vix):
+    #     """transform final df to numpy arrays"""
+    #     unique_ticker = df.tic.unique()
+    #     print(unique_ticker)
+    #     if_first_time = True
+    #     for tic in unique_ticker:
+    #         if if_first_time:
+    #             price_array = df[df.tic==tic][['adj_close']].values
+    #             #price_ary = df[df.tic==tic]['close'].values
+    #             tech_array = df[df.tic==tic][tech_indicator_list].values
+    #             if if_vix:
+    #                 risk_array = df[df.tic==tic]['vix'].values
+    #             else:
+    #                 risk_array = df[df.tic==tic]['turbulence'].values
+    #             if_first_time = False
+    #         else:
+    #             price_array = np.hstack([price_array, df[df.tic==tic][['adj_close']].values])
+    #             tech_array = np.hstack([tech_array, df[df.tic==tic][tech_indicator_list].values])
+    #     assert price_array.shape[0] == tech_array.shape[0]
+    #     assert tech_array.shape[0] == risk_array.shape[0]
+    #     print('Successfully transformed into array')
+    #     return price_array, tech_array, risk_array
         
 
     def get_trading_days(self, start, end):
