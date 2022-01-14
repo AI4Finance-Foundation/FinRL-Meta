@@ -92,19 +92,19 @@ class RiceQuantProcessor(BasicProcessor):
         df = df.sort_values(["date", "tic"]).reset_index(drop=True)
         return df
 
-    def df_to_array(self, df, tech_indicator_list, if_vix):
-        df = df.copy()
-        unique_ticker = df.tic.unique()
-        if_first_time = True
-        for tic in unique_ticker:
-            if if_first_time:
-                price_array = df[df.tic==tic][['close']].values
-                tech_array = df[df.tic==tic][tech_indicator_list].values
-                #risk_array = df[df.tic==tic]['turbulence'].values
-                if_first_time = False
-            else:
-                price_array = np.hstack([price_array, df[df.tic==tic][['close']].values])
-                tech_array = np.hstack([tech_array, df[df.tic==tic][tech_indicator_list].values])
-        print('Successfully transformed into array')
-        return price_array, tech_array, None
+    # def df_to_array(self, df, tech_indicator_list, if_vix):
+    #     df = df.copy()
+    #     unique_ticker = df.tic.unique()
+    #     if_first_time = True
+    #     for tic in unique_ticker:
+    #         if if_first_time:
+    #             price_array = df[df.tic==tic][['close']].values
+    #             tech_array = df[df.tic==tic][tech_indicator_list].values
+    #             #risk_array = df[df.tic==tic]['turbulence'].values
+    #             if_first_time = False
+    #         else:
+    #             price_array = np.hstack([price_array, df[df.tic==tic][['close']].values])
+    #             tech_array = np.hstack([tech_array, df[df.tic==tic][tech_indicator_list].values])
+    #     print('Successfully transformed into array')
+    #     return price_array, tech_array, None
     
