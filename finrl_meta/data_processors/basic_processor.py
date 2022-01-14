@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 from typing import List
-from typing import Tuple
 import stockstats
 from talib.abstract import CCI, DX, MACD, RSI
 
@@ -46,8 +45,8 @@ class BasicProcessor:
     def get_trading_days(self, start: str, end: str) -> List[str]:
         pass
 
-    # use_stockstats: True (stockstats), or False (use talib). Users can choose the method.
-    def add_technical_indicator(self, data: pd.DataFrame, tech_indicator_list: List[str], use_stockstats: bool=True) \
+    # use_stockstats_or_talib: 0 (stockstats, default), or 1 (use talib). Users can choose the method.
+    def add_technical_indicator(self, data: pd.DataFrame, tech_indicator_list: List[str], use_stockstats_or_talib: int=0) \
             -> pd.DataFrame:
         """
         calculate technical indicators
@@ -65,7 +64,8 @@ class BasicProcessor:
         # df = df.reset_index(drop=False)
         # df = df.drop(columns=["level_1"])
         # df = df.rename(columns={"level_0": "tic", "date": "time"})
-        if use_stockstats:  # use stockstats
+        assert use_stockstats_or_talib in [0, 1]
+        if use_stockstats_or_talib == 0:  # use stockstats
             stock = stockstats.StockDataFrame.retype(df.copy())
             unique_ticker = stock.tic.unique()
             for indicator in tech_indicator_list:
@@ -111,11 +111,20 @@ class BasicProcessor:
         :param data: (df) pandas dataframe
         :return: (df) pandas dataframe
         """
-        df = data.copy()
-        turbulence_index = self.calculate_turbulence(df)
-        df = df.merge(turbulence_index, on="time")
-        df = df.sort_values(["time", "tic"]).reset_index(drop=True)
-        return df
+        # df = data.copy()
+        # turbulence_index = self.calculate_turbulence(df)
+        # df = df.merge(turbulence_index, on="time")
+        # df = df.sort_values(["time", "tic"]).reset_index(drop=True)
+        # return df
+        if self.data_source in ["binance", "ccxt", "iexcloud", "joinquant", "quantconnect"]:
+            print("Turbulence not supported for {} yet. Return original DataFrame.".format(self.data_source))
+            return data
+        if self.data_source in ["alpaca", "ricequant", "tusharepro", "wrds", "yahoofinance"]:
+            df = data.copy()
+            turbulence_index = self.calculate_turbulence(df)
+            df = df.merge(turbulence_index, on="time")
+            df = df.sort_values(["time", "tic"]).reset_index(drop=True)
+            return df
 
     def calculate_turbulence(self, data: pd.DataFrame, time_period: int = 252) \
             -> pd.DataFrame:
@@ -230,22 +239,26 @@ class BasicProcessor:
         df = df.sort_values(["time", "tic"]).reset_index(drop=True)
         return df
 
-    # Tuple[np.array(dtype=float), np.array(dtype=float), np.array(dtype=float)]
-    def df_to_array(self, df: pd.DataFrame, tech_indicator_list: list, if_vix: bool):
-        df = df.copy()
+    # tech_array: technical indicator
+    # price_array, close price
+    def df_to_array(self, df: pd.DataFrame, tech_indicator_list: List[str], if_vix: bool) \
+            -> List[np.array]:
+        """transform final df to numpy arrays"""
         unique_ticker = df.tic.unique()
+        print(unique_ticker)
         if_first_time = True
         for tic in unique_ticker:
             if if_first_time:
                 price_array = df[df.tic == tic][["close"]].values
+                # price_ary = df[df.tic==tic]['close'].values
                 tech_array = df[df.tic == tic][tech_indicator_list].values
                 if if_vix:
-                    risk_array = df[df.tic == tic]["vix"].values
+                    turbulence_array = df[df.tic == tic]["vix"].values
                 else:
                     if "turbulence" in df.columns:
-                        risk_array = df[df.tic == tic]["turbulence"].values
+                        turbulence_array = df[df.tic == tic]["turbulence"].values
                     else:
-                        risk_array = None
+                        turbulence_array = []
                 if_first_time = False
             else:
                 price_array = np.hstack(
@@ -254,5 +267,7 @@ class BasicProcessor:
                 tech_array = np.hstack(
                     [tech_array, df[df.tic == tic][tech_indicator_list].values]
                 )
+        assert price_array.shape[0] == tech_array.shape[0]
+        assert tech_array.shape[0] == turbulence_array.shape[0]
         print("Successfully transformed into array")
-        return price_array, tech_array, risk_array
+        return price_array, tech_array, turbulence_array
