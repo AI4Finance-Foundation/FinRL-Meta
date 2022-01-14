@@ -284,22 +284,22 @@ class WrdsProcessor(BasicProcessor):
     #
     #     return df
 
-    def df_to_array(self,df,tech_indicator_list):
-        unique_ticker = df.tic.unique()
-        print(unique_ticker)
-        if_first_time = True
-        for tic in unique_ticker:
-            if if_first_time:
-                price_array = df[df.tic==tic][['close']].values
-                #price_ary = df[df.tic==tic]['close'].values
-                tech_array = df[df.tic==tic][tech_indicator_list].values
-                risk_array = df[df.tic==tic]['turbulence'].values
-                if_first_time = False
-            else:
-                price_array = np.hstack([price_array, df[df.tic==tic][['close']].values])
-                tech_array = np.hstack([tech_array, df[df.tic==tic][tech_indicator_list].values])
-        print('Successfully transformed into array')
-        return price_array, tech_array, risk_array
+    # def df_to_array(self,df,tech_indicator_list):
+    #     unique_ticker = df.tic.unique()
+    #     print(unique_ticker)
+    #     if_first_time = True
+    #     for tic in unique_ticker:
+    #         if if_first_time:
+    #             price_array = df[df.tic==tic][['close']].values
+    #             #price_ary = df[df.tic==tic]['close'].values
+    #             tech_array = df[df.tic==tic][tech_indicator_list].values
+    #             risk_array = df[df.tic==tic]['turbulence'].values
+    #             if_first_time = False
+    #         else:
+    #             price_array = np.hstack([price_array, df[df.tic==tic][['close']].values])
+    #             tech_array = np.hstack([tech_array, df[df.tic==tic][tech_indicator_list].values])
+    #     print('Successfully transformed into array')
+    #     return price_array, tech_array, risk_array
     
 
         
