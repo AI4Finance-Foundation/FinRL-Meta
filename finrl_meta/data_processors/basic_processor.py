@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from typing import List
+from typing import Tuple
 import stockstats
 from talib.abstract import CCI, DX, MACD, RSI
 
@@ -229,32 +230,29 @@ class BasicProcessor:
         df = df.sort_values(["time", "tic"]).reset_index(drop=True)
         return df
 
-    # tech_array: technical indicator
-    # price_array, close price
-    def df_to_array(self, df: pd.DataFrame, tech_indicator_list: List[str], if_vix: bool) \
-            -> List[np.array]:
-        """transform final df to numpy arrays"""
+    # Tuple[np.array(dtype=float), np.array(dtype=float), np.array(dtype=float)]
+    def df_to_array(self, df: pd.DataFrame, tech_indicator_list: list, if_vix: bool):
+        df = df.copy()
         unique_ticker = df.tic.unique()
-        print(unique_ticker)
         if_first_time = True
         for tic in unique_ticker:
             if if_first_time:
-                price_array = df[df.tic == tic][["adj_close"]].values
-                # price_ary = df[df.tic==tic]['close'].values
+                price_array = df[df.tic == tic][["close"]].values
                 tech_array = df[df.tic == tic][tech_indicator_list].values
                 if if_vix:
-                    turbulence_array = df[df.tic == tic]["vix"].values
+                    risk_array = df[df.tic == tic]["vix"].values
                 else:
-                    turbulence_array = df[df.tic == tic]["turbulence"].values
+                    if "turbulence" in df.columns:
+                        risk_array = df[df.tic == tic]["turbulence"].values
+                    else:
+                        risk_array = None
                 if_first_time = False
             else:
                 price_array = np.hstack(
-                    [price_array, df[df.tic == tic][["adj_close"]].values]
+                    [price_array, df[df.tic == tic][["close"]].values]
                 )
                 tech_array = np.hstack(
                     [tech_array, df[df.tic == tic][tech_indicator_list].values]
                 )
-        assert price_array.shape[0] == tech_array.shape[0]
-        assert tech_array.shape[0] == turbulence_array.shape[0]
         print("Successfully transformed into array")
-        return price_array, tech_array, turbulence_array
+        return price_array, tech_array, risk_array
