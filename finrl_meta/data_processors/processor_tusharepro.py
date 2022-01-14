@@ -1,4 +1,5 @@
 
+from email.policy import default
 import numpy as np
 import pandas as pd
 import tushare as ts
@@ -240,41 +241,124 @@ import pandas as pd
 from matplotlib import pyplot as plt
 
 class ReturnPlotter:
-    def __init__(self, baseline_ticket, start_date, end_date):
-        self.tic = baseline_ticket
+    """
+    An easy-to-use plotting tool to plot cumulative returns over time.
+    Baseline supports equal weighting(default) and any stocks you want to use for comparison.
+    """
+    def __init__(self, df_account_value, df_trade, start_date, end_date):
         self.start = start_date
         self.end = end_date
+        self.trade = df_trade
+        self.df_account_value = df_account_value
     
-    def get_baseline(self):
-        df = ts.get_hist_data(self.tic, start=self.start, end=self.end)
+    def get_baseline(self, ticket):
+        df = ts.get_hist_data(ticket, start=self.start, end=self.end)
         df.loc[:,'dt']=df.index
         df.index=range(len(df))
         df.sort_values(axis=0,by='dt',ascending=True,inplace=True)
         df["date"] = pd.to_datetime(df["dt"],format='%Y-%m-%d')
         return df
 
-    def plot(self, ours_df, baseline_df):
-        # ours don't have date=="2020-06-26"
-        baseline_df = baseline_df[baseline_df.dt != "2020-06-26"]
+    def plot(self, baseline_ticket=None):
+        """
+        Plot cumulative returns over time.
+        use baseline_ticket to specify stock you want to use for comparison
+        (default: equal weighted returns)
+        """
+        baseline_label = "Equal-weight portfolio"
+        tic2label = {"399300": "CSI 300 Index", "000016": "SSE 50 Index"}
+        if baseline_ticket:
+            # 使用指定ticket作为baseline
+            baseline_df = self.get_baseline(baseline_ticket)
+            baseline_df = baseline_df[baseline_df.dt != "2020-06-26"]       # ours don't have date=="2020-06-26"
+            baseline = baseline_df.close.tolist()
+            if baseline_ticket in tic2label.keys():
+                baseline_label = tic2label[baseline_ticket]
+            else:
+                baseline_label = baseline_ticket
+        else:
+            # 均等权重
+            all_date = self.trade.date.unique().tolist()
+            baseline = []
+            for day in all_date:
+                day_close = self.trade[self.trade["date"]==day].close.tolist()
+                avg_close = sum(day_close)/len(day_close)
+                baseline.append(avg_close)
 
-        ours = ours_df.account_value.tolist()
-        baseline = baseline_df.close.tolist()
+        ours = self.df_account_value.account_value.tolist()
         ours = self.pct(ours)
         baseline = self.pct(baseline)
 
         days_per_tick = 60                                          # you should scale this variable accroding to the total trading days
         time = list(range(len(ours)))
-        datetimes = ours_df.date.tolist()
+        datetimes = self.df_account_value.date.tolist()
         ticks = []
         for t, tick in zip(time, datetimes):
             if t % days_per_tick == 0:     ticks.append(tick)
 
         plt.title("Cumulative Returns")
-        plt.plot(time, ours, label="Ours", color="green")
-        plt.plot(time, baseline, label="buy and hold", color="grey")         
+        plt.plot(time, ours, label="DDPG Agent", color="green")
+        plt.plot(time, baseline, label=baseline_label, color="grey")         
+        plt.xticks([i*days_per_tick for i in range(len(ticks))], ticks, fontsize=7)
+
+        plt.xlabel("Date")
+        plt.ylabel("Cumulative Return")
+
+        plt.legend()
+        plt.show()
+
+    def plot_all(self):
+        baseline_label = "Equal-weight portfolio"
+        tic2label = {"399300": "CSI 300 Index", "000016": "SSE 50 Index"}
+        
+        # 399300
+        baseline_ticket = "399300"
+        baseline_df = self.get_baseline(baseline_ticket)
+        baseline_df = baseline_df[baseline_df.dt != "2020-06-26"]       # ours don't have date=="2020-06-26"
+        baseline_300 = baseline_df.close.tolist()
+        baseline_label_300 = tic2label[baseline_ticket]
+
+        # 000016
+        baseline_ticket = "000016"
+        baseline_df = self.get_baseline(baseline_ticket)
+        baseline_df = baseline_df[baseline_df.dt != "2020-06-26"]       # ours don't have date=="2020-06-26"
+        baseline_50 = baseline_df.close.tolist()
+        baseline_label_50 = tic2label[baseline_ticket]
+
+        # 均等权重
+        all_date = self.trade.date.unique().tolist()
+        baseline_equal_weight = []
+        for day in all_date:
+            day_close = self.trade[self.trade["date"]==day].close.tolist()
+            avg_close = sum(day_close)/len(day_close)
+            baseline_equal_weight.append(avg_close)
+
+        ours = self.df_account_value.account_value.tolist()
+
+        ours = self.pct(ours)
+        baseline_300 = self.pct(baseline_300)
+        baseline_50 = self.pct(baseline_50)
+        baseline_equal_weight = self.pct(baseline_equal_weight)
+
+        days_per_tick = 60                                          # you should scale this variable accroding to the total trading days
+        time = list(range(len(ours)))
+        datetimes = self.df_account_value.date.tolist()
+        ticks = []
+        for t, tick in zip(time, datetimes):
+            if t % days_per_tick == 0:     ticks.append(tick)
+
+        plt.title("Cumulative Returns")
+        plt.plot(time, ours, label="DDPG Agent", color="darkorange")
+        plt.plot(time, baseline_equal_weight, label=baseline_label, color="cornflowerblue")       # equal weight
+        plt.plot(time, baseline_300, label=baseline_label_300, color="lightgreen")          # 399300
+        plt.plot(time, baseline_50, label=baseline_label_50, color="silver")               # 000016
+        plt.xlabel("Date")
+        plt.ylabel("Cumulative Return")
+
         plt.xticks([i*days_per_tick for i in range(len(ticks))], ticks, fontsize=7)
         plt.legend()
         plt.show()
+
 
     def pct(self, l):
         """Get percentage"""

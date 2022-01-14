@@ -76,7 +76,7 @@ Supported Data Sources:
 
 
 
-OHLCV: open, high, low, close, volume 
+OHLCV: open, high, low, and close prices; volume 
 
 adj_close: adjusted close price
 

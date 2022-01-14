@@ -62,10 +62,10 @@ class BinanceProcessor(BasicProcessor):
     #     return final_df
     
 
-    def add_turbulence(self, df):
-        print('Turbulence not supported yet. Return original DataFrame.')
-        
-        return df
+    # def add_turbulence(self, df):
+    #     print('Turbulence not supported yet. Return original DataFrame.')
+    #
+    #     return df
     
 
     # def add_vix(self, df):
