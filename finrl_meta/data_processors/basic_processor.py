@@ -239,26 +239,21 @@ class BasicProcessor:
         df = df.sort_values(["time", "tic"]).reset_index(drop=True)
         return df
 
-    # tech_array: technical indicator
-    # price_array, close price
-    def df_to_array(self, df: pd.DataFrame, tech_indicator_list: List[str], if_vix: bool) \
-            -> List[np.array]:
-        """transform final df to numpy arrays"""
+    def df_to_array(self, df: pd.DataFrame, tech_indicator_list: list, if_vix: bool):
+        df = df.copy()
         unique_ticker = df.tic.unique()
-        print(unique_ticker)
         if_first_time = True
         for tic in unique_ticker:
             if if_first_time:
                 price_array = df[df.tic == tic][["close"]].values
-                # price_ary = df[df.tic==tic]['close'].values
                 tech_array = df[df.tic == tic][tech_indicator_list].values
                 if if_vix:
-                    turbulence_array = df[df.tic == tic]["vix"].values
+                    risk_array = df[df.tic == tic]["vix"].values
                 else:
                     if "turbulence" in df.columns:
-                        turbulence_array = df[df.tic == tic]["turbulence"].values
+                        risk_array = df[df.tic == tic]["turbulence"].values
                     else:
-                        turbulence_array = []
+                        risk_array = None
                 if_first_time = False
             else:
                 price_array = np.hstack(
@@ -267,7 +262,5 @@ class BasicProcessor:
                 tech_array = np.hstack(
                     [tech_array, df[df.tic == tic][tech_indicator_list].values]
                 )
-        assert price_array.shape[0] == tech_array.shape[0]
-        assert tech_array.shape[0] == turbulence_array.shape[0]
         print("Successfully transformed into array")
-        return price_array, tech_array, turbulence_array
+        return price_array, tech_array, risk_array
