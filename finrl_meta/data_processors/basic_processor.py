@@ -226,7 +226,7 @@ class BasicProcessor:
             ticker = "VIXY"
         elif self.data_source == 'wrds':
             ticker = "vix"
-        self_dataframe = self.dataframe
+        df = self.dataframe.copy()
         self.dataframe = [ticker]
         self.download_data(self.start, self.end, self.time_interval)
         self.clean_data()
@@ -234,8 +234,7 @@ class BasicProcessor:
         # vix = vix.rename(columns={"close": "VIXY"})
         cleaned_vix = self.dataframe.rename(columns={ticker: "vix"})
 
-        # df = data.copy()
-        df = self_dataframe.merge(cleaned_vix, on="time")
+        df = df.merge(cleaned_vix, on="time")
         df = df.sort_values(["time", "tic"]).reset_index(drop=True)
         self.dataframe = df
 
