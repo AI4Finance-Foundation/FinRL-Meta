@@ -20,27 +20,29 @@ class BasicProcessor:
     def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str):
         pass
 
-    def clean_data(self):
-        if "date" in self.dataframe.columns.values.tolist():
-            self.dataframe = self.dataframe.rename(columns={'date': 'time'})
-        if "datetime" in self.dataframe.columns.values.tolist():
-            self.dataframe = self.dataframe.rename(columns={'datetime': 'time'})
+    def clean_data(self) -> pd.DataFrame:
+        df = self.dataframe
+        if "date" in df.columns.values.tolist():
+            df = df.rename(columns={'date': 'time'})
+        if "datetime" in df.columns.values.tolist():
+            df = df.rename(columns={'datetime': 'time'})
         if self.data_source == "ccxt":
-            self.dataframe = self.dataframe.rename(columns={'index': 'time'})
+            df = df.rename(columns={'index': 'time'})
         elif self.data_source == 'ricequant':
             ''' RiceQuant data is already cleaned, we only need to transform data format here.
                 No need for filling NaN data'''
-            self.dataframe = self.dataframe.rename(columns={'order_book_id': 'tic'})
+            df = df.rename(columns={'order_book_id': 'tic'})
             # raw df uses multi-index (tic,time), reset it to single index (time)
-            self.dataframe = self.dataframe.reset_index(level=[0, 1])
+            df = df.reset_index(level=[0, 1])
             # check if there is NaN values
-            assert not self.dataframe.isnull().values.any()
-        self.dataframe = self.dataframe.dropna()
+            assert not df.isnull().values.any()
+        df2 = df.dropna()
         # adj_close: adjusted close price
-        if 'adj_close' not in self.dataframe.columns.values.tolist():
-            self.dataframe['adj_close'] = self.dataframe['close']
-        self.dataframe = self.dataframe.sort_values(by=['time', 'tic'])
-        self.dataframe = self.dataframe[['tic', 'time', 'open', 'high', 'low', 'close', 'adj_close', 'volume']]
+        if 'adj_close' not in df2.columns.values.tolist():
+            df2['adj_close'] = df2['close']
+        df2 = df2.sort_values(by=['time', 'tic'])
+        final_df = df2[['tic', 'time', 'open', 'high', 'low', 'close', 'adj_close', 'volume']]
+        self.dataframe = final_df
 
     def get_trading_days(self, start: str, end: str) -> List[str]:
         pass
