@@ -15,7 +15,7 @@ class BasicProcessor:
         self.time_interval: str = TIME_INTERVAL
         self.time_zone: str = ""
         self.dataframe: pd.DataFrame = pd.DataFrame()
-        self.dict_numpy: dict = {}
+        self.dictnumpy: dict = {}
 
     def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str):
         pass
