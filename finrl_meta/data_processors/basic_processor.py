@@ -101,8 +101,8 @@ class BasicProcessor:
         df = df.sort_values(by=["time", "tic"])
         time_to_drop = df[df.isna().any(axis=1)].time.unique()
         df = df[~df.time.isin(time_to_drop)]
-        print("Succesfully add technical indicators")
         self.dataframe = df
+        print("Succesfully add technical indicators")
 
     def add_turbulence(self):
         """
