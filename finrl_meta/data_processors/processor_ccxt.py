@@ -14,7 +14,7 @@ class CCXTProcessor(BasicProcessor):
         BasicProcessor.__init__(self, data_source, **kwargs)
         self.binance = ccxt.binance()
         
-    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str) -> pd.DataFrame:
+    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str):
         def min_ohlcv(dt, pair, limit):
             since = calendar.timegm(dt.utctimetuple())*1000
             ohlcv = self.binance.fetch_ohlcv(symbol=pair, timeframe='1m', since=since, limit=limit)
