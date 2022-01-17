@@ -36,7 +36,7 @@ class AlpacaProcessor(BasicProcessor):
         else:
             self.api = kwargs['API']
             
-    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str) -> pd.DataFrame:
+    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str):
         self.start = start_date
         self.end = end_date
         self.time_interval = time_interval
@@ -69,9 +69,10 @@ class AlpacaProcessor(BasicProcessor):
         for i in range(len(times)):
             times[i] = str(times[i])
         data_df['time'] = times"""
-        return data_df
+        self.dataframe = data_df
 
-    def clean_data(self, df):
+    def clean_data(self):
+        df = self.dataframe.copy()
         tic_list = np.unique(df.tic.values)
 
         trading_days = self.get_trading_days(start=self.start, end=self.end)
@@ -134,7 +135,7 @@ class AlpacaProcessor(BasicProcessor):
 
         print("Data clean finished!")
 
-        return new_df
+        self.dataframe = new_df
 
     # def add_technical_indicator(
     #     self,
