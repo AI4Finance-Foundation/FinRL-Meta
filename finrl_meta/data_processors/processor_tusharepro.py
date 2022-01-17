@@ -56,8 +56,7 @@ class TushareProProcessor(BasicProcessor):
         #print(dfb.shape)
         return dfb
 
-    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str) \
-            -> pd.DataFrame:
+    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str):
         """Fetches data from tusharepro API
         Parameters
         ----------
@@ -97,10 +96,10 @@ class TushareProProcessor(BasicProcessor):
 
         print("Shape of DataFrame: ", df.shape)
 
-        return df
+        self.dataframe = df
 
-    def clean_data(self, df: pd.DataFrame) -> pd.DataFrame:
-        dfc=copy.deepcopy(df)
+    def clean_data(self) -> pd.DataFrame:
+        dfc=copy.deepcopy(self.dataframe)
         
         dfcode=pd.DataFrame(columns=['tic'])
         dfdate=pd.DataFrame(columns=['date'])
@@ -139,17 +138,16 @@ class TushareProProcessor(BasicProcessor):
 
         print("Shape of DataFrame: ", df3.shape)
 
-        return df3
+        self.dataframe = df3
 
-    def add_technical_indicator(self, data: pd.DataFrame, tech_indicator_list: List[str], use_stockstats: bool=True) \
-            -> pd.DataFrame:
+    def add_technical_indicator(self, tech_indicator_list: List[str], use_stockstats_or_talib: int=0):
         """
         calculate technical indicators
         use stockstats/talib package to add technical inidactors
         :param data: (df) pandas dataframe
         :return: (df) pandas dataframe
         """
-        df = data.copy()
+        df = self.dataframe.copy()
         if "date" in df.columns.values.tolist():
             df = df.rename(columns={'date': 'time'})
         
@@ -159,7 +157,7 @@ class TushareProProcessor(BasicProcessor):
         # df = df.reset_index(drop=False)
         # df = df.drop(columns=["level_1"])
         # df = df.rename(columns={"level_0": "tic", "date": "time"})
-        if use_stockstats:  # use stockstats
+        if use_stockstats_or_talib == 0:  # use stockstats
             stock = stockstats.StockDataFrame.retype(df.copy())
             unique_ticker = stock.tic.unique()
             #print(unique_ticker)
@@ -198,26 +196,26 @@ class TushareProProcessor(BasicProcessor):
         df = df.rename(columns={'time': 'date'})    # 1/11 added by hx
         df = df.dropna()
         print("Succesfully add technical indicators")
-        return df
+        self.dataframe = df
 
     def get_trading_days(self, start: str, end: str) -> List[str]:
         print('not supported currently!')
         return ['not supported currently!']
     
-    def add_turbulence(self, data: pd.DataFrame) \
-            -> pd.DataFrame:
-        print('not supported currently!')
-        return pd.DataFrame(['not supported currently!'])
+    # def add_turbulence(self, data: pd.DataFrame) \
+    #         -> pd.DataFrame:
+    #     print('not supported currently!')
+    #     return pd.DataFrame(['not supported currently!'])
 
-    def calculate_turbulence(self, data: pd.DataFrame, time_period: int = 252) \
-            -> pd.DataFrame:
-        print('not supported currently!')
-        return pd.DataFrame(['not supported currently!'])
+    # def calculate_turbulence(self, data: pd.DataFrame, time_period: int = 252) \
+    #         -> pd.DataFrame:
+    #     print('not supported currently!')
+    #     return pd.DataFrame(['not supported currently!'])
     
-    def add_vix(self, data: pd.DataFrame) \
-            -> pd.DataFrame:
-        print('not supported currently!')
-        return pd.DataFrame(['not supported currently!'])
+    # def add_vix(self, data: pd.DataFrame) \
+    #         -> pd.DataFrame:
+    #     print('not supported currently!')
+    #     return pd.DataFrame(['not supported currently!'])
 
     # def df_to_array(self, df: pd.DataFrame, tech_indicator_list: List[str], if_vix: bool) \
     #         -> List[np.array]:
