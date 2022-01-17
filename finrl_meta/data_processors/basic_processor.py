@@ -238,34 +238,14 @@ class BasicProcessor:
         df = df.sort_values(["time", "tic"]).reset_index(drop=True)
         self.dataframe = df
 
-    def df_to_array(self, df: pd.DataFrame, tech_indicator_list: list, if_vix: bool):
-        df = df.copy()
+    def df_to_array(self, tech_indicator_list: list, if_vix: bool):
+        df = self.dataframe.copy()
         unique_ticker = df.tic.unique()
-        # if_first_time = True
-        # for tic in unique_ticker:
-        #     if if_first_time:
-        #         price_array = df[df.tic == tic][["close"]].values
-        #         tech_array = df[df.tic == tic][tech_indicator_list].values
-        #         if if_vix:
-        #             risk_array = df[df.tic == tic]["vix"].values
-        #         else:
-        #             if "turbulence" in df.columns:
-        #                 risk_array = df[df.tic == tic]["turbulence"].values
-        #             else:
-        #                 risk_array = None
-        #         if_first_time = False
-        #     else:
-        #         price_array = np.hstack(
-        #             [price_array, df[df.tic == tic][["close"]].values]
-        #         )
-        #         tech_array = np.hstack(
-        #             [tech_array, df[df.tic == tic][tech_indicator_list].values]
-        #         )
-        price_array = np.column_stack([df[df.tic == tic].close for tic in unique_ticker])
-        tech_array = np.hstack([df.loc[(df.tic == tic), tech_indicator_list] for tic in unique_ticker])
+        price_array = np.column_stack([df[df.tic==tic].close for tic in unique_ticker])
+        tech_array = np.hstack([df.loc[(df.tic==tic), tech_indicator_list] for tic in unique_ticker])
         if if_vix:
-            risk_array = np.column_stack([df[df.tic == tic].vix for tic in unique_ticker])
+            risk_array = np.column_stack([df[df.tic==tic].vix for tic in unique_ticker])
         else:
-            risk_array = np.column_stack([df[df.tic == tic].turbulence for tic in unique_ticker]) if "turbulence" in df.columns else None
+            risk_array = np.column_stack([df[df.tic==tic].turbulence for tic in unique_ticker]) if "turbulence" in df.columns else None
         print("Successfully transformed into array")
-        return price_array, tech_array,
+        return price_array, tech_array, risk_array
