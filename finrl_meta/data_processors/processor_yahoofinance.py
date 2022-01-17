@@ -38,7 +38,7 @@ class YahooFinanceProcessor(BasicProcessor):
     def __init__(self, data_source: str, **kwargs):
         BasicProcessor.__init__(self, data_source, **kwargs)
     
-    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str) -> pd.DataFrame:
+    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str):
         """Fetches data from Yahoo API
         Parameters
         ----------
@@ -88,11 +88,11 @@ class YahooFinanceProcessor(BasicProcessor):
 
         data_df = data_df.sort_values(by=['date','tic']).reset_index(drop=True)
 
-        return data_df
+        self.dataframe = data_df
     
-    def clean_data(self, data) -> pd.DataFrame:
+    def clean_data(self):
         
-        df = data.copy()
+        df = self.dataframe.copy()
         df = df.rename(columns={'date':'time'})
         time_interval = self.time_interval
         #get ticker list
@@ -163,7 +163,7 @@ class YahooFinanceProcessor(BasicProcessor):
         
         print('Data clean all finished!')
         
-        return new_df
+        self.dataframe = new_df
     
     # def add_technical_indicator(self, data, tech_indicator_list):
     #     """
