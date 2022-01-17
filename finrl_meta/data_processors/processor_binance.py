@@ -14,7 +14,7 @@ class BinanceProcessor(BasicProcessor):
         self.url = "https://api.binance.com/api/v3/klines"
     
     #main functions
-    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str) -> pd.DataFrame:
+    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str):
         startTime = dt.datetime.strptime(start_date, '%Y-%m-%d')
         endTime = dt.datetime.strptime(end_date, '%Y-%m-%d')
         
@@ -27,7 +27,7 @@ class BinanceProcessor(BasicProcessor):
         if time_interval == "1s":
             # as per https://binance-docs.github.io/apidocs/spot/en/#compressed-aggregate-trades-list
             self.limit = 1000
-            return self.fetch_n_combine(start_date, end_date, ticker_list)
+            final_df = self.fetch_n_combine(start_date, end_date, ticker_list)
         else:
             final_df = pd.DataFrame()
             for i in ticker_list:
@@ -35,7 +35,7 @@ class BinanceProcessor(BasicProcessor):
                 df = hist_data.iloc[:-1].dropna()
                 df['tic'] = i
                 final_df = final_df.append(df)
-            return final_df
+        self.dataframe = final_df
     
 
     # def clean_data(self, df):
