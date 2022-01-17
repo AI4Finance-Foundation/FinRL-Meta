@@ -185,7 +185,7 @@ class BasicProcessor:
         :param data: (df) pandas dataframe
         :return: (df) pandas dataframe
         """
-        if self.data_source in ['binance', 'ccxt', 'iexcloud', 'joinquant', 'quantconnect', 'ricequant']:
+        if self.data_source in ['binance', 'ccxt', 'iexcloud', 'joinquant', 'quantconnect', 'ricequant', 'tusharepro']:
             print('VIX is not applicable for {}. Return original DataFrame'.format(self.data_source))
 
         # if self.data_source == 'yahoofinance':
