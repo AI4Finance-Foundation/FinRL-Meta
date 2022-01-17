@@ -32,7 +32,7 @@ class IEXCloudProcessor(BasicProcessor):
 
     def download_data(
         self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str
-    ) -> pd.DataFrame:
+    ):
         """Returns end of day historical data for up to 15 years.
 
         Args:
@@ -102,7 +102,7 @@ class IEXCloudProcessor(BasicProcessor):
             )
         )
 
-        return price_data
+        self.dataframe = price_data
 
     def get_trading_days(self, start: str, end: str) -> List[str]:
         """Retrieves every trading day between two dates.
