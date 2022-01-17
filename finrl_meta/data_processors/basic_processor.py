@@ -57,15 +57,15 @@ class BasicProcessor:
         :return: (df) pandas dataframe
         """
         df = self.dataframe.copy()
-        # if "date" in df.columns.values.tolist():
-        #     df = df.rename(columns={'date': 'time'})
-        #
-        # if self.data_source == "ccxt":
-        #     df = df.rename(columns={'index': 'time'})
+        if "date" in df.columns.values.tolist():
+            df = df.rename(columns={'date': 'time'})
 
-        # df = df.reset_index(drop=False)
-        # df = df.drop(columns=["level_1"])
-        # df = df.rename(columns={"level_0": "tic", "date": "time"})
+        if self.data_source == "ccxt":
+            df = df.rename(columns={'index': 'time'})
+
+        df = df.reset_index(drop=False)
+        df = df.drop(columns=["level_1"])
+        df = df.rename(columns={"level_0": "tic", "date": "time"})
         assert use_stockstats_or_talib in [0, 1]
         if use_stockstats_or_talib == 0:  # use stockstats
             stock = stockstats.StockDataFrame.retype(df.copy())
