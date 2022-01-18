@@ -187,6 +187,7 @@ class BasicProcessor:
         """
         if self.data_source in ['binance', 'ccxt', 'iexcloud', 'joinquant', 'quantconnect', 'ricequant', 'tusharepro']:
             print('VIX is not applicable for {}. Return original DataFrame'.format(self.data_source))
+            return
 
         # if self.data_source == 'yahoofinance':
         #     df = data.copy()
@@ -226,6 +227,8 @@ class BasicProcessor:
             ticker = "VIXY"
         elif self.data_source == 'wrds':
             ticker = "vix"
+        else:
+            return
         df = self.dataframe.copy()
         self.dataframe = [ticker]
         self.download_data(self.start, self.end, self.time_interval)
