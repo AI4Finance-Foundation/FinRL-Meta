@@ -98,7 +98,7 @@ class TushareProProcessor(BasicProcessor):
 
         self.dataframe = df
 
-    def clean_data(self) -> pd.DataFrame:
+    def clean_data(self):
         dfc=copy.deepcopy(self.dataframe)
         
         dfcode=pd.DataFrame(columns=['tic'])
