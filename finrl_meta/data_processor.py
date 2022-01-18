@@ -90,10 +90,8 @@ class DataProcessor():
         self.processor.add_vix()
         self.dataframe = self.processor.dataframe
 
-    def df_to_array(self, df, if_vix) -> np.array:
-        price_array, tech_array, turbulence_array = self.processor.df_to_array(df,
-                                                                               self.tech_indicator_list,
-                                                                               if_vix)
+    def df_to_array(self, if_vix) -> np.array:
+        price_array, tech_array, turbulence_array = self.processor.df_to_array(self.tech_indicator_list, if_vix)
         # fill nan with 0 for technical indicators
         tech_nan_positions = np.isnan(tech_array)
         tech_array[tech_nan_positions] = 0
@@ -136,7 +134,8 @@ class DataProcessor():
 def test_joinquant():
     path_of_data = "../data"
 
-    TRADE_START_DATE = "2019-09-01"
+    # TRADE_START_DATE = "2019-09-01"
+    TRADE_START_DATE = "2020-09-01"
     TRADE_END_DATE = "2021-09-11"
     READ_DATA_FROM_LOCAL = 0
 

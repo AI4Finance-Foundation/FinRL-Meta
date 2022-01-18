@@ -20,7 +20,7 @@ class BasicProcessor:
     def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str):
         pass
 
-    def clean_data(self) -> pd.DataFrame:
+    def clean_data(self):
         df = self.dataframe
         if "date" in df.columns.values.tolist():
             df = df.rename(columns={'date': 'time'})
@@ -48,8 +48,7 @@ class BasicProcessor:
         pass
 
     # use_stockstats_or_talib: 0 (stockstats, default), or 1 (use talib). Users can choose the method.
-    def add_technical_indicator(self, tech_indicator_list: List[str], use_stockstats_or_talib: int=0) \
-            -> pd.DataFrame:
+    def add_technical_indicator(self, tech_indicator_list: List[str], use_stockstats_or_talib: int=0):
         """
         calculate technical indicators
         use stockstats/talib package to add technical inidactors
@@ -64,8 +63,10 @@ class BasicProcessor:
             df = df.rename(columns={'index': 'time'})
 
         df = df.reset_index(drop=False)
-        df = df.drop(columns=["level_1"])
-        df = df.rename(columns={"level_0": "tic", "date": "time"})
+        if "level_1" in df.columns:
+            df = df.drop(columns=["level_1"])
+        if "level_0" in df.columns and "tic" not in df.columns:
+            df = df.rename(columns={"level_0": "tic"})
         assert use_stockstats_or_talib in [0, 1]
         if use_stockstats_or_talib == 0:  # use stockstats
             stock = stockstats.StockDataFrame.retype(df.copy())
