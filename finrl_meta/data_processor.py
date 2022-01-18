@@ -13,6 +13,7 @@ import os
 class DataProcessor():
     def __init__(self, data_source, **kwargs):
         self.data_source = data_source
+        self.dataframe = pd.DataFrame()
         if self.data_source == 'alpaca':
             try:
                 # users should input values: kwargs['API_KEY'], kwargs['API_SECRET'], kwargs['APCA_API_BASE_URL'], kwargs['API']
@@ -63,34 +64,31 @@ class DataProcessor():
         else:
             raise ValueError('Data source input is NOT supported yet.')
 
-    def download_data(self, ticker_list, start_date, end_date,
-                      time_interval) -> pd.DataFrame:
-        df = self.processor.download_data(ticker_list=ticker_list,
+    def download_data(self, ticker_list, start_date, end_date, time_interval):
+        self.processor.download_data(ticker_list=ticker_list,
                                           start_date=start_date,
                                           end_date=end_date,
                                           time_interval=time_interval)
-        return df
+        self.dataframe = self.processor.dataframe
 
-    def clean_data(self, df) -> pd.DataFrame:
-        df = self.processor.clean_data(df)
 
-        return df
+    def clean_data(self):
+        self.processor.dataframe = self.dataframe
+        self.processor.clean_data()
+        self.dataframe = self.processor.dataframe
 
-    def add_technical_indicator(self, df, tech_indicator_list) -> pd.DataFrame:
+    def add_technical_indicator(self, tech_indicator_list):
         self.tech_indicator_list = tech_indicator_list
-        df = self.processor.add_technical_indicator(df, tech_indicator_list)
+        self.processor.add_technical_indicator(tech_indicator_list)
+        self.dataframe = self.processor.dataframe
 
-        return df
+    def add_turbulence(self):
+        self.processor.add_turbulence()
+        self.dataframe = self.processor.dataframe
 
-    def add_turbulence(self, df) -> pd.DataFrame:
-        df = self.processor.add_turbulence(df)
-
-        return df
-
-    def add_vix(self, df) -> pd.DataFrame:
-        df = self.processor.add_vix(df)
-
-        return df
+    def add_vix(self):
+        self.processor.add_vix()
+        self.dataframe = self.processor.dataframe
 
     def df_to_array(self, df, if_vix) -> np.array:
         price_array, tech_array, turbulence_array = self.processor.df_to_array(df,
@@ -115,20 +113,20 @@ class DataProcessor():
         if cache and os.path.isfile(cache_path):
             print('Using cached file {}'.format(cache_path))
             self.tech_indicator_list = technical_indicator_list
-            data = pd.read_csv(cache_path)
+            self.dataframe = pd.read_csv(cache_path)
 
         else:
-            data = self.download_data(ticker_list, start_date, end_date, time_interval)
-            data = self.clean_data(data)
+            self.download_data(ticker_list, start_date, end_date, time_interval)
+            self.clean_data()
             if cache:
                 if not os.path.exists(cache_dir):
                     os.mkdir(cache_dir)
-                data.to_csv(cache_path, index=False)
+                self.dataframe.to_csv(cache_path, index=False)
 
-        data = self.add_technical_indicator(data, technical_indicator_list)
+        self.add_technical_indicator(technical_indicator_list)
         if if_vix:
-            data = self.add_vix(data)
-        price_array, tech_array, turbulence_array = self.df_to_array(data, if_vix)
+            self.add_vix()
+        price_array, tech_array, turbulence_array = self.df_to_array(if_vix)
         tech_nan_positions = np.isnan(tech_array)
         tech_array[tech_nan_positions] = 0
 
@@ -157,12 +155,12 @@ def test_joinquant():
     # )
     ticker_list = ["000612.XSHE", "601808.XSHG"]
 
-    data2 = p.download_data(ticker_list=ticker_list, start_date=TRADE_START_DATE, end_date=TRADE_END_DATE, time_interval=TIME_INTERVAL)
+    p.download_data(ticker_list=ticker_list, start_date=TRADE_START_DATE, end_date=TRADE_END_DATE, time_interval=TIME_INTERVAL)
 
-    data3 = p.clean_data(data2)
-    data4 = p.add_turbulence(data3)
-    data5 = p.add_technical_indicator(data4, TECHNICAL_INDICATOR)
-    data6 = p.add_vix(data5)
+    p.clean_data()
+    p.add_turbulence()
+    p.add_technical_indicator(TECHNICAL_INDICATOR)
+    p.add_vix()
 
     price_array, tech_array, turbulence_array = p.run(ticker_list, TRADE_START_DATE, TRADE_END_DATE,
                                                       TIME_INTERVAL, TECHNICAL_INDICATOR,
