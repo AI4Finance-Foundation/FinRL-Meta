@@ -68,7 +68,7 @@ class CCXTProcessor(BasicProcessor):
             temp_col = pd.MultiIndex.from_product([[ticker],['open','high','low','close','volume']])
             dataset[temp_col] = df[['open','high','low','close','volume']].values
         print('Actual end time: ' + str(df['time'].values[-1]))
-        return dataset
+        self.dataframe = dataset
     
     # def add_technical_indicators(self, df, pair_list, tech_indicator_list = [
     #     'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',
