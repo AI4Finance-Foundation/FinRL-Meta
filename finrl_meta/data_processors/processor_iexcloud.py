@@ -30,9 +30,7 @@ class IEXCloudProcessor(BasicProcessor):
         self.base_url = self._get_base_url(mode=kwargs['mode'])
         self.token = kwargs['token'] or os.environ.get("IEX_TOKEN")
 
-    def download_data(
-        self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str
-    ):
+    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str):
         """Returns end of day historical data for up to 15 years.
 
         Args:
