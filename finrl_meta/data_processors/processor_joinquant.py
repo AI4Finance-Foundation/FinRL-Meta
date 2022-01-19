@@ -18,8 +18,7 @@ class JoinquantProcessor(BasicProcessor):
         if 'username' in kwargs.keys() and 'password' in kwargs.keys():
             jq.auth(kwargs['username'], kwargs['password'])
 
-    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str
-                      ) -> pd.DataFrame:
+    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str):
         unit = None
         # joinquant supports: '1m', '5m', '15m', '30m', '60m', '120m', '1d', '1w', '1M'。'1w' denotes one week，‘1M' denotes one month。
         if time_interval == '1D':
@@ -37,7 +36,7 @@ class JoinquantProcessor(BasicProcessor):
             end_dt=end_date,
         )
         df = df.reset_index().rename(columns={'level_0': 'tic'})
-        return df
+        self.dataframe = df
 
     def data_fetch(self,stock_list, num, unit, end_dt):
         df = jq.get_bars(security=stock_list, count=num, unit=unit, 

@@ -12,29 +12,29 @@ class RiceQuantProcessor(BasicProcessor):
         else:
             ricequant.init(kwargs['username'], kwargs['password']) #init with username and password
             
-    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str) -> pd.DataFrame:
+    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str):
         # download data by calling RiceQuant API
         dataframe = ricequant.get_price(ticker_list, frequency = time_interval, 
                             start_date = start_date, end_date = end_date)
-        return dataframe
+        self.dataframe = dataframe
     
-    def clean_data(self, df) -> pd.DataFrame:
-        ''' RiceQuant data is already cleaned, we only need to transform data format here.
-        No need for filling NaN data'''
-        df = df.copy()
-        # raw df uses multi-index (tic,time), reset it to single index (time) 
-        df = df.reset_index(level=[0,1])
-        # rename column order_book_id to tic
-        df = df.rename(columns={'order_book_id':'tic', 'datetime':'time'})
-        # reserve columns needed
-        df = df[['tic','time','open','high','low','close','volume']]
-        # check if there is NaN values
-        assert not df.isnull().values.any()
-        return df
+    # def clean_data(self, df) -> pd.DataFrame:
+    #     ''' RiceQuant data is already cleaned, we only need to transform data format here.
+    #     No need for filling NaN data'''
+    #     df = df.copy()
+    #     # raw df uses multi-index (tic,time), reset it to single index (time)
+    #     df = df.reset_index(level=[0,1])
+    #     # rename column order_book_id to tic
+    #     df = df.rename(columns={'order_book_id':'tic', 'datetime':'time'})
+    #     # reserve columns needed
+    #     df = df[['tic','time','open','high','low','close','volume']]
+    #     # check if there is NaN values
+    #     assert not df.isnull().values.any()
+    #     return df
     
-    def add_vix(self, data):
-        print('VIX is NOT applicable to China A-shares')
-        return data
+    # def add_vix(self, data):
+    #     print('VIX is NOT applicable to China A-shares')
+    #     return data
 
     # def calculate_turbulence(self, data, time_period=252):
     #     # can add other market assets

@@ -14,7 +14,7 @@ class CCXTProcessor(BasicProcessor):
         BasicProcessor.__init__(self, data_source, **kwargs)
         self.binance = ccxt.binance()
         
-    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str) -> pd.DataFrame:
+    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str):
         def min_ohlcv(dt, pair, limit):
             since = calendar.timegm(dt.utctimetuple())*1000
             ohlcv = self.binance.fetch_ohlcv(symbol=pair, timeframe='1m', since=since, limit=limit)
@@ -68,7 +68,7 @@ class CCXTProcessor(BasicProcessor):
             temp_col = pd.MultiIndex.from_product([[ticker],['open','high','low','close','volume']])
             dataset[temp_col] = df[['open','high','low','close','volume']].values
         print('Actual end time: ' + str(df['time'].values[-1]))
-        return dataset
+        self.dataframe = dataset
     
     # def add_technical_indicators(self, df, pair_list, tech_indicator_list = [
     #     'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',
@@ -91,9 +91,10 @@ class CCXTProcessor(BasicProcessor):
     #     print('Succesfully add technical indicators')
     #     return dataset
     
-    def df_to_ary(self, df, pair_list, tech_indicator_list=[
+    def df_to_ary(self, pair_list, tech_indicator_list=[
         'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',
         'close_30_sma', 'close_60_sma']):
+        df = self.dataframe
         df = df.dropna()
         date_ary = df.index.values
         price_array = df[pd.MultiIndex.from_product([pair_list,['close']])].values

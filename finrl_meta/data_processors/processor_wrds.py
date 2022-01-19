@@ -89,7 +89,7 @@ class WrdsProcessor(BasicProcessor):
             result = temp
             result = result.sort_values(by=['time','tic'])
             result = result.reset_index(drop=True)
-            return result
+            self.dataframe = result
     
     def preprocess_to_ohlcv(self, df, time_interval='60S'):
         df = df[['date','time_m','sym_root','size','price']]
@@ -123,8 +123,8 @@ class WrdsProcessor(BasicProcessor):
                 final_df = final_df.append(data_ohlc.reset_index(),ignore_index=True)
         return final_df
     
-    def clean_data(self, df):
-        df = df[['time', 'open', 'high', 'low', 'close', 'volume', 'tic']]
+    def clean_data(self):
+        df = self.dataframe[['time', 'open', 'high', 'low', 'close', 'volume', 'tic']]
         # remove 16:00 data
         tic_list = np.unique(df['tic'].values)
         ary = df.values
@@ -188,7 +188,7 @@ class WrdsProcessor(BasicProcessor):
         df = df[['time','open','high','low','close','volume','tic']]
         df = df.reset_index(drop=True)
         print('Data clean finished')
-        return df
+        self.dataframe = df
     
     # def add_technical_indicator(self, df, tech_indicator_list = [
     #         'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',

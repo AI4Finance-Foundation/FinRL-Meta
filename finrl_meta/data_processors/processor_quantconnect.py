@@ -26,7 +26,7 @@ class QuantConnectProcessor(BasicProcessor):
     #     history = qb.History(qb.Securities.Keys, start_time, end_time, resolution)
     #     return history
 
-    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str) -> pd.DataFrame:
+    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str):
         self.start = start_date
         self.end = end_date
         self.time_interval = time_interval
@@ -38,7 +38,7 @@ class QuantConnectProcessor(BasicProcessor):
         for stock in ticker_list:
             qb.AddEquity(stock)
         history = qb.History(qb.Securities.Keys, start_date, end_date, time_interval)
-        return history
+        self.dataframe = history
 
 
     # def preprocess(df, stock_list):

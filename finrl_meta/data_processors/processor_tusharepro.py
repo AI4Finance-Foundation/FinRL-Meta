@@ -56,8 +56,7 @@ class TushareProProcessor(BasicProcessor):
         #print(dfb.shape)
         return dfb
 
-    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str) \
-            -> pd.DataFrame:
+    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str):
         """Fetches data from tusharepro API
         Parameters
         ----------
@@ -97,10 +96,10 @@ class TushareProProcessor(BasicProcessor):
 
         print("Shape of DataFrame: ", df.shape)
 
-        return df
+        self.dataframe = df
 
-    def clean_data(self, df: pd.DataFrame) -> pd.DataFrame:
-        dfc=copy.deepcopy(df)
+    def clean_data(self):
+        dfc=copy.deepcopy(self.dataframe)
         
         dfcode=pd.DataFrame(columns=['tic'])
         dfdate=pd.DataFrame(columns=['date'])
@@ -139,85 +138,84 @@ class TushareProProcessor(BasicProcessor):
 
         print("Shape of DataFrame: ", df3.shape)
 
-        return df3
+        self.dataframe = df3
 
-    def add_technical_indicator(self, data: pd.DataFrame, tech_indicator_list: List[str], use_stockstats: bool=True) \
-            -> pd.DataFrame:
-        """
-        calculate technical indicators
-        use stockstats/talib package to add technical inidactors
-        :param data: (df) pandas dataframe
-        :return: (df) pandas dataframe
-        """
-        df = data.copy()
-        if "date" in df.columns.values.tolist():
-            df = df.rename(columns={'date': 'time'})
-        
-        if self.data_source == "ccxt":
-            df = df.rename(columns={'index': 'time'})
-
-        # df = df.reset_index(drop=False)
-        # df = df.drop(columns=["level_1"])
-        # df = df.rename(columns={"level_0": "tic", "date": "time"})
-        if use_stockstats:  # use stockstats
-            stock = stockstats.StockDataFrame.retype(df.copy())
-            unique_ticker = stock.tic.unique()
-            #print(unique_ticker)
-            for indicator in tech_indicator_list:
-                indicator_df = pd.DataFrame()
-                for i in range(len(unique_ticker)):
-                    try:
-                        temp_indicator = stock[stock.tic == unique_ticker[i]][indicator]
-                        temp_indicator = pd.DataFrame(temp_indicator)
-                        temp_indicator["tic"] = unique_ticker[i]
-                        temp_indicator["time"] = df[df.tic == unique_ticker[i]][
-                            "time"
-                        ].to_list()
-                        indicator_df = indicator_df.append(
-                            temp_indicator, ignore_index=True
-                        )
-                    except Exception as e:
-                        print(e)
-                #print(indicator_df)
-                df = df.merge(
-                    indicator_df[["tic", "time", indicator]], on=["tic", "time"], how="left"
-                )
-        else:  # use talib
-            final_df = pd.DataFrame()
-            for i in df.tic.unique():
-                tic_df = df[df.tic == i]
-                tic_df['macd'], tic_df['macd_signal'], tic_df['macd_hist'] = MACD(tic_df['close'], fastperiod=12,
-                                                                                  slowperiod=26, signalperiod=9)
-                tic_df['rsi'] = RSI(tic_df['close'], timeperiod=14)
-                tic_df['cci'] = CCI(tic_df['high'], tic_df['low'], tic_df['close'], timeperiod=14)
-                tic_df['dx'] = DX(tic_df['high'], tic_df['low'], tic_df['close'], timeperiod=14)
-                final_df = final_df.append(tic_df)
-            df = final_df
-
-        df = df.sort_values(by=["time", "tic"])
-        df = df.rename(columns={'time': 'date'})    # 1/11 added by hx
-        df = df.dropna()
-        print("Succesfully add technical indicators")
-        return df
+    # def add_technical_indicator(self, tech_indicator_list: List[str], use_stockstats_or_talib: int=0):
+    #     """
+    #     calculate technical indicators
+    #     use stockstats/talib package to add technical inidactors
+    #     :param data: (df) pandas dataframe
+    #     :return: (df) pandas dataframe
+    #     """
+    #     df = self.dataframe.copy()
+    #     if "date" in df.columns.values.tolist():
+    #         df = df.rename(columns={'date': 'time'})
+    #
+    #     if self.data_source == "ccxt":
+    #         df = df.rename(columns={'index': 'time'})
+    #
+    #     # df = df.reset_index(drop=False)
+    #     # df = df.drop(columns=["level_1"])
+    #     # df = df.rename(columns={"level_0": "tic", "date": "time"})
+    #     if use_stockstats_or_talib == 0:  # use stockstats
+    #         stock = stockstats.StockDataFrame.retype(df.copy())
+    #         unique_ticker = stock.tic.unique()
+    #         #print(unique_ticker)
+    #         for indicator in tech_indicator_list:
+    #             indicator_df = pd.DataFrame()
+    #             for i in range(len(unique_ticker)):
+    #                 try:
+    #                     temp_indicator = stock[stock.tic == unique_ticker[i]][indicator]
+    #                     temp_indicator = pd.DataFrame(temp_indicator)
+    #                     temp_indicator["tic"] = unique_ticker[i]
+    #                     temp_indicator["time"] = df[df.tic == unique_ticker[i]][
+    #                         "time"
+    #                     ].to_list()
+    #                     indicator_df = indicator_df.append(
+    #                         temp_indicator, ignore_index=True
+    #                     )
+    #                 except Exception as e:
+    #                     print(e)
+    #             #print(indicator_df)
+    #             df = df.merge(
+    #                 indicator_df[["tic", "time", indicator]], on=["tic", "time"], how="left"
+    #             )
+    #     else:  # use talib
+    #         final_df = pd.DataFrame()
+    #         for i in df.tic.unique():
+    #             tic_df = df[df.tic == i]
+    #             tic_df['macd'], tic_df['macd_signal'], tic_df['macd_hist'] = MACD(tic_df['close'], fastperiod=12,
+    #                                                                               slowperiod=26, signalperiod=9)
+    #             tic_df['rsi'] = RSI(tic_df['close'], timeperiod=14)
+    #             tic_df['cci'] = CCI(tic_df['high'], tic_df['low'], tic_df['close'], timeperiod=14)
+    #             tic_df['dx'] = DX(tic_df['high'], tic_df['low'], tic_df['close'], timeperiod=14)
+    #             final_df = final_df.append(tic_df)
+    #         df = final_df
+    #
+    #     df = df.sort_values(by=["time", "tic"])
+    #     df = df.rename(columns={'time': 'date'})    # 1/11 added by hx
+    #     df = df.dropna()
+    #     print("Succesfully add technical indicators")
+    #     self.dataframe = df
 
     def get_trading_days(self, start: str, end: str) -> List[str]:
         print('not supported currently!')
         return ['not supported currently!']
     
-    def add_turbulence(self, data: pd.DataFrame) \
-            -> pd.DataFrame:
-        print('not supported currently!')
-        return pd.DataFrame(['not supported currently!'])
+    # def add_turbulence(self, data: pd.DataFrame) \
+    #         -> pd.DataFrame:
+    #     print('not supported currently!')
+    #     return pd.DataFrame(['not supported currently!'])
 
-    def calculate_turbulence(self, data: pd.DataFrame, time_period: int = 252) \
-            -> pd.DataFrame:
-        print('not supported currently!')
-        return pd.DataFrame(['not supported currently!'])
+    # def calculate_turbulence(self, data: pd.DataFrame, time_period: int = 252) \
+    #         -> pd.DataFrame:
+    #     print('not supported currently!')
+    #     return pd.DataFrame(['not supported currently!'])
     
-    def add_vix(self, data: pd.DataFrame) \
-            -> pd.DataFrame:
-        print('not supported currently!')
-        return pd.DataFrame(['not supported currently!'])
+    # def add_vix(self, data: pd.DataFrame) \
+    #         -> pd.DataFrame:
+    #     print('not supported currently!')
+    #     return pd.DataFrame(['not supported currently!'])
 
     # def df_to_array(self, df: pd.DataFrame, tech_indicator_list: List[str], if_vix: bool) \
     #         -> List[np.array]:
