@@ -91,9 +91,10 @@ class CCXTProcessor(BasicProcessor):
     #     print('Succesfully add technical indicators')
     #     return dataset
     
-    def df_to_ary(self, df, pair_list, tech_indicator_list=[
+    def df_to_ary(self, pair_list, tech_indicator_list=[
         'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',
         'close_30_sma', 'close_60_sma']):
+        df = self.dataframe
         df = df.dropna()
         date_ary = df.index.values
         price_array = df[pd.MultiIndex.from_product([pair_list,['close']])].values
