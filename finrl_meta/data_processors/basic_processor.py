@@ -48,7 +48,6 @@ class BasicProcessor:
         if self.data_source in ["binance", "ccxt", "quantconnect", "ricequant", "tusharepro"]:
             print("Calculate get_trading_days not supported for {} yet.".format(self.data_source))
             return None
-        pass
 
     # use_stockstats_or_talib: 0 (stockstats, default), or 1 (use talib). Users can choose the method.
     def add_technical_indicator(self, tech_indicator_list: List[str], use_stockstats_or_talib: int=0):
