@@ -28,7 +28,7 @@ class WrdsProcessor(BasicProcessor):
         self.end = end_date
         self.time_interval = time_interval
         
-        def get_trading_days(start, end):
+        def get_trading_days(start: str, end: str) -> List[str]:
             nyse = tc.get_calendar('NYSE')
             df = nyse.sessions_in_range(pd.Timestamp(start,tz=pytz.UTC),
                                         pd.Timestamp(end,tz=pytz.UTC))
