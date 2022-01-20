@@ -297,7 +297,7 @@ class YahooFinanceProcessor(BasicProcessor):
     #     return price_array, tech_array, risk_array
         
 
-    def get_trading_days(self, start, end):
+    def get_trading_days(self, start: str, end: str) -> List[str]:
         nyse = tc.get_calendar('NYSE')
         df = nyse.sessions_in_range(pd.Timestamp(start,tz=pytz.UTC),
                                     pd.Timestamp(end,tz=pytz.UTC))
