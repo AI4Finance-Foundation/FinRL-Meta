@@ -45,6 +45,9 @@ class BasicProcessor:
         self.dataframe = final_df
 
     def get_trading_days(self, start: str, end: str) -> List[str]:
+        if self.data_source in ["binance", "ccxt", "quantconnect", "ricequant", "tusharepro"]:
+            print("Calculate get_trading_days not supported for {} yet.".format(self.data_source))
+            return None
         pass
 
     # use_stockstats_or_talib: 0 (stockstats, default), or 1 (use talib). Users can choose the method.
