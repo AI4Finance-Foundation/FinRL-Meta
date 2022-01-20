@@ -27,7 +27,7 @@ class JoinquantProcessor(BasicProcessor):
             unit = '1m'
         else:
             raise ValueError('not supported currently')
-        count = len(self.calc_trade_days_by_joinquant(start_date, end_date))
+        count = len(self.get_trading_days(start_date, end_date))
         df = jq.get_bars(
             security=ticker_list,
             count=count,
@@ -58,7 +58,7 @@ class JoinquantProcessor(BasicProcessor):
     # start_day: str
     # end_day: str
     # output: list of str_of_trade_day, e.g., ['2021-09-01', '2021-09-02']
-    def calc_trade_days_by_joinquant(self, start_day: str, end_day: str) -> List[str]:
+    def get_trading_days(self, start_day: str, end_day: str) -> List[str]:
         dates = jq.get_trade_days(start_day, end_day)
         str_dates = []
         for d in dates:
@@ -72,7 +72,7 @@ class JoinquantProcessor(BasicProcessor):
     # output: list of dataframes, e.g., [df1, df2]
     def read_data_from_csv(self, path_of_data, start_day, end_day):
         datasets = []
-        selected_days = self.calc_trade_days_by_joinquant(start_day, end_day)
+        selected_days = self.get_trading_days(start_day, end_day)
         filenames = calc_all_filenames(path_of_data)
         for filename in filenames:
             dataset_orig = pd.read_csv(filename)

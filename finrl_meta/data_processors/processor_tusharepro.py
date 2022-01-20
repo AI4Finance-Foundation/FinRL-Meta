@@ -198,9 +198,9 @@ class TushareProProcessor(BasicProcessor):
     #     print("Succesfully add technical indicators")
     #     self.dataframe = df
 
-    def get_trading_days(self, start: str, end: str) -> List[str]:
-        print('not supported currently!')
-        return ['not supported currently!']
+    # def get_trading_days(self, start: str, end: str) -> List[str]:
+    #     print('not supported currently!')
+    #     return ['not supported currently!']
     
     # def add_turbulence(self, data: pd.DataFrame) \
     #         -> pd.DataFrame:
