@@ -147,7 +147,7 @@ def test_joinquant():
     kwargs['password'] = "xxx"  # should input your password
     p = DataProcessor(data_source='joinquant', **kwargs)
 
-    # trade_days = p.calc_trade_days_by_joinquant(TRADE_START_DATE, TRADE_END_DATE)
+    # trade_days = p.get_trading_days(TRADE_START_DATE, TRADE_END_DATE)
     # stocknames = ["000612.XSHE", "601808.XSHG"]
     # data = p.download_data_for_stocks(
     #     stocknames, trade_days[0], trade_days[-1], READ_DATA_FROM_LOCAL, path_of_data
