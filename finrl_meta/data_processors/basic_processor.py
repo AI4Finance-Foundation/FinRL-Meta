@@ -124,12 +124,11 @@ class BasicProcessor:
             -> pd.DataFrame:
         """calculate turbulence index based on dow 30"""
         # can add other market assets
-        df = self.dataframe.copy()
-        df_price_pivot = df.pivot(index="time", columns="tic", values="close")
+        df_price_pivot = self.dataframe.pivot(index="time", columns="tic", values="close")
         # use returns to calculate turbulence
         df_price_pivot = df_price_pivot.pct_change()
 
-        unique_date = df['time'].unique()
+        unique_date = self.dataframe['time'].unique()
         # start after a year
         start = time_period
         turbulence_index = [0] * start
