@@ -72,8 +72,7 @@ class AlpacaProcessor(BasicProcessor):
         self.dataframe = data_df
 
     def clean_data(self):
-        df = self.dataframe.copy()
-        tic_list = np.unique(df.tic.values)
+        tic_list = np.unique(self.dataframe.tic.values)
 
         trading_days = self.get_trading_days(start=self.start, end=self.end)
         #produce full time index
@@ -89,7 +88,7 @@ class AlpacaProcessor(BasicProcessor):
             tmp_df = pd.DataFrame(
                 columns=["open", "high", "low", "close", "volume"], index=times
             )
-            tic_df = df[df.tic == tic]
+            tic_df = self.dataframe[self.dataframe.tic == tic]
             for i in range(tic_df.shape[0]):
                 tmp_df.loc[tic_df.iloc[i]["time"]] = tic_df.iloc[i][
                     ["open", "high", "low", "close", "volume"]
