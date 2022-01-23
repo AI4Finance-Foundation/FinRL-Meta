@@ -37,8 +37,7 @@ class QuantConnectProcessor(BasicProcessor):
         qb = QuantBook()
         for stock in ticker_list:
             qb.AddEquity(stock)
-        history = qb.History(qb.Securities.Keys, start_date, end_date, time_interval)
-        self.dataframe = history
+        self.dataframe = qb.History(qb.Securities.Keys, start_date, end_date, time_interval)
 
 
     # def preprocess(df, stock_list):

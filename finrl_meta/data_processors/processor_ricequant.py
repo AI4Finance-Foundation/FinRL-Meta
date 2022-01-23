@@ -14,9 +14,8 @@ class RiceQuantProcessor(BasicProcessor):
             
     def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str):
         # download data by calling RiceQuant API
-        dataframe = ricequant.get_price(ticker_list, frequency = time_interval, 
+        self.dataframe = ricequant.get_price(ticker_list, frequency = time_interval,
                             start_date = start_date, end_date = end_date)
-        self.dataframe = dataframe
     
     # def clean_data(self, df) -> pd.DataFrame:
     #     ''' RiceQuant data is already cleaned, we only need to transform data format here.
