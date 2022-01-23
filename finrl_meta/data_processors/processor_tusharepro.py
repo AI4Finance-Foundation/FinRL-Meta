@@ -76,27 +76,26 @@ class TushareProProcessor(BasicProcessor):
         
         ts.set_token(self.token)
         
-        self.df=pd.DataFrame()
+        self.dataframe = pd.DataFrame()
         for i in tqdm(self.ticker_list,total=len(self.ticker_list)):
             df_temp=self.get_data(i)
-            self.df=self.df.append(df_temp)
+            self.dataframe = self.dataframe.append(df_temp)
             #print("{} ok".format(i))
             time.sleep(0.25)
         
-        self.df.columns=['tic','date','open','high','low','close','pre_close','change','pct_chg','volume','amount']
-        self.df = self.df.sort_values(by=['date','tic']).reset_index(drop=True)
+        self.dataframe.columns=['tic','date','open','high','low','close','pre_close','change','pct_chg','volume','amount']
+        self.dataframe = self.dataframe.sort_values(by=['date','tic']).reset_index(drop=True)
         
-        df=self.df[['tic', 'date' , 'open' , 'high' , 'low' , 'close' , 'volume' ]]
-        df["date"]= pd.to_datetime(df["date"],format="%Y%m%d")
-        df["day"] = df["date"].dt.dayofweek 
-        df["date"] = df.date.apply(lambda x: x.strftime("%Y-%m-%d"))
+        self.dataframe = self.dataframe[['tic', 'date' , 'open' , 'high' , 'low' , 'close' , 'volume' ]]
+        self.dataframe["date"] = pd.to_datetime(self.dataframe["date"],format="%Y%m%d")
+        self.dataframe["day"] = self.dataframe["date"].dt.dayofweek
+        self.dataframe["date"] = self.dataframe.date.apply(lambda x: x.strftime("%Y-%m-%d"))
         
-        df = df.dropna()
-        df = df.sort_values(by=['date','tic']).reset_index(drop=True)
+        self.dataframe = self.dataframe.dropna()
+        self.dataframe = self.dataframe.sort_values(by=['date','tic']).reset_index(drop=True)
 
-        print("Shape of DataFrame: ", df.shape)
+        print("Shape of DataFrame: ", self.dataframe.shape)
 
-        self.dataframe = df
 
     def clean_data(self):
         dfc=copy.deepcopy(self.dataframe)
