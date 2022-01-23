@@ -50,11 +50,12 @@ class TushareProProcessor(BasicProcessor):
             
     
     def get_data(self,id) -> pd.DataFrame: 
-        dfb = ts.pro_bar(ts_code=id, start_date=self.start,end_date=self.end,adj=self.adj)
         #df1 = ts.pro_bar(ts_code=id, start_date=self.start_date,end_date='20180101')
         #dfb=pd.concat([df, df1], ignore_index=True)
         #print(dfb.shape)
-        return dfb
+        return ts.pro_bar(
+            ts_code=id, start_date=self.start, end_date=self.end, adj=self.adj
+        )
 
     def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str):
         """Fetches data from tusharepro API
@@ -270,10 +271,7 @@ class ReturnPlotter:
             baseline_df = self.get_baseline(baseline_ticket)
             baseline_df = baseline_df[baseline_df.dt != "2020-06-26"]       # ours don't have date=="2020-06-26"
             baseline = baseline_df.close.tolist()
-            if baseline_ticket in tic2label.keys():
-                baseline_label = tic2label[baseline_ticket]
-            else:
-                baseline_label = baseline_ticket
+            baseline_label = tic2label.get(baseline_ticket, baseline_ticket)
         else:
             # 均等权重
             all_date = self.trade.date.unique().tolist()
@@ -290,13 +288,10 @@ class ReturnPlotter:
         days_per_tick = 60                                          # you should scale this variable accroding to the total trading days
         time = list(range(len(ours)))
         datetimes = self.df_account_value.date.tolist()
-        ticks = []
-        for t, tick in zip(time, datetimes):
-            if t % days_per_tick == 0:     ticks.append(tick)
-
+        ticks = [tick for t, tick in zip(time, datetimes) if t % days_per_tick == 0]
         plt.title("Cumulative Returns")
         plt.plot(time, ours, label="DDPG Agent", color="green")
-        plt.plot(time, baseline, label=baseline_label, color="grey")         
+        plt.plot(time, baseline, label=baseline_label, color="grey")
         plt.xticks([i*days_per_tick for i in range(len(ticks))], ticks, fontsize=7)
 
         plt.xlabel("Date")
@@ -308,7 +303,7 @@ class ReturnPlotter:
     def plot_all(self):
         baseline_label = "Equal-weight portfolio"
         tic2label = {"399300": "CSI 300 Index", "000016": "SSE 50 Index"}
-        
+
         # 399300
         baseline_ticket = "399300"
         baseline_df = self.get_baseline(baseline_ticket)
@@ -341,10 +336,7 @@ class ReturnPlotter:
         days_per_tick = 60                                          # you should scale this variable accroding to the total trading days
         time = list(range(len(ours)))
         datetimes = self.df_account_value.date.tolist()
-        ticks = []
-        for t, tick in zip(time, datetimes):
-            if t % days_per_tick == 0:     ticks.append(tick)
-
+        ticks = [tick for t, tick in zip(time, datetimes) if t % days_per_tick == 0]
         plt.title("Cumulative Returns")
         plt.plot(time, ours, label="DDPG Agent", color="darkorange")
         plt.plot(time, baseline_equal_weight, label=baseline_label, color="cornflowerblue")       # equal weight

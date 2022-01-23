@@ -97,7 +97,7 @@ class YahooFinanceProcessor(BasicProcessor):
         time_interval = self.time_interval
         #get ticker list
         tic_list = np.unique(df.tic.values)
-    
+
         #get complete time index
         trading_days = self.get_trading_days(start=self.start, end=self.end)
         if time_interval == '1D':
@@ -106,12 +106,12 @@ class YahooFinanceProcessor(BasicProcessor):
             times = []
             for day in trading_days:
                 current_time = pd.Timestamp(day+' 09:30:00').tz_localize(self.time_zone)
-                for i in range(390):
+                for _ in range(390):
                     times.append(current_time)
                     current_time += pd.Timedelta(minutes=1)
         else:
             raise ValueError('Data clean at given time interval is not supported for YahooFinance data.')
-            
+
         #fill NaN data
         new_df = pd.DataFrame()
         for tic in tic_list:
@@ -126,8 +126,8 @@ class YahooFinanceProcessor(BasicProcessor):
             for i in range(tic_df.shape[0]):
                 tmp_df.loc[tic_df.iloc[i]['time']] = tic_df.iloc[i]\
                     [['open','high','low','close','adj_close','volume']]
-            
-            #if close on start date is NaN, fill data with first valid close 
+
+            #if close on start date is NaN, fill data with first valid close
             #and set volume to 0.
             if str(tmp_df.iloc[0]['close']) == 'nan':
                 print('NaN data on start date, fill using first valid data.')
@@ -135,11 +135,11 @@ class YahooFinanceProcessor(BasicProcessor):
                     if str(tmp_df.iloc[i]['close']) != 'nan':
                         first_valid_close = tmp_df.iloc[i]['close']
                         first_valid_adjclose = tmp_df.iloc[i]['adj_close']
-                        
-                tmp_df.iloc[0] = [first_valid_close, first_valid_close, 
+
+                tmp_df.iloc[0] = [first_valid_close, first_valid_close,
                                   first_valid_close, first_valid_close,
                                   first_valid_adjclose, 0.0]
-                
+
             #fill NaN data with previous close and set volume to 0.
             for i in range(tmp_df.shape[0]):
                 if str(tmp_df.iloc[i]['close']) == 'nan':
@@ -149,20 +149,20 @@ class YahooFinanceProcessor(BasicProcessor):
                         raise ValueError
                     tmp_df.iloc[i] = [previous_close, previous_close, previous_close,
                                       previous_close, previous_adj_close, 0.0]
-            
+
             #merge single ticker data to new DataFrame
             tmp_df = tmp_df.astype(float)
             tmp_df['tic'] = tic
             new_df = new_df.append(tmp_df)
-        
+
             print (('Data clean for ') + tic + (' is finished.'))
-            
+
         #reset index and rename columns
         new_df = new_df.reset_index()
         new_df = new_df.rename(columns={'index':'time'})
-        
+
         print('Data clean all finished!')
-        
+
         self.dataframe = new_df
     
     # def add_technical_indicator(self, data, tech_indicator_list):
@@ -301,8 +301,4 @@ class YahooFinanceProcessor(BasicProcessor):
         nyse = tc.get_calendar('NYSE')
         df = nyse.sessions_in_range(pd.Timestamp(start,tz=pytz.UTC),
                                     pd.Timestamp(end,tz=pytz.UTC))
-        trading_days = []
-        for day in df:
-            trading_days.append(str(day)[:10])
-    
-        return trading_days
+        return [str(day)[:10] for day in df]

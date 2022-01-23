@@ -142,9 +142,7 @@ def test_joinquant():
     TIME_INTERVAL = '1D'
     TECHNICAL_INDICATOR = ['macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30', 'close_30_sma', 'close_60_sma']
 
-    kwargs = {}
-    kwargs['username'] = "xxx"  # should input your username
-    kwargs['password'] = "xxx"  # should input your password
+    kwargs = {'username': 'xxx', 'password': 'xxx'}
     p = DataProcessor(data_source='joinquant', **kwargs)
 
     # trade_days = p.get_trading_days(TRADE_START_DATE, TRADE_END_DATE)
@@ -164,7 +162,6 @@ def test_joinquant():
     price_array, tech_array, turbulence_array = p.run(ticker_list, TRADE_START_DATE, TRADE_END_DATE,
                                                       TIME_INTERVAL, TECHNICAL_INDICATOR,
                                                       if_vix=False, cache=True)
-    pass
 
 
 def test_binance():

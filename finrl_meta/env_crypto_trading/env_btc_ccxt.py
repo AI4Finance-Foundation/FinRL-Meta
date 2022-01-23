@@ -46,8 +46,14 @@ class BitcoinEnv:  # custom env
 
         normalized_tech = [self.day_tech[0]*2**-1, self.day_tech[1]*2**-15, self.day_tech[2]*2**-15,
                            self.day_tech[3]*2**-6, self.day_tech[4]*2**-6,self.day_tech[5]*2**-15, self.day_tech[6]*2**-15]
-        state = np.hstack((self.account * 2 ** -18, self.day_price * 2 ** -15, normalized_tech, self.stocks * 2 ** -4,)).astype(np.float32)
-        return state
+        return np.hstack(
+            (
+                self.account * 2 ** -18,
+                self.day_price * 2 ** -15,
+                normalized_tech,
+                self.stocks * 2 ** -4,
+            )
+        ).astype(np.float32)
 
     def step(self, action) -> (np.ndarray, float, bool, None):
         stock_action = action[0] 
@@ -97,9 +103,8 @@ class BitcoinEnv:  # custom env
         device = agent.device
 
         state = self.reset()
-        episode_returns = list()
-        episode_returns.append(1)
-        btc_returns = list()# the cumulative_return / initial_account
+        episode_returns = [1]
+        btc_returns = [] # the cumulative_return / initial_account
         with _torch.no_grad():
             for i in range(self.max_step):
                 if i == 0:
@@ -109,7 +114,7 @@ class BitcoinEnv:  # custom env
                 a_tensor = act(s_tensor)  # action_tanh = act.forward()
                 action = a_tensor.detach().cpu().numpy()[0]  # not need detach(), because with torch.no_grad() outside
                 state, reward, done, _ = self.step(action)
-                    
+
                 episode_returns.append(self.total_asset/1e6)
                 if done:
                     break

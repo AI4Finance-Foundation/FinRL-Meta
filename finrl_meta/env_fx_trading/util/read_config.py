@@ -12,13 +12,10 @@ class EnvConfig():
         with open(config_file) as j: 
             self.config = json.load(j)
 
-    def env_parameters(self,item=''):   
-        """environment variables 
-        """ 
-        if item:
-            return self.config["env"][item]
-        else:
-            return self.config["env"]
+    def env_parameters(self,item=''):
+        """environment variables
+        """
+        return self.config["env"][item] if item else self.config["env"]
         
     def symbol(self, asset="GBPUSD", item='') :
         """get trading pair (symbol) information

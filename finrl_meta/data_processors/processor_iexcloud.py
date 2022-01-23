@@ -14,7 +14,7 @@ class IEXCloudProcessor(BasicProcessor):
     def _get_base_url(self, mode: str) -> str:
 
         as1 = "mode must be sandbox or production."
-        assert mode in ["sandbox", "production"], as1
+        assert mode in {"sandbox", "production"}, as1
 
         if mode == "sandbox":
             return "https://sandbox.iexapis.com"
@@ -73,13 +73,12 @@ class IEXCloudProcessor(BasicProcessor):
                 url=end_point,
                 params=query_params,
             )
-            if response.status_code == 200:
-                temp = pd.DataFrame.from_dict(data=response.json())
-                temp["ticker"] = stock
-                price_data = price_data.append(temp)
-            else:
+            if response.status_code != 200:
                 raise requests.exceptions.RequestException(response.text)
 
+            temp = pd.DataFrame.from_dict(data=response.json())
+            temp["ticker"] = stock
+            price_data = price_data.append(temp)
         price_data = price_data[
             [
                 "date",
@@ -126,8 +125,6 @@ class IEXCloudProcessor(BasicProcessor):
             start_date=pd.Timestamp(start, tz=pytz.UTC),
             end_date=pd.Timestamp(end, tz=pytz.UTC),
         )
-        tradin_days = df.applymap(
+        return df.applymap(
             lambda x: x.strftime("%Y-%m-%d")
         ).market_open.to_list()
-
-        return tradin_days

@@ -39,10 +39,9 @@ class JoinquantProcessor(BasicProcessor):
         self.dataframe = df
 
     def data_fetch(self,stock_list, num, unit, end_dt):
-        df = jq.get_bars(security=stock_list, count=num, unit=unit, 
+        return jq.get_bars(security=stock_list, count=num, unit=unit,
                          fields=['date','open','high','low','close','volume'],
                          end_dt=end_dt)
-        return df
     def preprocess(df, stock_list):
         n = len(stock_list)
         N = df.shape[0]
@@ -91,10 +90,7 @@ class JoinquantProcessor(BasicProcessor):
             self, stocknames, start_day, end_day, read_data_from_local, path_of_data
     ):
         assert read_data_from_local in [0, 1]
-        if read_data_from_local == 1:
-            remove = 0
-        else:
-            remove = 1
+        remove = 0 if read_data_from_local == 1 else 1
         remove_all_files(remove, path_of_data)
         dfs = []
         if read_data_from_local == 1:

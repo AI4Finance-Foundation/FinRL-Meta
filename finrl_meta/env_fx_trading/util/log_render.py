@@ -16,7 +16,9 @@ def render_to_file(**kwargs):
                             {"ActionPrice":14}{"MaxDD":8}{"CloseTime":>20}{"ClosePrice":14} \
                             {"Reward":8}{"SL":8}{"PT":8}{"DateDuration":20}{"Status":8}\n'
 
-        _header_comma = f'{"Ticket,Symbol,Type,ActionTime,ActionPrice,MaxDD,CloseTime,ClosePrice,Reward,SL,PT,DateDuration,Status"}\n'
+        _header_comma = 'Ticket,Symbol,Type,ActionTime,ActionPrice,MaxDD,CloseTime,ClosePrice,Reward,SL,PT,DateDuration,Status\n'
+
+
 
     if tranaction_close_this_step:
         for _tr in tranaction_close_this_step:

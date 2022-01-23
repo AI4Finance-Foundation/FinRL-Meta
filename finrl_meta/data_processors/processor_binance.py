@@ -138,16 +138,15 @@ class BinanceProcessor(BasicProcessor):
 
     #helpers for manipulating tick level data (1s intervals)
     def download_daily_aggTrades(self, symbols, num_symbols, dates, start_date, end_date):
-        current = 0
         trading_type="spot"
         date_range = start_date + " " + end_date
         start_date = convert_to_date_object(start_date)
         end_date = convert_to_date_object(end_date)
-        
+
         print("Found {} symbols".format(num_symbols))
 
         map = {}
-        for symbol in symbols:
+        for current, symbol in enumerate(symbols):
             map[symbol] = []
             print("[{}/{}] - start download daily {} aggTrades ".format(current+1, num_symbols, symbol))
             for date in dates:
@@ -157,7 +156,6 @@ class BinanceProcessor(BasicProcessor):
                     file_name = "{}-aggTrades-{}.zip".format(symbol.upper(), date)
                     fhandle = download_n_unzip_file(path, file_name, date_range)
                     map[symbol] += fhandle
-            current += 1
         return map
 
     def fetch_aggTrades(self, startDate: str, endDate:str, tickers: List[str]):
@@ -232,5 +230,4 @@ class BinanceProcessor(BasicProcessor):
     def fetch_n_combine(self, startDate, endDate, tickers):
         #return combine_raw(fetchAggTrades(startDate, endDate, tickers))
         mapping = self.fetch_aggTrades(startDate, endDate, tickers)
-        combined_df = self.combine_raw(mapping)
-        return combined_df
+        return self.combine_raw(mapping)

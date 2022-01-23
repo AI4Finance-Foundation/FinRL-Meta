@@ -80,7 +80,7 @@ class AlpacaProcessor(BasicProcessor):
         times = []
         for day in trading_days:
             current_time = pd.Timestamp(day+' 09:30:00').tz_localize(self.time_zone)
-            for i in range(390):
+            for _ in range(390):
                 times.append(current_time)
                 current_time += pd.Timedelta(minutes=1)
         #create a new dataframe with full time series
@@ -94,10 +94,10 @@ class AlpacaProcessor(BasicProcessor):
                 tmp_df.loc[tic_df.iloc[i]["time"]] = tic_df.iloc[i][
                     ["open", "high", "low", "close", "volume"]
                 ]
-            
+
             #if the close price of the first row is NaN
             if str(tmp_df.iloc[0]["close"]) == "nan":
-               print('The price of the first row for ticker ', tic, ' is NaN. ', 
+               print('The price of the first row for ticker ', tic, ' is NaN. ',
                      'It will filled with the first valid price.')
                for i in range(tmp_df.shape[0]):
                    if str(tmp_df.iloc[i]["close"]) != "nan":
@@ -112,7 +112,7 @@ class AlpacaProcessor(BasicProcessor):
             if str(tmp_df.iloc[0]["close"]) == "nan":
                 print('Missing data for ticker: ', tic, ' . The prices are all NaN. Fill with 0.')
                 tmp_df.iloc[0] = [0.0, 0.0, 0.0, 0.0, 0.0,]
-                      
+
             #forward filling row by row
             for i in range(tmp_df.shape[0]):
                 if str(tmp_df.iloc[i]["close"]) == "nan":
@@ -276,11 +276,7 @@ class AlpacaProcessor(BasicProcessor):
         df = nyse.sessions_in_range(
             pd.Timestamp(start, tz=pytz.UTC), pd.Timestamp(end, tz=pytz.UTC)
         )
-        trading_days = []
-        for day in df:
-            trading_days.append(str(day)[:10])
-
-        return trading_days
+        return [str(day)[:10] for day in df]
 
     def fetch_latest_data(
         self, ticker_list, time_interval, tech_indicator_list, limit=100

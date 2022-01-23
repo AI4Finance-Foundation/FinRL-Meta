@@ -17,7 +17,7 @@ def generate_table(left_col, right_col, table_title):
     
     # Do not use column headers
     col_headers = None
-    
+
     # Generate the right table
     if right_col:
         # Add padding
@@ -26,7 +26,7 @@ def generate_table(left_col, right_col, table_title):
         elif len(right_col) > len(left_col):
             left_col += [(' ', ' ')] * (len(right_col) - len(left_col))
         right_col = [('%-21s' % ('  '+k), v) for k,v in right_col]
-        
+
         # Generate the right table
         gen_stubs_right, gen_data_right = zip_longest(*right_col)
         gen_table_right = SimpleTable(gen_data_right,
@@ -38,20 +38,18 @@ def generate_table(left_col, right_col, table_title):
         # If there is no right table set the right table to empty
         gen_table_right = []
 
-    # Generate the left table  
-    gen_stubs_left, gen_data_left = zip_longest(*left_col) 
+    # Generate the left table
+    gen_stubs_left, gen_data_left = zip_longest(*left_col)
     gen_table_left = SimpleTable(gen_data_left,
                                  col_headers,
                                  gen_stubs_left,
                                  title = table_title,
                                  txt_fmt = fmt_2cols)
 
-    
+
     # Merge the left and right tables to make a single table
     gen_table_left.extend_right(gen_table_right)
-    general_table = gen_table_left
-
-    return general_table
+    return gen_table_left
 
 
 def get_env_param():
@@ -156,9 +154,7 @@ def get_optimal_vals(lq_time = 60, nm_trades = 60, tr_risk = 1e-6, title = ''):
                  ('Standard Deviation of Shortfall:', ['${:,.2f}'.format(np.sqrt(V))])]
 
     # Generate the table with the AC optimal values
-    val_table = generate_table(left_col, right_col, title)
-
-    return val_table
+    return generate_table(left_col, right_col, title)
 
 
 def get_min_param():

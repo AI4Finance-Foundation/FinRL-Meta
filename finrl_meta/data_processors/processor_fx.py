@@ -59,8 +59,7 @@ def split_timeserious(df, key_ts='dt', freq='W', symbol=''):
     """
     
     freq_name = {'H':'hourly','D':'daily','W':'weekly','M':'monthly','Y':'Yearly'}
-    count = 0
-    for n, g in df.groupby(pd.Grouper(level=key_ts,freq=freq)):
+    for count, (n, g) in enumerate(df.groupby(pd.Grouper(level=key_ts,freq=freq))):
         p =f'./data/split/{symbol}/{freq_name[freq]}'
         os.makedirs(p, exist_ok=True)
         #fname = f'{symbol}_{n:%Y%m%d}_{freq}_{count}.csv'
@@ -70,7 +69,6 @@ def split_timeserious(df, key_ts='dt', freq='W', symbol=''):
         g.reset_index(drop=True, inplace=True)
         g.drop(columns =['dt'], inplace=True)
         g.to_csv(fn)
-        count += 1
     return 
 """
 python ./neo_finrl/data_processors/processor_fx.py GBPUSD W ./data/raw/GBPUSD_raw.csv

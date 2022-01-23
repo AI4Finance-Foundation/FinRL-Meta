@@ -233,9 +233,11 @@ class tgym(gym.Env):
                         self.current_draw_downs[i] = int(
                             (self._l - tr["ActionPrice"]) * _point)
                         _max_draw_down += self.current_draw_downs[i]
-                        if self.current_draw_downs[i] < 0:
-                            if tr["MaxDD"] > self.current_draw_downs[i]:
-                                tr["MaxDD"] = self.current_draw_downs[i]
+                        if (
+                            self.current_draw_downs[i] < 0
+                            and tr["MaxDD"] > self.current_draw_downs[i]
+                        ):
+                            tr["MaxDD"] = self.current_draw_downs[i]
 
                 elif tr["Type"] == 1:  # sell
                     #stop loss trigger
@@ -257,9 +259,11 @@ class tgym(gym.Env):
                         self.current_draw_downs[i] = int(
                             (tr["ActionPrice"] - self._h) * _point)
                         _max_draw_down += self.current_draw_downs[i]
-                        if self.current_draw_downs[i] < 0:
-                            if tr["MaxDD"] > self.current_draw_downs[i]:
-                                tr["MaxDD"] = self.current_draw_downs[i]
+                        if (
+                            self.current_draw_downs[i] < 0
+                            and tr["MaxDD"] > self.current_draw_downs[i]
+                        ):
+                            tr["MaxDD"] = self.current_draw_downs[i]
 
                 if _max_draw_down > self.max_draw_downs[i]:
                     self.max_draw_downs[i] = _max_draw_down
@@ -274,20 +278,18 @@ class tgym(gym.Env):
                     tr["Status"] = 3
                     tr["CloseStep"]=self.current_step 
                     self.transaction_history.append(tr)
-                else:
-                    if (tr["ActionPrice"] >= self._l and _action == 0) \
-                        or (tr["ActionPrice"] <= self._h and _action == 1):
-                        tr["ActionStep"]=self.current_step                             
-                        self.current_holding[i] += 1
-                        self.balance -= self.cf.symbol(self.assets[i],"transaction_fee")
-                        self.transaction_limit_order.remove(tr)
-                        self.transaction_live.append(tr)
-                        self.tranaction_open_this_step.append(tr)
-                    elif tr["LimitStep"] + self.cf.symbol(self.assets[i],"limit_order_expiration") > self.current_step:
-                        tr["CloseStep"]=self.current_step 
-                        tr["Status"] = 4
-                        self.transaction_limit_order.remove(tr)
-                        self.transaction_history.append(tr)
+                elif (tr["ActionPrice"] >= self._l and _action == 0) or (tr["ActionPrice"] <= self._h and _action == 1):
+                    tr["ActionStep"] = self.current_step
+                    self.current_holding[i] += 1
+                    self.balance -= self.cf.symbol(self.assets[i], "transaction_fee")
+                    self.transaction_limit_order.remove(tr)
+                    self.transaction_live.append(tr)
+                    self.tranaction_open_this_step.append(tr)
+                elif tr["LimitStep"] + self.cf.symbol(self.assets[i], "limit_order_expiration") > self.current_step:
+                    tr["CloseStep"] = self.current_step
+                    tr["Status"] = 4
+                    self.transaction_limit_order.remove(tr)
+                    self.transaction_history.append(tr)
                         
 
     def _manage_tranaction(self, tr, _p, close_price, status=1):
@@ -330,20 +332,19 @@ class tgym(gym.Env):
     def get_observation(self, _step, _iter=0, col=None):
         if (col is None):
             return self.cached_data[_step]
-        else:
-            if col == '_time':
-                return self.cached_time_serial[_step][0]
-            elif col == '_day':
-                return self.cached_time_serial[_step][1]
+        if col == '_day':
+            return self.cached_time_serial[_step][1]
 
-            col_pos = -1
-            for i, _symbol in enumerate(self.observation_list):
-                if _symbol == col:
-                    col_pos = i
-                    break
-            assert col_pos >= 0
-            return self.cached_data[_step][_iter * len(self.observation_list) +
-                                           col_pos]
+        elif col == '_time':
+            return self.cached_time_serial[_step][0]
+        col_pos = -1
+        for i, _symbol in enumerate(self.observation_list):
+            if _symbol == col:
+                col_pos = i
+                break
+        assert col_pos >= 0
+        return self.cached_data[_step][_iter * len(self.observation_list) +
+                                       col_pos]
 
     def get_observation_vector(self, _dt, cols=None):
         cols = self.observation_list
@@ -395,9 +396,7 @@ class tgym(gym.Env):
     def render(self, mode='human', title=None, **kwargs):
         # Render the environment to the screen
         if mode in ('human', 'file'):
-            printout = False
-            if mode == 'human':
-                printout = True
+            printout = mode == 'human'
             pm = {
                 "log_header": self.log_header,
                 "log_filename": self.log_filename,

@@ -287,14 +287,12 @@ class MarketEnvironment():
    
     def permanentImpact(self, sharesToSell):
         # Calculate the permanent impact according to equations (6) and (1) of the AC paper
-        pi = self.gamma * sharesToSell
-        return pi
+        return self.gamma * sharesToSell
 
     
     def temporaryImpact(self, sharesToSell):
         # Calculate the temporary impact according to equation (7) of the AC paper
-        ti = (self.epsilon * np.sign(sharesToSell)) + ((self.eta / self.tau) * sharesToSell)
-        return ti
+        return (self.epsilon * np.sign(sharesToSell)) + ((self.eta / self.tau) * sharesToSell)
     
     def get_expected_shortfall(self, sharesToSell,totalSSSQ):
         # Calculate the expected shortfall according to equation (8) of the AC paper

@@ -7,7 +7,7 @@ from finrl_meta.data_processors.basic_processor import BasicProcessor
 class RiceQuantProcessor(BasicProcessor):
     def __init__(self, data_source: str, **kwargs):
         BasicProcessor.__init__(self, data_source, **kwargs)
-        if kwargs['username']== None or kwargs['password'] == None:
+        if kwargs['username'] is None or kwargs['password'] is None:
             ricequant.init()   #if the lisence is already set, you can init without username and password
         else:
             ricequant.init(kwargs['username'], kwargs['password']) #init with username and password

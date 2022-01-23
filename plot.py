@@ -25,8 +25,7 @@ def convert_daily_return_to_pyfolio_ts(df):
     strategy_ret.set_index("date", drop=False, inplace=True)
     strategy_ret.index = strategy_ret.index.tz_localize("UTC")
     del strategy_ret["date"]
-    ts = pd.Series(strategy_ret["daily_return"].values, index=strategy_ret.index)
-    return ts
+    return pd.Series(strategy_ret["daily_return"].values, index=strategy_ret.index)
 
 
 def backtest_stats(account_value, value_col_name="account_value"):
@@ -69,10 +68,9 @@ def backtest_plot(
 
 
 def get_baseline(ticker, start, end):
-    dji = YahooDownloader(
+    return YahooDownloader(
         start_date=start, end_date=end, ticker_list=[ticker]
     ).fetch_data()
-    return dji
 
 
 def trx_plot(df_trade, df_actions, ticker_list):
@@ -84,8 +82,8 @@ def trx_plot(df_trade, df_actions, ticker_list):
     for i in range(df_trx.shape[1]):
         df_trx_temp = df_trx.iloc[:, i]
         df_trx_temp_sign = np.sign(df_trx_temp)
-        buying_signal = df_trx_temp_sign.apply(lambda x: True if x > 0 else False)
-        selling_signal = df_trx_temp_sign.apply(lambda x: True if x < 0 else False)
+        buying_signal = df_trx_temp_sign.apply(lambda x: x > 0)
+        selling_signal = df_trx_temp_sign.apply(lambda x: x < 0)
 
         tic_plot = df_trade[
             (df_trade["tic"] == df_trx_temp.name)

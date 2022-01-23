@@ -14,61 +14,11 @@ class CCXTProcessor(BasicProcessor):
         BasicProcessor.__init__(self, data_source, **kwargs)
         self.binance = ccxt.binance()
         
-    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str):
-        def min_ohlcv(dt, pair, limit):
+    def min_ohlcv(dt, pair, limit):
             since = calendar.timegm(dt.utctimetuple())*1000
-            ohlcv = self.binance.fetch_ohlcv(symbol=pair, timeframe='1m', since=since, limit=limit)
-            return ohlcv
-    
-        def ohlcv(dt, pair, period='1d'):
-            ohlcv = []
-            limit = 1000
-            if period == '1Min':
-                limit = 720
-            elif period == '1D':
-                limit = 1
-            elif period == '1H':
-                limit = 24
-            elif period == '5Min':
-                limit = 288
-            for i in dt:
-                start_dt = i
-                since = calendar.timegm(start_dt.utctimetuple())*1000
-                if period == '1Min':
-                    ohlcv.extend(min_ohlcv(start_dt, pair, limit))
-                else:
-                    ohlcv.extend(self.binance.fetch_ohlcv(symbol=pair, timeframe=period, since=since, limit=limit))
-            df = pd.DataFrame(ohlcv, columns = ['time', 'open', 'high', 'low', 'close', 'volume'])
-            df['time'] = [datetime.fromtimestamp(float(time)/1000) for time in df['time']]
-            df['open'] = df['open'].astype(np.float64)
-            df['high'] = df['high'].astype(np.float64)
-            df['low'] = df['low'].astype(np.float64)
-            df['close'] = df['close'].astype(np.float64)
-            df['volume'] = df['volume'].astype(np.float64)
-            return df
-        
-        
-        crypto_column = pd.MultiIndex.from_product([ticker_list,['open','high','low','close','volume']])
-        first_time = True
-        for ticker in ticker_list:
-            start_dt = datetime.strptime(start_date, "%Y%m%d %H:%M:%S")
-            end_dt = datetime.strptime(end_date, "%Y%m%d %H:%M:%S")
-            start_timestamp = calendar.timegm(start_dt.utctimetuple())
-            end_timestamp = calendar.timegm(end_dt.utctimetuple())
-            if time_interval == '1Min':
-                date_list = [datetime.utcfromtimestamp(float(time)) \
-                             for time in range(start_timestamp, end_timestamp, 60*720)]
-            else:
-                date_list = [datetime.utcfromtimestamp(float(time)) \
-                             for time in range(start_timestamp, end_timestamp, 60*1440)]
-            df = ohlcv(date_list, ticker, time_interval)
-            if first_time:
-                dataset = pd.DataFrame(columns=crypto_column,index=df['time'].values)
-                first_time = False
-            temp_col = pd.MultiIndex.from_product([[ticker],['open','high','low','close','volume']])
-            dataset[temp_col] = df[['open','high','low','close','volume']].values
-        print('Actual end time: ' + str(df['time'].values[-1]))
-        self.dataframe = dataset
+            return self.binance.fetch_ohlcv(
+                symbol=pair, timeframe='1m', since=since, limit=limit
+            )
     
     # def add_technical_indicators(self, df, pair_list, tech_indicator_list = [
     #     'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',

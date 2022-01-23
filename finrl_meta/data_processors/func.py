@@ -34,13 +34,11 @@ def calc_time_zone(ticker_list: List[str], time_zone_selfdefined: str, use_time_
 
 # e.g., '20210911' -> '2021-09-11'
 def add_hyphen_for_date(d: str) -> str:
-    res = d[:4] + '-' + d[4:6] + '-' + d[6:]
-    return res
+    return d[:4] + '-' + d[4:6] + '-' + d[6:]
 
 # e.g., '2021-09-11' -> '20210911'
 def remove_hyphen_for_date(d: str) -> str:
-    res = d[:4] + d[5:7] + '-' + d[8:]
-    return res
+    return d[:4] + d[5:7] + '-' + d[8:]
 
 
 # filename: str
@@ -132,7 +130,7 @@ def download_n_unzip_file(base_path, file_name, date_range=None):
     if os.path.exists(csv_save_path): 
         print("\nfile already exists! {}".format(csv_save_path))
         return [csv_save_path]
-  
+
     # make the "cache" directory (only)
     if not os.path.exists(raw_cache_dir):
         Path(raw_cache_dir).mkdir(parents=True, exist_ok=True)
@@ -149,41 +147,39 @@ def download_n_unzip_file(base_path, file_name, date_range=None):
             dl_progress = 0
             print("\nFile Download: {}".format(zip_save_path))
             while True:
-                buf = dl_file.read(blocksize)   
+                buf = dl_file.read(blocksize)
                 if not buf:
                     break
                 out_file.write(buf)
                 #visuals
                 #dl_progress += len(buf)
                 #done = int(50 * dl_progress / length)
-                #sys.stdout.write("\r[%s%s]" % ('#' * done, '.' * (50-done)) )    
+                #sys.stdout.write("\r[%s%s]" % ('#' * done, '.' * (50-done)) )
                 #sys.stdout.flush()
-    
+
         #unzip and delete zip
         file = zipfile.ZipFile(zip_save_path)
         with zipfile.ZipFile(zip_save_path) as zip:
             #guaranteed just 1 csv
-            csvpath = zip.extract(zip.namelist()[0], raw_cache_dir) 
+            csvpath = zip.extract(zip.namelist()[0], raw_cache_dir)
             fhandles.append(csvpath)
         os.remove(zip_save_path)
         return fhandles
 
     except urllib.error.HTTPError:
         print("\nFile not found: {}".format(download_url))
-        pass
 
 def convert_to_date_object(d):
     year, month, day = [int(x) for x in d.split('-')]
-    date_obj = date(year, month, day)
-    return date_obj
+    return date(year, month, day)
 
 def get_path(trading_type, market_data_type, time_period, symbol, interval=None):
     trading_type_path = 'data/spot'
     #currently just supporting spot
     if trading_type != 'spot':
         trading_type_path = f'data/futures/{trading_type}'
-    if interval is not None:
-        path = f'{trading_type_path}/{time_period}/{market_data_type}/{symbol.upper()}/{interval}/'
-    else:
-        path = f'{trading_type_path}/{time_period}/{market_data_type}/{symbol.upper()}/'
-    return path
+    return (
+        f'{trading_type_path}/{time_period}/{market_data_type}/{symbol.upper()}/{interval}/'
+        if interval is not None
+        else f'{trading_type_path}/{time_period}/{market_data_type}/{symbol.upper()}/'
+    )

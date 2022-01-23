@@ -10,7 +10,19 @@ TIME_INTERVAL = '1D'
 class BasicProcessor:
     def __init__(self, data_source: str, **kwargs):
 
-        assert data_source in ["alpaca", "ccxt", "binance", "iexcloud", "joinquant", "quantconnect", "ricequant", "wrds", "yahoofinance", "tusharepro", ], "Data source input is NOT supported yet."
+        assert data_source in {
+            "alpaca",
+            "ccxt",
+            "binance",
+            "iexcloud",
+            "joinquant",
+            "quantconnect",
+            "ricequant",
+            "wrds",
+            "yahoofinance",
+            "tusharepro",
+        }, "Data source input is NOT supported yet."
+
         self.data_source: str = data_source
         self.time_interval: str = TIME_INTERVAL
         self.time_zone: str = ""
@@ -48,7 +60,6 @@ class BasicProcessor:
         if self.data_source in ["binance", "ccxt", "quantconnect", "ricequant", "tusharepro"]:
             print("Calculate get_trading_days not supported for {} yet.".format(self.data_source))
             return None
-        pass
 
     # use_stockstats_or_talib: 0 (stockstats, default), or 1 (use talib). Users can choose the method.
     def add_technical_indicator(self, tech_indicator_list: List[str], use_stockstats_or_talib: int=0):
@@ -70,7 +81,7 @@ class BasicProcessor:
             df = df.drop(columns=["level_1"])
         if "level_0" in df.columns and "tic" not in df.columns:
             df = df.rename(columns={"level_0": "tic"})
-        assert use_stockstats_or_talib in [0, 1]
+        assert use_stockstats_or_talib in {0, 1}
         if use_stockstats_or_talib == 0:  # use stockstats
             stock = stockstats.StockDataFrame.retype(df.copy())
             unique_ticker = stock.tic.unique()
@@ -130,8 +141,7 @@ class BasicProcessor:
             df = df.sort_values(["time", "tic"]).reset_index(drop=True)
             self.dataframe = df
 
-    def calculate_turbulence(self, time_period: int = 252) \
-            -> pd.DataFrame:
+    def calculate_turbulence(self, time_period: int = 252) -> pd.DataFrame:
         """calculate turbulence index based on dow 30"""
         # can add other market assets
         df = self.dataframe.copy()
@@ -158,9 +168,9 @@ class BasicProcessor:
                                   ].dropna(axis=1)
 
             cov_temp = filtered_hist_price.cov()
-            current_temp = current_price[[x for x in filtered_hist_price]] - np.mean(
+            current_temp = (current_price[list(filtered_hist_price)] - np.mean(
                 filtered_hist_price, axis=0
-            )
+            ))
             # cov_temp = hist_price.cov()
             # current_temp=(current_price - np.mean(hist_price,axis=0))
 
@@ -169,11 +179,8 @@ class BasicProcessor:
             )
             if temp > 0:
                 count += 1
-                if count > 2:
-                    turbulence_temp = temp[0][0]
-                else:
-                    # avoid large outlier because of the calculation just begins
-                    turbulence_temp = 0
+                # avoid large outlier because of the calculation just begins: else turbulence_temp = 0
+                turbulence_temp = temp[0][0] if count > 2 else 0
             else:
                 turbulence_temp = 0
             turbulence_index.append(turbulence_temp)
