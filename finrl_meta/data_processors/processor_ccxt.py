@@ -11,26 +11,26 @@ from finrl_meta.data_processors.basic_processor import BasicProcessor
 
 
 class CCXTProcessor(BasicProcessor):
-    def __init__(self, data_source: str, **kwargs):
-        BasicProcessor.__init__(self, data_source, **kwargs)
+    def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
+        BasicProcessor.__init__(self, data_source, start_date, end_date, time_interval, **kwargs)
         self.binance = ccxt.binance()
 
-    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str):
+    def download_data(self, ticker_list: List[str]):
 
         crypto_column = pd.MultiIndex.from_product([ticker_list, ['open', 'high', 'low', 'close', 'volume']])
         first_time = True
         for ticker in ticker_list:
-            start_dt = datetime.strptime(start_date, "%Y%m%d %H:%M:%S")
-            end_dt = datetime.strptime(end_date, "%Y%m%d %H:%M:%S")
+            start_dt = datetime.strptime(self.start_date, "%Y%m%d %H:%M:%S")
+            end_dt = datetime.strptime(self.end_date, "%Y%m%d %H:%M:%S")
             start_timestamp = calendar.timegm(start_dt.utctimetuple())
             end_timestamp = calendar.timegm(end_dt.utctimetuple())
-            if time_interval == '1Min':
+            if self.time_interval == '1Min':
                 date_list = [datetime.utcfromtimestamp(float(time)) \
                              for time in range(start_timestamp, end_timestamp, 60 * 720)]
             else:
                 date_list = [datetime.utcfromtimestamp(float(time)) \
                              for time in range(start_timestamp, end_timestamp, 60 * 1440)]
-            df = self.ohlcv(date_list, ticker, time_interval)
+            df = self.ohlcv(date_list, ticker, self.time_interval)
             if first_time:
                 dataset = pd.DataFrame(columns=crypto_column, index=df['time'].values)
                 first_time = False

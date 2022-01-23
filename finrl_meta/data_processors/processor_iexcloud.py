@@ -22,16 +22,12 @@ class IEXCloudProcessor(BasicProcessor):
 
         return "https://cloud.iexapis.com"
 
-    def __init__(
-            self,
-            data_source: str = None,
-            **kwargs,
-    ):
-        BasicProcessor.__init__(self, data_source, **kwargs)
+    def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
+        BasicProcessor.__init__(self, data_source, start_date, end_date, time_interval, **kwargs)
         self.base_url = self._get_base_url(mode=kwargs['mode'])
         self.token = kwargs['token'] or os.environ.get("IEX_TOKEN")
 
-    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str):
+    def download_data(self, ticker_list: List[str]):
         """Returns end of day historical data for up to 15 years.
 
         Args:
@@ -53,7 +49,7 @@ class IEXCloudProcessor(BasicProcessor):
                                         end_date='2021-12-12',
                                         time_interval = '1D')
         """
-        assert time_interval == '1D'  # one day
+        assert self.time_interval == '1D'  # one day
 
         price_data = pd.DataFrame()
 
@@ -61,9 +57,9 @@ class IEXCloudProcessor(BasicProcessor):
             "token": self.token,
         }
 
-        if start_date and end_date:
-            query_params["from"] = start_date
-            query_params["to"] = end_date
+        if self.start_date and self.end_date:
+            query_params["from"] = self.start_date
+            query_params["to"] = self.end_date
 
         for stock in ticker_list:
             end_point = (

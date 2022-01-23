@@ -11,25 +11,25 @@ from .func import download_n_unzip_file, convert_to_date_object, get_path
 
 
 class BinanceProcessor(BasicProcessor):
-    def __init__(self, data_source: str, **kwargs):
-        BasicProcessor.__init__(self, data_source, **kwargs)
+    def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
+        BasicProcessor.__init__(self, data_source, start_date, end_date, time_interval, **kwargs)
         self.url = "https://api.binance.com/api/v3/klines"
 
     # main functions
-    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str):
-        startTime = dt.datetime.strptime(start_date, '%Y-%m-%d')
-        endTime = dt.datetime.strptime(end_date, '%Y-%m-%d')
+    def download_data(self, ticker_list: List[str]):
+        startTime = dt.datetime.strptime(self.start_date, '%Y-%m-%d')
+        endTime = dt.datetime.strptime(self.end_date, '%Y-%m-%d')
 
         self.start_time = self.stringify_dates(startTime)
         self.end_time = self.stringify_dates(endTime)
-        self.interval = time_interval
+        self.interval = self.time_interval
         self.limit = 1440
 
         # 1s for now, will add support for variable time and variable tick soon
-        if time_interval == "1s":
+        if self.time_interval == "1s":
             # as per https://binance-docs.github.io/apidocs/spot/en/#compressed-aggregate-trades-list
             self.limit = 1000
-            final_df = self.fetch_n_combine(start_date, end_date, ticker_list)
+            final_df = self.fetch_n_combine(self.start_date, self.end_date, ticker_list)
         else:
             final_df = pd.DataFrame()
             for i in ticker_list:

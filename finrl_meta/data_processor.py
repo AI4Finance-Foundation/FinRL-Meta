@@ -11,64 +11,64 @@ import os
 import pickle
 
 class DataProcessor():
-    def __init__(self, data_source, **kwargs):
+    def __init__(self, data_source, start_date, end_date, time_interval, **kwargs):
         self.data_source = data_source
+        self.start_date = start_date
+        self.end_date = end_date
+        self.time_interval = time_interval
         self.dataframe = pd.DataFrame()
         if self.data_source == 'alpaca':
             try:
                 # users should input values: kwargs['API_KEY'], kwargs['API_SECRET'], kwargs['APCA_API_BASE_URL'], kwargs['API']
-                self.processor = Alpaca(data_source, **kwargs)
+                self.processor = Alpaca(data_source, start_date, end_date, time_interval, **kwargs)
                 print('Alpaca successfully connected')
             except:
                 raise ValueError('Please input correct account info for alpaca!')
         elif self.data_source == "joinquant":
             try:
                 # users should input values: kwargs['username'], kwargs['password']
-                self.processor = JoinquantProcessor(data_source, **kwargs)
+                self.processor = JoinquantProcessor(data_source, start_date, end_date, time_interval, **kwargs)
                 print('Joinquant successfully connected')
             except:
                 raise ValueError('Please input correct account info for joinquant!')
         elif self.data_source == 'ricequant':
             try:
                 # users should input values: kwargs['username'], kwargs['password']
-                self.processor = RiceQuant(data_source, **kwargs)
+                self.processor = RiceQuant(data_source, start_date, end_date, time_interval, **kwargs)
                 print('Ricequant successfully connected')
             except:
                 raise ValueError('Please input correct account info for ricequant!')
         elif self.data_source == 'wrds':
             try:
                 # users should input values: kwargs['if_offline']
-                self.processor = Wrds(data_source, **kwargs)
+                self.processor = Wrds(data_source, start_date, end_date, time_interval, **kwargs)
                 print('Wrds successfully connected')
             except:
                 raise ValueError('Please input correct account info for wrds!')
         elif self.data_source == 'yahoofinance':
             try:
-                self.processor = YahooFinance(data_source, **kwargs)
+                self.processor = YahooFinance(data_source, start_date, end_date, time_interval, **kwargs)
                 print('Yahoofinance successfully connected')
             except:
                 raise ValueError('Please input correct account info for yahoofinance!')
         elif self.data_source == 'binance':
             try:
-                self.processor = Binance(data_source, **kwargs)
+                self.processor = Binance(data_source, start_date, end_date, time_interval, **kwargs)
                 print('Binance successfully connected')
             except:
                 raise ValueError('Please input correct account info for binance!')
         elif self.data_source == "tusharepro":
             try:
                 # users should input values: kwargs['token'], choose to input values: kwargs['adj']
-                self.processor = Tusharepro(data_source, **kwargs)
+                self.processor = Tusharepro(data_source, start_date, end_date, time_interval, **kwargs)
                 print('tusharepro successfully connected')
             except:
                 raise ValueError('Please input correct account info for tusharepro!')
         else:
             raise ValueError('Data source input is NOT supported yet.')
 
-    def download_data(self, ticker_list, start_date, end_date, time_interval):
-        self.processor.download_data(ticker_list=ticker_list,
-                                          start_date=start_date,
-                                          end_date=end_date,
-                                          time_interval=time_interval)
+    def download_data(self, ticker_list):
+        self.processor.download_data(ticker_list=ticker_list)
         self.dataframe = self.processor.dataframe
 
 
@@ -98,13 +98,12 @@ class DataProcessor():
 
         return price_array, tech_array, turbulence_array
 
-    def run(self, ticker_list, start_date, end_date, time_interval,
-            technical_indicator_list,  if_vix, cache=False, use_stockstats_or_talib: int = 0):
+    def run(self, ticker_list, technical_indicator_list, if_vix, cache=False, use_stockstats_or_talib: int = 0):
 
-        if time_interval == "1s" and self.data_source != "binance":
+        if self.time_interval == "1s" and self.data_source != "binance":
             raise ValueError("Currently 1s interval data is only supported with 'binance' as data source")
 
-        cache_filename = '_'.join(ticker_list + [self.data_source, start_date, end_date, time_interval]) + '.pickle'
+        cache_filename = '_'.join(ticker_list + [self.data_source, self.start_date, self.end_date, self.time_interval]) + '.pickle'
         cache_dir = './cache'
         cache_path = os.path.join(cache_dir, cache_filename)
 
@@ -114,7 +113,7 @@ class DataProcessor():
             with open(cache_path, 'rb') as handle:
                 self.processor.dataframe = pickle.load(handle)
         else:
-            self.download_data(ticker_list, start_date, end_date, time_interval)
+            self.download_data(ticker_list)
             self.clean_data()
             if cache:
                 if not os.path.exists(cache_dir):
@@ -145,7 +144,7 @@ def test_joinquant():
     TECHNICAL_INDICATOR = ['macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30', 'close_30_sma', 'close_60_sma']
 
     kwargs = {'username': 'xxx', 'password': 'xxx'}
-    p = DataProcessor(data_source='joinquant', **kwargs)
+    p = DataProcessor(data_source='joinquant', start_date=TRADE_START_DATE, end_date=TRADE_END_DATE, time_interval=TIME_INTERVAL, **kwargs)
 
     # trade_days = p.get_trading_days(TRADE_START_DATE, TRADE_END_DATE)
     # stocknames = ["000612.XSHE", "601808.XSHG"]
@@ -154,31 +153,48 @@ def test_joinquant():
     # )
     ticker_list = ["000612.XSHE", "601808.XSHG"]
 
-    p.download_data(ticker_list=ticker_list, start_date=TRADE_START_DATE, end_date=TRADE_END_DATE, time_interval=TIME_INTERVAL)
+    p.download_data(ticker_list=ticker_list)
 
     p.clean_data()
     p.add_turbulence()
     p.add_technical_indicator(TECHNICAL_INDICATOR)
     p.add_vix()
 
-    price_array, tech_array, turbulence_array = p.run(ticker_list, TRADE_START_DATE, TRADE_END_DATE,
-                                                      TIME_INTERVAL, TECHNICAL_INDICATOR,
-                                                      if_vix=False, cache=True)
+    price_array, tech_array, turbulence_array = p.run(ticker_list, TECHNICAL_INDICATOR, if_vix=False, cache=True)
 
 
 def test_binance():
-    DP = DataProcessor('binance')
     ticker_list = ['BTCUSDT', 'ETHUSDT', 'ADAUSDT', 'BNBUSDT']
     start_date = '2021-09-01'
     end_date = '2021-09-20'
     time_interval = '5m'
+
+    DP = DataProcessor('binance', start_date, end_date, time_interval)
     technical_indicator_list = ['macd', 'rsi', 'cci', 'dx']  # self-defined technical indicator list is NOT supported yet
     if_vix = False
-    price_array, tech_array, turbulence_array = DP.run(ticker_list, start_date, end_date,
-                                                       time_interval, technical_indicator_list,
-                                                       if_vix, cache=True, use_stockstats_or_talib=1)
+    price_array, tech_array, turbulence_array = DP.run(ticker_list, technical_indicator_list, if_vix, cache=True, use_stockstats_or_talib=1)
     print(price_array.shape, tech_array.shape)
 
+def test_yfinance():
+
+    start_date = '2021-01-01'
+    end_date = '2021-09-20'
+    time_interval = '1D'
+
+    DP = DataProcessor('yahoofinance', start_date, end_date, time_interval)
+    ticker_list = [
+        "MTX.DE",
+        "MRK.DE",
+        "LIN.DE",
+        "ALV.DE",
+        "VNA.DE",
+    ]
+
+    technical_indicator_list = ['macd', 'rsi', 'cci', 'dx']  # self-defined technical indicator list is NOT supported yet
+    if_vix = False
+    price_array, tech_array, turbulence_array = DP.run(ticker_list, technical_indicator_list, if_vix, cache=True, use_stockstats_or_talib=1)
+    print(price_array.shape, tech_array.shape)
 if __name__ == "__main__":
     # test_joinquant()
-    test_binance()
+    #test_binance()
+    test_yfinance()

@@ -33,8 +33,8 @@ class TushareProProcessor(BasicProcessor):
     
     """
 
-    def __init__(self, data_source: str, **kwargs):
-        BasicProcessor.__init__(self, data_source, **kwargs)
+    def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
+        BasicProcessor.__init__(self, data_source, start_date, end_date, time_interval, **kwargs)
         if 'token' not in kwargs.keys():
             raise ValueError("pleses input token!")
         self.token = kwargs["token"]
@@ -52,7 +52,7 @@ class TushareProProcessor(BasicProcessor):
             ts_code=id, start_date=self.start, end_date=self.end, adj=self.adj
         )
 
-    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str):
+    def download_data(self, ticker_list: List[str]):
         """Fetches data from tusharepro API
         Parameters
         ----------
@@ -63,9 +63,6 @@ class TushareProProcessor(BasicProcessor):
             for the specified stock ticker
         """
         self.ticker_list = ticker_list
-        self.start = start_date
-        self.end = end_date
-        self.time_interval = time_interval
 
         if self.time_interval != "1D":
             raise ValueError('not supported currently')
@@ -73,7 +70,7 @@ class TushareProProcessor(BasicProcessor):
         ts.set_token(self.token)
 
         self.df = pd.DataFrame()
-        for i in tqdm(self.ticker_list, total=len(self.ticker_list)):
+        for i in tqdm(ticker_list, total=len(ticker_list)):
             df_temp = self.get_data(i)
             self.df = self.df.append(df_temp)
             # print("{} ok".format(i))

@@ -28,8 +28,8 @@ class AlpacaProcessor(BasicProcessor):
     #             raise ValueError("Wrong Account Info!")
     #     else:
     #         self.api = api
-    def __init__(self, data_source: str, **kwargs):
-        BasicProcessor.__init__(self, data_source, **kwargs)
+    def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
+        BasicProcessor.__init__(self, data_source, start_date, end_date, time_interval, **kwargs)
         if kwargs['API'] is None:
             try:
                 self.api = tradeapi.REST(kwargs['API_KEY'], kwargs['API_SECRET'], kwargs['APCA_API_BASE_URL'], "v2")
@@ -38,14 +38,11 @@ class AlpacaProcessor(BasicProcessor):
         else:
             self.api = kwargs['API']
 
-    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str):
-        self.start = start_date
-        self.end = end_date
-        self.time_interval = time_interval
+    def download_data(self, ticker_list: List[str]):
         self.time_zone = calc_time_zone(ticker_list, TIME_ZONE_SELFDEFINED, USE_TIME_ZONE_SELFDEFINED)
 
-        start_date = pd.Timestamp(start_date, tz=self.time_zone)
-        end_date = pd.Timestamp(end_date, tz=self.time_zone) + pd.Timedelta(days=1)
+        start_date = pd.Timestamp(self.start_date, tz=self.time_zone)
+        end_date = pd.Timestamp(self.end_date, tz=self.time_zone) + pd.Timedelta(days=1)
 
         date = start_date
         data_df = pd.DataFrame()
@@ -54,7 +51,7 @@ class AlpacaProcessor(BasicProcessor):
             end_time = (date + pd.Timedelta("15:59:00")).isoformat()
             for tic in ticker_list:
                 barset = self.api.get_barset(
-                    [tic], time_interval, start=start_time, end=end_time, limit=500
+                    [tic], self.time_interval, start=start_time, end=end_time, limit=500
                 ).df[tic]
                 barset["tic"] = tic
                 barset = barset.reset_index()

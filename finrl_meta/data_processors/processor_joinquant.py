@@ -13,27 +13,27 @@ from finrl_meta.data_processors.func import calc_all_filenames, remove_all_files
 
 
 class JoinquantProcessor(BasicProcessor):
-    def __init__(self, data_source: str, **kwargs):
-        BasicProcessor.__init__(self, data_source, **kwargs)
+    def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
+        BasicProcessor.__init__(self, data_source, start_date, end_date, time_interval, **kwargs)
         if 'username' in kwargs.keys() and 'password' in kwargs.keys():
             jq.auth(kwargs['username'], kwargs['password'])
 
-    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str):
+    def download_data(self, ticker_list: List[str]):
         unit = None
         # joinquant supports: '1m', '5m', '15m', '30m', '60m', '120m', '1d', '1w', '1M'。'1w' denotes one week，‘1M' denotes one month。
-        if time_interval == '1D':
+        if self.time_interval == '1D':
             unit = '1d'
-        elif time_interval == '1Min':
+        elif self.time_interval == '1Min':
             unit = '1m'
         else:
             raise ValueError('not supported currently')
-        count = len(self.get_trading_days(start_date, end_date))
+        count = len(self.get_trading_days(self.start_date, self.end_date))
         df = jq.get_bars(
             security=ticker_list,
             count=count,
             unit=unit,
             fields=["date", "open", "high", "low", "close", "volume"],
-            end_dt=end_date,
+            end_dt=self.end_date,
         )
         df = df.reset_index().rename(columns={'level_0': 'tic'})
         self.dataframe = df

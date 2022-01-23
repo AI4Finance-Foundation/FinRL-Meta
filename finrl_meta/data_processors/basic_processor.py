@@ -5,11 +5,8 @@ import pandas as pd
 import stockstats
 import talib
 
-TIME_INTERVAL = '1D'
-
-
 class BasicProcessor:
-    def __init__(self, data_source: str, **kwargs):
+    def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
 
         assert data_source in {
             "alpaca",
@@ -23,14 +20,15 @@ class BasicProcessor:
             "yahoofinance",
             "tusharepro",
         }, "Data source input is NOT supported yet."
-
         self.data_source: str = data_source
-        self.time_interval: str = TIME_INTERVAL
+        self.start_date = start_date
+        self.end_date = end_date
+        self.time_interval = time_interval
         self.time_zone: str = ""
         self.dataframe: pd.DataFrame = pd.DataFrame()
         self.dictnumpy: dict = {}
 
-    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str):
+    def download_data(self, ticker_list: List[str]):
         pass
 
     def clean_data(self):

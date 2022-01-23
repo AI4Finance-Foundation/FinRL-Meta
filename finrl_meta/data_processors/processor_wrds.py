@@ -17,32 +17,26 @@ class WrdsProcessor(BasicProcessor):
     # def __init__(self,if_offline=False):
     #     if not if_offline:
     #         self.db = wrds.Connection()
-    def __init__(self, data_source: str, **kwargs):
-        BasicProcessor.__init__(self, data_source, **kwargs)
+    def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
+        BasicProcessor.__init__(self, data_source, start_date, end_date, time_interval, **kwargs)
         if 'if_offline' in kwargs.keys() and not kwargs['if_offline']:
             self.db = wrds.Connection()
 
-    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str,
-                      if_save_tempfile=False,
-                      filter_shares=0):
+    def download_data(self, ticker_list: List[str],  if_save_tempfile=False,  filter_shares=0):
 
-        self.start = start_date
-        self.end = end_date
-        self.time_interval = time_interval
-
-        dates = self.get_trading_days(start_date, end_date)
+        dates = self.get_trading_days(self.start_date, self.end_date)
         print('Trading days: ')
         print(dates)
         first_time = True
         empty = True
         stock_set = tuple(ticker_list)
         for i in dates:
-            x = self.data_fetch_wrds(i, stock_set, filter_shares, time_interval)
+            x = self.data_fetch_wrds(i, stock_set, filter_shares, self.time_interval)
 
             if not x[1]:
                 empty = False
                 dataset = x[0]
-                dataset = self.preprocess_to_ohlcv(dataset, time_interval=(str(time_interval) + 'S'))
+                dataset = self.preprocess_to_ohlcv(dataset, time_interval=(str(self.time_interval) + 'S'))
                 print('Data for date: ' + i + ' finished')
                 if first_time:
                     temp = dataset

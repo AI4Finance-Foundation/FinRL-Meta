@@ -38,10 +38,10 @@ class YahooFinanceProcessor(BasicProcessor):
         Fetches data from yahoo API
     """
 
-    def __init__(self, data_source: str, **kwargs):
-        BasicProcessor.__init__(self, data_source, **kwargs)
+    def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
+        BasicProcessor.__init__(self, data_source, start_date, end_date, time_interval, **kwargs)
 
-    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str):
+    def download_data(self, ticker_list: List[str]):
         """Fetches data from Yahoo API
         Parameters
         ----------
@@ -52,15 +52,12 @@ class YahooFinanceProcessor(BasicProcessor):
             for the specified stock ticker
         """
 
-        self.start = start_date
-        self.end = end_date
-        self.time_interval = time_interval
         self.time_zone = calc_time_zone(ticker_list, TIME_ZONE_SELFDEFINED, USE_TIME_ZONE_SELFDEFINED)
 
         # Download and save the data in a pandas DataFrame:
         data_df = pd.DataFrame()
         for tic in ticker_list:
-            temp_df = yf.download(tic, start=start_date, end=end_date)
+            temp_df = yf.download(tic, start=self.start_date, end=self.end_date, interval=self.time_interval)
             temp_df["tic"] = tic
             data_df = data_df.append(temp_df)
         # reset the index, we want to use numbers as index instead of dates
@@ -102,7 +99,7 @@ class YahooFinanceProcessor(BasicProcessor):
         tic_list = np.unique(df.tic.values)
 
         # get complete time index
-        trading_days = self.get_trading_days(start=self.start, end=self.end)
+        trading_days = self.get_trading_days(start=self.start_date, end=self.end_date)
         if time_interval == '1D':
             times = trading_days
         elif time_interval == '1Min':
