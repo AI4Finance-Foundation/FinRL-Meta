@@ -28,15 +28,14 @@ class JoinquantProcessor(BasicProcessor):
         else:
             raise ValueError('not supported currently')
         count = len(self.get_trading_days(start_date, end_date))
-        df = jq.get_bars(
+        self.dataframe = jq.get_bars(
             security=ticker_list,
             count=count,
             unit=unit,
             fields=["date", "open", "high", "low", "close", "volume"],
             end_dt=end_date,
         )
-        df = df.reset_index().rename(columns={'level_0': 'tic'})
-        self.dataframe = df
+        self.dataframe = self.dataframe.reset_index().rename(columns={'level_0': 'tic'})
 
     def data_fetch(self,stock_list, num, unit, end_dt):
         df = jq.get_bars(security=stock_list, count=num, unit=unit, 
