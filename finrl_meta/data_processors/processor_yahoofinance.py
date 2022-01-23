@@ -1,15 +1,17 @@
 '''Reference: https://github.com/AI4Finance-LLC/FinRL'''
 
-import pandas as pd
-import yfinance as yf
-import numpy as np
-from stockstats import StockDataFrame as Sdf
-import exchange_calendars as tc
 from typing import List
+
+import exchange_calendars as tc
+import numpy as np
+import pandas as pd
 import pytz
-from finrl_meta.data_processors.func import calc_time_zone
+import yfinance as yf
+
 # from basic_processor import BasicProcessor
 from finrl_meta.data_processors.basic_processor import BasicProcessor
+from finrl_meta.data_processors.func import calc_time_zone
+
 TIME_ZONE_SHANGHAI = 'Asia/Shanghai'  ## Hang Seng HSI, SSE, CSI
 TIME_ZONE_USEASTERN = 'US/Eastern'  # Dow, Nasdaq, SP
 TIME_ZONE_PARIS = 'Europe/Paris'  # CAC,
@@ -17,6 +19,7 @@ TIME_ZONE_BERLIN = 'Europe/Berlin'  # DAX, TECDAX, MDAX, SDAX
 TIME_ZONE_JAKARTA = 'Asia/Jakarta'  # LQ45
 TIME_ZONE_SELFDEFINED = 'xxx'  # If neither of the above is your time zone, you should define it, and set USE_TIME_ZONE_SELFDEFINED 1.
 USE_TIME_ZONE_SELFDEFINED = 0  # 0 (default) or 1 (use the self defined)
+
 
 class YahooFinanceProcessor(BasicProcessor):
     """Provides methods for retrieving daily stock data from
@@ -37,7 +40,7 @@ class YahooFinanceProcessor(BasicProcessor):
 
     def __init__(self, data_source: str, **kwargs):
         BasicProcessor.__init__(self, data_source, **kwargs)
-    
+
     def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str):
         """Fetches data from Yahoo API
         Parameters
@@ -86,49 +89,49 @@ class YahooFinanceProcessor(BasicProcessor):
         print("Shape of DataFrame: ", data_df.shape)
         # print("Display DataFrame: ", data_df.head())
 
-        data_df = data_df.sort_values(by=['date','tic']).reset_index(drop=True)
+        data_df = data_df.sort_values(by=['date', 'tic']).reset_index(drop=True)
 
         self.dataframe = data_df
-    
+
     def clean_data(self):
-        
+
         df = self.dataframe.copy()
-        df = df.rename(columns={'date':'time'})
+        df = df.rename(columns={'date': 'time'})
         time_interval = self.time_interval
-        #get ticker list
+        # get ticker list
         tic_list = np.unique(df.tic.values)
 
-        #get complete time index
+        # get complete time index
         trading_days = self.get_trading_days(start=self.start, end=self.end)
         if time_interval == '1D':
             times = trading_days
         elif time_interval == '1Min':
             times = []
             for day in trading_days:
-                current_time = pd.Timestamp(day+' 09:30:00').tz_localize(self.time_zone)
+                current_time = pd.Timestamp(day + ' 09:30:00').tz_localize(self.time_zone)
                 for _ in range(390):
                     times.append(current_time)
                     current_time += pd.Timedelta(minutes=1)
         else:
             raise ValueError('Data clean at given time interval is not supported for YahooFinance data.')
 
-        #fill NaN data
+        # fill NaN data
         new_df = pd.DataFrame()
         for tic in tic_list:
-            print (('Clean data for ') + tic)
-            #create empty DataFrame using complete time index
-            tmp_df = pd.DataFrame(columns=['open','high','low','close',
-                                           'adj_close','volume'],
+            print(('Clean data for ') + tic)
+            # create empty DataFrame using complete time index
+            tmp_df = pd.DataFrame(columns=['open', 'high', 'low', 'close',
+                                           'adj_close', 'volume'],
                                   index=times)
-            #get data for current ticker
+            # get data for current ticker
             tic_df = df[df.tic == tic]
-            #fill empty DataFrame using orginal data
+            # fill empty DataFrame using orginal data
             for i in range(tic_df.shape[0]):
-                tmp_df.loc[tic_df.iloc[i]['time']] = tic_df.iloc[i]\
-                    [['open','high','low','close','adj_close','volume']]
+                tmp_df.loc[tic_df.iloc[i]['time']] = tic_df.iloc[i] \
+                    [['open', 'high', 'low', 'close', 'adj_close', 'volume']]
 
-            #if close on start date is NaN, fill data with first valid close
-            #and set volume to 0.
+            # if close on start date is NaN, fill data with first valid close
+            # and set volume to 0.
             if str(tmp_df.iloc[0]['close']) == 'nan':
                 print('NaN data on start date, fill using first valid data.')
                 for i in range(tmp_df.shape[0]):
@@ -140,31 +143,31 @@ class YahooFinanceProcessor(BasicProcessor):
                                   first_valid_close, first_valid_close,
                                   first_valid_adjclose, 0.0]
 
-            #fill NaN data with previous close and set volume to 0.
+            # fill NaN data with previous close and set volume to 0.
             for i in range(tmp_df.shape[0]):
                 if str(tmp_df.iloc[i]['close']) == 'nan':
-                    previous_close = tmp_df.iloc[i-1]['close']
-                    previous_adj_close = tmp_df.iloc[i-1]['adj_close']
+                    previous_close = tmp_df.iloc[i - 1]['close']
+                    previous_adj_close = tmp_df.iloc[i - 1]['adj_close']
                     if str(previous_close) == 'nan':
                         raise ValueError
                     tmp_df.iloc[i] = [previous_close, previous_close, previous_close,
                                       previous_close, previous_adj_close, 0.0]
 
-            #merge single ticker data to new DataFrame
+            # merge single ticker data to new DataFrame
             tmp_df = tmp_df.astype(float)
             tmp_df['tic'] = tic
             new_df = new_df.append(tmp_df)
 
-            print (('Data clean for ') + tic + (' is finished.'))
+            print(('Data clean for ') + tic + (' is finished.'))
 
-        #reset index and rename columns
+        # reset index and rename columns
         new_df = new_df.reset_index()
-        new_df = new_df.rename(columns={'index':'time'})
+        new_df = new_df.rename(columns={'index': 'time'})
 
         print('Data clean all finished!')
 
         self.dataframe = new_df
-    
+
     # def add_technical_indicator(self, data, tech_indicator_list):
     #     """
     #     calculate technical indicators
@@ -272,7 +275,7 @@ class YahooFinanceProcessor(BasicProcessor):
     #     df = df.merge(vix, on="time")
     #     df = df.sort_values(["time", "tic"]).reset_index(drop=True)
     #     return df
-    
+
     # def df_to_array(self, df, tech_indicator_list, if_vix):
     #     """transform final df to numpy arrays"""
     #     unique_ticker = df.tic.unique()
@@ -295,10 +298,9 @@ class YahooFinanceProcessor(BasicProcessor):
     #     assert tech_array.shape[0] == risk_array.shape[0]
     #     print('Successfully transformed into array')
     #     return price_array, tech_array, risk_array
-        
 
     def get_trading_days(self, start, end):
         nyse = tc.get_calendar('NYSE')
-        df = nyse.sessions_in_range(pd.Timestamp(start,tz=pytz.UTC),
-                                    pd.Timestamp(end,tz=pytz.UTC))
+        df = nyse.sessions_in_range(pd.Timestamp(start, tz=pytz.UTC),
+                                    pd.Timestamp(end, tz=pytz.UTC))
         return [str(day)[:10] for day in df]

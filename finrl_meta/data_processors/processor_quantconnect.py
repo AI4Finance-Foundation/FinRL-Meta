@@ -1,9 +1,7 @@
-import numpy as np
-import pandas as pd
 from typing import List
+
 # from basic_processor import BasicProcessor
 from finrl_meta.data_processors.basic_processor import BasicProcessor
-from finrl_meta.data_processors.func import calc_time_zone
 
 TIME_ZONE_SHANGHAI = 'Asia/Shanghai'  ## Hang Seng HSI, SSE, CSI
 TIME_ZONE_USEASTERN = 'US/Eastern'  # Dow, Nasdaq, SP
@@ -12,6 +10,7 @@ TIME_ZONE_BERLIN = 'Europe/Berlin'  # DAX, TECDAX, MDAX, SDAX
 TIME_ZONE_JAKARTA = 'Asia/Jakarta'  # LQ45
 TIME_ZONE_SELFDEFINED = 'xxx'  # If neither of the above is your time zone, you should define it, and set USE_TIME_ZONE_SELFDEFINED 1.
 USE_TIME_ZONE_SELFDEFINED = 0  # 0 (default) or 1 (use the self defined)
+
 
 ## The code of this file is used in website, not locally.
 class QuantConnectProcessor(BasicProcessor):
@@ -39,7 +38,6 @@ class QuantConnectProcessor(BasicProcessor):
             qb.AddEquity(stock)
         history = qb.History(qb.Securities.Keys, start_date, end_date, time_interval)
         self.dataframe = history
-
 
     # def preprocess(df, stock_list):
     #     df = df[['open','high','low','close','volume']]

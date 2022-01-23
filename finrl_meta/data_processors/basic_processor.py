@@ -1,6 +1,7 @@
+from typing import List
+
 import numpy as np
 import pandas as pd
-from typing import List
 import stockstats
 from talib.abstract import CCI, DX, MACD, RSI
 
@@ -62,7 +63,7 @@ class BasicProcessor:
             return None
 
     # use_stockstats_or_talib: 0 (stockstats, default), or 1 (use talib). Users can choose the method.
-    def add_technical_indicator(self, tech_indicator_list: List[str], use_stockstats_or_talib: int=0):
+    def add_technical_indicator(self, tech_indicator_list: List[str], use_stockstats_or_talib: int = 0):
         """
         calculate technical indicators
         use stockstats/talib package to add technical inidactors
@@ -255,11 +256,12 @@ class BasicProcessor:
     def df_to_array(self, tech_indicator_list: list, if_vix: bool):
         df = self.dataframe.copy()
         unique_ticker = df.tic.unique()
-        price_array = np.column_stack([df[df.tic==tic].close for tic in unique_ticker])
-        tech_array = np.hstack([df.loc[(df.tic==tic), tech_indicator_list] for tic in unique_ticker])
+        price_array = np.column_stack([df[df.tic == tic].close for tic in unique_ticker])
+        tech_array = np.hstack([df.loc[(df.tic == tic), tech_indicator_list] for tic in unique_ticker])
         if if_vix:
-            risk_array = np.column_stack([df[df.tic==tic].vix for tic in unique_ticker])
+            risk_array = np.column_stack([df[df.tic == tic].vix for tic in unique_ticker])
         else:
-            risk_array = np.column_stack([df[df.tic==tic].turbulence for tic in unique_ticker]) if "turbulence" in df.columns else None
+            risk_array = np.column_stack(
+                [df[df.tic == tic].turbulence for tic in unique_ticker]) if "turbulence" in df.columns else None
         print("Successfully transformed into array")
         return price_array, tech_array, risk_array

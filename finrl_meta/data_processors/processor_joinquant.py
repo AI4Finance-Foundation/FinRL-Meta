@@ -1,15 +1,15 @@
-import jqdatasdk as jq
-import pandas as pd
-import numpy as np
 import copy
-import os
 import datetime
+import os
 from typing import List
-from finrl_meta.data_processors.func import calc_all_filenames, date2str, remove_all_files
-from finrl_meta.data_processors.func import add_hyphen_for_date
-from finrl_meta.data_processors.func import remove_hyphen_for_date
+
+import jqdatasdk as jq
+import numpy as np
+import pandas as pd
+
 # from basic_processor import BasicProcessor
 from finrl_meta.data_processors.basic_processor import BasicProcessor
+from finrl_meta.data_processors.func import calc_all_filenames, remove_all_files
 
 
 class JoinquantProcessor(BasicProcessor):
@@ -38,20 +38,21 @@ class JoinquantProcessor(BasicProcessor):
         df = df.reset_index().rename(columns={'level_0': 'tic'})
         self.dataframe = df
 
-    def data_fetch(self,stock_list, num, unit, end_dt):
+    def data_fetch(self, stock_list, num, unit, end_dt):
         return jq.get_bars(security=stock_list, count=num, unit=unit,
-                         fields=['date','open','high','low','close','volume'],
-                         end_dt=end_dt)
+                           fields=['date', 'open', 'high', 'low', 'close', 'volume'],
+                           end_dt=end_dt)
+
     def preprocess(df, stock_list):
         n = len(stock_list)
         N = df.shape[0]
-        assert N%n == 0
-        d = int(N/n)
-        stock1_ary = df.iloc[0:d,1:].values
+        assert N % n == 0
+        d = int(N / n)
+        stock1_ary = df.iloc[0:d, 1:].values
         temp_ary = stock1_ary
         for j in range(1, n):
-            stocki_ary = df.iloc[j*d:(j+1)*d,1:].values
-            temp_ary = np.hstack((temp_ary,stocki_ary))
+            stocki_ary = df.iloc[j * d:(j + 1) * d, 1:].values
+            temp_ary = np.hstack((temp_ary, stocki_ary))
         return temp_ary
 
     # start_day: str
@@ -109,5 +110,3 @@ class JoinquantProcessor(BasicProcessor):
                 dfs.append(df)
                 df.to_csv(path_of_data + "/" + stockname + ".csv", float_format="%.4f")
         return dfs
-
-

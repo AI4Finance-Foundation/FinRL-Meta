@@ -6,6 +6,7 @@ import pandas as pd
 import pandas_market_calendars as mcal
 import pytz
 import requests
+
 from basic_processor import BasicProcessor
 
 
@@ -22,9 +23,9 @@ class IEXCloudProcessor(BasicProcessor):
         return "https://cloud.iexapis.com"
 
     def __init__(
-        self,
-        data_source: str = None,
-        **kwargs,
+            self,
+            data_source: str = None,
+            **kwargs,
     ):
         BasicProcessor.__init__(self, data_source, **kwargs)
         self.base_url = self._get_base_url(mode=kwargs['mode'])

@@ -1,14 +1,15 @@
-import wrds
 import datetime
-import pandas as pd
+
 import exchange_calendars as tc
-import pytz
 import numpy as np
-from typing import List
-from stockstats import StockDataFrame as Sdf
+import pandas as pd
+import pytz
+import wrds
+
 # from basic_processor import BasicProcessor
 from finrl_meta.data_processors.basic_processor import BasicProcessor
-pd.options.mode.chained_assignment = None 
+
+pd.options.mode.chained_assignment = None
 
 
 class WrdsProcessor(BasicProcessor):
@@ -21,20 +22,20 @@ class WrdsProcessor(BasicProcessor):
             self.db = wrds.Connection()
 
     def get_trading_days(start, end):
-            nyse = tc.get_calendar('NYSE')
-            df = nyse.sessions_in_range(pd.Timestamp(start,tz=pytz.UTC),
-                                        pd.Timestamp(end,tz=pytz.UTC))
-            return [str(day)[:10] for day in df]
-    
+        nyse = tc.get_calendar('NYSE')
+        df = nyse.sessions_in_range(pd.Timestamp(start, tz=pytz.UTC),
+                                    pd.Timestamp(end, tz=pytz.UTC))
+        return [str(day)[:10] for day in df]
+
     def preprocess_to_ohlcv(self, df, time_interval='60S'):
-        df = df[['date','time_m','sym_root','size','price']]
+        df = df[['date', 'time_m', 'sym_root', 'size', 'price']]
         tic_list = np.unique(df['sym_root'].values)
         final_df = None
         first_time = True
         for i in range(len(tic_list)):
             tic = tic_list[i]
             time_list = []
-            temp_df = df[df['sym_root']==tic]
+            temp_df = df[df['sym_root'] == tic]
             for i in range(temp_df.shape[0]):
                 date = temp_df['date'].iloc[i]
                 time_m = temp_df['time_m'].iloc[i]
@@ -47,7 +48,7 @@ class WrdsProcessor(BasicProcessor):
             temp_df['time'] = time_list
             temp_df = temp_df.set_index('time')
             data_ohlc = temp_df['price'].resample(time_interval).ohlc()
-            data_v = temp_df['size'].resample(time_interval).agg({'size':'sum'})
+            data_v = temp_df['size'].resample(time_interval).agg({'size': 'sum'})
             volume = data_v['size'].values
             data_ohlc['volume'] = volume
             data_ohlc['tic'] = tic
@@ -55,9 +56,9 @@ class WrdsProcessor(BasicProcessor):
                 final_df = data_ohlc.reset_index()
                 first_time = False
             else:
-                final_df = final_df.append(data_ohlc.reset_index(),ignore_index=True)
+                final_df = final_df.append(data_ohlc.reset_index(), ignore_index=True)
         return final_df
-    
+
     def clean_data(self):
         df = self.dataframe[['time', 'open', 'high', 'low', 'close', 'volume', 'tic']]
         # remove 16:00 data
@@ -71,10 +72,10 @@ class WrdsProcessor(BasicProcessor):
                 rows_1600.append(i)
 
         df = df.drop(rows_1600)
-        df = df.sort_values(by=['tic','time'])
+        df = df.sort_values(by=['tic', 'time'])
 
-        #check missing rows
-        tic_dic = {tic: [0,0] for tic in tic_list}
+        # check missing rows
+        tic_dic = {tic: [0, 0] for tic in tic_list}
         ary = df.values
         for i in range(ary.shape[0]):
             row = ary[i]
@@ -85,7 +86,7 @@ class WrdsProcessor(BasicProcessor):
             tic_dic[tic][1] += 1
         constant = np.unique(df['time'].values).shape[0]
         nan_tics = [tic for tic, value in tic_dic.items() if value[1] != constant]
-        #fill missing rows
+        # fill missing rows
         normal_time = np.unique(df['time'].values)
 
         df2 = df.copy()
@@ -93,30 +94,30 @@ class WrdsProcessor(BasicProcessor):
             tic_time = df[df['tic'] == tic]['time'].values
             missing_time = [i for i in normal_time if i not in tic_time]
             for time in missing_time:
-                temp_df = pd.DataFrame([[time,np.nan,np.nan,np.nan,np.nan,0,tic]],
+                temp_df = pd.DataFrame([[time, np.nan, np.nan, np.nan, np.nan, 0, tic]],
                                        columns=['time', 'open', 'high', 'low', 'close', 'volume', 'tic'])
-                df2=df2.append(temp_df,ignore_index=True)
+                df2 = df2.append(temp_df, ignore_index=True)
 
-        #fill nan data
-        df = df2.sort_values(by=['tic','time'])
+        # fill nan data
+        df = df2.sort_values(by=['tic', 'time'])
         for i in range(df.shape[0]):
             if float(df.iloc[i]['volume']) == 0:
-                previous_close = df.iloc[i-1]['close']
+                previous_close = df.iloc[i - 1]['close']
                 if str(previous_close) == 'nan':
                     raise ValueError('Error nan price')
-                df.iloc[i,1] = previous_close
-                df.iloc[i,2]= previous_close
-                df.iloc[i,3]= previous_close
-                df.iloc[i,4]= previous_close
-        #check if nan 
-        ary = df[['open','high','low','close','volume']].values
+                df.iloc[i, 1] = previous_close
+                df.iloc[i, 2] = previous_close
+                df.iloc[i, 3] = previous_close
+                df.iloc[i, 4] = previous_close
+        # check if nan
+        ary = df[['open', 'high', 'low', 'close', 'volume']].values
         assert np.isnan(np.min(ary)) == False
-        #final preprocess
-        df = df[['time','open','high','low','close','volume','tic']]
+        # final preprocess
+        df = df[['time', 'open', 'high', 'low', 'close', 'volume', 'tic']]
         df = df.reset_index(drop=True)
         print('Data clean finished')
         self.dataframe = df
-    
+
     # def add_technical_indicator(self, df, tech_indicator_list = [
     #         'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',
     #         'close_30_sma', 'close_60_sma']):
@@ -143,7 +144,7 @@ class WrdsProcessor(BasicProcessor):
     #     df = df.sort_values(by=['date', 'tic'])
     #     print('Succesfully add technical indicators')
     #     return df
-    
+
     # def calculate_turbulence(self,data, time_period=252):
     #     # can add other market assets
     #     df = data.copy()
@@ -227,9 +228,3 @@ class WrdsProcessor(BasicProcessor):
     #             tech_array = np.hstack([tech_array, df[df.tic==tic][tech_indicator_list].values])
     #     print('Successfully transformed into array')
     #     return price_array, tech_array, risk_array
-    
-
-        
-        
-    
-            
