@@ -63,12 +63,11 @@ class CCXTProcessor(BasicProcessor):
                              for time in range(start_timestamp, end_timestamp, 60*1440)]
             df = ohlcv(date_list, ticker, time_interval)
             if first_time:
-                dataset = pd.DataFrame(columns=crypto_column,index=df['time'].values)
+                self.dataframe = pd.DataFrame(columns=crypto_column,index=df['time'].values)
                 first_time = False
             temp_col = pd.MultiIndex.from_product([[ticker],['open','high','low','close','volume']])
-            dataset[temp_col] = df[['open','high','low','close','volume']].values
+            self.dataframe[temp_col] = df[['open','high','low','close','volume']].values
         print('Actual end time: ' + str(df['time'].values[-1]))
-        self.dataframe = dataset
     
     # def add_technical_indicators(self, df, pair_list, tech_indicator_list = [
     #     'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',
