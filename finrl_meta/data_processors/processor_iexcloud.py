@@ -54,7 +54,7 @@ class IEXCloudProcessor(BasicProcessor):
         """
         assert time_interval == '1D'  # one day
 
-        price_data = pd.DataFrame()
+        self.dataframe = pd.DataFrame()
 
         query_params = {
             "token": self.token,
@@ -76,11 +76,11 @@ class IEXCloudProcessor(BasicProcessor):
             if response.status_code == 200:
                 temp = pd.DataFrame.from_dict(data=response.json())
                 temp["ticker"] = stock
-                price_data = price_data.append(temp)
+                self.dataframe = self.dataframe.append(temp)
             else:
                 raise requests.exceptions.RequestException(response.text)
 
-        price_data = price_data[
+        self.dataframe = self.dataframe[
             [
                 "date",
                 "ticker",
@@ -92,15 +92,15 @@ class IEXCloudProcessor(BasicProcessor):
                 "volume",
             ]
         ]
-        price_data = price_data.rename(columns={"ticker": "tic", "date": "time", "fclose": "adj_close"})
+        self.dataframe = self.dataframe.rename(columns={"ticker": "tic", "date": "time", "fclose": "adj_close"})
 
-        price_data.date = price_data.date.map(
+        self.dataframe.date = self.dataframe.date.map(
             lambda x: datetime.fromtimestamp(x / 1000, pytz.UTC).strftime(
                 "%Y-%m-%d"
             )
         )
 
-        self.dataframe = price_data
+
 
     def get_trading_days(self, start: str, end: str) -> List[str]:
         """Retrieves every trading day between two dates.
