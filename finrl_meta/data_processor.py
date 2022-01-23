@@ -8,7 +8,7 @@ from finrl_meta.data_processors.processor_tusharepro import TushareProProcessor 
 import pandas as pd
 import numpy as np
 import os
-
+import pickle
 
 class DataProcessor():
     def __init__(self, data_source, **kwargs):
@@ -77,9 +77,9 @@ class DataProcessor():
         self.processor.clean_data()
         self.dataframe = self.processor.dataframe
 
-    def add_technical_indicator(self, tech_indicator_list):
+    def add_technical_indicator(self, tech_indicator_list, use_stockstats_or_talib: int = 0):
         self.tech_indicator_list = tech_indicator_list
-        self.processor.add_technical_indicator(tech_indicator_list)
+        self.processor.add_technical_indicator(tech_indicator_list, use_stockstats_or_talib)
         self.dataframe = self.processor.dataframe
 
     def add_turbulence(self):
@@ -99,29 +99,31 @@ class DataProcessor():
         return price_array, tech_array, turbulence_array
 
     def run(self, ticker_list, start_date, end_date, time_interval,
-            technical_indicator_list, if_vix, cache=False):
+            technical_indicator_list,  if_vix, cache=False, use_stockstats_or_talib: int = 0):
 
         if time_interval == "1s" and self.data_source != "binance":
             raise ValueError("Currently 1s interval data is only supported with 'binance' as data source")
 
-        cache_csv = '_'.join(ticker_list + [self.data_source, start_date, end_date, time_interval]) + '.csv'
+        cache_filename = '_'.join(ticker_list + [self.data_source, start_date, end_date, time_interval]) + '.pickle'
         cache_dir = './cache'
-        cache_path = os.path.join(cache_dir, cache_csv)
+        cache_path = os.path.join(cache_dir, cache_filename)
 
         if cache and os.path.isfile(cache_path):
             print(f'Using cached file {cache_path}')
             self.tech_indicator_list = technical_indicator_list
-            self.dataframe = pd.read_csv(cache_path)
-
+            with open(cache_path, 'rb') as handle:
+                self.processor.dataframe = pickle.load(handle)
         else:
             self.download_data(ticker_list, start_date, end_date, time_interval)
             self.clean_data()
             if cache:
                 if not os.path.exists(cache_dir):
                     os.mkdir(cache_dir)
-                self.dataframe.to_csv(cache_path, index=False)
+                with open(cache_path, 'wb') as handle:
+                    pickle.dump(self.dataframe, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-        self.add_technical_indicator(technical_indicator_list)
+
+        self.add_technical_indicator(technical_indicator_list, use_stockstats_or_talib)
         if if_vix:
             self.add_vix()
         price_array, tech_array, turbulence_array = self.df_to_array(if_vix)
@@ -174,10 +176,9 @@ def test_binance():
     if_vix = False
     price_array, tech_array, turbulence_array = DP.run(ticker_list, start_date, end_date,
                                                        time_interval, technical_indicator_list,
-                                                       if_vix, cache=True)
+                                                       if_vix, cache=True, use_stockstats_or_talib=1)
     print(price_array.shape, tech_array.shape)
 
-
 if __name__ == "__main__":
-    test_joinquant()
-    # test_binance()
+    # test_joinquant()
+    test_binance()

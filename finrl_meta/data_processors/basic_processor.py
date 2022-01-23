@@ -3,7 +3,7 @@ from typing import List
 import numpy as np
 import pandas as pd
 import stockstats
-from talib.abstract import CCI, DX, MACD, RSI
+import talib
 
 TIME_INTERVAL = '1D'
 
@@ -105,11 +105,11 @@ class BasicProcessor:
             final_df = pd.DataFrame()
             for i in self.dataframe.tic.unique():
                 tic_df = self.dataframe[self.dataframe.tic == i]
-                tic_df['macd'], tic_df['macd_signal'], tic_df['macd_hist'] = MACD(tic_df['close'], fastperiod=12,
+                tic_df['macd'], tic_df['macd_signal'], tic_df['macd_hist'] = talib.MACD(tic_df['close'], fastperiod=12,
                                                                                   slowperiod=26, signalperiod=9)
-                tic_df['rsi'] = RSI(tic_df['close'], timeperiod=14)
-                tic_df['cci'] = CCI(tic_df['high'], tic_df['low'], tic_df['close'], timeperiod=14)
-                tic_df['dx'] = DX(tic_df['high'], tic_df['low'], tic_df['close'], timeperiod=14)
+                tic_df['rsi'] = talib.RSI(tic_df['close'], timeperiod=14)
+                tic_df['cci'] = talib.CCI(tic_df['high'], tic_df['low'], tic_df['close'], timeperiod=14)
+                tic_df['dx'] = talib.DX(tic_df['high'], tic_df['low'], tic_df['close'], timeperiod=14)
                 final_df = final_df.append(tic_df)
             self.dataframe = final_df
 
