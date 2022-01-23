@@ -83,19 +83,17 @@ def remove_all_files(remove, path_of_data):
 
     if remove == 1:
         if len(dir_list) == 0:
-            print("dir_list: {}. Right.".format(dir_list))
+            print(f"dir_list: {dir_list}. Right.")
         else:
             print(
-                "dir_list: {}. Wrong. You should remove all files by hands.".format(
-                    dir_list
-                )
+                f"dir_list: {dir_list}. Wrong. You should remove all files by hands."
             )
         assert len(dir_list) == 0
     else:
         if len(dir_list) == 0:
-            print("dir_list: {}. Wrong. There is not data.".format(dir_list))
+            print(f"dir_list: {dir_list}. Wrong. There is not data.")
         else:
-            print("dir_list: {}. Right.".format(dir_list))
+            print(f"dir_list: {dir_list}. Right.")
         assert len(dir_list) > 0
 
 
@@ -115,12 +113,12 @@ def get_destination_dir(file_url):
 
 
 def get_download_url(file_url):
-    return "{}{}".format(BINANCE_BASE_URL, file_url)
+    return f"{BINANCE_BASE_URL}{file_url}"
 
 
 # downloads zip, unzips zip and deltes zip
 def download_n_unzip_file(base_path, file_name, date_range=None):
-    download_path = "{}{}".format(base_path, file_name)
+    download_path = f"{base_path}{file_name}"
     if date_range:
         date_range = date_range.replace(" ", "_")
         base_path = os.path.join(base_path, date_range)
@@ -135,7 +133,7 @@ def download_n_unzip_file(base_path, file_name, date_range=None):
     fhandles = []
 
     if os.path.exists(csv_save_path):
-        print("\nfile already exists! {}".format(csv_save_path))
+        print(f"\nfile already exists! {csv_save_path}")
         return [csv_save_path]
 
     # make the "cache" directory (only)
@@ -152,7 +150,7 @@ def download_n_unzip_file(base_path, file_name, date_range=None):
 
         with open(zip_save_path, 'wb') as out_file:
             dl_progress = 0
-            print("\nFile Download: {}".format(zip_save_path))
+            print(f"\nFile Download: {zip_save_path}")
             while True:
                 buf = dl_file.read(blocksize)
                 if not buf:
@@ -174,7 +172,7 @@ def download_n_unzip_file(base_path, file_name, date_range=None):
         return fhandles
 
     except urllib.error.HTTPError:
-        print("\nFile not found: {}".format(download_url))
+        print(f"\nFile not found: {download_url}")
 
 
 def convert_to_date_object(d):

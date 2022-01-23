@@ -59,7 +59,7 @@ class BasicProcessor:
 
     def get_trading_days(self, start: str, end: str) -> List[str]:
         if self.data_source in ["binance", "ccxt", "quantconnect", "ricequant", "tusharepro"]:
-            print("Calculate get_trading_days not supported for {} yet.".format(self.data_source))
+            print(f"Calculate get_trading_days not supported for {self.data_source} yet.")
             return None
 
     # use_stockstats_or_talib: 0 (stockstats, default), or 1 (use talib). Users can choose the method.
@@ -134,7 +134,7 @@ class BasicProcessor:
         # df = df.sort_values(["time", "tic"]).reset_index(drop=True)
         # return df
         if self.data_source in ["binance", "ccxt", "iexcloud", "joinquant", "quantconnect"]:
-            print("Turbulence not supported for {} yet. Return original DataFrame.".format(self.data_source))
+            print(f"Turbulence not supported for {self.data_source} yet. Return original DataFrame.")
         if self.data_source in ["alpaca", "ricequant", "tusharepro", "wrds", "yahoofinance"]:
             df = self.dataframe.copy()
             turbulence_index = self.calculate_turbulence(df)
@@ -198,7 +198,7 @@ class BasicProcessor:
         :return: (df) pandas dataframe
         """
         if self.data_source in ['binance', 'ccxt', 'iexcloud', 'joinquant', 'quantconnect', 'ricequant', 'tusharepro']:
-            print('VIX is not applicable for {}. Return original DataFrame'.format(self.data_source))
+            print(f'VIX is not applicable for {self.data_source}. Return original DataFrame')
             return
 
         # if self.data_source == 'yahoofinance':

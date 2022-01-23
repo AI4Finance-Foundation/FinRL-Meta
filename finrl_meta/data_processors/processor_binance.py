@@ -137,17 +137,17 @@ class BinanceProcessor(BasicProcessor):
         start_date = convert_to_date_object(start_date)
         end_date = convert_to_date_object(end_date)
 
-        print("Found {} symbols".format(num_symbols))
+        print(f"Found {num_symbols} symbols")
 
         map = {}
         for current, symbol in enumerate(symbols):
             map[symbol] = []
-            print("[{}/{}] - start download daily {} aggTrades ".format(current + 1, num_symbols, symbol))
+            print(f"[{current + 1}/{num_symbols}] - start download daily {symbol} aggTrades ")
             for date in dates:
                 current_date = convert_to_date_object(date)
                 if current_date >= start_date and current_date <= end_date:
                     path = get_path(trading_type, "aggTrades", "daily", symbol)
-                    file_name = "{}-aggTrades-{}.zip".format(symbol.upper(), date)
+                    file_name = f"{symbol.upper()}-aggTrades-{date}.zip"
                     fhandle = download_n_unzip_file(path, file_name, date_range)
                     map[symbol] += fhandle
         return map

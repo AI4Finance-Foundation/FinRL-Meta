@@ -109,7 +109,7 @@ class DataProcessor():
         cache_path = os.path.join(cache_dir, cache_csv)
 
         if cache and os.path.isfile(cache_path):
-            print('Using cached file {}'.format(cache_path))
+            print(f'Using cached file {cache_path}')
             self.tech_indicator_list = technical_indicator_list
             self.dataframe = pd.read_csv(cache_path)
 

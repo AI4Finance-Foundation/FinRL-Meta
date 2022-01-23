@@ -57,29 +57,29 @@ def get_env_param():
     fp_title = 'Financial Parameters'
 
     # Get the default financial parameters from the simulation environment
-    fp_left_col = [('Annual Volatility:', ['{:.0f}%'.format(env.anv * 100)]),
-                   ('Daily Volatility:', ['{:.1f}%'.format(env.dpv * 100)])]
+    fp_left_col = [('Annual Volatility:', [f'{env.anv * 100:.0f}%']),
+                   ('Daily Volatility:', [f'{env.dpv * 100:.1f}%'])]
 
-    fp_right_col = [('Bid-Ask Spread:', ['{:.3f}'.format(env.basp)]),
-                    ('Daily Trading Volume:', ['{:,.0f}'.format(env.dtv)])]
+    fp_right_col = [('Bid-Ask Spread:', [f'{env.basp:.3f}']),
+                    ('Daily Trading Volume:', [f'{env.dtv:,.0f}'])]
 
     # Set the title for the Almgren and Chriss Model parameters table
     acp_title = 'Almgren and Chriss Model Parameters'
 
     # Get the default Almgren and Chriss Model Parameters from the simulation environment
-    acp_left_col = [('Total Number of Shares for Agent1 to Sell:', ['{:,}'.format(env.total_shares1)]),
-                    ('Total Number of Shares for Agent2 to Sell:', ['{:,}'.format(env.total_shares2)]),
-                    ('Starting Price per Share:', ['${:.2f}'.format(env.startingPrice)]),
-                    ('Price Impact for Each 1% of Daily Volume Traded:', ['${}'.format(env.eta)]),
-                    ('Number of Days to Sell All the Shares:', ['{}'.format(env.liquidation_time)]),
-                    ('Number of Trades:', ['{}'.format(env.num_n)])]
+    acp_left_col = [('Total Number of Shares for Agent1 to Sell:', [f'{env.total_shares1:,}']),
+                    ('Total Number of Shares for Agent2 to Sell:', [f'{env.total_shares2:,}']),
+                    ('Starting Price per Share:', [f'${env.startingPrice:.2f}']),
+                    ('Price Impact for Each 1% of Daily Volume Traded:', [f'${env.eta}']),
+                    ('Number of Days to Sell All the Shares:', [f'{env.liquidation_time}']),
+                    ('Number of Trades:', [f'{env.num_n}'])]
 
-    acp_right_col = [('Fixed Cost of Selling per Share:', ['${:.3f}'.format(env.epsilon)]),
-                     ('Trader\'s Risk Aversion for Agent 1:', ['{}'.format(env.llambda1)]),
-                     ('Trader\'s Risk Aversion for Agent 2:', ['{}'.format(env.llambda2)]),
-                     ('Permanent Impact Constant:', ['{}'.format(env.gamma)]),
-                     ('Single Step Variance:', ['{:.3f}'.format(env.singleStepVariance)]),
-                     ('Time Interval between trades:', ['{}'.format(env.tau)])]
+    acp_right_col = [('Fixed Cost of Selling per Share:', [f'${env.epsilon:.3f}']),
+                     ('Trader\'s Risk Aversion for Agent 1:', [f'{env.llambda1}']),
+                     ('Trader\'s Risk Aversion for Agent 2:', [f'{env.llambda2}']),
+                     ('Permanent Impact Constant:', [f'{env.gamma}']),
+                     ('Single Step Variance:', [f'{env.singleStepVariance:.3f}']),
+                     ('Time Interval between trades:', [f'{env.tau}'])]
 
     # Generate tables with the default financial and AC Model parameters
     fp_table = generate_table(fp_left_col, fp_right_col, fp_title)
@@ -104,8 +104,8 @@ def plot_price_model(seed=0, num_days=1000):
         price_hist[i] = info.price
 
     # Print Average and Standard Deviation in Stock Price
-    print('Average Stock Price: ${:,.2f}'.format(price_hist.mean()))
-    print('Standard Deviation in Stock Price: ${:,.2f}'.format(price_hist.std()))
+    print(f'Average Stock Price: ${price_hist.mean():,.2f}')
+    print(f'Standard Deviation in Stock Price: ${price_hist.std():,.2f}')
     #     print('Standard Deviation of Random Noise: {:,.5f}'.format(np.sqrt(env.singleStepVariance * env.tau)))
 
     # Plot the price history for the given number of days
@@ -138,13 +138,13 @@ def get_optimal_vals(lq_time=60, nm_trades=60, tr_risk=1e-6, title=''):
     V = env.get_AC_variance(env.total_shares)
     U = env.compute_AC_utility(env.total_shares)
 
-    left_col = [('Number of Days to Sell All the Shares:', ['{}'.format(env.liquidation_time)]),
-                ('Half-Life of The Trade:', ['{:,.1f}'.format(1 / env.kappa)]),
-                ('Utility:', ['${:,.2f}'.format(U)])]
+    left_col = [('Number of Days to Sell All the Shares:', [f'{env.liquidation_time}']),
+                ('Half-Life of The Trade:', [f'{1 / env.kappa:,.1f}']),
+                ('Utility:', [f'${U:,.2f}'])]
 
-    right_col = [('Initial Portfolio Value:', ['${:,.2f}'.format(env.total_shares * env.startingPrice)]),
-                 ('Expected Shortfall:', ['${:,.2f}'.format(E)]),
-                 ('Standard Deviation of Shortfall:', ['${:,.2f}'.format(np.sqrt(V))])]
+    right_col = [('Initial Portfolio Value:', [f'${env.total_shares * env.startingPrice:,.2f}']),
+                 ('Expected Shortfall:', [f'${E:,.2f}']),
+                 ('Standard Deviation of Shortfall:', [f'${np.sqrt(V):,.2f}'])]
 
     # Generate the table with the AC optimal values
     return generate_table(left_col, right_col, title)
@@ -162,7 +162,7 @@ def get_min_param():
 
 def get_crfs(trisk):
     # Create the annotation label
-    tr_st = '{:.0e}'.format(trisk)
+    tr_st = f'{trisk:.0e}'
     lnum = tr_st.split('e')[0]
     lexp = tr_st.split('e')[1]
     if np.abs(np.int(lexp)) < 10:
@@ -341,7 +341,7 @@ def plot_trade_list(lq_time=60, nm_trades=60, tr_risk=1e-6, show_trl=False):
     plt.subplots_adjust(wspace=0.4)
     plt.show()
 
-    print('\nNumber of Shares Sold: {:,.0f}\n'.format(new_trl.sum()))
+    print(f'\nNumber of Shares Sold: {new_trl.sum():,.0f}\n')
 
     if show_trl:
         # Since we are not selling fractional shares we round up the shares in the trading list
@@ -393,7 +393,7 @@ def implement_trade_list(seed=0, lq_time=60, nm_trades=60, tr_risk=1e-6):
 
         # If all shares have been sold, stop making transactions and get the implementation sortfall
         if info.done:
-            print('Implementation Shortfall: ${:,.2f} \n'.format(info.implementation_shortfall))
+            print(f'Implementation Shortfall: ${info.implementation_shortfall:,.2f} \n')
             break
 
     # Plot the impacted price
@@ -430,7 +430,7 @@ def get_av_std(lq_time=60, nm_trades=60, tr_risk=1e-6, trs=100):
 
         # Print current episode every 100 episodes
         if (episode + 1) % 100 == 0:
-            print('Episode [{}/{}]'.format(episode + 1, trs), end='\r', flush=True)
+            print(f'Episode [{episode + 1}/{trs}]', end='\r', flush=True)
 
         # Reset the enviroment
         env.reset(seed=episode, liquid_time=lq_time, num_trades=nm_trades, lamb=tr_risk)
@@ -446,8 +446,8 @@ def get_av_std(lq_time=60, nm_trades=60, tr_risk=1e-6, trs=100):
                 shortfall_hist = np.append(shortfall_hist, info.implementation_shortfall)
                 break
 
-    print('Average Implementation Shortfall: ${:,.2f}'.format(shortfall_hist.mean()))
-    print('Standard Deviation of the Implementation Shortfall: ${:,.2f}'.format(shortfall_hist.std()))
+    print(f'Average Implementation Shortfall: ${shortfall_hist.mean():,.2f}')
+    print(f'Standard Deviation of the Implementation Shortfall: ${shortfall_hist.std():,.2f}')
 
     plt.plot(shortfall_hist, 'cyan', label='')
     plt.xlim(0, trs)
