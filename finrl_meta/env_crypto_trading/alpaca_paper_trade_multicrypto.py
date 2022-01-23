@@ -28,15 +28,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from datetime import datetime, timedelta
-from finrl_meta.data_processors.processor_ccxt import CCXTProcessor
 import math
 import threading
-import alpaca_trade_api as tradeapi
 import time
-import pandas as pd
+from datetime import datetime, timedelta
+
+import alpaca_trade_api as tradeapi
 import numpy as np
+import pandas as pd
 import torch
+
+from finrl_meta.data_processors.processor_ccxt import CCXTProcessor
 
 
 class AlpacaPaperTradingMultiCrypto():
@@ -75,9 +77,9 @@ class AlpacaPaperTradingMultiCrypto():
         if self.CCTX_time_interval == '1m':
             self.time_interval = 60
         elif self.CCTX_time_interval == '1h':
-            self.time_interval = 60**2
+            self.time_interval = 60 ** 2
         elif self.CCTX_time_interval == '1d':
-            self.time_interval = 60**2 * 24
+            self.time_interval = 60 ** 2 * 24
         else:
             raise ValueError('Time interval input is NOT supported yet.')
 

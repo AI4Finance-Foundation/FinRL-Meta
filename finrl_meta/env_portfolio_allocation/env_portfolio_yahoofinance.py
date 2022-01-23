@@ -1,11 +1,11 @@
 '''From FinRL https://github.com/AI4Finance-LLC/FinRL/tree/master/finrl/env'''
 
+import gym
+import matplotlib
 import numpy as np
 import pandas as pd
-from gym.utils import seeding
-import gym
 from gym import spaces
-import matplotlib
+from gym.utils import seeding
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -64,19 +64,19 @@ class StockPortfolioEnv(gym.Env):
     metadata = {"render.modes": ["human"]}
 
     def __init__(
-        self,
-        df,
-        stock_dim,
-        hmax,
-        initial_amount,
-        transaction_cost_pct,
-        reward_scaling,
-        state_space,
-        action_space,
-        tech_indicator_list,
-        turbulence_threshold=None,
-        lookback=252,
-        day=0,
+            self,
+            df,
+            stock_dim,
+            hmax,
+            initial_amount,
+            transaction_cost_pct,
+            reward_scaling,
+            state_space,
+            action_space,
+            tech_indicator_list,
+            turbulence_threshold=None,
+            lookback=252,
+            day=0,
     ):
         # super(StockEnv, self).__init__()
         # money = 10 , scope = 1
@@ -146,9 +146,9 @@ class StockPortfolioEnv(gym.Env):
             df_daily_return.columns = ["daily_return"]
             if df_daily_return["daily_return"].std() != 0:
                 sharpe = (
-                    (252 ** 0.5)
-                    * df_daily_return["daily_return"].mean()
-                    / df_daily_return["daily_return"].std()
+                        (252 ** 0.5)
+                        * df_daily_return["daily_return"].mean()
+                        / df_daily_return["daily_return"].std()
                 )
                 print("Sharpe: ", sharpe)
             print("=================================")
