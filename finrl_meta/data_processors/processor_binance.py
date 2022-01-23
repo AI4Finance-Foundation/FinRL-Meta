@@ -27,15 +27,14 @@ class BinanceProcessor(BasicProcessor):
         if time_interval == "1s":
             # as per https://binance-docs.github.io/apidocs/spot/en/#compressed-aggregate-trades-list
             self.limit = 1000
-            final_df = self.fetch_n_combine(start_date, end_date, ticker_list)
+            self.dataframe = self.fetch_n_combine(start_date, end_date, ticker_list)
         else:
-            final_df = pd.DataFrame()
+            self.dataframe = pd.DataFrame()
             for i in ticker_list:
                 hist_data = self.dataframe_with_limit(symbol=i)
                 df = hist_data.iloc[:-1].dropna()
                 df['tic'] = i
-                final_df = final_df.append(df)
-        self.dataframe = final_df
+                self.dataframe = self.dataframe.append(df)
     
 
     # def clean_data(self, df):
