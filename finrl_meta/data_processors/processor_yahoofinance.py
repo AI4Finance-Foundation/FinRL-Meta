@@ -55,16 +55,16 @@ class YahooFinanceProcessor(BasicProcessor):
         self.time_zone = calc_time_zone(ticker_list, TIME_ZONE_SELFDEFINED, USE_TIME_ZONE_SELFDEFINED)
 
         # Download and save the data in a pandas DataFrame:
-        data_df = pd.DataFrame()
+        self.dataframe = pd.DataFrame()
         for tic in ticker_list:
             temp_df = yf.download(tic, start=start_date, end=end_date)
             temp_df["tic"] = tic
-            data_df = data_df.append(temp_df)
+            self.dataframe = self.dataframe.append(temp_df)
         # reset the index, we want to use numbers as index instead of dates
-        data_df = data_df.reset_index()
+        self.dataframe = self.dataframe.reset_index()
         try:
             # convert the column names to standardized names
-            data_df.columns = [
+            self.dataframe.columns = [
                 "date",
                 "open",
                 "high",
@@ -77,21 +77,19 @@ class YahooFinanceProcessor(BasicProcessor):
         except NotImplementedError:
             print("the features are not supported currently")
         # create day of the week column (monday = 0)
-        data_df["day"] = data_df["date"].dt.dayofweek
+        self.dataframe["day"] = self.dataframe["date"].dt.dayofweek
         # convert date to standard string format, easy to filter
-        data_df["date"] = data_df.date.apply(lambda x: x.strftime("%Y-%m-%d"))
+        self.dataframe["date"] = self.dataframe.date.apply(lambda x: x.strftime("%Y-%m-%d"))
         # drop missing data
-        data_df = data_df.dropna()
-        data_df = data_df.reset_index(drop=True)
-        print("Shape of DataFrame: ", data_df.shape)
+        self.dataframe = self.dataframe.dropna()
+        self.dataframe = self.dataframe.reset_index(drop=True)
+        print("Shape of DataFrame: ", self.dataframe.shape)
         # print("Display DataFrame: ", data_df.head())
 
-        data_df = data_df.sort_values(by=['date','tic']).reset_index(drop=True)
-
-        self.dataframe = data_df
+        self.dataframe = self.dataframe.sort_values(by=['date','tic']).reset_index(drop=True)
     
     def clean_data(self):
-        
+
         df = self.dataframe.copy()
         df = df.rename(columns={'date':'time'})
         time_interval = self.time_interval
