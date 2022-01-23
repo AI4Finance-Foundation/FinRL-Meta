@@ -34,28 +34,26 @@ class BasicProcessor:
         pass
 
     def clean_data(self):
-        df = self.dataframe
-        if "date" in df.columns.values.tolist():
-            df = df.rename(columns={'date': 'time'})
-        if "datetime" in df.columns.values.tolist():
-            df = df.rename(columns={'datetime': 'time'})
+        if "date" in self.dataframe.columns.values.tolist():
+            self.dataframe.rename(columns={'date': 'time'}, inplace=True)
+        if "datetime" in self.dataframe.columns.values.tolist():
+            self.dataframe.rename(columns={'datetime': 'time'}, inplace=True)
         if self.data_source == "ccxt":
-            df = df.rename(columns={'index': 'time'})
+            self.dataframe.rename(columns={'index': 'time'}, inplace=True)
         elif self.data_source == 'ricequant':
             ''' RiceQuant data is already cleaned, we only need to transform data format here.
                 No need for filling NaN data'''
-            df = df.rename(columns={'order_book_id': 'tic'})
+            self.dataframe.rename(columns={'order_book_id': 'tic'}, inplace=True)
             # raw df uses multi-index (tic,time), reset it to single index (time)
-            df = df.reset_index(level=[0, 1])
+            self.dataframe.reset_index(level=[0, 1], inplace=True)
             # check if there is NaN values
-            assert not df.isnull().values.any()
-        df2 = df.dropna()
+            assert not self.dataframe.isnull().values.any()
+        self.dataframe.dropna(inplace=True)
         # adj_close: adjusted close price
-        if 'adj_close' not in df2.columns.values.tolist():
-            df2['adj_close'] = df2['close']
-        df2 = df2.sort_values(by=['time', 'tic'])
-        final_df = df2[['tic', 'time', 'open', 'high', 'low', 'close', 'adj_close', 'volume']]
-        self.dataframe = final_df
+        if 'adj_close' not in self.dataframe.columns.values.tolist():
+            self.dataframe['adj_close'] = self.dataframe['close']
+        self.dataframe.sort_values(by=['time', 'tic'], inplace=True)
+        self.dataframe = self.dataframe[['tic', 'time', 'open', 'high', 'low', 'close', 'adj_close', 'volume']]
 
     def get_trading_days(self, start: str, end: str) -> List[str]:
         if self.data_source in ["binance", "ccxt", "quantconnect", "ricequant", "tusharepro"]:
@@ -70,21 +68,20 @@ class BasicProcessor:
         :param data: (df) pandas dataframe
         :return: (df) pandas dataframe
         """
-        df = self.dataframe.copy()
-        if "date" in df.columns.values.tolist():
-            df = df.rename(columns={'date': 'time'})
+        if "date" in self.dataframe.columns.values.tolist():
+            self.dataframe.rename(columns={'date': 'time'}, inplace=True)
 
         if self.data_source == "ccxt":
-            df = df.rename(columns={'index': 'time'})
+            self.dataframe.rename(columns={'index': 'time'}, inplace=True)
 
-        df = df.reset_index(drop=False)
-        if "level_1" in df.columns:
-            df = df.drop(columns=["level_1"])
-        if "level_0" in df.columns and "tic" not in df.columns:
-            df = df.rename(columns={"level_0": "tic"})
+        self.dataframe.reset_index(drop=False, inplace=True)
+        if "level_1" in self.dataframe.columns:
+            self.dataframe.drop(columns=["level_1"], inplace=True)
+        if "level_0" in self.dataframe.columns and "tic" not in self.dataframe.columns:
+            self.dataframe.rename(columns={"level_0": "tic"}, inplace=True)
         assert use_stockstats_or_talib in {0, 1}
         if use_stockstats_or_talib == 0:  # use stockstats
-            stock = stockstats.StockDataFrame.retype(df.copy())
+            stock = stockstats.StockDataFrame.retype(self.dataframe)
             unique_ticker = stock.tic.unique()
             for indicator in tech_indicator_list:
                 indicator_df = pd.DataFrame()
@@ -93,7 +90,7 @@ class BasicProcessor:
                         temp_indicator = stock[stock.tic == unique_ticker[i]][indicator]
                         temp_indicator = pd.DataFrame(temp_indicator)
                         temp_indicator["tic"] = unique_ticker[i]
-                        temp_indicator["time"] = df[df.tic == unique_ticker[i]][
+                        temp_indicator["time"] = self.dataframe[self.dataframe.tic == unique_ticker[i]][
                             "time"
                         ].to_list()
                         indicator_df = indicator_df.append(
@@ -101,25 +98,24 @@ class BasicProcessor:
                         )
                     except Exception as e:
                         print(e)
-                df = df.merge(
+                self.dataframe = self.dataframe.merge(
                     indicator_df[["tic", "time", indicator]], on=["tic", "time"], how="left"
                 )
         else:  # use talib
             final_df = pd.DataFrame()
-            for i in df.tic.unique():
-                tic_df = df[df.tic == i]
+            for i in self.dataframe.tic.unique():
+                tic_df = self.dataframe[self.dataframe.tic == i]
                 tic_df['macd'], tic_df['macd_signal'], tic_df['macd_hist'] = MACD(tic_df['close'], fastperiod=12,
                                                                                   slowperiod=26, signalperiod=9)
                 tic_df['rsi'] = RSI(tic_df['close'], timeperiod=14)
                 tic_df['cci'] = CCI(tic_df['high'], tic_df['low'], tic_df['close'], timeperiod=14)
                 tic_df['dx'] = DX(tic_df['high'], tic_df['low'], tic_df['close'], timeperiod=14)
                 final_df = final_df.append(tic_df)
-            df = final_df
+            self.dataframe = final_df
 
-        df = df.sort_values(by=["time", "tic"])
-        time_to_drop = df[df.isna().any(axis=1)].time.unique()
-        df = df[~df.time.isin(time_to_drop)]
-        self.dataframe = df
+        self.dataframe.sort_values(by=["time", "tic"], inplace=True)
+        time_to_drop = self.dataframe[self.dataframe.isna().any(axis=1)].time.unique()
+        self.dataframe = self.dataframe[~self.dataframe.time.isin(time_to_drop)]
         print("Succesfully add technical indicators")
 
     def add_turbulence(self):
@@ -136,21 +132,18 @@ class BasicProcessor:
         if self.data_source in ["binance", "ccxt", "iexcloud", "joinquant", "quantconnect"]:
             print(f"Turbulence not supported for {self.data_source} yet. Return original DataFrame.")
         if self.data_source in ["alpaca", "ricequant", "tusharepro", "wrds", "yahoofinance"]:
-            df = self.dataframe.copy()
-            turbulence_index = self.calculate_turbulence(df)
-            df = df.merge(turbulence_index, on="time")
-            df = df.sort_values(["time", "tic"]).reset_index(drop=True)
-            self.dataframe = df
+            turbulence_index = self.calculate_turbulence()
+            self.dataframe = self.dataframe.merge(turbulence_index, on="time")
+            self.dataframe.sort_values(["time", "tic"], inplace=True).reset_index(drop=True, inplace=True)
 
     def calculate_turbulence(self, time_period: int = 252) -> pd.DataFrame:
         """calculate turbulence index based on dow 30"""
         # can add other market assets
-        df = self.dataframe.copy()
-        df_price_pivot = df.pivot(index="time", columns="tic", values="close")
+        df_price_pivot = self.dataframe.pivot(index="time", columns="tic", values="close")
         # use returns to calculate turbulence
         df_price_pivot = df_price_pivot.pct_change()
 
-        unique_date = df['time'].unique()
+        unique_date = self.dataframe['time'].unique()
         # start after a year
         start = time_period
         turbulence_index = [0] * start
@@ -254,14 +247,13 @@ class BasicProcessor:
         self.dataframe = df
 
     def df_to_array(self, tech_indicator_list: list, if_vix: bool):
-        df = self.dataframe.copy()
-        unique_ticker = df.tic.unique()
-        price_array = np.column_stack([df[df.tic == tic].close for tic in unique_ticker])
-        tech_array = np.hstack([df.loc[(df.tic == tic), tech_indicator_list] for tic in unique_ticker])
+        unique_ticker = self.dataframe.tic.unique()
+        price_array = np.column_stack([self.dataframe[self.dataframe.tic == tic].close for tic in unique_ticker])
+        tech_array = np.hstack([self.dataframe.loc[(self.dataframe.tic == tic), tech_indicator_list] for tic in unique_ticker])
         if if_vix:
-            risk_array = np.column_stack([df[df.tic == tic].vix for tic in unique_ticker])
+            risk_array = np.column_stack([self.dataframe[self.dataframe.tic == tic].vix for tic in unique_ticker])
         else:
             risk_array = np.column_stack(
-                [df[df.tic == tic].turbulence for tic in unique_ticker]) if "turbulence" in df.columns else None
+                [self.dataframe[self.dataframe.tic == tic].turbulence for tic in unique_ticker]) if "turbulence" in self.dataframe.columns else None
         print("Successfully transformed into array")
         return price_array, tech_array, risk_array
