@@ -1,4 +1,5 @@
 import datetime
+from typing import List
 
 import exchange_calendars as tc
 import numpy as np
@@ -21,11 +22,41 @@ class WrdsProcessor(BasicProcessor):
         if 'if_offline' in kwargs.keys() and not kwargs['if_offline']:
             self.db = wrds.Connection()
 
-    def get_trading_days(start, end):
-        nyse = tc.get_calendar('NYSE')
-        df = nyse.sessions_in_range(pd.Timestamp(start, tz=pytz.UTC),
-                                    pd.Timestamp(end, tz=pytz.UTC))
-        return [str(day)[:10] for day in df]
+    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str,
+                      if_save_tempfile=False,
+                      filter_shares=0):
+
+        self.start = start_date
+        self.end = end_date
+        self.time_interval = time_interval
+
+        dates = self.get_trading_days(start_date, end_date)
+        print('Trading days: ')
+        print(dates)
+        first_time = True
+        empty = True
+        stock_set = tuple(ticker_list)
+        for i in dates:
+            x = self.data_fetch_wrds(i, stock_set, filter_shares, time_interval)
+
+            if not x[1]:
+                empty = False
+                dataset = x[0]
+                dataset = self.preprocess_to_ohlcv(dataset, time_interval=(str(time_interval) + 'S'))
+                print('Data for date: ' + i + ' finished')
+                if first_time:
+                    temp = dataset
+                    first_time = False
+                else:
+                    temp = pd.concat([temp, dataset])
+                if if_save_tempfile:
+                    temp.to_csv('./temp.csv')
+        if empty:
+            raise ValueError('Empty Data under input parameters!')
+        result = temp
+        result = result.sort_values(by=['time', 'tic'])
+        result = result.reset_index(drop=True)
+        self.dataframe = result
 
     def preprocess_to_ohlcv(self, df, time_interval='60S'):
         df = df[['date', 'time_m', 'sym_root', 'size', 'price']]
@@ -117,6 +148,30 @@ class WrdsProcessor(BasicProcessor):
         df = df.reset_index(drop=True)
         print('Data clean finished')
         self.dataframe = df
+
+    def get_trading_days(self, start, end):
+        nyse = tc.get_calendar('NYSE')
+        df = nyse.sessions_in_range(pd.Timestamp(start, tz=pytz.UTC),
+                                    pd.Timestamp(end, tz=pytz.UTC))
+        return [str(day)[:10] for day in df]
+
+    def data_fetch_wrds(self, date='2021-05-01', stock_set=('AAPL'), filter_shares=0, time_interval=60):
+        # start_date, end_date should be in the same year
+        current_date = datetime.datetime.strptime(date, '%Y-%m-%d')
+        lib = 'taqm_' + str(current_date.year)  # taqm_2021
+        table = 'ctm_' + current_date.strftime('%Y%m%d')  # ctm_20210501
+
+        parm = {'syms': stock_set, 'num_shares': filter_shares}
+        try:
+            data = self.db.raw_sql("select * from " + lib + '.' + table +
+                                   " where sym_root in %(syms)s and time_m between '9:30:00' and '16:00:00' and size > %(num_shares)s and sym_suffix is null",
+                                   params=parm)
+            if_empty = False
+            return data, if_empty
+        except:
+            print('Data for date: ' + date + ' error')
+            if_empty = True
+            return None, if_empty
 
     # def add_technical_indicator(self, df, tech_indicator_list = [
     #         'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',
