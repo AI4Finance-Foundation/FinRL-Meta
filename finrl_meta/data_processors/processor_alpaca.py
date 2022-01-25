@@ -29,7 +29,7 @@ class AlpacaProcessor(BasicProcessor):
     #     else:
     #         self.api = api
     def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
-        BasicProcessor.__init__(self, data_source, start_date, end_date, time_interval, **kwargs)
+        super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
         if kwargs['API'] is None:
             try:
                 self.api = tradeapi.REST(kwargs['API_KEY'], kwargs['API_SECRET'], kwargs['APCA_API_BASE_URL'], "v2")

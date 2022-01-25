@@ -14,7 +14,7 @@ from finrl_meta.data_processors.func import calc_all_filenames, remove_all_files
 
 class JoinquantProcessor(BasicProcessor):
     def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
-        BasicProcessor.__init__(self, data_source, start_date, end_date, time_interval, **kwargs)
+        super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
         if 'username' in kwargs.keys() and 'password' in kwargs.keys():
             jq.auth(kwargs['username'], kwargs['password'])
 

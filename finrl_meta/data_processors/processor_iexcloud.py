@@ -23,7 +23,7 @@ class IEXCloudProcessor(BasicProcessor):
         return "https://cloud.iexapis.com"
 
     def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
-        BasicProcessor.__init__(self, data_source, start_date, end_date, time_interval, **kwargs)
+        super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
         self.base_url = self._get_base_url(mode=kwargs['mode'])
         self.token = kwargs['token'] or os.environ.get("IEX_TOKEN")
 

@@ -15,7 +15,7 @@ USE_TIME_ZONE_SELFDEFINED = 0  # 0 (default) or 1 (use the self defined)
 ## The code of this file is used in website, not locally.
 class QuantConnectProcessor(BasicProcessor):
     def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
-        BasicProcessor.__init__(self, data_source, start_date, end_date, time_interval, **kwargs)
+        super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
 
     # def data_fetch(start_time, end_time, stock_list, resolution=Resolution.Daily) :
     #     #resolution: Daily, Hour, Minute, Second

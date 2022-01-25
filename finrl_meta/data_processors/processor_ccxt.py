@@ -12,7 +12,7 @@ from finrl_meta.data_processors.basic_processor import BasicProcessor
 
 class CCXTProcessor(BasicProcessor):
     def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
-        BasicProcessor.__init__(self, data_source, start_date, end_date, time_interval, **kwargs)
+        super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
         self.binance = ccxt.binance()
 
     def download_data(self, ticker_list: List[str]):
