@@ -242,3 +242,6 @@ class BasicProcessor:
             risk_array = np.column_stack([self.dataframe[self.dataframe.tic==tic].turbulence for tic in unique_ticker]) if "turbulence" in self.dataframe.columns else None
         print("Successfully transformed into array")
         return price_array, tech_array, risk_array
+
+    def transfer_standard_time_interval(self) -> str:
+        pass

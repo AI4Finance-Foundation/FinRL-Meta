@@ -372,3 +372,28 @@ class AlpacaProcessor(BasicProcessor):
         cumu_returns = equities/equities[0]
         cumu_returns = cumu_returns[~np.isnan(cumu_returns)]
         return cumu_returns
+
+    # s: second, m: minute, h: hour, d: day, w: week, M: month
+    def transfer_standard_time_interval(self) -> str:
+        if self.time_interval == "alpaca":
+            pass
+        elif self.time_interval == "binance":
+            pass
+        elif self.time_interval == "ccxt":
+            pass
+        elif self.time_interval == "iexcloud":
+            pass
+        elif self.time_interval == "joinquant":
+            assert self.time_interval in {'1m', '5m', '15m', '30m', '60m', '120m', '1d', '1w', '1M'}, "This time interval {self.time_interval} is not supported for {self.data_source}"
+        elif self.time_interval == "quantconnect":
+            pass
+        elif self.time_interval == "ricequant":
+            pass
+        elif self.time_interval == "tusharepro":
+            pass
+        elif self.time_interval == "wrds":
+            pass
+        elif self.time_interval == "yahoofinance":
+            pass
+        else:
+            raise ValueError("Not support this time interval: {self.time_interval} in {self.data_source}")
