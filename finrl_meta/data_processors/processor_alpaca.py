@@ -373,7 +373,8 @@ class AlpacaProcessor(BasicProcessor):
         cumu_returns = cumu_returns[~np.isnan(cumu_returns)]
         return cumu_returns
 
-    # s: second, m: minute, h: hour, d: day, w: week, M: month
+    # standard_time_interval  s: second, m: minute, h: hour, d: day, w: week, M: month
+    # output time_interval of the processor
     def transfer_standard_time_interval(self) -> str:
         if self.time_interval == "alpaca":
             pass
