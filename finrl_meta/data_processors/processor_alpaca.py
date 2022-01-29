@@ -1,11 +1,16 @@
 from typing import List
 
 import alpaca_trade_api as tradeapi
-import exchange_calendars as tc
 import numpy as np
 import pandas as pd
 import pytz
-
+try:
+    import exchange_calendars as tc
+except:
+    print('Cannot import exchange_calendars.', 
+          'If you are using python>=3.7, please install it.')
+    import trading_calendars as tc
+    print('Use trading_calendars instead for alpaca processor.')
 # from basic_processor import BasicProcessor
 from finrl_meta.data_processors.basic_processor import BasicProcessor
 from finrl_meta.data_processors.func import calc_time_zone

@@ -113,6 +113,31 @@ class BinanceProcessor(BasicProcessor):
         df.reset_index(drop=True, inplace=True)
 
         return df
+    
+    def get_newest_bars(self, symbols, interval, limit):
+        merged_df = pd.DataFrame()
+        for symbol in symbols:
+            req_params = {"symbol": symbol, 'interval': interval, 'limit': limit}
+    
+            df = pd.DataFrame(requests.get(self.url, params=req_params).json(), index=range(limit))
+            
+            if df.empty:
+                return None
+            
+            df = df.iloc[:, 0:6]
+            df.columns = ['datetime','open','high','low','close','volume']
+    
+            df[['open','high','low','close','volume']] = df[['open','high','low','close','volume']].astype(float)
+    
+            # No stock split and dividend announcement, hence adjusted close is the same as close
+            df['adj_close'] = df['close']
+            df['datetime'] = df.datetime.apply(lambda x: dt.datetime.fromtimestamp(x/1000.0))
+            df['tic'] = symbol
+            df = df.rename(columns = {'datetime':'time'})
+            df.reset_index(drop=True, inplace=True)
+            merged_df = merged_df.append(df)
+            
+        return merged_df
 
     def dataframe_with_limit(self, symbol):
         final_df = pd.DataFrame()
