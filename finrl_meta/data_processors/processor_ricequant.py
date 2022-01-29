@@ -1,23 +1,24 @@
-import rqdatac as ricequant
-import pandas as pd
-import numpy as np
 from typing import List
+
+import rqdatac as ricequant
+
 from finrl_meta.data_processors.basic_processor import BasicProcessor
 
+
 class RiceQuantProcessor(BasicProcessor):
-    def __init__(self, data_source: str, **kwargs):
-        BasicProcessor.__init__(self, data_source, **kwargs)
-        if kwargs['username']== None or kwargs['password'] == None:
-            ricequant.init()   #if the lisence is already set, you can init without username and password
+    def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
+        super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
+        if kwargs['username'] is None or kwargs['password'] is None:
+            ricequant.init()  # if the lisence is already set, you can init without username and password
         else:
-            ricequant.init(kwargs['username'], kwargs['password']) #init with username and password
-            
-    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str):
+            ricequant.init(kwargs['username'], kwargs['password'])  # init with username and password
+
+    def download_data(self, ticker_list: List[str]):
         # download data by calling RiceQuant API
-        dataframe = ricequant.get_price(ticker_list, frequency = time_interval, 
-                            start_date = start_date, end_date = end_date)
+        dataframe = ricequant.get_price(ticker_list, frequency=self.time_interval,
+                                        start_date=self.start_date, end_date=self.end_date)
         self.dataframe = dataframe
-    
+
     # def clean_data(self, df) -> pd.DataFrame:
     #     ''' RiceQuant data is already cleaned, we only need to transform data format here.
     #     No need for filling NaN data'''
@@ -31,7 +32,7 @@ class RiceQuantProcessor(BasicProcessor):
     #     # check if there is NaN values
     #     assert not df.isnull().values.any()
     #     return df
-    
+
     # def add_vix(self, data):
     #     print('VIX is NOT applicable to China A-shares')
     #     return data
@@ -107,4 +108,3 @@ class RiceQuantProcessor(BasicProcessor):
     #             tech_array = np.hstack([tech_array, df[df.tic==tic][tech_indicator_list].values])
     #     print('Successfully transformed into array')
     #     return price_array, tech_array, None
-    

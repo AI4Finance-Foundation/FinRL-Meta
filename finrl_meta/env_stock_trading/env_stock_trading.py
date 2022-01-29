@@ -2,20 +2,21 @@ import gym
 import numpy as np
 from numpy import random as rd
 
+
 class StockTradingEnv(gym.Env):
     def __init__(
-        self,
-        config,
-        initial_account=1e6,
-        gamma=0.99,
-        turbulence_thresh=99,
-        min_stock_rate=0.1,
-        max_stock=1e2,
-        initial_capital=1e6,
-        buy_cost_pct=1e-3,
-        sell_cost_pct=1e-3,
-        reward_scaling=2 ** -11,
-        initial_stocks=None,
+            self,
+            config,
+            initial_account=1e6,
+            gamma=0.99,
+            turbulence_thresh=99,
+            min_stock_rate=0.1,
+            max_stock=1e2,
+            initial_capital=1e6,
+            buy_cost_pct=1e-3,
+            sell_cost_pct=1e-3,
+            reward_scaling=2 ** -11,
+            initial_stocks=None,
     ):
         price_array = config["price_array"]
         tech_array = config["tech_array"]
@@ -28,7 +29,7 @@ class StockTradingEnv(gym.Env):
         self.tech_array = self.tech_array * 2 ** -7
         self.turbulence_bool = (turbulence_array > turbulence_thresh).astype(np.float32)
         self.turbulence_array = (
-            self.sigmoid_sign(turbulence_array, turbulence_thresh) * 2 ** -5
+                self.sigmoid_sign(turbulence_array, turbulence_thresh) * 2 ** -5
         ).astype(np.float32)
 
         stock_dim = self.price_array.shape[1]
@@ -80,12 +81,12 @@ class StockTradingEnv(gym.Env):
 
         if self.if_train:
             self.stocks = (
-                self.initial_stocks + rd.randint(0, 64, size=self.initial_stocks.shape)
+                    self.initial_stocks + rd.randint(0, 64, size=self.initial_stocks.shape)
             ).astype(np.float32)
             self.stocks_cool_down = np.zeros_like(self.stocks)
             self.cash = (
-                self.initial_capital * rd.uniform(0.95, 1.05)
-                - (self.stocks * price).sum()
+                    self.initial_capital * rd.uniform(0.95, 1.05)
+                    - (self.stocks * price).sum()
             )
         else:
             self.stocks = self.initial_stocks.astype(np.float32)
@@ -110,17 +111,17 @@ class StockTradingEnv(gym.Env):
                     sell_num_shares = min(self.stocks[index], -actions[index])
                     self.stocks[index] -= sell_num_shares
                     self.cash += (
-                        price[index] * sell_num_shares * (1 - self.sell_cost_pct)
+                            price[index] * sell_num_shares * (1 - self.sell_cost_pct)
                     )
                     self.stocks_cool_down[index] = 0
             for index in np.where(actions > min_action)[0]:  # buy_index:
                 if (
-                    price[index] > 0
+                        price[index] > 0
                 ):  # Buy only if the price is > 0 (no missing data in this particular date)
                     buy_num_shares = min(self.cash // price[index], actions[index])
                     self.stocks[index] += buy_num_shares
                     self.cash -= (
-                        price[index] * buy_num_shares * (1 + self.buy_cost_pct)
+                            price[index] * buy_num_shares * (1 + self.buy_cost_pct)
                     )
                     self.stocks_cool_down[index] = 0
 

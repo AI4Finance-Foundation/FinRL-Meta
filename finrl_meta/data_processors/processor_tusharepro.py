@@ -1,19 +1,14 @@
-
-from email.policy import default
-import numpy as np
 import pandas as pd
-import tushare as ts
 from tqdm import tqdm
-from stockstats import StockDataFrame as Sdf
-import stockstats
 from finrl_meta.data_processors.basic_processor import BasicProcessor
 from typing import List
 import time
 import copy
 import warnings
-from talib.abstract import CCI, DX, MACD, RSI
 from copy import deepcopy
+
 warnings.filterwarnings("ignore")
+
 
 class TushareProProcessor(BasicProcessor):
     """Provides methods for retrieving daily stock data from tusharepro API
@@ -37,26 +32,27 @@ class TushareProProcessor(BasicProcessor):
         Fetches data from tusharepro API
     
     """
-    def __init__(self, data_source: str, **kwargs):
-        BasicProcessor.__init__(self, data_source, **kwargs)
-        if  'token' not in kwargs.keys() :
+
+    def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
+        super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
+        if 'token' not in kwargs.keys():
             raise ValueError("pleses input token!")
-        self.token=kwargs["token"]
-        if  'adj' in kwargs.keys() :
-            self.adj=kwargs["adj"]
+        self.token = kwargs["token"]
+        if 'adj' in kwargs.keys():
+            self.adj = kwargs["adj"]
             print(f"Using {self.adj} method")
         else:
-            self.adj=None
-            
-    
-    def get_data(self,id) -> pd.DataFrame: 
-        dfb = ts.pro_bar(ts_code=id, start_date=self.start,end_date=self.end,adj=self.adj)
-        #df1 = ts.pro_bar(ts_code=id, start_date=self.start_date,end_date='20180101')
-        #dfb=pd.concat([df, df1], ignore_index=True)
-        #print(dfb.shape)
-        return dfb
+            self.adj = None
 
-    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str):
+    def get_data(self, id) -> pd.DataFrame:
+        # df1 = ts.pro_bar(ts_code=id, start_date=self.start_date,end_date='20180101')
+        # dfb=pd.concat([df, df1], ignore_index=True)
+        # print(dfb.shape)
+        return ts.pro_bar(
+            ts_code=id, start_date=self.start, end_date=self.end, adj=self.adj
+        )
+
+    def download_data(self, ticker_list: List[str]):
         """Fetches data from tusharepro API
         Parameters
         ----------
@@ -67,74 +63,72 @@ class TushareProProcessor(BasicProcessor):
             for the specified stock ticker
         """
         self.ticker_list = ticker_list
-        self.start = start_date
-        self.end = end_date
-        self.time_interval = time_interval
 
-        if self.time_interval!="1D":
+        if self.time_interval != "1D":
             raise ValueError('not supported currently')
-        
+
         ts.set_token(self.token)
-        
-        self.df=pd.DataFrame()
-        for i in tqdm(self.ticker_list,total=len(self.ticker_list)):
-            df_temp=self.get_data(i)
-            self.df=self.df.append(df_temp)
-            #print("{} ok".format(i))
+
+        self.df = pd.DataFrame()
+        for i in tqdm(ticker_list, total=len(ticker_list)):
+            df_temp = self.get_data(i)
+            self.df = self.df.append(df_temp)
+            # print("{} ok".format(i))
             time.sleep(0.25)
-        
-        self.df.columns=['tic','date','open','high','low','close','pre_close','change','pct_chg','volume','amount']
-        self.df = self.df.sort_values(by=['date','tic']).reset_index(drop=True)
-        
-        df=self.df[['tic', 'date' , 'open' , 'high' , 'low' , 'close' , 'volume' ]]
-        df["date"]= pd.to_datetime(df["date"],format="%Y%m%d")
-        df["day"] = df["date"].dt.dayofweek 
+
+        self.df.columns = ['tic', 'date', 'open', 'high', 'low', 'close', 'pre_close', 'change', 'pct_chg', 'volume',
+                           'amount']
+        self.df = self.df.sort_values(by=['date', 'tic']).reset_index(drop=True)
+
+        df = self.df[['tic', 'date', 'open', 'high', 'low', 'close', 'volume']]
+        df["date"] = pd.to_datetime(df["date"], format="%Y%m%d")
+        df["day"] = df["date"].dt.dayofweek
         df["date"] = df.date.apply(lambda x: x.strftime("%Y-%m-%d"))
-        
+
         df = df.dropna()
-        df = df.sort_values(by=['date','tic']).reset_index(drop=True)
+        df = df.sort_values(by=['date', 'tic']).reset_index(drop=True)
 
         print("Shape of DataFrame: ", df.shape)
 
         self.dataframe = df
 
     def clean_data(self):
-        dfc=copy.deepcopy(self.dataframe)
-        
-        dfcode=pd.DataFrame(columns=['tic'])
-        dfdate=pd.DataFrame(columns=['date'])
+        dfc = copy.deepcopy(self.dataframe)
 
-        dfcode.tic=dfc.tic.unique()
-        
+        dfcode = pd.DataFrame(columns=['tic'])
+        dfdate = pd.DataFrame(columns=['date'])
+
+        dfcode.tic = dfc.tic.unique()
+
         if "time" in dfc.columns.values.tolist():
             dfc = dfc.rename(columns={'time': 'date'})
-        
-        dfdate.date=dfc.date.unique()
-        dfdate.sort_values(by="date",ascending=False,ignore_index=True,inplace=True)
-        
+
+        dfdate.date = dfc.date.unique()
+        dfdate.sort_values(by="date", ascending=False, ignore_index=True, inplace=True)
+
         # the old pandas may not support pd.merge(how="cross")
-        try: 
-            df1=pd.merge(dfcode,dfdate,how="cross")
+        try:
+            df1 = pd.merge(dfcode, dfdate, how="cross")
         except:
             print("Please wait for a few seconds...")
-            df1=pd.DataFrame(columns=["tic","date"])
+            df1 = pd.DataFrame(columns=["tic", "date"])
             for i in range(dfcode.shape[0]):
                 for j in range(dfdate.shape[0]):
-                    df1=df1.append(pd.DataFrame(data={"tic":dfcode.iat[i,0], "date":dfdate.iat[j,0]},index=[(i+1)*(j+1)-1]))
-            
-        df2=pd.merge(df1,dfc,how="left",on=["tic","date"])
-        
+                    df1 = df1.append(pd.DataFrame(data={"tic": dfcode.iat[i, 0], "date": dfdate.iat[j, 0]},
+                                                  index=[(i + 1) * (j + 1) - 1]))
+
+        df2 = pd.merge(df1, dfc, how="left", on=["tic", "date"])
 
         # back fill missing data then front fill
-        df3=pd.DataFrame(columns=df2.columns)
+        df3 = pd.DataFrame(columns=df2.columns)
         for i in self.ticker_list:
-            df4=df2[df2.tic==i].fillna(method="bfill").fillna(method="ffill")
-            df3=pd.concat([df3, df4], ignore_index=True)
+            df4 = df2[df2.tic == i].fillna(method="bfill").fillna(method="ffill")
+            df3 = pd.concat([df3, df4], ignore_index=True)
 
-        df3=df3.fillna(0)
+        df3 = df3.fillna(0)
 
         # reshape dataframe
-        df3 = df3.sort_values(by=['date','tic']).reset_index(drop=True)
+        df3 = df3.sort_values(by=['date', 'tic']).reset_index(drop=True)
 
         print("Shape of DataFrame: ", df3.shape)
 
@@ -201,7 +195,7 @@ class TushareProProcessor(BasicProcessor):
     # def get_trading_days(self, start: str, end: str) -> List[str]:
     #     print('not supported currently!')
     #     return ['not supported currently!']
-    
+
     # def add_turbulence(self, data: pd.DataFrame) \
     #         -> pd.DataFrame:
     #     print('not supported currently!')
@@ -211,7 +205,7 @@ class TushareProProcessor(BasicProcessor):
     #         -> pd.DataFrame:
     #     print('not supported currently!')
     #     return pd.DataFrame(['not supported currently!'])
-    
+
     # def add_vix(self, data: pd.DataFrame) \
     #         -> pd.DataFrame:
     #     print('not supported currently!')
@@ -238,23 +232,25 @@ import tushare as ts
 import pandas as pd
 from matplotlib import pyplot as plt
 
+
 class ReturnPlotter:
     """
     An easy-to-use plotting tool to plot cumulative returns over time.
     Baseline supports equal weighting(default) and any stocks you want to use for comparison.
     """
+
     def __init__(self, df_account_value, df_trade, start_date, end_date):
         self.start = start_date
         self.end = end_date
         self.trade = df_trade
         self.df_account_value = df_account_value
-    
+
     def get_baseline(self, ticket):
         df = ts.get_hist_data(ticket, start=self.start, end=self.end)
-        df.loc[:,'dt']=df.index
-        df.index=range(len(df))
-        df.sort_values(axis=0,by='dt',ascending=True,inplace=True)
-        df["date"] = pd.to_datetime(df["dt"],format='%Y-%m-%d')
+        df.loc[:, 'dt'] = df.index
+        df.index = range(len(df))
+        df.sort_values(axis=0, by='dt', ascending=True, inplace=True)
+        df["date"] = pd.to_datetime(df["dt"], format='%Y-%m-%d')
         return df
 
     def plot(self, baseline_ticket=None):
@@ -268,36 +264,30 @@ class ReturnPlotter:
         if baseline_ticket:
             # 使用指定ticket作为baseline
             baseline_df = self.get_baseline(baseline_ticket)
-            baseline_df = baseline_df[baseline_df.dt != "2020-06-26"]       # ours don't have date=="2020-06-26"
+            baseline_df = baseline_df[baseline_df.dt != "2020-06-26"]  # ours don't have date=="2020-06-26"
             baseline = baseline_df.close.tolist()
-            if baseline_ticket in tic2label.keys():
-                baseline_label = tic2label[baseline_ticket]
-            else:
-                baseline_label = baseline_ticket
+            baseline_label = tic2label.get(baseline_ticket, baseline_ticket)
         else:
             # 均等权重
             all_date = self.trade.date.unique().tolist()
             baseline = []
             for day in all_date:
-                day_close = self.trade[self.trade["date"]==day].close.tolist()
-                avg_close = sum(day_close)/len(day_close)
+                day_close = self.trade[self.trade["date"] == day].close.tolist()
+                avg_close = sum(day_close) / len(day_close)
                 baseline.append(avg_close)
 
         ours = self.df_account_value.account_value.tolist()
         ours = self.pct(ours)
         baseline = self.pct(baseline)
 
-        days_per_tick = 60                                          # you should scale this variable accroding to the total trading days
+        days_per_tick = 60  # you should scale this variable accroding to the total trading days
         time = list(range(len(ours)))
         datetimes = self.df_account_value.date.tolist()
-        ticks = []
-        for t, tick in zip(time, datetimes):
-            if t % days_per_tick == 0:     ticks.append(tick)
-
+        ticks = [tick for t, tick in zip(time, datetimes) if t % days_per_tick == 0]
         plt.title("Cumulative Returns")
         plt.plot(time, ours, label="DDPG Agent", color="green")
-        plt.plot(time, baseline, label=baseline_label, color="grey")         
-        plt.xticks([i*days_per_tick for i in range(len(ticks))], ticks, fontsize=7)
+        plt.plot(time, baseline, label=baseline_label, color="grey")
+        plt.xticks([i * days_per_tick for i in range(len(ticks))], ticks, fontsize=7)
 
         plt.xlabel("Date")
         plt.ylabel("Cumulative Return")
@@ -308,18 +298,18 @@ class ReturnPlotter:
     def plot_all(self):
         baseline_label = "Equal-weight portfolio"
         tic2label = {"399300": "CSI 300 Index", "000016": "SSE 50 Index"}
-        
+
         # 399300
         baseline_ticket = "399300"
         baseline_df = self.get_baseline(baseline_ticket)
-        baseline_df = baseline_df[baseline_df.dt != "2020-06-26"]       # ours don't have date=="2020-06-26"
+        baseline_df = baseline_df[baseline_df.dt != "2020-06-26"]  # ours don't have date=="2020-06-26"
         baseline_300 = baseline_df.close.tolist()
         baseline_label_300 = tic2label[baseline_ticket]
 
         # 000016
         baseline_ticket = "000016"
         baseline_df = self.get_baseline(baseline_ticket)
-        baseline_df = baseline_df[baseline_df.dt != "2020-06-26"]       # ours don't have date=="2020-06-26"
+        baseline_df = baseline_df[baseline_df.dt != "2020-06-26"]  # ours don't have date=="2020-06-26"
         baseline_50 = baseline_df.close.tolist()
         baseline_label_50 = tic2label[baseline_ticket]
 
@@ -327,8 +317,8 @@ class ReturnPlotter:
         all_date = self.trade.date.unique().tolist()
         baseline_equal_weight = []
         for day in all_date:
-            day_close = self.trade[self.trade["date"]==day].close.tolist()
-            avg_close = sum(day_close)/len(day_close)
+            day_close = self.trade[self.trade["date"] == day].close.tolist()
+            avg_close = sum(day_close) / len(day_close)
             baseline_equal_weight.append(avg_close)
 
         ours = self.df_account_value.account_value.tolist()
@@ -338,35 +328,31 @@ class ReturnPlotter:
         baseline_50 = self.pct(baseline_50)
         baseline_equal_weight = self.pct(baseline_equal_weight)
 
-        days_per_tick = 60                                          # you should scale this variable accroding to the total trading days
+        days_per_tick = 60  # you should scale this variable accroding to the total trading days
         time = list(range(len(ours)))
         datetimes = self.df_account_value.date.tolist()
-        ticks = []
-        for t, tick in zip(time, datetimes):
-            if t % days_per_tick == 0:     ticks.append(tick)
-
+        ticks = [tick for t, tick in zip(time, datetimes) if t % days_per_tick == 0]
         plt.title("Cumulative Returns")
         plt.plot(time, ours, label="DDPG Agent", color="darkorange")
-        plt.plot(time, baseline_equal_weight, label=baseline_label, color="cornflowerblue")       # equal weight
-        plt.plot(time, baseline_300, label=baseline_label_300, color="lightgreen")          # 399300
-        plt.plot(time, baseline_50, label=baseline_label_50, color="silver")               # 000016
+        plt.plot(time, baseline_equal_weight, label=baseline_label, color="cornflowerblue")  # equal weight
+        plt.plot(time, baseline_300, label=baseline_label_300, color="lightgreen")  # 399300
+        plt.plot(time, baseline_50, label=baseline_label_50, color="silver")  # 000016
         plt.xlabel("Date")
         plt.ylabel("Cumulative Return")
 
-        plt.xticks([i*days_per_tick for i in range(len(ticks))], ticks, fontsize=7)
+        plt.xticks([i * days_per_tick for i in range(len(ticks))], ticks, fontsize=7)
         plt.legend()
         plt.show()
-
 
     def pct(self, l):
         """Get percentage"""
         base = l[0]
-        return [x/base for x in l]
+        return [x / base for x in l]
 
     def get_return(self, df, value_col_name="account_value"):
         df = deepcopy(df)
         df["daily_return"] = df[value_col_name].pct_change(1)
-        df["date"] = pd.to_datetime(df["date"],format='%Y-%m-%d')
+        df["date"] = pd.to_datetime(df["date"], format='%Y-%m-%d')
         df.set_index("date", inplace=True, drop=True)
         df.index = df.index.tz_localize("UTC")
         return pd.Series(df["daily_return"], index=df.index)

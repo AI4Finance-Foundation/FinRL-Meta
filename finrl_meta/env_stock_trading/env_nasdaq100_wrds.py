@@ -1,21 +1,23 @@
 import os
+
 import gym
 import numpy as np
 from numpy import random as rd
 
 gym.logger.set_level(40)  # Block warning: 'WARN: Box bound precision lowered by casting to float32'
 
+
 class StockEnvNAS100:
-    def __init__(self, cwd='./data/nas100', price_ary=None, tech_ary=None, turbulence_ary=None, 
+    def __init__(self, cwd='./data/nas100', price_ary=None, tech_ary=None, turbulence_ary=None,
                  gamma=0.999, turbulence_thresh=30, min_stock_rate=0.1,
                  max_stock=1e2, initial_capital=1e6, buy_cost_pct=1e-3, sell_cost_pct=1e-3,
                  data_gap=4, reward_scaling=2 ** -11,
                  ticker_list=None, tech_indicator_list=None, initial_stocks=None, if_eval=False, if_trade=False):
         self.min_stock_rate = min_stock_rate
-        beg_i, mid_i, end_i = 0, int(211210), int(422420)  
+        beg_i, mid_i, end_i = 0, int(211210), int(422420)
 
         (i0, i1) = (beg_i, mid_i) if if_eval else (mid_i, end_i)
-        data_arrays = self.load_data(cwd) if cwd !=None else price_ary,tech_ary,turbulence_ary
+        data_arrays = self.load_data(cwd) if cwd != None else price_ary, tech_ary, turbulence_ary
         if not if_trade:
             data_arrays = [ary[i0:i1:data_gap] for ary in data_arrays]
         else:
@@ -181,5 +183,3 @@ class StockEnvNAS100:
             return 1 / (1 + np.exp(-x * np.e)) - 0.5
 
         return sigmoid(ary / thresh) * thresh
-
-

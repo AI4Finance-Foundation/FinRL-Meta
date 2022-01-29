@@ -1,4 +1,4 @@
-from setuptools import  setup
+from setuptools import setup
 
 # Read requirements.txt, ignore comments
 # try:

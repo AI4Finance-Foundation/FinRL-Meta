@@ -28,15 +28,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from datetime import datetime, timedelta
-from finrl_meta.data_processors.processor_ccxt import CCXTProcessor
 import math
 import threading
-import alpaca_trade_api as tradeapi
 import time
-import pandas as pd
+from datetime import datetime, timedelta
+
+import alpaca_trade_api as tradeapi
 import numpy as np
+import pandas as pd
 import torch
+
+from finrl_meta.data_processors.processor_ccxt import CCXTProcessor
 
 
 class AlpacaPaperTradingMultiCrypto():
@@ -47,21 +49,20 @@ class AlpacaPaperTradingMultiCrypto():
                  max_stock=1e2, latency=None):
         # load agent
         self.drl_lib = drl_lib
-        if agent == 'ppo':
-            if drl_lib == 'elegantrl':
-                from elegantrl.agent import AgentPPO
-                # load agent
-                try:
-                    agent = AgentPPO()
-                    agent.init(net_dim, state_dim, action_dim)
-                    agent.save_or_load_agent(cwd=cwd, if_save=False)
-                    self.act = agent.act
-                    self.device = agent.device
-                except:
-                    raise ValueError('Fail to load agent!')
-        else:
+        if agent != 'ppo':
             raise ValueError('Agent input is NOT supported yet.')
 
+        if drl_lib == 'elegantrl':
+            from elegantrl.agent import AgentPPO
+            # load agent
+            try:
+                agent = AgentPPO()
+                agent.init(net_dim, state_dim, action_dim)
+                agent.save_or_load_agent(cwd=cwd, if_save=False)
+                self.act = agent.act
+                self.device = agent.device
+            except:
+                raise ValueError('Fail to load agent!')
         # connect to Alpaca trading API
         try:
             self.alpaca = tradeapi.REST(API_KEY, API_SECRET, APCA_API_BASE_URL, 'v2')
@@ -76,9 +77,9 @@ class AlpacaPaperTradingMultiCrypto():
         if self.CCTX_time_interval == '1m':
             self.time_interval = 60
         elif self.CCTX_time_interval == '1h':
-            self.time_interval = 60 * 60
+            self.time_interval = 60 ** 2
         elif self.CCTX_time_interval == '1d':
-            self.time_interval = 60 * 60 * 24
+            self.time_interval = 60 ** 2 * 24
         else:
             raise ValueError('Time interval input is NOT supported yet.')
 
@@ -109,7 +110,7 @@ class AlpacaPaperTradingMultiCrypto():
 
     def test_latency(self, test_times=10):
         total_time = 0
-        for i in range(0, test_times):
+        for _ in range(test_times):
             time0 = time.time()
             self.get_state()
             time1 = time.time()
@@ -141,16 +142,15 @@ class AlpacaPaperTradingMultiCrypto():
         state = self.get_state()
 
         # Get action
-        if self.drl_lib == 'elegantrl':
-            with torch.no_grad():
-                s_tensor = torch.as_tensor((state,), device=self.device)
-                a_tensor = self.act(s_tensor)
-                action = a_tensor.detach().cpu().numpy()[0]
-            action = (action * self.max_stock).astype(float)
-            print('\n' + 'ACTION:    ', action, '\n')
-        else:
+        if self.drl_lib != 'elegantrl':
             raise ValueError('The DRL library input is NOT supported yet. Please check your input.')
 
+        with torch.no_grad():
+            s_tensor = torch.as_tensor((state,), device=self.device)
+            a_tensor = self.act(s_tensor)
+            action = a_tensor.detach().cpu().numpy()[0]
+        action = (action * self.max_stock).astype(float)
+        print('\n' + 'ACTION:    ', action, '\n')
         # Normalize action
         action_norm_vector = []
         for price in self.price:
@@ -184,11 +184,7 @@ class AlpacaPaperTradingMultiCrypto():
             self.stocks_cd[index] = 0
 
         for index in np.where(action > min_action)[0]:  # buy_index:
-            if self.cash < 0:
-                tmp_cash = 0
-            else:
-                tmp_cash = self.cash
-
+            tmp_cash = max(self.cash, 0)
             print('current cash:', tmp_cash)
             # Adjusted part to accept decimal places up to two
             buy_num_shares = min(tmp_cash / self.price[index], abs(float(action[index])))

@@ -6,6 +6,7 @@ import pandas as pd
 import pandas_market_calendars as mcal
 import pytz
 import requests
+
 from basic_processor import BasicProcessor
 
 
@@ -14,23 +15,19 @@ class IEXCloudProcessor(BasicProcessor):
     def _get_base_url(self, mode: str) -> str:
 
         as1 = "mode must be sandbox or production."
-        assert mode in ["sandbox", "production"], as1
+        assert mode in {"sandbox", "production"}, as1
 
         if mode == "sandbox":
             return "https://sandbox.iexapis.com"
 
         return "https://cloud.iexapis.com"
 
-    def __init__(
-        self,
-        data_source: str = None,
-        **kwargs,
-    ):
-        BasicProcessor.__init__(self, data_source, **kwargs)
+    def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
+        super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
         self.base_url = self._get_base_url(mode=kwargs['mode'])
         self.token = kwargs['token'] or os.environ.get("IEX_TOKEN")
 
-    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str):
+    def download_data(self, ticker_list: List[str]):
         """Returns end of day historical data for up to 15 years.
 
         Args:
@@ -52,7 +49,7 @@ class IEXCloudProcessor(BasicProcessor):
                                         end_date='2021-12-12',
                                         time_interval = '1D')
         """
-        assert time_interval == '1D'  # one day
+        assert self.time_interval == '1D'  # one day
 
         price_data = pd.DataFrame()
 
@@ -60,9 +57,9 @@ class IEXCloudProcessor(BasicProcessor):
             "token": self.token,
         }
 
-        if start_date and end_date:
-            query_params["from"] = start_date
-            query_params["to"] = end_date
+        if self.start_date and self.end_date:
+            query_params["from"] = self.start_date
+            query_params["to"] = self.end_date
 
         for stock in ticker_list:
             end_point = (
@@ -73,13 +70,12 @@ class IEXCloudProcessor(BasicProcessor):
                 url=end_point,
                 params=query_params,
             )
-            if response.status_code == 200:
-                temp = pd.DataFrame.from_dict(data=response.json())
-                temp["ticker"] = stock
-                price_data = price_data.append(temp)
-            else:
+            if response.status_code != 200:
                 raise requests.exceptions.RequestException(response.text)
 
+            temp = pd.DataFrame.from_dict(data=response.json())
+            temp["ticker"] = stock
+            price_data = price_data.append(temp)
         price_data = price_data[
             [
                 "date",
@@ -126,8 +122,6 @@ class IEXCloudProcessor(BasicProcessor):
             start_date=pd.Timestamp(start, tz=pytz.UTC),
             end_date=pd.Timestamp(end, tz=pytz.UTC),
         )
-        tradin_days = df.applymap(
+        return df.applymap(
             lambda x: x.strftime("%Y-%m-%d")
         ).market_open.to_list()
-
-        return tradin_days

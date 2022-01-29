@@ -1,24 +1,24 @@
 # import DRL agents
-from drl_agents.stablebaselines3_models import DRLAgent as DRLAgent_sb3
-from drl_agents.rllib_models import DRLAgent as DRLAgent_rllib
 from drl_agents.elegantrl_models import DRLAgent as DRLAgent_erl
-
+from drl_agents.rllib_models import DRLAgent as DRLAgent_rllib
+from drl_agents.stablebaselines3_models import DRLAgent as DRLAgent_sb3
 # import data processor
 from finrl_meta.data_processor import DataProcessor
 
+
 def test(start_date, end_date, ticker_list, data_source, time_interval,
-            technical_indicator_list, drl_lib, env, model_name, if_vix=True,
-            **kwargs):
-    #process data using unified data processor
-    DP = DataProcessor(data_source,  **kwargs)
+         technical_indicator_list, drl_lib, env, model_name, if_vix=True,
+         **kwargs):
+    # process data using unified data processor
+    DP = DataProcessor(data_source, **kwargs)
     price_array, tech_array, turbulence_array = DP.run(ticker_list, start_date
-                                                       , end_date, time_interval, 
-                                                       technical_indicator_list, 
+                                                       , end_date, time_interval,
+                                                       technical_indicator_list,
                                                        if_vix)
-    data_config = {'price_array':price_array,
-                   'tech_array':tech_array,
-                   'turbulence_array':turbulence_array}
-    #build environment using processed data
+    data_config = {'price_array': price_array,
+                   'tech_array': tech_array,
+                   'turbulence_array': turbulence_array}
+    # build environment using processed data
     env_instance = env(config=data_config)
 
     env_config = {

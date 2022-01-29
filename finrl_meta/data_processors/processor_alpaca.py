@@ -1,13 +1,15 @@
+from typing import List
+
 import alpaca_trade_api as tradeapi
+import exchange_calendars as tc
 import numpy as np
 import pandas as pd
 import pytz
-from typing import List
-from finrl_meta.data_processors.func import calc_time_zone
-import exchange_calendars as tc
-from stockstats import StockDataFrame as Sdf
+
 # from basic_processor import BasicProcessor
 from finrl_meta.data_processors.basic_processor import BasicProcessor
+from finrl_meta.data_processors.func import calc_time_zone
+
 TIME_ZONE_SHANGHAI = 'Asia/Shanghai'  ## Hang Seng HSI, SSE, CSI
 TIME_ZONE_USEASTERN = 'US/Eastern'  # Dow, Nasdaq, SP
 TIME_ZONE_PARIS = 'Europe/Paris'  # CAC,
@@ -26,8 +28,8 @@ class AlpacaProcessor(BasicProcessor):
     #             raise ValueError("Wrong Account Info!")
     #     else:
     #         self.api = api
-    def __init__(self, data_source: str, **kwargs):
-        BasicProcessor.__init__(self, data_source, **kwargs)
+    def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
+        super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
         if kwargs['API'] is None:
             try:
                 self.api = tradeapi.REST(kwargs['API_KEY'], kwargs['API_SECRET'], kwargs['APCA_API_BASE_URL'], "v2")
@@ -35,15 +37,12 @@ class AlpacaProcessor(BasicProcessor):
                 raise ValueError("Wrong Account Info!")
         else:
             self.api = kwargs['API']
-            
-    def download_data(self, ticker_list: List[str], start_date: str, end_date: str, time_interval: str):
-        self.start = start_date
-        self.end = end_date
-        self.time_interval = time_interval
+
+    def download_data(self, ticker_list: List[str]):
         self.time_zone = calc_time_zone(ticker_list, TIME_ZONE_SELFDEFINED, USE_TIME_ZONE_SELFDEFINED)
 
-        start_date = pd.Timestamp(start_date, tz=self.time_zone)
-        end_date = pd.Timestamp(end_date, tz=self.time_zone) + pd.Timedelta(days=1)
+        start_date = pd.Timestamp(self.start_date, tz=self.time_zone)
+        end_date = pd.Timestamp(self.end_date, tz=self.time_zone) + pd.Timedelta(days=1)
 
         date = start_date
         data_df = pd.DataFrame()
@@ -52,7 +51,7 @@ class AlpacaProcessor(BasicProcessor):
             end_time = (date + pd.Timedelta("15:59:00")).isoformat()
             for tic in ticker_list:
                 barset = self.api.get_barset(
-                    [tic], time_interval, start=start_time, end=end_time, limit=500
+                    [tic], self.time_interval, start=start_time, end=end_time, limit=500
                 ).df[tic]
                 barset["tic"] = tic
                 barset = barset.reset_index()
@@ -76,14 +75,14 @@ class AlpacaProcessor(BasicProcessor):
         tic_list = np.unique(df.tic.values)
 
         trading_days = self.get_trading_days(start=self.start, end=self.end)
-        #produce full time index
+        # produce full time index
         times = []
         for day in trading_days:
-            current_time = pd.Timestamp(day+' 09:30:00').tz_localize(self.time_zone)
-            for i in range(390):
+            current_time = pd.Timestamp(day + ' 09:30:00').tz_localize(self.time_zone)
+            for _ in range(390):
                 times.append(current_time)
                 current_time += pd.Timedelta(minutes=1)
-        #create a new dataframe with full time series
+        # create a new dataframe with full time series
         new_df = pd.DataFrame()
         for tic in tic_list:
             tmp_df = pd.DataFrame(
@@ -94,26 +93,26 @@ class AlpacaProcessor(BasicProcessor):
                 tmp_df.loc[tic_df.iloc[i]["time"]] = tic_df.iloc[i][
                     ["open", "high", "low", "close", "volume"]
                 ]
-            
-            #if the close price of the first row is NaN
+
+            # if the close price of the first row is NaN
             if str(tmp_df.iloc[0]["close"]) == "nan":
-               print('The price of the first row for ticker ', tic, ' is NaN. ', 
-                     'It will filled with the first valid price.')
-               for i in range(tmp_df.shape[0]):
-                   if str(tmp_df.iloc[i]["close"]) != "nan":
-                          first_valid_price = tmp_df.iloc[i]["close"]
-                          tmp_df.iloc[0] = [first_valid_price,
-                                     first_valid_price,
-                                     first_valid_price,
-                                     first_valid_price,
-                                     0.0,]
-                          break
-            #if the close price of the first row is still NaN (All the prices are NaN in this case)
+                print('The price of the first row for ticker ', tic, ' is NaN. ',
+                      'It will filled with the first valid price.')
+                for i in range(tmp_df.shape[0]):
+                    if str(tmp_df.iloc[i]["close"]) != "nan":
+                        first_valid_price = tmp_df.iloc[i]["close"]
+                        tmp_df.iloc[0] = [first_valid_price,
+                                          first_valid_price,
+                                          first_valid_price,
+                                          first_valid_price,
+                                          0.0, ]
+                        break
+            # if the close price of the first row is still NaN (All the prices are NaN in this case)
             if str(tmp_df.iloc[0]["close"]) == "nan":
                 print('Missing data for ticker: ', tic, ' . The prices are all NaN. Fill with 0.')
-                tmp_df.iloc[0] = [0.0, 0.0, 0.0, 0.0, 0.0,]
-                      
-            #forward filling row by row
+                tmp_df.iloc[0] = [0.0, 0.0, 0.0, 0.0, 0.0, ]
+
+            # forward filling row by row
             for i in range(tmp_df.shape[0]):
                 if str(tmp_df.iloc[i]["close"]) == "nan":
                     previous_close = tmp_df.iloc[i - 1]["close"]
@@ -276,14 +275,10 @@ class AlpacaProcessor(BasicProcessor):
         df = nyse.sessions_in_range(
             pd.Timestamp(start, tz=pytz.UTC), pd.Timestamp(end, tz=pytz.UTC)
         )
-        trading_days = []
-        for day in df:
-            trading_days.append(str(day)[:10])
-
-        return trading_days
+        return [str(day)[:10] for day in df]
 
     def fetch_latest_data(
-        self, ticker_list, time_interval, tech_indicator_list, limit=100
+            self, ticker_list, time_interval, tech_indicator_list, limit=100
     ) -> pd.DataFrame:
 
         data_df = pd.DataFrame()
@@ -314,7 +309,6 @@ class AlpacaProcessor(BasicProcessor):
                 tmp_df.loc[tic_df.iloc[i]["time"]] = tic_df.iloc[i][
                     ["open", "high", "low", "close", "volume"]
                 ]
-            
 
                 if str(tmp_df.iloc[0]["close"]) == "nan":
                     for i in range(tmp_df.shape[0]):
@@ -330,8 +324,7 @@ class AlpacaProcessor(BasicProcessor):
                             break
                 if str(tmp_df.iloc[0]["close"]) == "nan":
                     print('Missing data for ticker: ', tic, ' . The prices are all NaN. Fill with 0.')
-                    tmp_df.iloc[0] = [0.0, 0.0, 0.0, 0.0, 0.0,]
-        
+                    tmp_df.iloc[0] = [0.0, 0.0, 0.0, 0.0, 0.0, ]
 
             for i in range(tmp_df.shape[0]):
                 if str(tmp_df.iloc[i]["close"]) == "nan":
@@ -363,13 +356,13 @@ class AlpacaProcessor(BasicProcessor):
         turb_df = self.api.get_barset(["VIXY"], time_interval, limit=1).df["VIXY"]
         latest_turb = turb_df["close"].values
         return latest_price, latest_tech, latest_turb
-    
+
     def get_portfolio_history(self, start, end):
         trading_days = self.get_trading_days(start, end)
         df = pd.DataFrame()
         for day in trading_days:
-            df = df.append(self.api.get_portfolio_history(date_start = day,timeframe='5Min').df.iloc[:79])
+            df = df.append(self.api.get_portfolio_history(date_start=day, timeframe='5Min').df.iloc[:79])
         equities = df.equity.values
-        cumu_returns = equities/equities[0]
+        cumu_returns = equities / equities[0]
         cumu_returns = cumu_returns[~np.isnan(cumu_returns)]
         return cumu_returns
