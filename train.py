@@ -8,9 +8,8 @@ def train(start_date, end_date, ticker_list, data_source, time_interval,
           technical_indicator_list, drl_lib, env, model_name, if_vix=True,
           **kwargs):
     # process data using unified data processor
-    DP = DataProcessor(data_source, **kwargs)
-    price_array, tech_array, turbulence_array = DP.run(ticker_list, start_date
-                                                       , end_date, time_interval,
+    DP = DataProcessor(data_source, start_date, end_date, time_interval, **kwargs)
+    price_array, tech_array, turbulence_array = DP.run(ticker_list, 
                                                        technical_indicator_list,
                                                        if_vix)
     data_config = {'price_array': price_array,
