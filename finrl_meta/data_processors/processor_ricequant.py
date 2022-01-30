@@ -17,7 +17,14 @@ class RiceQuantProcessor(BasicProcessor):
         # download data by calling RiceQuant API
         dataframe = ricequant.get_price(ticker_list, frequency=self.time_interval,
                                         start_date=self.start_date, end_date=self.end_date)
-        self.dataframe = dataframe
+
+        # on later calls (for example for getting the vix) merge
+        if self.dataframe.empty:
+            self.dataframe = dataframe
+        else:
+            self.dataframe = self.dataframe.merge(
+                dataframe, on=["tic", "time"], how="left"
+            )
 
     # def clean_data(self, df) -> pd.DataFrame:
     #     ''' RiceQuant data is already cleaned, we only need to transform data format here.

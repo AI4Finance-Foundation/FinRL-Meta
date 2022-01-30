@@ -37,7 +37,14 @@ class BinanceProcessor(BasicProcessor):
                 df = hist_data.iloc[:-1].dropna()
                 df['tic'] = i
                 final_df = final_df.append(df)
-        self.dataframe = final_df
+
+        # on later calls (for example for getting the vix) merge
+        if self.dataframe.empty:
+            self.dataframe = final_df
+        else:
+            self.dataframe = self.dataframe.merge(
+                final_df, on=["tic", "time"], how="left"
+            )
 
     # def clean_data(self, df):
     #     df = df.dropna()

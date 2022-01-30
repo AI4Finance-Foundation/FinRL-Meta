@@ -96,7 +96,13 @@ class IEXCloudProcessor(BasicProcessor):
             )
         )
 
-        self.dataframe = price_data
+        # on later calls (for example for getting the vix) merge
+        if self.dataframe.empty:
+            self.dataframe = price_data
+        else:
+            self.dataframe = self.dataframe.merge(
+                price_data, on=["tic", "time"], how="left"
+            )
 
     def get_trading_days(self, start: str, end: str) -> List[str]:
         """Retrieves every trading day between two dates.

@@ -73,7 +73,14 @@ class AlpacaProcessor(BasicProcessor):
         for i in range(len(times)):
             times[i] = str(times[i])
         data_df['time'] = times"""
-        self.dataframe = data_df
+
+        # on later calls (for example for getting the vix) merge
+        if self.dataframe.empty:
+            self.dataframe = data_df
+        else:
+            self.dataframe = self.dataframe.merge(
+                data_df, on=["tic", "time"], how="left"
+            )
 
     def clean_data(self):
         df = self.dataframe.copy()

@@ -34,7 +34,15 @@ class QuantConnectProcessor(BasicProcessor):
         for stock in ticker_list:
             qb.AddEquity(stock)
         history = qb.History(qb.Securities.Keys, self.start_date, self.end_date, self.time_interval)
-        self.dataframe = history
+
+        # on later calls (for example for getting the vix) merge
+        if self.dataframe.empty:
+            self.dataframe = history
+        else:
+            self.dataframe = self.dataframe.merge(
+                history, on=["tic", "time"], how="left"
+            )
+
 
     # def preprocess(df, stock_list):
     #     df = df[['open','high','low','close','volume']]

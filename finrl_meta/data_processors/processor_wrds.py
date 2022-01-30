@@ -54,7 +54,14 @@ class WrdsProcessor(BasicProcessor):
         result = temp
         result = result.sort_values(by=['time', 'tic'])
         result = result.reset_index(drop=True)
-        self.dataframe = result
+
+        # on later calls (for example for getting the vix) merge
+        if self.dataframe.empty:
+            self.dataframe = result
+        else:
+            self.dataframe = self.dataframe.merge(
+                result, on=["tic", "time"], how="left"
+            )
 
     def preprocess_to_ohlcv(self, df, time_interval='60S'):
         df = df[['date', 'time_m', 'sym_root', 'size', 'price']]
