@@ -114,17 +114,16 @@ class DataProcessor():
                 self.processor.dataframe = pickle.load(handle)
         else:
             self.download_data(ticker_list)
-            self.clean_data()
             if cache:
                 if not os.path.exists(cache_dir):
                     os.mkdir(cache_dir)
                 with open(cache_path, 'wb') as handle:
                     pickle.dump(self.dataframe, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-
-        self.add_technical_indicator(technical_indicator_list, use_stockstats_or_talib)
         if if_vix:
             self.add_vix()
+        self.clean_data()
+        self.add_technical_indicator(technical_indicator_list, use_stockstats_or_talib)
         price_array, tech_array, turbulence_array = self.df_to_array(if_vix)
         tech_nan_positions = np.isnan(tech_array)
         tech_array[tech_nan_positions] = 0
@@ -154,11 +153,11 @@ def test_joinquant():
     ticker_list = ["000612.XSHE", "601808.XSHG"]
 
     p.download_data(ticker_list=ticker_list)
-
+    p.add_vix()
     p.clean_data()
     p.add_turbulence()
     p.add_technical_indicator(TECHNICAL_INDICATOR)
-    p.add_vix()
+
 
     price_array, tech_array, turbulence_array = p.run(ticker_list, TECHNICAL_INDICATOR, if_vix=False, cache=True)
 
@@ -191,7 +190,7 @@ def test_yfinance():
     ]
 
     technical_indicator_list = ['macd', 'rsi', 'cci', 'dx']  # self-defined technical indicator list is NOT supported yet
-    if_vix = False
+    if_vix = True
     price_array, tech_array, turbulence_array = DP.run(ticker_list, technical_indicator_list, if_vix, cache=True, use_stockstats_or_talib=1)
     print(price_array.shape, tech_array.shape)
 if __name__ == "__main__":
