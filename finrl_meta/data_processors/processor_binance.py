@@ -38,13 +38,11 @@ class BinanceProcessor(BasicProcessor):
                 df['tic'] = i
                 final_df = final_df.append(df)
 
-        # on later calls (for example for getting the vix) merge
+        # on later calls (for example for getting the vix) append
         if self.dataframe.empty:
             self.dataframe = final_df
         else:
-            self.dataframe = self.dataframe.merge(
-                final_df, on=["tic", "time"], how="left"
-            )
+            self.dataframe.append(final_df)
 
     # def clean_data(self, df):
     #     df = df.dropna()

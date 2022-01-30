@@ -35,13 +35,11 @@ class QuantConnectProcessor(BasicProcessor):
             qb.AddEquity(stock)
         history = qb.History(qb.Securities.Keys, self.start_date, self.end_date, self.time_interval)
 
-        # on later calls (for example for getting the vix) merge
+        # on later calls (for example for getting the vix) append
         if self.dataframe.empty:
             self.dataframe = history
         else:
-            self.dataframe = self.dataframe.merge(
-                history, on=["tic", "time"], how="left"
-            )
+            self.dataframe.append(history)
 
 
     # def preprocess(df, stock_list):

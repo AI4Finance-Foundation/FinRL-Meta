@@ -38,13 +38,11 @@ class CCXTProcessor(BasicProcessor):
             dataset[temp_col] = df[['open', 'high', 'low', 'close', 'volume']].values
         print('Actual end time: ' + str(df['time'].values[-1]))
 
-        # on later calls (for example for getting the vix) merge
+        # on later calls (for example for getting the vix) append
         if self.dataframe.empty:
             self.dataframe = dataset
         else:
-            self.dataframe = self.dataframe.merge(
-                dataset, on=["tic", "time"], how="left"
-            )
+            self.dataframe.append(dataset)
 
     # def add_technical_indicators(self, df, pair_list, tech_indicator_list = [
     #     'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',

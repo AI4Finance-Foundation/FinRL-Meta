@@ -38,13 +38,11 @@ class JoinquantProcessor(BasicProcessor):
         df.reset_index(inplace=True)
         df.rename(columns={'level_0': 'tic'}, inplace=True)
 
-        # on later calls (for example for getting the vix) merge
+        # on later calls (for example for getting the vix) append
         if self.dataframe.empty:
             self.dataframe = df
         else:
-            self.dataframe = self.dataframe.merge(
-                df, on=["tic", "time"], how="left"
-            )
+            self.dataframe.append(df)
 
     def data_fetch(self, stock_list, num, unit, end_dt):
         return jq.get_bars(security=stock_list, count=num, unit=unit,

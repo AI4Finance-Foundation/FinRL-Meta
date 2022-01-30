@@ -21,8 +21,8 @@ TIME_ZONE_USEASTERN = 'US/Eastern'  # Dow, Nasdaq, SP
 TIME_ZONE_PARIS = 'Europe/Paris'  # CAC,
 TIME_ZONE_BERLIN = 'Europe/Berlin'  # DAX, TECDAX, MDAX, SDAX
 TIME_ZONE_JAKARTA = 'Asia/Jakarta'  # LQ45
-TIME_ZONE_SELFDEFINED = 'xxx'  # If neither of the above is your time zone, you should define it, and set USE_TIME_ZONE_SELFDEFINED 1.
-USE_TIME_ZONE_SELFDEFINED = 0  # 0 (default) or 1 (use the self defined)
+TIME_ZONE_SELFDEFINED = 'Europe/Berlin'  # If neither of the above is your time zone, you should define it, and set USE_TIME_ZONE_SELFDEFINED 1.
+USE_TIME_ZONE_SELFDEFINED = 1  # 0 (default) or 1 (use the self defined)
 
 
 class YahooFinanceProcessor(BasicProcessor):
@@ -95,13 +95,11 @@ class YahooFinanceProcessor(BasicProcessor):
         data_df.sort_values(by=['time', 'tic'], inplace=True)
         data_df.reset_index(drop=True, inplace=True)
 
-        # on later calls (for example for getting the vix) merge
+        # on later calls (for example for getting the vix) append
         if self.dataframe.empty:
             self.dataframe = data_df
         else:
-            self.dataframe = self.dataframe.merge(
-                data_df, on=["tic", "time"], how="left"
-            )
+            self.dataframe.append(data_df)
 
     def clean_data(self):
 

@@ -92,13 +92,11 @@ class TushareProProcessor(BasicProcessor):
 
         print("Shape of DataFrame: ", df.shape)
 
-        # on later calls (for example for getting the vix) merge
+        # on later calls (for example for getting the vix) append
         if self.dataframe.empty:
             self.dataframe = df
         else:
-            self.dataframe = self.dataframe.merge(
-                df, on=["tic", "time"], how="left"
-            )
+            self.dataframe.append(df)
 
     def clean_data(self):
         dfc = copy.deepcopy(self.dataframe)
