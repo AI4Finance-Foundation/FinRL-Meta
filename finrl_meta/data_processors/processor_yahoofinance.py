@@ -21,8 +21,8 @@ TIME_ZONE_USEASTERN = 'US/Eastern'  # Dow, Nasdaq, SP
 TIME_ZONE_PARIS = 'Europe/Paris'  # CAC,
 TIME_ZONE_BERLIN = 'Europe/Berlin'  # DAX, TECDAX, MDAX, SDAX
 TIME_ZONE_JAKARTA = 'Asia/Jakarta'  # LQ45
-TIME_ZONE_SELFDEFINED = 'Europe/Berlin'  # If neither of the above is your time zone, you should define it, and set USE_TIME_ZONE_SELFDEFINED 1.
-USE_TIME_ZONE_SELFDEFINED = 1  # 0 (default) or 1 (use the self defined)
+TIME_ZONE_SELFDEFINED = 'xxx'  # If neither of the above is your time zone, you should define it, and set USE_TIME_ZONE_SELFDEFINED 1.
+USE_TIME_ZONE_SELFDEFINED = 0  # 0 (default) or 1 (use the self defined)
 
 
 class YahooFinanceProcessor(BasicProcessor):
@@ -99,7 +99,7 @@ class YahooFinanceProcessor(BasicProcessor):
         if self.dataframe.empty:
             self.dataframe = data_df
         else:
-            self.dataframe.append(data_df)
+            self.dataframe = self.dataframe.append(data_df)
 
     def clean_data(self):
 

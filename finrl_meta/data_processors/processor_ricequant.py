@@ -22,7 +22,7 @@ class RiceQuantProcessor(BasicProcessor):
         if self.dataframe.empty:
             self.dataframe = dataframe
         else:
-            self.dataframe.append(dataframe)
+            self.dataframe = self.dataframe.append(dataframe)
 
 
     # def clean_data(self, df) -> pd.DataFrame:

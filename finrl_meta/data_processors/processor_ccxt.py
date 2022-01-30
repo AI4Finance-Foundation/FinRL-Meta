@@ -42,7 +42,7 @@ class CCXTProcessor(BasicProcessor):
         if self.dataframe.empty:
             self.dataframe = dataset
         else:
-            self.dataframe.append(dataset)
+            self.dataframe = self.dataframe.append(dataset)
 
     # def add_technical_indicators(self, df, pair_list, tech_indicator_list = [
     #     'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',

@@ -42,7 +42,7 @@ class JoinquantProcessor(BasicProcessor):
         if self.dataframe.empty:
             self.dataframe = df
         else:
-            self.dataframe.append(df)
+            self.dataframe = self.dataframe.append(df)
 
     def data_fetch(self, stock_list, num, unit, end_dt):
         return jq.get_bars(security=stock_list, count=num, unit=unit,

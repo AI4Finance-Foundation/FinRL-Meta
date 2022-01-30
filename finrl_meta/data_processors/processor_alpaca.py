@@ -78,7 +78,7 @@ class AlpacaProcessor(BasicProcessor):
         if self.dataframe.empty:
             self.dataframe = data_df
         else:
-            self.dataframe.append(data_df)
+            self.dataframe = self.dataframe.append(data_df)
 
     def clean_data(self):
         df = self.dataframe.copy()

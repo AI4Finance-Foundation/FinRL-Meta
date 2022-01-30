@@ -100,7 +100,7 @@ class IEXCloudProcessor(BasicProcessor):
         if self.dataframe.empty:
             self.dataframe = price_data
         else:
-            self.dataframe.append(price_data)
+            self.dataframe = self.dataframe.append(price_data)
 
     def get_trading_days(self, start: str, end: str) -> List[str]:
         """Retrieves every trading day between two dates.

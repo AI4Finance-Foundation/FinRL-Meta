@@ -39,7 +39,7 @@ class QuantConnectProcessor(BasicProcessor):
         if self.dataframe.empty:
             self.dataframe = history
         else:
-            self.dataframe.append(history)
+            self.dataframe = self.dataframe.append(history)
 
 
     # def preprocess(df, stock_list):

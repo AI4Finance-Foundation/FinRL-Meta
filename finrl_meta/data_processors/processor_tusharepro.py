@@ -96,7 +96,7 @@ class TushareProProcessor(BasicProcessor):
         if self.dataframe.empty:
             self.dataframe = df
         else:
-            self.dataframe.append(df)
+            self.dataframe = self.dataframe.append(df)
 
     def clean_data(self):
         dfc = copy.deepcopy(self.dataframe)

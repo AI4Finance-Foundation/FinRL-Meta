@@ -59,7 +59,7 @@ class WrdsProcessor(BasicProcessor):
         if self.dataframe.empty:
             self.dataframe = result
         else:
-            self.dataframe.append(result)
+            self.dataframe = self.dataframe.append(result)
 
     def preprocess_to_ohlcv(self, df, time_interval='60S'):
         df = df[['date', 'time_m', 'sym_root', 'size', 'price']]

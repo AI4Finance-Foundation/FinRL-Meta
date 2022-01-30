@@ -42,7 +42,7 @@ class BinanceProcessor(BasicProcessor):
         if self.dataframe.empty:
             self.dataframe = final_df
         else:
-            self.dataframe.append(final_df)
+            self.dataframe = self.dataframe.append(final_df)
 
     # def clean_data(self, df):
     #     df = df.dropna()
