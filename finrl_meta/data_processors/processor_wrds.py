@@ -52,8 +52,8 @@ class WrdsProcessor(BasicProcessor):
         if empty:
             raise ValueError('Empty Data under input parameters!')
         result = temp
-        result = result.sort_values(by=['time', 'tic'])
-        result = result.reset_index(drop=True)
+        result.sort_values(by=['time', 'tic'], inplace=True)
+        result.reset_index(drop=True, inplace=True)
 
         # on later calls (for example for getting the vix) merge
         if self.dataframe.empty:
@@ -108,7 +108,7 @@ class WrdsProcessor(BasicProcessor):
                 rows_1600.append(i)
 
         df = df.drop(rows_1600)
-        df = df.sort_values(by=['tic', 'time'])
+        df.sort_values(by=['tic', 'time'], inplace=True)
 
         # check missing rows
         tic_dic = {tic: [0, 0] for tic in tic_list}
@@ -150,7 +150,7 @@ class WrdsProcessor(BasicProcessor):
         assert np.isnan(np.min(ary)) == False
         # final preprocess
         df = df[['time', 'open', 'high', 'low', 'close', 'volume', 'tic']]
-        df = df.reset_index(drop=True)
+        df.reset_index(drop=True, inplace=True)
         print('Data clean finished')
         self.dataframe = df
 

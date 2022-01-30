@@ -35,7 +35,8 @@ class JoinquantProcessor(BasicProcessor):
             fields=["time", "open", "high", "low", "close", "volume"],
             end_dt=self.end_date,
         )
-        df = df.reset_index().rename(columns={'level_0': 'tic'})
+        df.reset_index(inplace=True)
+        df.rename(columns={'level_0': 'tic'}, inplace=True)
 
         # on later calls (for example for getting the vix) merge
         if self.dataframe.empty:

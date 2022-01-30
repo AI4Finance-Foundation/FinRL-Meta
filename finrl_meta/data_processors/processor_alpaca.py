@@ -141,8 +141,8 @@ class AlpacaProcessor(BasicProcessor):
             tmp_df["tic"] = tic
             new_df = new_df.append(tmp_df)
 
-        new_df = new_df.reset_index()
-        new_df = new_df.rename(columns={"index": "time"})
+        new_df.reset_index(inplace=True)
+        new_df.rename(columns={"index": "time"}, inplace=True)
 
         print("Data clean finished!")
 
@@ -354,8 +354,8 @@ class AlpacaProcessor(BasicProcessor):
             tmp_df["tic"] = tic
             new_df = new_df.append(tmp_df)
 
-        new_df = new_df.reset_index()
-        new_df = new_df.rename(columns={"index": "time"})
+        new_df.reset_index(inplace=True)
+        new_df.rename(columns={"index": "time"}, inplace=True)
 
         df = self.add_technical_indicator(new_df, tech_indicator_list)
         df["VIXY"] = 0

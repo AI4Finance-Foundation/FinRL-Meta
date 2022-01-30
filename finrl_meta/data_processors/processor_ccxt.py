@@ -73,7 +73,7 @@ class CCXTProcessor(BasicProcessor):
                 'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',
                 'close_30_sma', 'close_60_sma']
         df = self.dataframe
-        df = df.dropna()
+        df.dropna(inplace=True)
         date_ary = df.index.values
         price_array = df[pd.MultiIndex.from_product([pair_list, ['close']])].values
         tech_array = df[pd.MultiIndex.from_product([pair_list, tech_indicator_list])].values

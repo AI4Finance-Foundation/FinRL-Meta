@@ -78,15 +78,17 @@ class TushareProProcessor(BasicProcessor):
 
         self.df.columns = ['tic', 'date', 'open', 'high', 'low', 'close', 'pre_close', 'change', 'pct_chg', 'volume',
                            'amount']
-        self.df = self.df.sort_values(by=['date', 'tic']).reset_index(drop=True)
+        self.df.sort_values(by=['date', 'tic'], inplace=True)
+        self.df.reset_index(drop=True, inplace=True)
 
         df = self.df[['tic', 'date', 'open', 'high', 'low', 'close', 'volume']]
         df["date"] = pd.to_datetime(df["date"], format="%Y%m%d")
         df["day"] = df["date"].dt.dayofweek
         df["date"] = df.date.apply(lambda x: x.strftime("%Y-%m-%d"))
 
-        df = df.dropna()
-        df = df.sort_values(by=['date', 'tic']).reset_index(drop=True)
+        df.dropna(inplace=True)
+        df.sort_values(by=['date', 'tic'], inplace=True)
+        df.reset_index(drop=True, inplace=True)
 
         print("Shape of DataFrame: ", df.shape)
 
@@ -107,7 +109,7 @@ class TushareProProcessor(BasicProcessor):
         dfcode.tic = dfc.tic.unique()
 
         if "time" in dfc.columns.values.tolist():
-            dfc = dfc.rename(columns={'time': 'date'})
+            dfc.rename(columns={'time': 'date'}, inplace=True)
 
         dfdate.date = dfc.date.unique()
         dfdate.sort_values(by="date", ascending=False, ignore_index=True, inplace=True)
@@ -131,10 +133,11 @@ class TushareProProcessor(BasicProcessor):
             df4 = df2[df2.tic == i].fillna(method="bfill").fillna(method="ffill")
             df3 = pd.concat([df3, df4], ignore_index=True)
 
-        df3 = df3.fillna(0)
+        df3.fillna(0, inplace=True)
 
         # reshape dataframe
-        df3 = df3.sort_values(by=['date', 'tic']).reset_index(drop=True)
+        df3.sort_values(by=['date', 'tic'], inplace=True)
+        df3.reset_index(drop=True, inplace=True)
 
         print("Shape of DataFrame: ", df3.shape)
 
@@ -229,7 +232,7 @@ class TushareProProcessor(BasicProcessor):
         :return: (df) pandas dataframe
         """
         data = df[(df[target_date_col] >= start) & (df[target_date_col] < end)]
-        data = data.sort_values([target_date_col, "tic"], ignore_index=True)
+        data.sort_values([target_date_col, "tic"], ignore_index=True, inplace=True)
         data.index = data[target_date_col].factorize()[0]
         return data
 

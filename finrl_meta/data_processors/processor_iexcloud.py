@@ -88,7 +88,7 @@ class IEXCloudProcessor(BasicProcessor):
                 "volume",
             ]
         ]
-        price_data = price_data.rename(columns={"ticker": "tic", "date": "time", "fclose": "adj_close"})
+        price_data.rename(columns={"ticker": "tic", "date": "time", "fclose": "adj_close"}, inplace=True)
 
         price_data.date = price_data.date.map(
             lambda x: datetime.fromtimestamp(x / 1000, pytz.UTC).strftime(
