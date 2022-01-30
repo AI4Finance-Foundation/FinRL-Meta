@@ -32,7 +32,7 @@ class JoinquantProcessor(BasicProcessor):
             security=ticker_list,
             count=count,
             unit=unit,
-            fields=["date", "open", "high", "low", "close", "volume"],
+            fields=["time", "open", "high", "low", "close", "volume"],
             end_dt=self.end_date,
         )
         df = df.reset_index().rename(columns={'level_0': 'tic'})
@@ -40,7 +40,7 @@ class JoinquantProcessor(BasicProcessor):
 
     def data_fetch(self, stock_list, num, unit, end_dt):
         return jq.get_bars(security=stock_list, count=num, unit=unit,
-                           fields=['date', 'open', 'high', 'low', 'close', 'volume'],
+                           fields=['time', 'open', 'high', 'low', 'close', 'volume'],
                            end_dt=end_dt)
 
     def preprocess(df, stock_list):
