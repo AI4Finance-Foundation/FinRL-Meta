@@ -113,7 +113,8 @@ class BasicProcessor:
         if self.data_source in ["alpaca", "ricequant", "tusharepro", "wrds", "yahoofinance"]:
             turbulence_index = self.calculate_turbulence()
             self.dataframe = self.dataframe.merge(turbulence_index, on="time")
-            self.dataframe.sort_values(["time", "tic"], inplace=True).reset_index(drop=True, inplace=True)
+            self.dataframe.sort_values(["time", "tic"], inplace=True)
+            self.dataframe.reset_index(drop=True, inplace=True)
 
     def calculate_turbulence(self, time_period: int = 252) -> pd.DataFrame:
         """calculate turbulence index based on dow 30"""
@@ -215,7 +216,13 @@ class BasicProcessor:
             return
 
         self.download_data([ticker])
-        self.dataframe.rename(columns={ticker: "vix"}, inplace=True)
+        vix_index = pd.DataFrame(
+            {"time": self.dataframe[self.dataframe.tic == ticker].time, "vix": self.dataframe[self.dataframe.tic == ticker].close}
+        )
+        # remove vix ticker data from dataframe
+        self.dataframe = self.dataframe[self.dataframe.tic != ticker]
+        # set the vix column
+        self.dataframe = self.dataframe.merge(vix_index, on="time")
 
 
     def df_to_array(self, tech_indicator_list: list, if_vix: bool):
