@@ -65,7 +65,7 @@ class YahooFinanceProcessor(BasicProcessor):
             temp_df["tic"] = tic
             data_df = data_df.append(temp_df)
         # reset the index, we want to use numbers as index instead of dates
-        data_df = data_df.reset_index()
+        data_df.reset_index(inplace=True)
         try:
             # convert the column names to standardized names
             data_df.columns = [
@@ -84,20 +84,28 @@ class YahooFinanceProcessor(BasicProcessor):
         data_df["day"] = data_df["date"].dt.dayofweek
         # convert date to standard string format, easy to filter
         data_df["date"] = data_df.date.apply(lambda x: x.strftime("%Y-%m-%d"))
+        data_df.rename(columns={'date': 'time'}, inplace=True)
         # drop missing data
-        data_df = data_df.dropna()
-        data_df = data_df.reset_index(drop=True)
+        data_df.dropna(inplace=True)
+        data_df.reset_index(drop=True, inplace=True)
         print("Shape of DataFrame: ", data_df.shape)
         # print("Display DataFrame: ", data_df.head())
 
-        data_df = data_df.sort_values(by=['date', 'tic']).reset_index(drop=True)
 
-        self.dataframe = data_df
+        data_df.sort_values(by=['time', 'tic'], inplace=True)
+        data_df.reset_index(drop=True, inplace=True)
+
+        # on later calls (for example for getting the vix) merge
+        if self.dataframe.empty:
+            self.dataframe = data_df
+        else:
+            self.dataframe = self.dataframe.merge(
+                data_df, on=["tic", "time"], how="left"
+            )
 
     def clean_data(self):
 
         df = self.dataframe.copy()
-        df = df.rename(columns={'date': 'time'})
         time_interval = self.time_interval
         # get ticker list
         tic_list = np.unique(df.tic.values)
@@ -162,8 +170,8 @@ class YahooFinanceProcessor(BasicProcessor):
             print(('Data clean for ') + tic + (' is finished.'))
 
         # reset index and rename columns
-        new_df = new_df.reset_index()
-        new_df = new_df.rename(columns={'index': 'time'})
+        new_df.reset_index(inplace=True)
+        new_df.rename(columns={'index': 'time'}, inplace=True)
 
         print('Data clean all finished!')
 
