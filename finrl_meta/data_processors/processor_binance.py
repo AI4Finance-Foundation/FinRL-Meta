@@ -133,7 +133,7 @@ class BinanceProcessor(BasicProcessor):
             df['adj_close'] = df['close']
             df['datetime'] = df.datetime.apply(lambda x: dt.datetime.fromtimestamp(x/1000.0))
             df['tic'] = symbol
-            df = df.rename(columns = {'datetime':'time'})
+            df.rename(columns = {'datetime':'time'}, inplace=True)
             df.reset_index(drop=True, inplace=True)
             merged_df = merged_df.append(df)
             
