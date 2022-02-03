@@ -1,4 +1,4 @@
-# FinRL-Meta: A Universe of Market Environments.
+# FinRL-Meta: A Universe of Market Environments
 
 
 [![Downloads](https://pepy.tech/badge/finrl_meta)](https://pepy.tech/project/finrl_meta)
