@@ -15,6 +15,7 @@ TIME_ZONE_SELFDEFINED = 'xxx'  # If neither of the above is your time zone, you 
 USE_TIME_ZONE_SELFDEFINED = 0  # 0 (default) or 1 (use the self defined)
 BINANCE_BASE_URL = 'https://data.binance.vision/'
 
+# the following tickers are copied from finrl config.py
 SRI_KEHATI_TICKER = [
     "AALI.JK",
     "ADHI.JK",
