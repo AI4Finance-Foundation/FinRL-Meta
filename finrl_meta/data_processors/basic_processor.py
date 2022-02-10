@@ -255,3 +255,31 @@ class BasicProcessor:
                 [self.dataframe[self.dataframe.tic == tic].turbulence for tic in unique_ticker]) if "turbulence" in self.dataframe.columns else None
         print("Successfully transformed into array")
         return price_array, tech_array, risk_array
+
+    # standard_time_interval  s: second, m: minute, h: hour, d: day, w: week, M: month
+    # output time_interval of the processor
+    def transfer_standard_time_interval(self) -> str:
+        if self.time_interval == "alpaca":
+            pass
+        elif self.time_interval == "binance":
+            pass
+        elif self.time_interval == "ccxt":
+            pass
+        elif self.time_interval == "iexcloud":
+            pass
+        elif self.time_interval == "joinquant":
+            assert self.time_interval in {'1m', '5m', '15m', '30m', '60m', '120m', '1d', '1w', '1M'}, "This time interval {self.time_interval} is not supported for {self.data_source}"
+        elif self.time_interval == "quantconnect":
+            pass
+        elif self.time_interval == "ricequant":
+            pass
+        elif self.time_interval == "tusharepro":
+            pass
+        elif self.time_interval == "wrds":
+            pass
+        elif self.time_interval == "yahoofinance":
+            pass
+        else:
+            raise ValueError("Not support this time interval: {self.time_interval} in {self.data_source}")
+
+
