@@ -268,7 +268,7 @@ class BasicProcessor:
         elif self.data_source == "iexcloud":
             time_intervals = {'1d'}
             assert self.time_interval in time_intervals, "This time interval is not supported. Supported time intervals: " + time_intervals
-            self.time_interval = '1D'
+            self.time_interval = self.time_interval.upper()
         elif self.data_source == "joinquant":
             time_intervals = {'1m', '5m', '15m', '30m', '60m', '120m', '1d', '1w', '1M'}
             assert self.time_interval in time_intervals, "This time interval is not supported. Supported time intervals: " + time_intervals
@@ -279,7 +279,7 @@ class BasicProcessor:
         elif self.data_source == "tusharepro":
             time_intervals = {'1d'}
             assert self.time_interval in time_intervals, "This time interval is not supported. Supported time intervals: " + time_intervals
-            self.time_interval = '1D'
+            self.time_interval = self.time_interval.upper()
         elif self.data_source == "wrds":
             pass
         elif self.data_source == "yahoofinance":
