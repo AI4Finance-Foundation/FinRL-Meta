@@ -259,25 +259,30 @@ class BasicProcessor:
     # standard_time_interval  s: second, m: minute, h: hour, d: day, w: week, M: month
     # output time_interval of the processor
     def transfer_standard_time_interval(self) -> str:
-        if self.time_interval == "alpaca":
+        if self.data_source == "alpaca":
             pass
-        elif self.time_interval == "binance":
+        elif self.data_source == "binance":
             pass
-        elif self.time_interval == "ccxt":
+        elif self.data_source == "ccxt":
             pass
-        elif self.time_interval == "iexcloud":
+        elif self.data_source == "iexcloud":
+            time_intervals = {'1d'}
+            assert self.time_interval in time_intervals, "This time interval is not supported. Supported time intervals: " + time_intervals
+            self.time_interval = '1D'
+        elif self.data_source == "joinquant":
+            time_intervals = {'1m', '5m', '15m', '30m', '60m', '120m', '1d', '1w', '1M'}
+            assert self.time_interval in time_intervals, "This time interval is not supported. Supported time intervals: " + time_intervals
+        elif self.data_source == "quantconnect":
             pass
-        elif self.time_interval == "joinquant":
-            assert self.time_interval in {'1m', '5m', '15m', '30m', '60m', '120m', '1d', '1w', '1M'}, "This time interval {self.time_interval} is not supported for {self.data_source}"
-        elif self.time_interval == "quantconnect":
+        elif self.data_source == "ricequant":
             pass
-        elif self.time_interval == "ricequant":
+        elif self.data_source == "tusharepro":
+            time_intervals = {'1d'}
+            assert self.time_interval in time_intervals, "This time interval is not supported. Supported time intervals: " + time_intervals
+            self.time_interval = '1D'
+        elif self.data_source == "wrds":
             pass
-        elif self.time_interval == "tusharepro":
-            pass
-        elif self.time_interval == "wrds":
-            pass
-        elif self.time_interval == "yahoofinance":
+        elif self.data_source == "yahoofinance":
             pass
         else:
             raise ValueError("Not support this time interval: {self.time_interval} in {self.data_source}")
