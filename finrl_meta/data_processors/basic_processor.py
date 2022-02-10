@@ -285,6 +285,6 @@ class BasicProcessor:
         elif self.data_source == "yahoofinance":
             pass
         else:
-            raise ValueError("Not support this time interval: {self.time_interval} in {self.data_source}")
+            raise ValueError("Not support transfer_standard_time_interval for {self.data_source}")
 
 
