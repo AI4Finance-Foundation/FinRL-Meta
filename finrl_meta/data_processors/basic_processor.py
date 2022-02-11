@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import stockstats
 import talib
+import copy
 
 class BasicProcessor:
     def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
@@ -258,7 +259,7 @@ class BasicProcessor:
 
     # standard_time_interval  s: second, m: minute, h: hour, d: day, w: week, M: month
     # output time_interval of the processor
-    def transfer_standard_time_interval(self) -> str:
+    def transfer_time_interval(self):
         if self.data_source == "alpaca":
             pass
         elif self.data_source == "binance":
@@ -268,11 +269,12 @@ class BasicProcessor:
         elif self.data_source == "iexcloud":
             time_intervals = ["1d"]
             assert self.time_interval in time_intervals, "This time interval is not supported. Supported time intervals: " + ",".join(time_intervals)
-            self.time_interval = self.time_interval.upper()
+            self.transferred_time_interval = self.time_interval.upper()
         elif self.data_source == "joinquant":
             # '1m', '5m', '15m', '30m', '60m', '120m', '1d', '1w', '1M'
             time_intervals = ["1m", "5m", "15m", "30m", "60m", "120m", "1d", "1w", "1M"]
             assert self.time_interval in time_intervals, "This time interval is not supported. Supported time intervals: " + ",".join(time_intervals)
+            self.transferred_time_interval = copy.deepcopy(self.time_interval)
         elif self.data_source == "quantconnect":
             pass
         elif self.data_source == "ricequant":
@@ -280,7 +282,7 @@ class BasicProcessor:
         elif self.data_source == "tusharepro":
             time_intervals = ["1d"]
             assert self.time_interval in time_intervals, "This time interval is not supported. Supported time intervals: " + ",".join(time_intervals)
-            self.time_interval = self.time_interval.upper()
+            self.transferred_time_interval = self.time_interval.upper()
         elif self.data_source == "wrds":
             pass
         elif self.data_source == "yahoofinance":
