@@ -259,7 +259,7 @@ class BasicProcessor:
 
     # standard_time_interval  s: second, m: minute, h: hour, d: day, w: week, M: month
     # output time_interval of the processor
-    def transfer_time_interval(self):
+    def calc_transferred_time_interval(self):
         if self.data_source == "alpaca":
             pass
         elif self.data_source == "binance":
