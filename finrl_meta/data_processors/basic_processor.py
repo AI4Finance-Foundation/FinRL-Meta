@@ -255,3 +255,37 @@ class BasicProcessor:
                 [self.dataframe[self.dataframe.tic == tic].turbulence for tic in unique_ticker]) if "turbulence" in self.dataframe.columns else None
         print("Successfully transformed into array")
         return price_array, tech_array, risk_array
+
+    # standard_time_interval  s: second, m: minute, h: hour, d: day, w: week, M: month
+    # output time_interval of the processor
+    def transfer_standard_time_interval(self) -> str:
+        if self.data_source == "alpaca":
+            pass
+        elif self.data_source == "binance":
+            pass
+        elif self.data_source == "ccxt":
+            pass
+        elif self.data_source == "iexcloud":
+            time_intervals = ["1d"]
+            assert self.time_interval in time_intervals, "This time interval is not supported. Supported time intervals: " + ",".join(time_intervals)
+            self.time_interval = self.time_interval.upper()
+        elif self.data_source == "joinquant":
+            # '1m', '5m', '15m', '30m', '60m', '120m', '1d', '1w', '1M'
+            time_intervals = ["1m", "5m", "15m", "30m", "60m", "120m", "1d", "1w", "1M"]
+            assert self.time_interval in time_intervals, "This time interval is not supported. Supported time intervals: " + ",".join(time_intervals)
+        elif self.data_source == "quantconnect":
+            pass
+        elif self.data_source == "ricequant":
+            pass
+        elif self.data_source == "tusharepro":
+            time_intervals = ["1d"]
+            assert self.time_interval in time_intervals, "This time interval is not supported. Supported time intervals: " + ",".join(time_intervals)
+            self.time_interval = self.time_interval.upper()
+        elif self.data_source == "wrds":
+            pass
+        elif self.data_source == "yahoofinance":
+            pass
+        else:
+            raise ValueError("Not support transfer_standard_time_interval for {self.data_source}")
+
+
