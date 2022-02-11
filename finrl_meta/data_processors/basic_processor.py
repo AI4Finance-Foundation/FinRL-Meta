@@ -22,12 +22,13 @@ class BasicProcessor:
             "tusharepro",
         }, "Data source input is NOT supported yet."
         self.data_source: str = data_source
-        self.start_date = start_date
-        self.end_date = end_date
-        self.time_interval = time_interval
+        self.start_date: str = start_date
+        self.end_date: str = end_date
+        self.time_interval: str = time_interval  # standard time_interval
+        self.transferred_time_interval: str = self.calc_transferred_time_interval()  # transferred time_interval of this processor
         self.time_zone: str = ""
         self.dataframe: pd.DataFrame = pd.DataFrame()
-        self.dictnumpy: dict = {}
+        self.dictnumpy: dict = {}  # e.g., self.dictnumpy["open"] = np.array([1, 2, 3]), self.dictnumpy["close"] = np.array([1, 2, 3])
 
     def download_data(self, ticker_list: List[str]):
         pass
@@ -259,7 +260,7 @@ class BasicProcessor:
 
     # standard_time_interval  s: second, m: minute, h: hour, d: day, w: week, M: month
     # output time_interval of the processor
-    def calc_transferred_time_interval(self):
+    def calc_transferred_time_interval(self) -> str:
         if self.data_source == "alpaca":
             pass
         elif self.data_source == "binance":
@@ -269,12 +270,12 @@ class BasicProcessor:
         elif self.data_source == "iexcloud":
             time_intervals = ["1d"]
             assert self.time_interval in time_intervals, "This time interval is not supported. Supported time intervals: " + ",".join(time_intervals)
-            self.transferred_time_interval = self.time_interval.upper()
+            return self.time_interval.upper()
         elif self.data_source == "joinquant":
             # '1m', '5m', '15m', '30m', '60m', '120m', '1d', '1w', '1M'
             time_intervals = ["1m", "5m", "15m", "30m", "60m", "120m", "1d", "1w", "1M"]
             assert self.time_interval in time_intervals, "This time interval is not supported. Supported time intervals: " + ",".join(time_intervals)
-            self.transferred_time_interval = copy.deepcopy(self.time_interval)
+            return self.time_interval
         elif self.data_source == "quantconnect":
             pass
         elif self.data_source == "ricequant":
@@ -282,7 +283,7 @@ class BasicProcessor:
         elif self.data_source == "tusharepro":
             time_intervals = ["1d"]
             assert self.time_interval in time_intervals, "This time interval is not supported. Supported time intervals: " + ",".join(time_intervals)
-            self.transferred_time_interval = self.time_interval.upper()
+            return self.time_interval.upper()
         elif self.data_source == "wrds":
             pass
         elif self.data_source == "yahoofinance":
