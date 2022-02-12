@@ -40,19 +40,23 @@ class BaostockProcessor(BasicProcessor):
         print('baostock login respond  error_msg:' + lg.error_msg)
 
         self.time_zone = calc_time_zone(ticker_list, TIME_ZONE_SELFDEFINED, USE_TIME_ZONE_SELFDEFINED)
+        self.dataframe = pd.DataFrame()
+        for ticker in ticker_list:
+            rs = bs.query_history_k_data_plus(ticker,
+                                              "date,code,open,high,low,close,preclose,volume,amount,adjustflag,turn,tradestatus,pctChg,isST",
+                                              start_date=self.start_date, end_date=self.end_date,
+                                              frequency=self.time_interval, adjustflag="3")
 
-        rs = bs.query_history_k_data_plus(ticker_list,
-                                          "date,code,open,high,low,close,preclose,volume,amount,adjustflag,turn,tradestatus,pctChg,isST",
-                                          start_date=self.start_date, end_date=self.end_date,
-                                          frequency=self.time_interval, adjustflag="3")
+            print('baostock download_data respond error_code:' + rs.error_code)
+            print('baostock download_data respond  error_msg:' + rs.error_msg)
 
-        print('baostock download_data respond error_code:' + rs.error_code)
-        print('baostock download_data respond  error_msg:' + rs.error_msg)
+            data_list = []
+            while (rs.error_code == '0') & rs.next():
+                data_list.append(rs.get_row_data())
+            df = pd.DataFrame(data_list, columns=rs.fields)
+            self.dataframe.append(df)
 
-        data_list = []
-        while (rs.error_code == '0') & rs.next():
-            data_list.append(rs.get_row_data())
-        self.dataframe = pd.DataFrame(data_list, columns=rs.fields)
+
         bs.logout()
 
     def clean_data(self):
