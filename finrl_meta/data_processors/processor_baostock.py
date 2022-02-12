@@ -42,8 +42,9 @@ class BaostockProcessor(BasicProcessor):
         self.time_zone = calc_time_zone(ticker_list, TIME_ZONE_SELFDEFINED, USE_TIME_ZONE_SELFDEFINED)
         self.dataframe = pd.DataFrame()
         for ticker in ticker_list:
+            # All supported: "date,code,open,high,low,close,preclose,volume,amount,adjustflag,turn,tradestatus,pctChg,isST"
             rs = bs.query_history_k_data_plus(ticker,
-                                              "date,code,open,high,low,close,preclose,volume,amount,adjustflag,turn,tradestatus,pctChg,isST",
+                                              "date,code,open,high,low,close,volume",
                                               start_date=self.start_date, end_date=self.end_date,
                                               frequency=self.time_interval, adjustflag="3")
 
