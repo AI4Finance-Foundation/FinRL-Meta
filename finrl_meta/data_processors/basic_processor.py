@@ -11,6 +11,7 @@ class BasicProcessor:
 
         assert data_source in {
             "alpaca",
+            "baostock",
             "ccxt",
             "binance",
             "iexcloud",
@@ -262,6 +263,8 @@ class BasicProcessor:
     # output time_interval of the processor
     def calc_transferred_time_interval(self) -> str:
         if self.data_source == "alpaca":
+            pass
+        elif self.data_source == "baostock":
             pass
         elif self.data_source == "binance":
             pass
