@@ -253,7 +253,8 @@ class BasicProcessor:
     def df_to_array(self, tech_indicator_list: list, if_vix: bool):
         unique_ticker = self.dataframe.tic.unique()
         price_array = np.column_stack([self.dataframe[self.dataframe.tic == tic].close for tic in unique_ticker])
-        tech_array = np.hstack([self.dataframe.loc[(self.dataframe.tic == tic), tech_indicator_list] for tic in unique_ticker])
+        common_tech_indicator_list = [i for i in tech_indicator_list if i in self.dataframe.columns.values.tolist()]
+        tech_array = np.hstack([self.dataframe.loc[(self.dataframe.tic == tic), common_tech_indicator_list] for tic in unique_ticker])
         if if_vix:
             risk_array = np.column_stack([self.dataframe[self.dataframe.tic == tic].vix for tic in unique_ticker])
         else:
