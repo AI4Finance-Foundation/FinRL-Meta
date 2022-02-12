@@ -54,15 +54,12 @@ class BaostockProcessor(BasicProcessor):
             while (rs.error_code == '0') & rs.next():
                 data_list.append(rs.get_row_data())
             df = pd.DataFrame(data_list, columns=rs.fields)
-            self.dataframe.append(df)
-
-
+            self.dataframe = self.dataframe.append(df)
+        self.dataframe = self.dataframe.sort_values(by=['date', 'code']).reset_index(drop=True)
         bs.logout()
 
     def clean_data(self):
-        pass
-
-
+        self.dataframe = self.dataframe.rename(columns={'date': 'time', 'code': 'tic'})
 
 
     def get_trading_days(self, start, end):
