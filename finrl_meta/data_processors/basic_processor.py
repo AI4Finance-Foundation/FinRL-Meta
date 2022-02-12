@@ -81,10 +81,12 @@ class BasicProcessor:
         if "level_0" in self.dataframe.columns and "tic" not in self.dataframe.columns:
             self.dataframe.rename(columns={"level_0": "tic"}, inplace=True)
         assert use_stockstats_or_talib in {0, 1}
+        print("tech_indicator_list: ", tech_indicator_list)
         if use_stockstats_or_talib == 0:  # use stockstats
             stock = stockstats.StockDataFrame.retype(self.dataframe)
             unique_ticker = stock.tic.unique()
             for indicator in tech_indicator_list:
+                print("indicator: ", indicator)
                 indicator_df = pd.DataFrame()
                 for i in range(len(unique_ticker)):
                     try:
@@ -99,9 +101,10 @@ class BasicProcessor:
                         )
                     except Exception as e:
                         print(e)
-                self.dataframe = self.dataframe.merge(
-                    indicator_df[["tic", "time", indicator]], on=["tic", "time"], how="left"
-                )
+                if not indicator_df.empty:
+                    self.dataframe = self.dataframe.merge(
+                        indicator_df[["tic", "time", indicator]], on=["tic", "time"], how="left"
+                    )
         else:  # use talib
             final_df = pd.DataFrame()
             for i in self.dataframe.tic.unique():
