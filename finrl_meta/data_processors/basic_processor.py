@@ -26,7 +26,8 @@ class BasicProcessor:
         self.start_date: str = start_date
         self.end_date: str = end_date
         self.time_interval: str = time_interval  # standard time_interval
-        self.transferred_time_interval: str = self.calc_transferred_time_interval()  # transferred time_interval of this processor
+        # transferred_time_interval will be supported in the future.
+        # self.transferred_time_interval: str = self.calc_transferred_time_interval()  # transferred time_interval of this processor
         self.time_zone: str = ""
         self.dataframe: pd.DataFrame = pd.DataFrame()
         self.dictnumpy: dict = {}  # e.g., self.dictnumpy["open"] = np.array([1, 2, 3]), self.dictnumpy["close"] = np.array([1, 2, 3])
@@ -41,7 +42,8 @@ class BasicProcessor:
             self.dataframe.rename(columns={'datetime': 'time'}, inplace=True)
         if self.data_source == "ccxt":
             self.dataframe.rename(columns={'index': 'time'}, inplace=True)
-        elif self.data_source == 'ricequant':
+
+        if self.data_source == 'ricequant':
             ''' RiceQuant data is already cleaned, we only need to transform data format here.
                 No need for filling NaN data'''
             self.dataframe.rename(columns={'order_book_id': 'tic'}, inplace=True)
@@ -49,6 +51,9 @@ class BasicProcessor:
             self.dataframe.reset_index(level=[0, 1], inplace=True)
             # check if there is NaN values
             assert not self.dataframe.isnull().values.any()
+        elif self.data_source == 'baostock':
+            self.dataframe.rename(columns={'code': 'tic'}, inplace=True)
+
         self.dataframe.dropna(inplace=True)
         # adj_close: adjusted close price
         if 'adj_close' not in self.dataframe.columns.values.tolist():
