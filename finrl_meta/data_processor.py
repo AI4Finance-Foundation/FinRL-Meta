@@ -5,6 +5,7 @@ from finrl_meta.data_processors.processor_binance import BinanceProcessor as Bin
 from finrl_meta.data_processors.processor_ricequant import RiceQuantProcessor as RiceQuant
 from finrl_meta.data_processors.processor_joinquant import JoinquantProcessor
 from finrl_meta.data_processors.processor_tusharepro import TushareProProcessor as Tusharepro
+from finrl_meta.data_processors.processor_baostock import BaostockProcessor
 import pandas as pd
 import numpy as np
 import os
@@ -24,6 +25,12 @@ class DataProcessor():
                 print('Alpaca successfully connected')
             except:
                 raise ValueError('Please input correct account info for alpaca!')
+        elif self.data_source == "baostock":
+            try:
+                self.processor = BaostockProcessor(data_source, start_date, end_date, time_interval, **kwargs)
+                print('Baostock successfully connected')
+            except:
+                raise ValueError('Please input correct account info for baostock!')
         elif self.data_source == "joinquant":
             try:
                 # users should input values: kwargs['username'], kwargs['password']
@@ -194,7 +201,36 @@ def test_yfinance():
     if_vix = False
     price_array, tech_array, turbulence_array = DP.run(ticker_list, technical_indicator_list, if_vix, cache=True, use_stockstats_or_talib=1)
     print(price_array.shape, tech_array.shape)
+
+def test_baostock():
+    TRADE_START_DATE = "2019-09-01"
+    TRADE_END_DATE = "2021-09-11"
+
+    TIME_INTERVAL = 'd'
+    TECHNICAL_INDICATOR = ['macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30', 'close_30_sma', 'close_60_sma']
+    kwargs = {}
+    p = DataProcessor(data_source='baostock', start_date=TRADE_START_DATE, end_date=TRADE_END_DATE, time_interval=TIME_INTERVAL, **kwargs)
+
+    # trade_days = p.get_trading_days(TRADE_START_DATE, TRADE_END_DATE)
+    # stocknames = ["000612.XSHE", "601808.XSHG"]
+    # data = p.download_data_for_stocks(
+    #     stocknames, trade_days[0], trade_days[-1], READ_DATA_FROM_LOCAL, path_of_data
+    # )
+    # ticker_list = ["000612.XSHE", "601808.XSHG"]
+    ticker_list = ["sh.600000"]
+
+    p.download_data(ticker_list=ticker_list)
+
+    p.clean_data()
+    p.add_turbulence()
+    p.add_technical_indicator(TECHNICAL_INDICATOR)
+    p.add_vix()
+
+    price_array, tech_array, turbulence_array = p.run(ticker_list, TECHNICAL_INDICATOR, if_vix=False, cache=True)
+    pass
+
 if __name__ == "__main__":
     # test_joinquant()
     #test_binance()
-    test_yfinance()
+    # test_yfinance()
+    test_baostock()

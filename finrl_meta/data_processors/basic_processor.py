@@ -11,6 +11,7 @@ class BasicProcessor:
 
         assert data_source in {
             "alpaca",
+            "baostock",
             "ccxt",
             "binance",
             "iexcloud",
@@ -80,10 +81,12 @@ class BasicProcessor:
         if "level_0" in self.dataframe.columns and "tic" not in self.dataframe.columns:
             self.dataframe.rename(columns={"level_0": "tic"}, inplace=True)
         assert use_stockstats_or_talib in {0, 1}
+        print("tech_indicator_list: ", tech_indicator_list)
         if use_stockstats_or_talib == 0:  # use stockstats
             stock = stockstats.StockDataFrame.retype(self.dataframe)
             unique_ticker = stock.tic.unique()
             for indicator in tech_indicator_list:
+                print("indicator: ", indicator)
                 indicator_df = pd.DataFrame()
                 for i in range(len(unique_ticker)):
                     try:
@@ -98,9 +101,10 @@ class BasicProcessor:
                         )
                     except Exception as e:
                         print(e)
-                self.dataframe = self.dataframe.merge(
-                    indicator_df[["tic", "time", indicator]], on=["tic", "time"], how="left"
-                )
+                if not indicator_df.empty:
+                    self.dataframe = self.dataframe.merge(
+                        indicator_df[["tic", "time", indicator]], on=["tic", "time"], how="left"
+                    )
         else:  # use talib
             final_df = pd.DataFrame()
             for i in self.dataframe.tic.unique():
@@ -249,7 +253,8 @@ class BasicProcessor:
     def df_to_array(self, tech_indicator_list: list, if_vix: bool):
         unique_ticker = self.dataframe.tic.unique()
         price_array = np.column_stack([self.dataframe[self.dataframe.tic == tic].close for tic in unique_ticker])
-        tech_array = np.hstack([self.dataframe.loc[(self.dataframe.tic == tic), tech_indicator_list] for tic in unique_ticker])
+        common_tech_indicator_list = [i for i in tech_indicator_list if i in self.dataframe.columns.values.tolist()]
+        tech_array = np.hstack([self.dataframe.loc[(self.dataframe.tic == tic), common_tech_indicator_list] for tic in unique_ticker])
         if if_vix:
             risk_array = np.column_stack([self.dataframe[self.dataframe.tic == tic].vix for tic in unique_ticker])
         else:
@@ -263,6 +268,15 @@ class BasicProcessor:
     def calc_transferred_time_interval(self) -> str:
         if self.data_source == "alpaca":
             pass
+        elif self.data_source == "baostock":
+            # 默认为d，日k线；d=日k线、w=周、m=月、5=5分钟、15=15分钟、30=30分钟、60=60分钟k线数据，不区分大小写；指数没有分钟线数据；周线每周最后一个交易日才可以获取，月线每月最后一个交易日才可以获取。
+            pass
+            time_intervals = ["5m", "15m", "30m", "60m", "1d", "1w", "1M"]
+            assert self.time_interval in time_intervals, "This time interval is not supported. Supported time intervals: " + ",".join(time_intervals)
+            if "d" in self.time_interval or "w" in self.time_interval or "M" in self.time_interval:
+                return self.time_interval[-1:].lower()
+            elif "m" in self.time_interval:
+                return self.time_interval[:-1]
         elif self.data_source == "binance":
             pass
         elif self.data_source == "ccxt":
