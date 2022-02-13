@@ -269,7 +269,14 @@ class BasicProcessor:
         if self.data_source == "alpaca":
             pass
         elif self.data_source == "baostock":
+            # 默认为d，日k线；d=日k线、w=周、m=月、5=5分钟、15=15分钟、30=30分钟、60=60分钟k线数据，不区分大小写；指数没有分钟线数据；周线每周最后一个交易日才可以获取，月线每月最后一个交易日才可以获取。
             pass
+            time_intervals = ["5m", "15m", "30m", "60m", "1d", "1w", "1M"]
+            assert self.time_interval in time_intervals, "This time interval is not supported. Supported time intervals: " + ",".join(time_intervals)
+            if "d" in self.time_interval or "w" in self.time_interval or "M" in self.time_interval:
+                return self.time_interval[-1:].lower()
+            elif "m" in self.time_interval:
+                return self.time_interval[:-1]
         elif self.data_source == "binance":
             pass
         elif self.data_source == "ccxt":
