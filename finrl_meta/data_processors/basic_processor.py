@@ -32,7 +32,26 @@ class BasicProcessor:
         pass
 
     def clean_data(self):
-        pass
+        if "date" in self.dataframe.columns.values.tolist():
+            self.dataframe.rename(columns={'date': 'time'}, inplace=True)
+        if "datetime" in self.dataframe.columns.values.tolist():
+            self.dataframe.rename(columns={'datetime': 'time'}, inplace=True)
+        if self.data_source == "ccxt":
+            self.dataframe.rename(columns={'index': 'time'}, inplace=True)
+        elif self.data_source == 'ricequant':
+            ''' RiceQuant data is already cleaned, we only need to transform data format here.
+                No need for filling NaN data'''
+            self.dataframe.rename(columns={'order_book_id': 'tic'}, inplace=True)
+            # raw df uses multi-index (tic,time), reset it to single index (time)
+            self.dataframe.reset_index(level=[0, 1], inplace=True)
+            # check if there is NaN values
+            assert not self.dataframe.isnull().values.any()
+        self.dataframe.dropna(inplace=True)
+        # adj_close: adjusted close price
+        if 'adj_close' not in self.dataframe.columns.values.tolist():
+            self.dataframe['adj_close'] = self.dataframe['close']
+        self.dataframe.sort_values(by=['time', 'tic'], inplace=True)
+        self.dataframe = self.dataframe[['tic', 'time', 'open', 'high', 'low', 'close', 'adj_close', 'volume']]
 
     def get_trading_days(self, start: str, end: str) -> List[str]:
         if self.data_source in ["binance", "ccxt", "quantconnect", "ricequant", "tusharepro"]:
