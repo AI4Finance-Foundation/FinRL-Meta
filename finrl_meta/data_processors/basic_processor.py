@@ -26,7 +26,8 @@ class BasicProcessor:
         self.start_date: str = start_date
         self.end_date: str = end_date
         self.time_interval: str = time_interval  # standard time_interval
-        self.transferred_time_interval: str = self.calc_transferred_time_interval()  # transferred time_interval of this processor
+        # transferred_time_interval will be supported in the future.
+        # self.transferred_time_interval: str = self.calc_transferred_time_interval()  # transferred time_interval of this processor
         self.time_zone: str = ""
         self.dataframe: pd.DataFrame = pd.DataFrame()
         self.dictnumpy: dict = {}  # e.g., self.dictnumpy["open"] = np.array([1, 2, 3]), self.dictnumpy["close"] = np.array([1, 2, 3])
