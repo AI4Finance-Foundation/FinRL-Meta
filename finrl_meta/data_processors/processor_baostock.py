@@ -59,9 +59,6 @@ class BaostockProcessor(BasicProcessor):
         self.dataframe = self.dataframe.sort_values(by=['date', 'code']).reset_index(drop=True)
         bs.logout()
 
-    def clean_data(self):
-        self.dataframe = self.dataframe.rename(columns={'date': 'time', 'code': 'tic'})
-
 
     def get_trading_days(self, start, end):
         lg = bs.login()
