@@ -46,7 +46,7 @@ class JoinquantProcessor(BasicProcessor):
 
     def data_fetch(self, stock_list, num, unit, end_dt):
         return jq.get_bars(security=stock_list, count=num, unit=unit,
-                           fields=['time', 'open', 'high', 'low', 'close', 'volume'],
+                           fields=['date', 'open', 'high', 'low', 'close', 'volume'],
                            end_dt=end_dt)
 
     def preprocess(df, stock_list):
