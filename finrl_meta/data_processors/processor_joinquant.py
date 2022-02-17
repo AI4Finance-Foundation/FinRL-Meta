@@ -7,10 +7,8 @@ import jqdatasdk as jq
 import numpy as np
 import pandas as pd
 
-# from basic_processor import BasicProcessor
 from finrl_meta.data_processors.basic_processor import BasicProcessor
 from finrl_meta.data_processors.func import calc_all_filenames, remove_all_files
-
 
 class JoinquantProcessor(BasicProcessor):
     def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
@@ -31,10 +29,6 @@ class JoinquantProcessor(BasicProcessor):
         df = df.reset_index().rename(columns={'level_0': 'tic'})
         self.dataframe = df
 
-    def data_fetch(self, stock_list, num, unit, end_dt):
-        return jq.get_bars(security=stock_list, count=num, unit=unit,
-                           fields=['date', 'open', 'high', 'low', 'close', 'volume'],
-                           end_dt=end_dt)
 
     def preprocess(df, stock_list):
         n = len(stock_list)
