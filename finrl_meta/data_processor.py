@@ -147,7 +147,7 @@ def test_joinquant():
     TRADE_END_DATE = "2021-09-11"
     READ_DATA_FROM_LOCAL = 0
 
-    TIME_INTERVAL = '1D'
+    TIME_INTERVAL = '1d'
     TECHNICAL_INDICATOR = ['macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30', 'close_30_sma', 'close_60_sma']
 
     kwargs = {'username': 'xxx', 'password': 'xxx'}

@@ -21,12 +21,6 @@ class JoinquantProcessor(BasicProcessor):
     def download_data(self, ticker_list: List[str]):
         unit = None
         # joinquant supports: '1m', '5m', '15m', '30m', '60m', '120m', '1d', '1w', '1M'。'1w' denotes one week，‘1M' denotes one month。
-        if self.time_interval == '1D':
-            unit = '1d'
-        elif self.time_interval == '1Min':
-            unit = '1m'
-        else:
-            raise ValueError('not supported currently')
         count = len(self.get_trading_days(self.start_date, self.end_date))
         df = jq.get_bars(
             security=ticker_list,
