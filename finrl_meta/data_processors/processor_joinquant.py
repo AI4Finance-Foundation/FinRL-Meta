@@ -19,13 +19,12 @@ class JoinquantProcessor(BasicProcessor):
             jq.auth(kwargs['username'], kwargs['password'])
 
     def download_data(self, ticker_list: List[str]):
-        unit = None
         # joinquant supports: '1m', '5m', '15m', '30m', '60m', '120m', '1d', '1w', '1M'。'1w' denotes one week，‘1M' denotes one month。
         count = len(self.get_trading_days(self.start_date, self.end_date))
         df = jq.get_bars(
             security=ticker_list,
             count=count,
-            unit=unit,
+            unit=self.time_interval,
             fields=["date", "open", "high", "low", "close", "volume"],
             end_dt=self.end_date,
         )
