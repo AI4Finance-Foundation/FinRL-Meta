@@ -204,7 +204,7 @@ def test_baostock():
     kwargs = {}
     p = DataProcessor(data_source='baostock', start_date=TRADE_START_DATE, end_date=TRADE_END_DATE, time_interval=TIME_INTERVAL, **kwargs)
 
-    ticker_list = ["sh.600000"]
+    ticker_list = ["600000.XSHG"]
 
     p.download_data(ticker_list=ticker_list)
 
