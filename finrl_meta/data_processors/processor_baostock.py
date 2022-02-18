@@ -42,6 +42,7 @@ class BaostockProcessor(BasicProcessor):
         self.time_zone = calc_time_zone(ticker_list, TIME_ZONE_SELFDEFINED, USE_TIME_ZONE_SELFDEFINED)
         self.dataframe = pd.DataFrame()
         for ticker in ticker_list:
+            standrad_ticker = self.transfer_ticker_to_standard(ticker)
             # All supported: "date,code,open,high,low,close,preclose,volume,amount,adjustflag,turn,tradestatus,pctChg,isST"
             rs = bs.query_history_k_data_plus(ticker,
                                               "date,code,open,high,low,close,volume",
@@ -55,6 +56,7 @@ class BaostockProcessor(BasicProcessor):
             while (rs.error_code == '0') & rs.next():
                 data_list.append(rs.get_row_data())
             df = pd.DataFrame(data_list, columns=rs.fields)
+            df.loc[:, 'code'] = pd.DataFrame([standrad_ticker] * df.shape[0])
             self.dataframe = self.dataframe.append(df)
         self.dataframe = self.dataframe.sort_values(by=['date', 'code']).reset_index(drop=True)
         bs.logout()
@@ -66,4 +68,24 @@ class BaostockProcessor(BasicProcessor):
         print('baostock login respond  error_msg:' + lg.error_msg)
         return bs.query_trade_dates(start_date=start, end_date=end)
         bs.logout()
+
+    # "sh.600000" -> "600000.XSHG"
+    # "sz.000612" -> "000612.XSHE"
+    def transfer_ticker_to_standard(self, ticker: str) -> str:
+        alpha, n = ticker.split('.')
+        assert alpha in ["sh", "sz"], "Wrong alpha"
+        if alpha == "sh":
+            standard_ticker = n + ".XSHG"
+        elif alpha == "sz":
+            standard_ticker = n + ".XSHE"
+        return standard_ticker
+
+    # ["sh.600000"] -> ["600000.XSHG"]
+    # ["sz.000612"] -> ["000612.XSHE"]
+    def transfer_tickers_to_standard(self, tickers: List[str]) -> List[str]:
+        standard_tickers = []
+        for ticker in tickers:
+            standard_ticker = self.transfer_ticker_to_standard(ticker)
+            standard_tickers.append(standard_ticker)
+        return standard_tickers
 

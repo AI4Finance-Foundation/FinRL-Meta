@@ -310,4 +310,11 @@ class BasicProcessor:
         else:
             raise ValueError("Not support transfer_standard_time_interval for {self.data_source}")
 
+    # "sh.600000" -> "600000.XSHG"
+    # "sz.000612" -> "000612.XSHE"
+    def transfer_ticker_to_standard(self, ticker: str) -> str:
+        return ticker
+
+
+
 

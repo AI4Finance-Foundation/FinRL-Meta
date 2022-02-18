@@ -140,12 +140,9 @@ class DataProcessor():
 
 
 def test_joinquant():
-    path_of_data = "../data"
-
     # TRADE_START_DATE = "2019-09-01"
     TRADE_START_DATE = "2020-09-01"
     TRADE_END_DATE = "2021-09-11"
-    READ_DATA_FROM_LOCAL = 0
 
     # supported time interval: '1m', '5m', '15m', '30m', '60m', '120m', '1d', '1w', '1M'
     TIME_INTERVAL = '1d'
@@ -154,11 +151,6 @@ def test_joinquant():
     kwargs = {'username': 'xxx', 'password': 'xxx'}
     p = DataProcessor(data_source='joinquant', start_date=TRADE_START_DATE, end_date=TRADE_END_DATE, time_interval=TIME_INTERVAL, **kwargs)
 
-    # trade_days = p.get_trading_days(TRADE_START_DATE, TRADE_END_DATE)
-    # stocknames = ["000612.XSHE", "601808.XSHG"]
-    # data = p.download_data_for_stocks(
-    #     stocknames, trade_days[0], trade_days[-1], READ_DATA_FROM_LOCAL, path_of_data
-    # )
     ticker_list = ["000612.XSHE", "601808.XSHG"]
 
     p.download_data(ticker_list=ticker_list)
@@ -169,7 +161,7 @@ def test_joinquant():
     p.add_vix()
 
     price_array, tech_array, turbulence_array = p.run(ticker_list, TECHNICAL_INDICATOR, if_vix=False, cache=True)
-
+    pass
 
 def test_binance():
     ticker_list = ['BTCUSDT', 'ETHUSDT', 'ADAUSDT', 'BNBUSDT']
@@ -212,12 +204,6 @@ def test_baostock():
     kwargs = {}
     p = DataProcessor(data_source='baostock', start_date=TRADE_START_DATE, end_date=TRADE_END_DATE, time_interval=TIME_INTERVAL, **kwargs)
 
-    # trade_days = p.get_trading_days(TRADE_START_DATE, TRADE_END_DATE)
-    # stocknames = ["000612.XSHE", "601808.XSHG"]
-    # data = p.download_data_for_stocks(
-    #     stocknames, trade_days[0], trade_days[-1], READ_DATA_FROM_LOCAL, path_of_data
-    # )
-    # ticker_list = ["000612.XSHE", "601808.XSHG"]
     ticker_list = ["sh.600000"]
 
     p.download_data(ticker_list=ticker_list)
