@@ -7,10 +7,8 @@ import jqdatasdk as jq
 import numpy as np
 import pandas as pd
 
-# from basic_processor import BasicProcessor
 from finrl_meta.data_processors.basic_processor import BasicProcessor
 from finrl_meta.data_processors.func import calc_all_filenames, remove_all_files
-
 
 class JoinquantProcessor(BasicProcessor):
     def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
@@ -19,23 +17,18 @@ class JoinquantProcessor(BasicProcessor):
             jq.auth(kwargs['username'], kwargs['password'])
 
     def download_data(self, ticker_list: List[str]):
-        unit = None
         # joinquant supports: '1m', '5m', '15m', '30m', '60m', '120m', '1d', '1w', '1M'。'1w' denotes one week，‘1M' denotes one month。
         count = len(self.get_trading_days(self.start_date, self.end_date))
         df = jq.get_bars(
             security=ticker_list,
             count=count,
-            unit=unit,
+            unit=self.time_interval,
             fields=["date", "open", "high", "low", "close", "volume"],
             end_dt=self.end_date,
         )
         df = df.reset_index().rename(columns={'level_0': 'tic'})
         self.dataframe = df
 
-    def data_fetch(self, stock_list, num, unit, end_dt):
-        return jq.get_bars(security=stock_list, count=num, unit=unit,
-                           fields=['date', 'open', 'high', 'low', 'close', 'volume'],
-                           end_dt=end_dt)
 
     def preprocess(df, stock_list):
         n = len(stock_list)
