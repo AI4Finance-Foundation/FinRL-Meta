@@ -312,7 +312,7 @@ class BasicProcessor:
 
     # "sh.600000" -> "600000.XSHG"
     # "sz.000612" -> "000612.XSHE"
-    def transfer_ticker_to_standard(self, ticker: str) -> str:
+    def transfer_nonstandard_ticker_to_standard(self, ticker: str) -> str:
         return ticker
 
 
