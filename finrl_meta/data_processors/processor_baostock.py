@@ -42,9 +42,9 @@ class BaostockProcessor(BasicProcessor):
         self.time_zone = calc_time_zone(ticker_list, TIME_ZONE_SELFDEFINED, USE_TIME_ZONE_SELFDEFINED)
         self.dataframe = pd.DataFrame()
         for ticker in ticker_list:
-            standrad_ticker = self.transfer_ticker_to_standard(ticker)
+            nonstandrad_ticker = self.transfer_standard_ticker_to_nonstandard(ticker)
             # All supported: "date,code,open,high,low,close,preclose,volume,amount,adjustflag,turn,tradestatus,pctChg,isST"
-            rs = bs.query_history_k_data_plus(ticker,
+            rs = bs.query_history_k_data_plus(nonstandrad_ticker,
                                               "date,code,open,high,low,close,volume",
                                               start_date=self.start_date, end_date=self.end_date,
                                               frequency=self.time_interval, adjustflag="3")
@@ -56,7 +56,7 @@ class BaostockProcessor(BasicProcessor):
             while (rs.error_code == '0') & rs.next():
                 data_list.append(rs.get_row_data())
             df = pd.DataFrame(data_list, columns=rs.fields)
-            df.loc[:, 'code'] = pd.DataFrame([standrad_ticker] * df.shape[0])
+            df.loc[:, 'code'] = pd.DataFrame([ticker] * df.shape[0])
             self.dataframe = self.dataframe.append(df)
         self.dataframe = self.dataframe.sort_values(by=['date', 'code']).reset_index(drop=True)
         bs.logout()
@@ -71,7 +71,7 @@ class BaostockProcessor(BasicProcessor):
 
     # "sh.600000" -> "600000.XSHG"
     # "sz.000612" -> "000612.XSHE"
-    def transfer_ticker_to_standard(self, ticker: str) -> str:
+    def transfer_nonstandard_ticker_to_standard(self, ticker: str) -> str:
         alpha, n = ticker.split('.')
         assert alpha in ["sh", "sz"], "Wrong alpha"
         if alpha == "sh":
@@ -80,12 +80,23 @@ class BaostockProcessor(BasicProcessor):
             standard_ticker = n + ".XSHE"
         return standard_ticker
 
+    # "600000.XSHG" -> "sh.600000"
+    # "000612.XSHE" -> "sz.000612"
+    def transfer_standard_ticker_to_nonstandard(self, ticker: str) -> str:
+        n, alpha = ticker.split('.')
+        assert alpha in ["XSHG", "XSHE"], "Wrong alpha"
+        if alpha == "XSHG":
+            nonstandard_ticker = "sh." + n
+        elif alpha == "XSHE":
+            nonstandard_ticker = "sz." + n
+        return nonstandard_ticker
+
     # ["sh.600000"] -> ["600000.XSHG"]
     # ["sz.000612"] -> ["000612.XSHE"]
     def transfer_tickers_to_standard(self, tickers: List[str]) -> List[str]:
         standard_tickers = []
         for ticker in tickers:
-            standard_ticker = self.transfer_ticker_to_standard(ticker)
+            standard_ticker = self.transfer_nonstandard_ticker_to_standard(ticker)
             standard_tickers.append(standard_ticker)
         return standard_tickers
 
