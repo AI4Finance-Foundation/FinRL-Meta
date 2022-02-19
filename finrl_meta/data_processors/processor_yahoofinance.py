@@ -58,12 +58,11 @@ class YahooFinanceProcessor(BasicProcessor):
 
         self.time_zone = calc_time_zone(ticker_list, TIME_ZONE_SELFDEFINED, USE_TIME_ZONE_SELFDEFINED)
 
+        assert self.time_interval == "1d" or self.time_interval == "1D", "Not support this time_interval {self.time_interval} in {self.data_source}."
         # Download and save the data in a pandas DataFrame:
-        data_df = pd.DataFrame()
-        for tic in ticker_list:
-            temp_df = yf.download(tic, start=self.start_date, end=self.end_date, interval=self.time_interval)
-            temp_df["tic"] = tic
-            data_df = data_df.append(temp_df)
+        new_tickers = " ".join(ticker_list)
+        data = yf.download(new_tickers, start=self.start_date, end=self.end_date)
+        data_df = pd.DataFrame(data)
         # reset the index, we want to use numbers as index instead of dates
         data_df = data_df.reset_index()
         try:
