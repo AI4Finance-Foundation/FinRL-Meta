@@ -309,7 +309,7 @@ class BasicProcessor:
             else:
                 return self.time_interval
         elif self.data_source == "tusharepro":
-            # 分钟频度包括1分、5、15、30、60分数据
+            # 分钟频度包括1分、5、15、30、60分数据. Not support currently. 
             # time_intervals = ["1m", "5m", "15m", "30m", "60m", "1d"]
             time_intervals = ["1d"]
             assert self.time_interval in time_intervals, "This time interval is not supported. Supported time intervals: " + ",".join(time_intervals)
@@ -318,7 +318,7 @@ class BasicProcessor:
             pass
         elif self.data_source == "yahoofinance":
             # nonstandard_time_interval: ["1m", "2m", "5m", "15m", "30m", "60m", "90m", "1h", "1d", "5d","1wk", "1mo", "3mo"]
-            time_intervals = ["1m", "2m", "5m", "15m", "30m", "60m", "90m", "1h", "1d", "5d","1w", "1M", "3M"]
+            time_intervals = ["1m", "2m", "5m", "15m", "30m", "60m", "90m", "1h", "1d", "5d", "1w", "1M", "3M"]
             assert self.time_interval in time_intervals, "This time interval is not supported. Supported time intervals: " + ",".join(time_intervals)
             if "w" in self.time_interval:
                 return self.time_interval + "k"
