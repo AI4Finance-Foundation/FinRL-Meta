@@ -219,5 +219,5 @@ def test_baostock():
 if __name__ == "__main__":
     # test_joinquant()
     #test_binance()
-    # test_yfinance()
-    test_baostock()
+    test_yfinance()
+    # test_baostock()
