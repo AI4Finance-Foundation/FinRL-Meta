@@ -64,7 +64,7 @@ class TushareProProcessor(BasicProcessor):
         """
         self.ticker_list = ticker_list
 
-        if self.time_interval != "1D":
+        if self.time_interval != "1d":
             raise ValueError('not supported currently')
 
         ts.set_token(self.token)
