@@ -27,7 +27,7 @@ class BasicProcessor:
         self.end_date: str = end_date
         self.time_interval: str = time_interval  # standard time_interval
         # transferred_time_interval will be supported in the future.
-        # self.transferred_time_interval: str = self.calc_transferred_time_interval()  # transferred time_interval of this processor
+        # self.nonstandard_time_interval: str = self.calc_nonstandard_time_interval()  # transferred time_interval of this processor
         self.time_zone: str = ""
         self.dataframe: pd.DataFrame = pd.DataFrame()
         self.dictnumpy: dict = {}  # e.g., self.dictnumpy["open"] = np.array([1, 2, 3]), self.dictnumpy["close"] = np.array([1, 2, 3])
@@ -268,13 +268,13 @@ class BasicProcessor:
         print("Successfully transformed into array")
         return price_array, tech_array, risk_array
 
-    # standard_time_interval  s: second, m: minute, h: hour, d: day, w: week, M: month
+    # standard_time_interval  s: second, m: minute, h: hour, d: day, w: week, M: month, q: quarter, y: year
     # output time_interval of the processor
-    def calc_transferred_time_interval(self) -> str:
+    def calc_nonstandard_time_interval(self) -> str:
         if self.data_source == "alpaca":
             pass
         elif self.data_source == "baostock":
-            # 默认为d，日k线；d=日k线、w=周、m=月、5=5分钟、15=15分钟、30=30分钟、60=60分钟k线数据，不区分大小写；指数没有分钟线数据；周线每周最后一个交易日才可以获取，月线每月最后一个交易日才可以获取。
+            # nonstandard_time_interval: 默认为d，日k线；d=日k线、w=周、m=月、5=5分钟、15=15分钟、30=30分钟、60=60分钟k线数据，不区分大小写；指数没有分钟线数据；周线每周最后一个交易日才可以获取，月线每月最后一个交易日才可以获取。
             pass
             time_intervals = ["5m", "15m", "30m", "60m", "1d", "1w", "1M"]
             assert self.time_interval in time_intervals, "This time interval is not supported. Supported time intervals: " + ",".join(time_intervals)
@@ -283,7 +283,10 @@ class BasicProcessor:
             elif "m" in self.time_interval:
                 return self.time_interval[:-1]
         elif self.data_source == "binance":
-            pass
+            # nonstandard_time_interval: 1m,3m,5m,15m,30m,1h,2h,4h,6h,8h,12h,1d,3d,1w,1M
+            time_intervals = ["1m", "3m", "5m", "15m", "30m", "1h", "2h", "4h", "6h", "8h", "12h", "1d", "3d", "1w", "1M"]
+            assert self.time_interval in time_intervals, "This time interval is not supported. Supported time intervals: " + ",".join(time_intervals)
+            return self.time_interval
         elif self.data_source == "ccxt":
             pass
         elif self.data_source == "iexcloud":
@@ -298,15 +301,31 @@ class BasicProcessor:
         elif self.data_source == "quantconnect":
             pass
         elif self.data_source == "ricequant":
-            pass
+            #  nonstandard_time_interval: 'd' - 天，'w' - 周，'m' - 月， 'q' - 季，'y' - 年
+            time_intervals = ["d", "w", "M", "q", "y"]
+            assert self.time_interval[-1] in time_intervals, "This time interval is not supported. Supported time intervals: " + ",".join(time_intervals)
+            if "M" in self.time_interval:
+                return self.time_interval.lower()
+            else:
+                return self.time_interval
         elif self.data_source == "tusharepro":
+            # 分钟频度包括1分、5、15、30、60分数据. Not support currently. 
+            # time_intervals = ["1m", "5m", "15m", "30m", "60m", "1d"]
             time_intervals = ["1d"]
             assert self.time_interval in time_intervals, "This time interval is not supported. Supported time intervals: " + ",".join(time_intervals)
-            return self.time_interval.upper()
+            return self.time_interval
         elif self.data_source == "wrds":
             pass
         elif self.data_source == "yahoofinance":
-            pass
+            # nonstandard_time_interval: ["1m", "2m", "5m", "15m", "30m", "60m", "90m", "1h", "1d", "5d","1wk", "1mo", "3mo"]
+            time_intervals = ["1m", "2m", "5m", "15m", "30m", "60m", "90m", "1h", "1d", "5d", "1w", "1M", "3M"]
+            assert self.time_interval in time_intervals, "This time interval is not supported. Supported time intervals: " + ",".join(time_intervals)
+            if "w" in self.time_interval:
+                return self.time_interval + "k"
+            elif "M" in self.time_interval:
+                return self.time_interval[: -1] + "mo"
+            else:
+                return self.time_interval
         else:
             raise ValueError("Not support transfer_standard_time_interval for {self.data_source}")
 
