@@ -165,7 +165,7 @@ def test_yfinance():
     print(price_array.shape, tech_array.shape)
 
 def test_baostock():
-    TRADE_START_DATE = "2019-09-01"
+    TRADE_START_DATE = "2020-09-01"
     TRADE_END_DATE = "2021-09-11"
 
     TIME_INTERVAL = 'd'
@@ -186,7 +186,7 @@ def test_baostock():
     pass
 
 def test_quandl():
-    TRADE_START_DATE = "2019-09-01"
+    TRADE_START_DATE = "2020-09-01"
     TRADE_END_DATE = "2021-09-11"
 
     TIME_INTERVAL = '1d'
@@ -212,3 +212,4 @@ if __name__ == "__main__":
     # test_yfinance()
     # test_baostock()
     test_quandl()
+    # test_baostock()

@@ -23,8 +23,8 @@ TIME_ZONE_USEASTERN = 'US/Eastern'  # Dow, Nasdaq, SP
 TIME_ZONE_PARIS = 'Europe/Paris'  # CAC,
 TIME_ZONE_BERLIN = 'Europe/Berlin'  # DAX, TECDAX, MDAX, SDAX
 TIME_ZONE_JAKARTA = 'Asia/Jakarta'  # LQ45
-TIME_ZONE_SELFDEFINED = 'xxx'  # If neither of the above is your time zone, you should define it, and set USE_TIME_ZONE_SELFDEFINED 1.
-USE_TIME_ZONE_SELFDEFINED = 0  # 0 (default) or 1 (use the self defined)
+TIME_ZONE_SELFDEFINED = TIME_ZONE_USEASTERN  # If neither of the above is your time zone, you should define it, and set USE_TIME_ZONE_SELFDEFINED 1.
+USE_TIME_ZONE_SELFDEFINED = 1  # 0 (default) or 1 (use the self defined)
 
 
 class QuandlProcessor(BasicProcessor):
@@ -38,10 +38,12 @@ class QuandlProcessor(BasicProcessor):
         # Download and save the data in a pandas DataFrame:
         data_df = pd.DataFrame()
 
-        data = quandl.get_table('ZACKS/FC', paginate=True, ticker=ticker_list, per_end_date={'gte': '2015-01-01'}, qopts={'columns': ['ticker', 'per_end_date']})
-
-
-
+        # data = quandl.get_table('ZACKS/FC', paginate=True, ticker=ticker_list, per_end_date={'gte': '2021-09-01'}, qopts={'columns': ['ticker', 'per_end_date']})
+        # data = quandl.get('ZACKS/FC', ticker=ticker_list,  start_date="2020-12-31", end_date="2021-12-31")
+        data = quandl.get_table('WIKI/PRICES', ticker=['AAPL', 'MSFT', 'WMT'],
+                                qopts={'columns': ['ticker', 'date', 'adj_close']},
+                                date={'gte': self.start_date, 'lte': self.end_date},
+                                paginate=True)
         data_df = data_df.dropna()
         data_df = data_df.reset_index(drop=True)
         print("Shape of DataFrame: ", data_df.shape)
