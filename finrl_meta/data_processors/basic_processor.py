@@ -16,6 +16,7 @@ class BasicProcessor:
             "binance",
             "iexcloud",
             "joinquant",
+            "quandl",
             "quantconnect",
             "ricequant",
             "wrds",
