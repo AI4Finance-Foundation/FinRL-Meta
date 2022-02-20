@@ -4,6 +4,8 @@ from finrl_meta.data_processors.processor_yahoofinance import YahooFinanceProces
 from finrl_meta.data_processors.processor_binance import BinanceProcessor as Binance
 from finrl_meta.data_processors.processor_ricequant import RiceQuantProcessor as RiceQuant
 from finrl_meta.data_processors.processor_joinquant import JoinquantProcessor
+from finrl_meta.data_processors.processor_quandl import QuandlProcessor
+from finrl_meta.data_processors.processor_quantconnect import QuantConnectProcessor
 from finrl_meta.data_processors.processor_tusharepro import TushareProProcessor as Tusharepro
 from finrl_meta.data_processors.processor_baostock import BaostockProcessor
 import pandas as pd
@@ -12,67 +14,34 @@ import os
 import pickle
 
 class DataProcessor():
+    def processor_None(self):
+        print("Not support for {self.data_source}")
+
     def __init__(self, data_source, start_date, end_date, time_interval, **kwargs):
         self.data_source = data_source
         self.start_date = start_date
         self.end_date = end_date
         self.time_interval = time_interval
         self.dataframe = pd.DataFrame()
-        if self.data_source == 'alpaca':
-            try:
-                # users should input values: kwargs['API_KEY'], kwargs['API_SECRET'], kwargs['APCA_API_BASE_URL'], kwargs['API']
-                self.processor = Alpaca(data_source, start_date, end_date, time_interval, **kwargs)
-                print('Alpaca successfully connected')
-            except:
-                raise ValueError('Please input correct account info for alpaca!')
-        elif self.data_source == "baostock":
-            try:
-                self.processor = BaostockProcessor(data_source, start_date, end_date, time_interval, **kwargs)
-                print('Baostock successfully connected')
-            except:
-                raise ValueError('Please input correct account info for baostock!')
-        elif self.data_source == "joinquant":
-            try:
-                # users should input values: kwargs['username'], kwargs['password']
-                self.processor = JoinquantProcessor(data_source, start_date, end_date, time_interval, **kwargs)
-                print('Joinquant successfully connected')
-            except:
-                raise ValueError('Please input correct account info for joinquant!')
-        elif self.data_source == 'ricequant':
-            try:
-                # users should input values: kwargs['username'], kwargs['password']
-                self.processor = RiceQuant(data_source, start_date, end_date, time_interval, **kwargs)
-                print('Ricequant successfully connected')
-            except:
-                raise ValueError('Please input correct account info for ricequant!')
-        elif self.data_source == 'wrds':
-            try:
-                # users should input values: kwargs['if_offline']
-                self.processor = Wrds(data_source, start_date, end_date, time_interval, **kwargs)
-                print('Wrds successfully connected')
-            except:
-                raise ValueError('Please input correct account info for wrds!')
-        elif self.data_source == 'yahoofinance':
-            try:
-                self.processor = YahooFinance(data_source, start_date, end_date, time_interval, **kwargs)
-                print('Yahoofinance successfully connected')
-            except:
-                raise ValueError('Please input correct account info for yahoofinance!')
-        elif self.data_source == 'binance':
-            try:
-                self.processor = Binance(data_source, start_date, end_date, time_interval, **kwargs)
-                print('Binance successfully connected')
-            except:
-                raise ValueError('Please input correct account info for binance!')
-        elif self.data_source == "tusharepro":
-            try:
-                # users should input values: kwargs['token'], choose to input values: kwargs['adj']
-                self.processor = Tusharepro(data_source, start_date, end_date, time_interval, **kwargs)
-                print('tusharepro successfully connected')
-            except:
-                raise ValueError('Please input correct account info for tusharepro!')
-        else:
-            raise ValueError('Data source input is NOT supported yet.')
+        processor_dict = {
+            "alpaca": Alpaca,
+            "binance": Binance,
+            "baostock": BaostockProcessor,
+            "joinquant": JoinquantProcessor,
+            "quandl":  QuandlProcessor,
+            "quantconnect":  QuantConnectProcessor,
+            "ricequant":  RiceQuant,
+            "tusharepro": Tusharepro,
+            "wrds":  Wrds,
+            "yahoofinance":  YahooFinance,
+        }
+
+        try:
+            self.processor = processor_dict.get(self.data_source, self.processor_None())(data_source, start_date, end_date, time_interval, **kwargs)
+            print('{self.data_source} successfully connected')
+        except:
+            raise ValueError('Please input correct account info for {self.data_source}!')
+
 
     def download_data(self, ticker_list):
         self.processor.download_data(ticker_list=ticker_list)
