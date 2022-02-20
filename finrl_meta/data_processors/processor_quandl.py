@@ -37,10 +37,10 @@ class QuandlProcessor(BasicProcessor):
 
         # Download and save the data in a pandas DataFrame:
         data_df = pd.DataFrame()
-
+        # # set paginate to True because Quandl limits tables API to 10,000 rows per call
         # data = quandl.get_table('ZACKS/FC', paginate=True, ticker=ticker_list, per_end_date={'gte': '2021-09-01'}, qopts={'columns': ['ticker', 'per_end_date']})
         # data = quandl.get('ZACKS/FC', ticker=ticker_list,  start_date="2020-12-31", end_date="2021-12-31")
-        data = quandl.get_table('WIKI/PRICES', ticker=['AAPL', 'MSFT', 'WMT'],
+        data_df = quandl.get_table('ZACKS/FC', ticker=ticker_list,
                                 qopts={'columns': ['ticker', 'date', 'adj_close']},
                                 date={'gte': self.start_date, 'lte': self.end_date},
                                 paginate=True)

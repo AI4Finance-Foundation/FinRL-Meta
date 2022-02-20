@@ -208,8 +208,9 @@ def test_quandl():
 
 if __name__ == "__main__":
     # test_joinquant()
-    #test_binance()
+    # test_binance()
     # test_yfinance()
     # test_baostock()
+    # test_quandl()
+    # test_quandl()
     test_quandl()
-    # test_baostock()
