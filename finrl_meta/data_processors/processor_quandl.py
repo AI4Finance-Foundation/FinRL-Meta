@@ -36,22 +36,22 @@ class QuandlProcessor(BasicProcessor):
         self.time_zone = calc_time_zone(ticker_list, TIME_ZONE_SELFDEFINED, USE_TIME_ZONE_SELFDEFINED)
 
         # Download and save the data in a pandas DataFrame:
-        data_df = pd.DataFrame()
+        # data_df = pd.DataFrame()
         # # set paginate to True because Quandl limits tables API to 10,000 rows per call
         # data = quandl.get_table('ZACKS/FC', paginate=True, ticker=ticker_list, per_end_date={'gte': '2021-09-01'}, qopts={'columns': ['ticker', 'per_end_date']})
         # data = quandl.get('ZACKS/FC', ticker=ticker_list,  start_date="2020-12-31", end_date="2021-12-31")
-        data_df = quandl.get_table('ZACKS/FC', ticker=ticker_list,
+        self.dataframe = quandl.get_table('ZACKS/FC', ticker=ticker_list,
                                 qopts={'columns': ['ticker', 'date', 'adj_close']},
                                 date={'gte': self.start_date, 'lte': self.end_date},
                                 paginate=True)
-        data_df = data_df.dropna()
-        data_df = data_df.reset_index(drop=True)
-        print("Shape of DataFrame: ", data_df.shape)
+        self.dataframe.dropna(inplace=True)
+        self.dataframe.reset_index(drop=True, inplace=True)
+        print("Shape of DataFrame: ", self.dataframe.shape)
         # print("Display DataFrame: ", data_df.head())
 
-        data_df = data_df.sort_values(by=['date', 'ticker']).reset_index(drop=True)
+        self.dataframe.sort_values(by=['date', 'ticker'], inplace=True)
+        self.dataframe.reset_index(drop=True, inplace=True)
 
-        self.dataframe = data_df
 
 
 
