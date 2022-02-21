@@ -71,7 +71,8 @@ class TushareProProcessor(BasicProcessor):
 
         self.df = pd.DataFrame()
         for i in tqdm(ticker_list, total=len(ticker_list)):
-            df_temp = self.get_data(i)
+            nonstandard_id = self.transfer_standard_ticker_to_nonstandard(i)
+            df_temp = self.get_data(nonstandard_id)
             self.df = self.df.append(df_temp)
             # print("{} ok".format(i))
             time.sleep(0.25)
@@ -81,6 +82,7 @@ class TushareProProcessor(BasicProcessor):
         self.df = self.df.sort_values(by=['date', 'tic']).reset_index(drop=True)
 
         df = self.df[['tic', 'date', 'open', 'high', 'low', 'close', 'volume']]
+        df.loc[:, 'tic'] = pd.DataFrame(self.transfer_standard_tickers_to_nonstandard(df['tic'].tolist()))
         df["date"] = pd.to_datetime(df["date"], format="%Y%m%d")
         df["day"] = df["date"].dt.dayofweek
         df["date"] = df.date.apply(lambda x: x.strftime("%Y-%m-%d"))
@@ -226,6 +228,18 @@ class TushareProProcessor(BasicProcessor):
         data = data.sort_values([target_date_col, "tic"], ignore_index=True)
         data.index = data[target_date_col].factorize()[0]
         return data
+
+    # "600000.XSHG" -> "600000.SH"
+    # "000612.XSHE" -> "000612.SZ"
+    def transfer_standard_ticker_to_nonstandard(self, ticker: str) -> str:
+        n, alpha = ticker.split('.')
+        assert alpha in ["XSHG", "XSHE"], "Wrong alpha"
+        if alpha == "XSHG":
+            nonstandard_ticker = n + ".SH"
+        elif alpha == "XSHE":
+            nonstandard_ticker = n + ".SZ"
+        return nonstandard_ticker
+
 
 
 import tushare as ts
