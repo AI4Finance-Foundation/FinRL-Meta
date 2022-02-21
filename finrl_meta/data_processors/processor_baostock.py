@@ -69,16 +69,6 @@ class BaostockProcessor(BasicProcessor):
         return bs.query_trade_dates(start_date=start, end_date=end)
         bs.logout()
 
-    # "sh.600000" -> "600000.XSHG"
-    # "sz.000612" -> "000612.XSHE"
-    def transfer_nonstandard_ticker_to_standard(self, ticker: str) -> str:
-        alpha, n = ticker.split('.')
-        assert alpha in ["sh", "sz"], "Wrong alpha"
-        if alpha == "sh":
-            standard_ticker = n + ".XSHG"
-        elif alpha == "sz":
-            standard_ticker = n + ".XSHE"
-        return standard_ticker
 
     # "600000.XSHG" -> "sh.600000"
     # "000612.XSHE" -> "sz.000612"
@@ -91,12 +81,5 @@ class BaostockProcessor(BasicProcessor):
             nonstandard_ticker = "sz." + n
         return nonstandard_ticker
 
-    # ["sh.600000"] -> ["600000.XSHG"]
-    # ["sz.000612"] -> ["000612.XSHE"]
-    def transfer_tickers_to_standard(self, tickers: List[str]) -> List[str]:
-        standard_tickers = []
-        for ticker in tickers:
-            standard_ticker = self.transfer_nonstandard_ticker_to_standard(ticker)
-            standard_tickers.append(standard_ticker)
-        return standard_tickers
+
 
