@@ -328,7 +328,7 @@ class BasicProcessor:
             else:
                 return self.time_interval
         else:
-            raise ValueError("Not support transfer_standard_time_interval for {self.data_source}")
+            raise ValueError(f"Not support transfer_standard_time_interval for {self.data_source}")
 
 
     # "600000.XSHG" -> "sh.600000"
