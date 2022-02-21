@@ -49,7 +49,7 @@ class QuandlProcessor(BasicProcessor):
         print("Shape of DataFrame: ", data_df.shape)
         # print("Display DataFrame: ", data_df.head())
 
-        data_df = data_df.sort_values(by=['date', 'tic']).reset_index(drop=True)
+        data_df = data_df.sort_values(by=['date', 'ticker']).reset_index(drop=True)
 
         self.dataframe = data_df
 
