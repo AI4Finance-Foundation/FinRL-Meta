@@ -63,17 +63,18 @@ DataOps is a series of principles and practices to improve the quality and reduc
 Supported Data Sources: 
 |Data Source |Type |Range and Frequency |Request Limits|Raw Data|Preprocessed Data|
 |  ----  |  ----  |  ----  |  ----  |  ----  |  ----  |
-|Alpaca| US Stocks, ETFs| 2015-now, 1min| Account-specific| OHLCV| Prices&Indicators|
-|Baostock| CN Securities| 1990-12-19-now, 5min| Account-specific| OHLCV| Prices&Indicators|
-|Binance| Cryptocurrency| API-specific, 1s, 1min| API-specific| Tick-level daily aggegrated trades, OHLCV| Prices&Indicators|
-|CCXT| Cryptocurrency| API-specific, 1min| API-specific| OHLCV| Prices&Indicators|
-|IEXCloud| NMS US securities|1970-now, 1 day|100 per second per IP|OHLCV| Prices&Indicators|
-|JoinQuant| CN Securities| 2005-now, 1min| 3 requests each time| OHLCV| Prices&Indicators|
-|QuantConnect| US Securities| 1998-now, 1s| NA| OHLCV| Prices&Indicators|
-|RiceQuant| CN Securities| 2005-now, 1ms| Account-specific| OHLCV| Prices&Indicators|
-|tusharepro| CN Securities, A share| -now, 1 min| Account-specific| OHLCV| Prices&Indicators|
-|WRDS.TAQ| US Securities| 2003-now, 1ms| 5 requests each time| Intraday Trades|Prices&Indicators|
-|Yahoo! Finance| US Securities| Frequency-specific, 1min| 2,000/hour| OHLCV | Prices&Indicators|
+|[Alpaca](https://alpaca.markets/docs/introduction/)| US Stocks, ETFs| 2015-now, 1min| Account-specific| OHLCV| Prices&Indicators|
+|[Baostock](http://baostock.com/baostock/index.php/Python_API%E6%96%87%E6%A1%A3)| CN Securities| 1990-12-19-now, 5min| Account-specific| OHLCV| Prices&Indicators|
+|[Binance](https://binance-docs.github.io/apidocs/spot/en/#public-api-definitions)| Cryptocurrency| API-specific, 1s, 1min| API-specific| Tick-level daily aggegrated trades, OHLCV| Prices&Indicators|
+|[CCXT](https://docs.ccxt.com/en/latest/manual.html)| Cryptocurrency| API-specific, 1min| API-specific| OHLCV| Prices&Indicators|
+|[IEXCloud](https://iexcloud.io/docs/api/)| NMS US securities|1970-now, 1 day|100 per second per IP|OHLCV| Prices&Indicators|
+|[JoinQuant](https://www.joinquant.com/)| CN Securities| 2005-now, 1min| 3 requests each time| OHLCV| Prices&Indicators|
+|[QuantConnect](https://www.quantconnect.com/docs/home/home)| US Securities| 1998-now, 1s| NA| OHLCV| Prices&Indicators|
+|[RiceQuant](https://www.ricequant.com/doc/rqdata/python/)| CN Securities| 2005-now, 1ms| Account-specific| OHLCV| Prices&Indicators|
+|[tusharepro](https://tushare.pro/document/1?doc_id=131)| CN Securities, A share| -now, 1 min| Account-specific| OHLCV| Prices&Indicators|
+|[WRDS.TAQ](https://wrds-www.wharton.upenn.edu/pages/about/data-vendors/nyse-trade-and-quote-taq/)| US Securities| 2003-now, 1ms| 5 requests each time| Intraday Trades|Prices&Indicators|
+|[Yahoo! Finance](https://pypi.org/project/yfinance/)| US Securities| Frequency-specific, 1min| 2,000/hour| OHLCV | Prices&Indicators|
+
 
 
 
@@ -84,24 +85,6 @@ adj_close: adjusted close price
 Technical indicators users can add: 'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30', 'close_30_sma', 'close_60_sma'
 Users also can add their features. 
 
-
-Websites:
-
-Baostock http://baostock.com/baostock/index.php/Python_API%E6%96%87%E6%A1%A3
-
-Binance https://binance-docs.github.io/apidocs/spot/en/#public-api-definitions
-
-CCXT https://docs.ccxt.com/en/latest/manual.html
-
-IEXCloud https://iexcloud.io/docs/api/
-
-JoinQuant https://www.joinquant.com/
-
-RiceQuant https://www.ricequant.com/doc/rqdata/python/
-
-tusharepro https://tushare.pro/document/1?doc_id=131
-
-YahooFinance https://pypi.org/project/yfinance/
 
 ## Plug-and-Play
 In the development pipeline, we separate market environments from the data layer and the agent layer. Any DRL agent can be directly plugged into our environments, then trained and tested. Different agents/algorithms can be compared by running on the same benchmark environment for fair evaluations. 
