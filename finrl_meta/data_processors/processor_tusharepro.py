@@ -84,7 +84,7 @@ class TushareProProcessor(BasicProcessor):
         self.dataframe.reset_index(drop=True, inplace=True)
 
         self.dataframe = self.dataframe[['tic', 'date', 'open', 'high', 'low', 'close', 'volume']]
-        self.dataframe.loc[:, 'tic'] = pd.DataFrame(self.transfer_standard_tickers_to_nonstandard(self.dataframe['tic'].tolist()))
+        self.dataframe.loc[:, 'tic'] = pd.DataFrame((self.dataframe['tic'].tolist()))
         self.dataframe["date"] = pd.to_datetime(self.dataframe["date"], format="%Y%m%d")
         self.dataframe["day"] = self.dataframe["date"].dt.dayofweek
         self.dataframe["date"] = self.dataframe.date.apply(lambda x: x.strftime("%Y-%m-%d"))
