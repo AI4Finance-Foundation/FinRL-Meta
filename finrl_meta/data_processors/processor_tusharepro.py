@@ -71,8 +71,9 @@ class TushareProProcessor(BasicProcessor):
 
         self.dataframe = pd.DataFrame()
         for i in tqdm(ticker_list, total=len(ticker_list)):
-            nonstandard_id = self.transfer_standard_ticker_to_nonstandard(i)
-            df_temp = self.get_data(nonstandard_id)
+            #nonstandard_id = self.transfer_standard_ticker_to_nonstandard(i)
+            #df_temp = self.get_data(nonstandard_id)
+            df_temp = self.get_data(i)
             self.dataframe = self.dataframe.append(df_temp)
             # print("{} ok".format(i))
             time.sleep(0.25)
