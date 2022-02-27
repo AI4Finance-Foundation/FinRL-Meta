@@ -49,7 +49,7 @@ class TushareProProcessor(BasicProcessor):
         # dfb=pd.concat([df, df1], ignore_index=True)
         # print(dfb.shape)
         return ts.pro_bar(
-            ts_code=id, start_date=self.start, end_date=self.end, adj=self.adj
+            ts_code=id, start_date=self.start_date, end_date=self.end_date, adj=self.adj
         )
 
     def download_data(self, ticker_list: List[str]):
