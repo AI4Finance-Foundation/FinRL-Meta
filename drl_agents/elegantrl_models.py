@@ -1,12 +1,13 @@
 # RL models from elegantrl
 import torch
-from elegantrl.agent import AgentDDPG
-from elegantrl.agent import AgentPPO
-from elegantrl.agent import AgentSAC
-from elegantrl.agent import AgentTD3
-#from elegantrl.agent import AgentA2C
-from elegantrl.run import train_and_evaluate, init_agent
-from elegantrl.config import Arguments
+
+from elegantrl.agents import AgentDDPG
+from elegantrl.agents import AgentPPO
+from elegantrl.agents import AgentSAC
+from elegantrl.agents import AgentTD3
+from elegantrl.train.run import train_and_evaluate, init_agent
+from elegantrl.train.config import Arguments
+
 MODELS = {"ddpg": AgentDDPG, "td3": AgentTD3, "sac": AgentSAC, "ppo": AgentPPO}
 #MODELS = {"ddpg": AgentDDPG, "td3": AgentTD3, "sac": AgentSAC, "ppo": AgentPPO, "a2c": AgentA2C}
 OFF_POLICY_MODELS = ["ddpg", "td3", "sac"]
