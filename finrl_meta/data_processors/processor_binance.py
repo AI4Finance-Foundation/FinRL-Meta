@@ -20,13 +20,14 @@ class BinanceProcessor():
         self.interval = time_interval
         self.limit = 1440
         
-        final_df = pd.DataFrame()
+        df_list =[]
         for i in ticker_list:
             hist_data = self.dataframe_with_limit(symbol=i)
             df = hist_data.iloc[:-1]
             df = df.dropna()
             df['tic'] = i
-            final_df = final_df.append(df)
+            df_list.append(df)
+        final_df = pd.concat(df_list, axis=0, ignore_index=True)
         
         return final_df
     
@@ -41,14 +42,15 @@ class BinanceProcessor():
         self.tech_indicator_list = ['open', 'high', 'low', 'close', 'volume', 
                                          'macd', 'macd_signal', 'macd_hist', 
                                          'rsi', 'cci', 'dx']
-        final_df = pd.DataFrame()
+        df_list = []
         for i in df.tic.unique():
-            tic_df = df[df.tic==i] 
+            tic_df = df.loc[df.tic == i].copy()
             tic_df['macd'], tic_df['macd_signal'], tic_df['macd_hist'] = MACD(tic_df['close'], fastperiod=12, slowperiod=26, signalperiod=9)
             tic_df['rsi'] = RSI(tic_df['close'], timeperiod=14)
             tic_df['cci'] = CCI(tic_df['high'], tic_df['low'], tic_df['close'], timeperiod=14)
             tic_df['dx'] = DX(tic_df['high'], tic_df['low'], tic_df['close'], timeperiod=14)
-            final_df = final_df.append(tic_df)
+            df_list.append(tic_df)
+        final_df = pd.concat(df_list, axis=0, ignore_index=True)
         
         return final_df
     
