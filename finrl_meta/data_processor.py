@@ -1,9 +1,3 @@
-from finrl_meta.data_processors.processor_alpaca import AlpacaProcessor as Alpaca
-from finrl_meta.data_processors.processor_wrds import WrdsProcessor as Wrds
-from finrl_meta.data_processors.processor_yahoofinance import YahooFinanceProcessor as YahooFinance
-from finrl_meta.data_processors.processor_binance import BinanceProcessor as Binance
-from finrl_meta.data_processors.processor_ricequant import RiceQuantProcessor as RiceQuant
-from finrl_meta.data_processors.processor_joinquant import JoinquantProcessor
 import pandas as pd
 import numpy as np
 
@@ -11,6 +5,7 @@ import numpy as np
 class DataProcessor():
     def __init__(self, data_source, **kwargs):
         if data_source == 'alpaca':
+            from finrl_meta.data_processors.processor_alpaca import AlpacaProcessor as Alpaca
             try:
                 API_KEY= kwargs.get('API_KEY')
                 API_SECRET= kwargs.get('API_SECRET')
@@ -20,9 +15,11 @@ class DataProcessor():
             except:
                 raise ValueError('Please input correct account info for alpaca!')
         elif data_source == "joinquant":
+            from finrl_meta.data_processors.processor_joinquant import JoinquantProcessor
             self.processor = JoinquantProcessor(data_source, **kwargs)
 
         elif data_source =='ricequant':
+            from finrl_meta.data_processors.processor_ricequant import RiceQuantProcessor as RiceQuant
             try:
                 username = kwargs.get('username')
                 password = kwargs.get('password')
@@ -31,12 +28,15 @@ class DataProcessor():
                 self.processor = RiceQuant()
                 
         elif data_source == 'wrds':
+            from finrl_meta.data_processors.processor_wrds import WrdsProcessor as Wrds
             self.processor = Wrds()
             
         elif data_source == 'yahoofinance':
+            from finrl_meta.data_processors.processor_yahoofinance import YahooFinanceProcessor as YahooFinance
             self.processor = YahooFinance()
         
         elif data_source =='binance':
+            from finrl_meta.data_processors.processor_binance import BinanceProcessor as Binance
             self.processor = Binance()
         
         else:
