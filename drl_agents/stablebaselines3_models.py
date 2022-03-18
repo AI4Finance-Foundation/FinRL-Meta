@@ -3,7 +3,7 @@ import time
 
 import numpy as np
 import pandas as pd
-from finrl.apps import config
+from finrl import config
 from finrl.finrl_meta.env_stock_trading.env_stocktrading import StockTradingEnv
 from finrl.finrl_meta.preprocessor.preprocessors import data_split
 from stable_baselines3 import A2C, DDPG, PPO, SAC, TD3
