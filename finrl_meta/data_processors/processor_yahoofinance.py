@@ -28,7 +28,7 @@ BINANCE_BASE_URL,
 )
 
 
-class YahooFinanceProcessor(BasicProcessor):
+class YahoofinanceProcessor(BasicProcessor):
     """Provides methods for retrieving daily stock data from
     Yahoo Finance API
     Attributes
