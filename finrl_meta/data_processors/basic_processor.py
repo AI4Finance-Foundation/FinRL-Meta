@@ -256,7 +256,7 @@ class BaseProcessor:
         df = df.sort_values(["time", "tic"]).reset_index(drop=True)
         self.dataframe = df
 
-    def df_to_array(self, tech_indicator_list: list, if_vix: bool):
+    def df_to_array(self, tech_indicator_list: List[str], if_vix: bool):
         unique_ticker = self.dataframe.tic.unique()
         price_array = np.column_stack([self.dataframe[self.dataframe.tic == tic].close for tic in unique_ticker])
         common_tech_indicator_list = [i for i in tech_indicator_list if i in self.dataframe.columns.values.tolist()]
