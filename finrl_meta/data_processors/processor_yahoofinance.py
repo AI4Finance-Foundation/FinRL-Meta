@@ -51,7 +51,7 @@ class YahoofinanceProcessor(BaseProcessor):
                 "high",
                 "low",
                 "close",
-                "adj_close",
+                "adjusted_close",
                 "volume",
                 "tic",
             ]
@@ -98,14 +98,14 @@ class YahoofinanceProcessor(BaseProcessor):
             print(('Clean data for ') + tic)
             # create empty DataFrame using complete time index
             tmp_df = pd.DataFrame(columns=['open', 'high', 'low', 'close',
-                                           'adj_close', 'volume'],
+                                           'adjusted_close', 'volume'],
                                   index=times)
             # get data for current ticker
             tic_df = df[df.tic == tic]
             # fill empty DataFrame using orginal data
             for i in range(tic_df.shape[0]):
                 tmp_df.loc[tic_df.iloc[i]['time']] = tic_df.iloc[i] \
-                    [['open', 'high', 'low', 'close', 'adj_close', 'volume']]
+                    [['open', 'high', 'low', 'close', 'adjusted_close', 'volume']]
 
             # if close on start date is NaN, fill data with first valid close
             # and set volume to 0.
@@ -114,7 +114,7 @@ class YahoofinanceProcessor(BaseProcessor):
                 for i in range(tmp_df.shape[0]):
                     if str(tmp_df.iloc[i]['close']) != 'nan':
                         first_valid_close = tmp_df.iloc[i]['close']
-                        first_valid_adjclose = tmp_df.iloc[i]['adj_close']
+                        first_valid_adjclose = tmp_df.iloc[i]['adjusted_close']
 
                 tmp_df.iloc[0] = [first_valid_close, first_valid_close,
                                   first_valid_close, first_valid_close,
@@ -124,11 +124,11 @@ class YahoofinanceProcessor(BaseProcessor):
             for i in range(tmp_df.shape[0]):
                 if str(tmp_df.iloc[i]['close']) == 'nan':
                     previous_close = tmp_df.iloc[i - 1]['close']
-                    previous_adj_close = tmp_df.iloc[i - 1]['adj_close']
+                    previous_adjusted_close = tmp_df.iloc[i - 1]['adjusted_close']
                     if str(previous_close) == 'nan':
                         raise ValueError
                     tmp_df.iloc[i] = [previous_close, previous_close, previous_close,
-                                      previous_close, previous_adj_close, 0.0]
+                                      previous_close, previous_adjusted_close, 0.0]
 
             # merge single ticker data to new DataFrame
             tmp_df = tmp_df.astype(float)
@@ -246,7 +246,7 @@ class YahoofinanceProcessor(BaseProcessor):
     #                                 ticker_list = ["^VIX"],
     #                                 time_interval = self.time_interval)
     #     df_vix = self.clean_data(df_vix)
-    #     vix = df_vix[['time','adj_close']]
+    #     vix = df_vix[['time','adjusted_close']]
     #     vix.columns = ['time','vix']
     #
     #     df = df.merge(vix, on="time")
@@ -260,7 +260,7 @@ class YahoofinanceProcessor(BaseProcessor):
     #     if_first_time = True
     #     for tic in unique_ticker:
     #         if if_first_time:
-    #             price_array = df[df.tic==tic][['adj_close']].values
+    #             price_array = df[df.tic==tic][['adjusted_close']].values
     #             #price_ary = df[df.tic==tic]['close'].values
     #             tech_array = df[df.tic==tic][tech_indicator_list].values
     #             if if_vix:
@@ -269,7 +269,7 @@ class YahoofinanceProcessor(BaseProcessor):
     #                 risk_array = df[df.tic==tic]['turbulence'].values
     #             if_first_time = False
     #         else:
-    #             price_array = np.hstack([price_array, df[df.tic==tic][['adj_close']].values])
+    #             price_array = np.hstack([price_array, df[df.tic==tic][['adjusted_close']].values])
     #             tech_array = np.hstack([tech_array, df[df.tic==tic][tech_indicator_list].values])
     #     assert price_array.shape[0] == tech_array.shape[0]
     #     assert tech_array.shape[0] == risk_array.shape[0]

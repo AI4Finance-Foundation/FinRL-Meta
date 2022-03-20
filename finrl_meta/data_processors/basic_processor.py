@@ -56,11 +56,11 @@ class BaseProcessor:
             self.dataframe.rename(columns={'code': 'tic'}, inplace=True)
 
         self.dataframe.dropna(inplace=True)
-        # adj_close: adjusted close price
-        if 'adj_close' not in self.dataframe.columns.values.tolist():
-            self.dataframe['adj_close'] = self.dataframe['close']
+        # adjusted_close: adjusted close price
+        if 'adjusted_close' not in self.dataframe.columns.values.tolist():
+            self.dataframe['adjusted_close'] = self.dataframe['close']
         self.dataframe.sort_values(by=['time', 'tic'], inplace=True)
-        self.dataframe = self.dataframe[['tic', 'time', 'open', 'high', 'low', 'close', 'adj_close', 'volume']]
+        self.dataframe = self.dataframe[['tic', 'time', 'open', 'high', 'low', 'close', 'adjusted_close', 'volume']]
 
     def get_trading_days(self, start: str, end: str) -> List[str]:
         if self.data_source in ["binance", "ccxt", "quantconnect", "ricequant", "tushare"]:
@@ -213,7 +213,7 @@ class BaseProcessor:
         #         time_interval=self.time_interval,
         #     )
         #     df_vix = self.clean_data(df_vix)
-        #     vix = df_vix[["time", "adj_close"]]
+        #     vix = df_vix[["time", "adjusted_close"]]
         #     vix.columns = ["time", "vix"]
         #
         #     df = df.merge(vix, on="time")

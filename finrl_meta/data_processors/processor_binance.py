@@ -108,7 +108,7 @@ class BinanceProcessor(BaseProcessor):
         df[['open', 'high', 'low', 'close', 'volume']] = df[['open', 'high', 'low', 'close', 'volume']].astype(float)
 
         # No stock split and dividend announcement, hence adjusted close is the same as close
-        df['adj_close'] = df['close']
+        df['adjusted_close'] = df['close']
         df['datetime'] = df.datetime.apply(lambda x: dt.datetime.fromtimestamp(x / 1000.0))
         df.reset_index(drop=True, inplace=True)
 
@@ -130,7 +130,7 @@ class BinanceProcessor(BaseProcessor):
             df[['open','high','low','close','volume']] = df[['open','high','low','close','volume']].astype(float)
     
             # No stock split and dividend announcement, hence adjusted close is the same as close
-            df['adj_close'] = df['close']
+            df['adjusted_close'] = df['close']
             df['datetime'] = df.datetime.apply(lambda x: dt.datetime.fromtimestamp(x/1000.0))
             df['tic'] = symbol
             df = df.rename(columns = {'datetime':'time'})

@@ -47,7 +47,7 @@ class QuandlProcessor(BaseProcessor):
         # data = quandl.get_table('ZACKS/FC', paginate=True, ticker=ticker_list, per_end_date={'gte': '2021-09-01'}, qopts={'columns': ['ticker', 'per_end_date']})
         # data = quandl.get('ZACKS/FC', ticker=ticker_list,  start_date="2020-12-31", end_date="2021-12-31")
         self.dataframe = quandl.get_table('ZACKS/FC', ticker=ticker_list,
-                                qopts={'columns': ['ticker', 'date', 'adj_close']},
+                                qopts={'columns': ['ticker', 'date', 'adjusted_close']},
                                 date={'gte': self.start_date, 'lte': self.end_date},
                                 paginate=True)
         self.dataframe.dropna(inplace=True)
