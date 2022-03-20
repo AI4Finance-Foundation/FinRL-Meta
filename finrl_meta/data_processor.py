@@ -1,13 +1,14 @@
 from finrl_meta.data_processors.processor_alpaca import AlpacaProcessor
+from finrl_meta.data_processors.processor_baostock import BaostockProcessor
 from finrl_meta.data_processors.processor_wrds import WrdsProcessor
-from finrl_meta.data_processors.processor_yahoofinance import YahoofinanceProcessor
 from finrl_meta.data_processors.processor_binance import BinanceProcessor
-from finrl_meta.data_processors.processor_ricequant import RicequantProcessor
+from finrl_meta.data_processors.processor_iexcloud import IexcloudProcessor
 from finrl_meta.data_processors.processor_joinquant import JoinquantProcessor
 from finrl_meta.data_processors.processor_quandl import QuandlProcessor
 from finrl_meta.data_processors.processor_quantconnect import QuantconnectProcessor
+from finrl_meta.data_processors.processor_ricequant import RicequantProcessor
 from finrl_meta.data_processors.processor_tushare import TushareProcessor
-from finrl_meta.data_processors.processor_baostock import BaostockProcessor
+from finrl_meta.data_processors.processor_yahoofinance import YahoofinanceProcessor
 import pandas as pd
 import numpy as np
 import os
@@ -27,6 +28,7 @@ class DataProcessor():
             "alpaca": AlpacaProcessor,
             "binance": BinanceProcessor,
             "baostock": BaostockProcessor,
+            "iexcloud": IexcloudProcessor,
             "joinquant": JoinquantProcessor,
             "quandl":  QuandlProcessor,
             "quantconnect":  QuantconnectProcessor,
