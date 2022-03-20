@@ -33,7 +33,6 @@ SDAX_50_TICKER,
 
 
 def calc_time_zone(ticker_list: List[str], time_zone_selfdefined: str, use_time_zone_selfdefined: int) -> str:
-    time_zone = ''
     if use_time_zone_selfdefined == 1:
         time_zone = time_zone_selfdefined
     elif ticker_list in [HSI_50_TICKER, SSE_50_TICKER, CSI_300_TICKER]:
