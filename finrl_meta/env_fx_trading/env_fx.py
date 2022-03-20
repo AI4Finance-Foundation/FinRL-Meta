@@ -39,7 +39,7 @@ class tgym(gym.Env):
         some fraction of the number of time steps so far.The purpose of this is to delay 
         rewarding the agent too fast in the early stages and allow it to explore 
         sufficiently before optimizing a single strategy too deeply. 
-        It will also reward agents that maintain a higher balance for longer, 
+        It will also reward agents that maintain a higher balance for longer,
         rather than those who rapidly gain money using unsustainable strategies.
     16. Observation_space contains all of the input variables we want our agent 
         to consider before making, or not making a trade. We want our agent to “see” 

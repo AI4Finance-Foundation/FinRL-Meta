@@ -11,24 +11,27 @@ except:
           'If you are using python>=3.7, please install it.')
     import trading_calendars as tc
     print('Use trading_calendars instead for alpaca processor.')
-# from basic_processor import BasicProcessor
-from finrl_meta.data_processors.basic_processor import BasicProcessor
+# from basic_processor import BaseProcessor
+from finrl_meta.data_processors.basic_processor import BaseProcessor
 from finrl_meta.data_processors.func import calc_time_zone
 
-TIME_ZONE_SHANGHAI = 'Asia/Shanghai'  ## Hang Seng HSI, SSE, CSI
-TIME_ZONE_USEASTERN = 'US/Eastern'  # Dow, Nasdaq, SP
-TIME_ZONE_PARIS = 'Europe/Paris'  # CAC,
-TIME_ZONE_BERLIN = 'Europe/Berlin'  # DAX, TECDAX, MDAX, SDAX
-TIME_ZONE_JAKARTA = 'Asia/Jakarta'  # LQ45
-TIME_ZONE_SELFDEFINED = 'xxx'  # If neither of the above is your time zone, you should define it, and set USE_TIME_ZONE_SELFDEFINED 1.
-USE_TIME_ZONE_SELFDEFINED = 0  # 0 (default) or 1 (use the self defined)
+from finrl_meta.config import (
+TIME_ZONE_SHANGHAI,
+TIME_ZONE_USEASTERN,
+TIME_ZONE_PARIS,
+TIME_ZONE_BERLIN,
+TIME_ZONE_JAKARTA,
+TIME_ZONE_SELFDEFINED,
+USE_TIME_ZONE_SELFDEFINED,
+BINANCE_BASE_URL,
+)
 
 
-class AlpacaProcessor(BasicProcessor):
-    # def __init__(self, API_KEY=None, API_SECRET=None, APCA_API_BASE_URL=None, api=None):
+class AlpacaProcessor(BaseProcessor):
+    # def __init__(self, API_KEY=None, API_SECRET=None, API_BASE_URL=None, api=None):
     #     if api is None:
     #         try:
-    #             self.api = tradeapi.REST(API_KEY, API_SECRET, APCA_API_BASE_URL, "v2")
+    #             self.api = tradeapi.REST(API_KEY, API_SECRET, API_BASE_URL, "v2")
     #         except BaseException:
     #             raise ValueError("Wrong Account Info!")
     #     else:
@@ -37,7 +40,7 @@ class AlpacaProcessor(BasicProcessor):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
         if kwargs['API'] is None:
             try:
-                self.api = tradeapi.REST(kwargs['API_KEY'], kwargs['API_SECRET'], kwargs['APCA_API_BASE_URL'], "v2")
+                self.api = tradeapi.REST(kwargs['API_KEY'], kwargs['API_SECRET'], kwargs['API_BASE_URL'], "v2")
             except BaseException:
                 raise ValueError("Wrong Account Info!")
         else:

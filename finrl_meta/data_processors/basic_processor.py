@@ -6,7 +6,7 @@ import stockstats
 import talib
 import copy
 
-class BasicProcessor:
+class BaseProcessor:
     def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
 
         assert data_source in {
@@ -21,7 +21,7 @@ class BasicProcessor:
             "ricequant",
             "wrds",
             "yahoofinance",
-            "tusharepro",
+            "tushare",
         }, "Data source input is NOT supported yet."
         self.data_source: str = data_source
         self.start_date: str = start_date
@@ -63,7 +63,7 @@ class BasicProcessor:
         self.dataframe = self.dataframe[['tic', 'time', 'open', 'high', 'low', 'close', 'adj_close', 'volume']]
 
     def get_trading_days(self, start: str, end: str) -> List[str]:
-        if self.data_source in ["binance", "ccxt", "quantconnect", "ricequant", "tusharepro"]:
+        if self.data_source in ["binance", "ccxt", "quantconnect", "ricequant", "tushare"]:
             print(f"Calculate get_trading_days not supported for {self.data_source} yet.")
             return None
 
@@ -141,7 +141,7 @@ class BasicProcessor:
         # return df
         if self.data_source in ["binance", "ccxt", "iexcloud", "joinquant", "quantconnect"]:
             print(f"Turbulence not supported for {self.data_source} yet. Return original DataFrame.")
-        if self.data_source in ["alpaca", "ricequant", "tusharepro", "wrds", "yahoofinance"]:
+        if self.data_source in ["alpaca", "ricequant", "tushare", "wrds", "yahoofinance"]:
             turbulence_index = self.calculate_turbulence()
             self.dataframe = self.dataframe.merge(turbulence_index, on="time")
             self.dataframe.sort_values(["time", "tic"], inplace=True).reset_index(drop=True, inplace=True)
@@ -200,7 +200,7 @@ class BasicProcessor:
         :param data: (df) pandas dataframe
         :return: (df) pandas dataframe
         """
-        if self.data_source in ['binance', 'ccxt', 'iexcloud', 'joinquant', 'quantconnect', 'ricequant', 'tusharepro']:
+        if self.data_source in ['binance', 'ccxt', 'iexcloud', 'joinquant', 'quantconnect', 'ricequant', 'tushare']:
             print(f'VIX is not applicable for {self.data_source}. Return original DataFrame')
             return
 
@@ -309,7 +309,7 @@ class BasicProcessor:
                 return self.time_interval.lower()
             else:
                 return self.time_interval
-        elif self.data_source == "tusharepro":
+        elif self.data_source == "tushare":
             # 分钟频度包括1分、5、15、30、60分数据. Not support currently. 
             # time_intervals = ["1m", "5m", "15m", "30m", "60m", "1d"]
             time_intervals = ["1d"]
