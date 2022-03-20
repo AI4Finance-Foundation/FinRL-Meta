@@ -55,9 +55,9 @@ class DataProcessor():
         self.processor.clean_data()
         self.dataframe = self.processor.dataframe
 
-    def add_technical_indicator(self, tech_indicator_list, use_stockstats_or_talib: int = 0):
+    def add_technical_indicator(self, tech_indicator_list, select_stockstats_talib: int = 0):
         self.tech_indicator_list = tech_indicator_list
-        self.processor.add_technical_indicator(tech_indicator_list, use_stockstats_or_talib)
+        self.processor.add_technical_indicator(tech_indicator_list, select_stockstats_talib)
         self.dataframe = self.processor.dataframe
 
     def add_turbulence(self):
@@ -76,7 +76,7 @@ class DataProcessor():
 
         return price_array, tech_array, turbulence_array
 
-    def run(self, ticker_list, technical_indicator_list, if_vix, cache=False, use_stockstats_or_talib: int = 0):
+    def run(self, ticker_list, technical_indicator_list, if_vix, cache=False, select_stockstats_talib: int = 0):
 
         if self.time_interval == "1s" and self.data_source != "binance":
             raise ValueError("Currently 1s interval data is only supported with 'binance' as data source")
@@ -100,7 +100,7 @@ class DataProcessor():
                     pickle.dump(self.dataframe, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
-        self.add_technical_indicator(technical_indicator_list, use_stockstats_or_talib)
+        self.add_technical_indicator(technical_indicator_list, select_stockstats_talib)
         if if_vix:
             self.add_vix()
         price_array, tech_array, turbulence_array = self.df_to_array(if_vix)
@@ -143,7 +143,7 @@ def test_binance():
     dp = DataProcessor('binance', start_date, end_date, time_interval)
     technical_indicator_list = ['macd', 'rsi', 'cci', 'dx']  # self-defined technical indicator list is NOT supported yet
     if_vix = False
-    price_array, tech_array, turbulence_array = dp.run(ticker_list, technical_indicator_list, if_vix, cache=True, use_stockstats_or_talib=1)
+    price_array, tech_array, turbulence_array = dp.run(ticker_list, technical_indicator_list, if_vix, cache=True, select_stockstats_talib=1)
     print(price_array.shape, tech_array.shape)
 
 def test_yfinance():
@@ -163,7 +163,7 @@ def test_yfinance():
 
     technical_indicator_list = ['macd', 'rsi', 'cci', 'dx']  # self-defined technical indicator list is NOT supported yet
     if_vix = False
-    price_array, tech_array, turbulence_array = dp.run(ticker_list, technical_indicator_list, if_vix, cache=True, use_stockstats_or_talib=1)
+    price_array, tech_array, turbulence_array = dp.run(ticker_list, technical_indicator_list, if_vix, cache=True, select_stockstats_talib=1)
     print(price_array.shape, tech_array.shape)
 
 def test_baostock():

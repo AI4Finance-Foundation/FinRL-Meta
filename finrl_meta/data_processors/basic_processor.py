@@ -67,8 +67,8 @@ class BaseProcessor:
             print(f"Calculate get_trading_days not supported for {self.data_source} yet.")
             return None
 
-    # use_stockstats_or_talib: 0 (stockstats, default), or 1 (use talib). Users can choose the method.
-    def add_technical_indicator(self, tech_indicator_list: List[str], use_stockstats_or_talib: int = 0):
+    # select_stockstats_talib: 0 (stockstats, default), or 1 (use talib). Users can choose the method.
+    def add_technical_indicator(self, tech_indicator_list: List[str], select_stockstats_talib: int = 0):
         """
         calculate technical indicators
         use stockstats/talib package to add technical inidactors
@@ -86,9 +86,9 @@ class BaseProcessor:
             self.dataframe.drop(columns=["level_1"], inplace=True)
         if "level_0" in self.dataframe.columns and "tic" not in self.dataframe.columns:
             self.dataframe.rename(columns={"level_0": "tic"}, inplace=True)
-        assert use_stockstats_or_talib in {0, 1}
+        assert select_stockstats_talib in {0, 1}
         print("tech_indicator_list: ", tech_indicator_list)
-        if use_stockstats_or_talib == 0:  # use stockstats
+        if select_stockstats_talib == 0:  # use stockstats
             stock = stockstats.StockDataFrame.retype(self.dataframe)
             unique_ticker = stock.tic.unique()
             for indicator in tech_indicator_list:
