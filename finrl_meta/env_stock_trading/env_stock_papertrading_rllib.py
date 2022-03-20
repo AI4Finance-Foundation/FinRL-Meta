@@ -29,7 +29,7 @@ class AlpacaPaperTrading_rllib():
 
     def __init__(self, ticker_list, time_interval, agent, cwd, net_dim,
                  state_dim, action_dim, API_KEY, API_SECRET,
-                 APCA_API_BASE_URL, tech_indicator_list, turbulence_thresh=30, max_stock=1e2):
+                 API_BASE_URL, tech_indicator_list, turbulence_thresh=30, max_stock=1e2):
         # load agent
         print('agent', agent)
         if agent == 'ppo':
@@ -55,7 +55,7 @@ class AlpacaPaperTrading_rllib():
 
         # connect to Alpaca trading API
         try:
-            self.alpaca = tradeapi.REST(API_KEY, API_SECRET, APCA_API_BASE_URL, 'v2')
+            self.alpaca = tradeapi.REST(API_KEY, API_SECRET, API_BASE_URL, 'v2')
         except:
             raise ValueError('Fail to connect Alpaca. Please check account info and internet connection.')
 

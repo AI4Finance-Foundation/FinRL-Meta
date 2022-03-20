@@ -28,10 +28,10 @@ BINANCE_BASE_URL,
 
 
 class AlpacaProcessor(BasicProcessor):
-    # def __init__(self, API_KEY=None, API_SECRET=None, APCA_API_BASE_URL=None, api=None):
+    # def __init__(self, API_KEY=None, API_SECRET=None, API_BASE_URL=None, api=None):
     #     if api is None:
     #         try:
-    #             self.api = tradeapi.REST(API_KEY, API_SECRET, APCA_API_BASE_URL, "v2")
+    #             self.api = tradeapi.REST(API_KEY, API_SECRET, API_BASE_URL, "v2")
     #         except BaseException:
     #             raise ValueError("Wrong Account Info!")
     #     else:
@@ -40,7 +40,7 @@ class AlpacaProcessor(BasicProcessor):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
         if kwargs['API'] is None:
             try:
-                self.api = tradeapi.REST(kwargs['API_KEY'], kwargs['API_SECRET'], kwargs['APCA_API_BASE_URL'], "v2")
+                self.api = tradeapi.REST(kwargs['API_KEY'], kwargs['API_SECRET'], kwargs['API_BASE_URL'], "v2")
             except BaseException:
                 raise ValueError("Wrong Account Info!")
         else:

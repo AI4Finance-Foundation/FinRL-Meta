@@ -45,7 +45,7 @@ class AlpacaPaperTradingMultiCrypto():
 
     def __init__(self, ticker_list, time_interval, drl_lib, agent, cwd, net_dim,
                  state_dim, action_dim, API_KEY, API_SECRET,
-                 APCA_API_BASE_URL, tech_indicator_list,
+                 API_BASE_URL, tech_indicator_list,
                  max_stock=1e2, latency=None):
         # load agent
         self.drl_lib = drl_lib
@@ -65,7 +65,7 @@ class AlpacaPaperTradingMultiCrypto():
                 raise ValueError('Fail to load agent!')
         # connect to Alpaca trading API
         try:
-            self.alpaca = tradeapi.REST(API_KEY, API_SECRET, APCA_API_BASE_URL, 'v2')
+            self.alpaca = tradeapi.REST(API_KEY, API_SECRET, API_BASE_URL, 'v2')
             print('Connected to Alpaca API!')
         except:
             raise ValueError('Fail to connect Alpaca. Please check account info and internet connection.')
