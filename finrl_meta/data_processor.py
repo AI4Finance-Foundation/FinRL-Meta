@@ -18,7 +18,7 @@ class DataProcessor():
     def processor_None(self):
         print("Not support for {self.data_source}")
 
-    def __init__(self, data_source, start_date, end_date, time_interval, **kwargs):
+    def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
         self.data_source = data_source
         self.start_date = start_date
         self.end_date = end_date

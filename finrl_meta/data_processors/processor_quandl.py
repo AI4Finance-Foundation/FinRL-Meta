@@ -35,7 +35,7 @@ USE_TIME_ZONE_SELFDEFINED = 1  # 0 (default) or 1 (use the self defined)
 
 class QuandlProcessor(BaseProcessor):
 
-    def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
+    def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
 
     def download_data(self, ticker_list: List[str]):

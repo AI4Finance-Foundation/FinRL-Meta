@@ -36,7 +36,7 @@ class AlpacaProcessor(BaseProcessor):
     #             raise ValueError("Wrong Account Info!")
     #     else:
     #         self.api = api
-    def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
+    def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
         if kwargs['API'] is None:
             try:

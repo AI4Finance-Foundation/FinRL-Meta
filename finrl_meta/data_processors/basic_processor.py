@@ -7,7 +7,7 @@ import talib
 import copy
 
 class BaseProcessor:
-    def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
+    def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
 
         assert data_source in {
             "alpaca",
