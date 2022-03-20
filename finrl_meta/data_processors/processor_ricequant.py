@@ -5,7 +5,7 @@ import rqdatac as ricequant
 from finrl_meta.data_processors.basic_processor import BasicProcessor
 
 
-class RiceQuantProcessor(BasicProcessor):
+class RicequantProcessor(BasicProcessor):
     def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
         if kwargs['username'] is None or kwargs['password'] is None:

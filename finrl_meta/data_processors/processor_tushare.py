@@ -10,8 +10,8 @@ from copy import deepcopy
 warnings.filterwarnings("ignore")
 
 
-class TushareProProcessor(BasicProcessor):
-    """Provides methods for retrieving daily stock data from tusharepro API
+class TushareProcessor(BasicProcessor):
+    """Provides methods for retrieving daily stock data from tushare API
     Attributes
     ----------
         start_date : str
@@ -29,7 +29,7 @@ class TushareProProcessor(BasicProcessor):
     Methods
     -------
     download_data()
-        Fetches data from tusharepro API
+        Fetches data from tushare API
     
     """
 
@@ -53,7 +53,7 @@ class TushareProProcessor(BasicProcessor):
         )
 
     def download_data(self, ticker_list: List[str]):
-        """Fetches data from tusharepro API
+        """Fetches data from tushare API
         Parameters
         ----------
         Returns
