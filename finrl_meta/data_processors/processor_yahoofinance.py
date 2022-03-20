@@ -33,16 +33,6 @@ class YahoofinanceProcessor(BaseProcessor):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
 
     def download_data(self, ticker_list: List[str]):
-        """Fetches data from Yahoo API
-        Parameters
-        ----------
-        Returns
-        -------
-        `pd.DataFrame`
-            7 columns: A date, open, high, low, close, volume and tick symbol
-            for the specified stock ticker
-        """
-
         self.time_zone = calc_time_zone(ticker_list, TIME_ZONE_SELFDEFINED, USE_TIME_ZONE_SELFDEFINED)
 
         # Download and save the data in a pandas DataFrame:
