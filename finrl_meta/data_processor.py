@@ -140,10 +140,10 @@ def test_binance():
     end_date = '2021-09-20'
     time_interval = '5m'
 
-    DP = DataProcessor('binance', start_date, end_date, time_interval)
+    dp = DataProcessor('binance', start_date, end_date, time_interval)
     technical_indicator_list = ['macd', 'rsi', 'cci', 'dx']  # self-defined technical indicator list is NOT supported yet
     if_vix = False
-    price_array, tech_array, turbulence_array = DP.run(ticker_list, technical_indicator_list, if_vix, cache=True, use_stockstats_or_talib=1)
+    price_array, tech_array, turbulence_array = dp.run(ticker_list, technical_indicator_list, if_vix, cache=True, use_stockstats_or_talib=1)
     print(price_array.shape, tech_array.shape)
 
 def test_yfinance():
@@ -152,7 +152,7 @@ def test_yfinance():
     end_date = '2021-09-20'
     time_interval = '1D'
 
-    DP = DataProcessor('yahoofinance', start_date, end_date, time_interval)
+    dp = DataProcessor('yahoofinance', start_date, end_date, time_interval)
     ticker_list = [
         "MTX.DE",
         "MRK.DE",
@@ -163,7 +163,7 @@ def test_yfinance():
 
     technical_indicator_list = ['macd', 'rsi', 'cci', 'dx']  # self-defined technical indicator list is NOT supported yet
     if_vix = False
-    price_array, tech_array, turbulence_array = DP.run(ticker_list, technical_indicator_list, if_vix, cache=True, use_stockstats_or_talib=1)
+    price_array, tech_array, turbulence_array = dp.run(ticker_list, technical_indicator_list, if_vix, cache=True, use_stockstats_or_talib=1)
     print(price_array.shape, tech_array.shape)
 
 def test_baostock():
