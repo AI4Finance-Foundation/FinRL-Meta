@@ -13,7 +13,7 @@ import pandas as pd
 import numpy as np
 import os
 import pickle
-
+from typing import List
 class DataProcessor():
     def processor_None(self):
         print("Not support for {self.data_source}")
@@ -55,7 +55,7 @@ class DataProcessor():
         self.processor.clean_data()
         self.dataframe = self.processor.dataframe
 
-    def add_technical_indicator(self, tech_indicator_list, select_stockstats_talib: int = 0):
+    def add_technical_indicator(self, tech_indicator_list: List[str], select_stockstats_talib: int = 0):
         self.tech_indicator_list = tech_indicator_list
         self.processor.add_technical_indicator(tech_indicator_list, select_stockstats_talib)
         self.dataframe = self.processor.dataframe
@@ -68,7 +68,7 @@ class DataProcessor():
         self.processor.add_vix()
         self.dataframe = self.processor.dataframe
 
-    def df_to_array(self, if_vix) -> np.array:
+    def df_to_array(self, if_vix: bool) -> np.array:
         price_array, tech_array, turbulence_array = self.processor.df_to_array(self.tech_indicator_list, if_vix)
         # fill nan with 0 for technical indicators
         tech_nan_positions = np.isnan(tech_array)
@@ -76,7 +76,7 @@ class DataProcessor():
 
         return price_array, tech_array, turbulence_array
 
-    def run(self, ticker_list, technical_indicator_list, if_vix, cache=False, select_stockstats_talib: int = 0):
+    def run(self, ticker_list: str, technical_indicator_list: List[str], if_vix: bool, cache: bool = False, select_stockstats_talib: int = 0):
 
         if self.time_interval == "1s" and self.data_source != "binance":
             raise ValueError("Currently 1s interval data is only supported with 'binance' as data source")
