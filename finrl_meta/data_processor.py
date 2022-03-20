@@ -1,12 +1,12 @@
-from finrl_meta.data_processors.processor_alpaca import AlpacaProcessor as Alpaca
-from finrl_meta.data_processors.processor_wrds import WrdsProcessor as Wrds
-from finrl_meta.data_processors.processor_yahoofinance import YahooFinanceProcessor as YahooFinance
-from finrl_meta.data_processors.processor_binance import BinanceProcessor as Binance
-from finrl_meta.data_processors.processor_ricequant import RiceQuantProcessor as RiceQuant
+from finrl_meta.data_processors.processor_alpaca import AlpacaProcessor
+from finrl_meta.data_processors.processor_wrds import WrdsProcessor
+from finrl_meta.data_processors.processor_yahoofinance import YahoofinanceProcessor
+from finrl_meta.data_processors.processor_binance import BinanceProcessor
+from finrl_meta.data_processors.processor_ricequant import RicequantProcessor
 from finrl_meta.data_processors.processor_joinquant import JoinquantProcessor
 from finrl_meta.data_processors.processor_quandl import QuandlProcessor
 from finrl_meta.data_processors.processor_quantconnect import QuantConnectProcessor
-from finrl_meta.data_processors.processor_tusharepro import TushareProProcessor as Tusharepro
+from finrl_meta.data_processors.processor_tushare import TushareProcessor
 from finrl_meta.data_processors.processor_baostock import BaostockProcessor
 import pandas as pd
 import numpy as np
@@ -24,23 +24,23 @@ class DataProcessor():
         self.time_interval = time_interval
         self.dataframe = pd.DataFrame()
         processor_dict = {
-            "alpaca": Alpaca,
-            "binance": Binance,
+            "alpaca": AlpacaProcessor,
+            "binance": BinanceProcessor,
             "baostock": BaostockProcessor,
             "joinquant": JoinquantProcessor,
             "quandl":  QuandlProcessor,
             "quantconnect":  QuantConnectProcessor,
-            "ricequant":  RiceQuant,
-            "tusharepro": Tusharepro,
-            "wrds":  Wrds,
-            "yahoofinance":  YahooFinance,
+            "ricequant":  RicequantProcessor,
+            "tushare": TushareProcessor,
+            "wrds":  WrdsProcessor,
+            "yahoofinance":  YahoofinanceProcessor,
         }
 
         try:
             self.processor = processor_dict.get(self.data_source, self.processor_None())(data_source, start_date, end_date, time_interval, **kwargs)
-            print('{self.data_source} successfully connected')
+            print(f'{self.data_source} successfully connected')
         except:
-            raise ValueError('Please input correct account info for {self.data_source}!')
+            raise ValueError(f'Please input correct account info for {self.data_source}!')
 
 
     def download_data(self, ticker_list):
