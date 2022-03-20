@@ -29,22 +29,6 @@ BINANCE_BASE_URL,
 
 
 class YahoofinanceProcessor(BaseProcessor):
-    """Provides methods for retrieving daily stock data from
-    Yahoo Finance API
-    Attributes
-    ----------
-        start_date : str
-            start date of the data (modified from config.py)
-        end_date : str
-            end date of the data (modified from config.py)
-        ticker_list : list
-            a list of stock tickers (modified from config.py)
-    Methods
-    -------
-    fetch_data()
-        Fetches data from yahoo API
-    """
-
     def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
 
