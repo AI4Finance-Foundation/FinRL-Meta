@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import pyfolio
-from finrl.apps import config
+from finrl import config
 from finrl.neo_finrl.preprocessor.yahoodownloader import YahooDownloader
 from pyfolio import timeseries
 
