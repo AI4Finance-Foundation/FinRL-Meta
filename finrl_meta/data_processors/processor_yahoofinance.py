@@ -45,7 +45,7 @@ class YahoofinanceProcessor(BaseProcessor):
         Fetches data from yahoo API
     """
 
-    def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
+    def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
 
     def download_data(self, ticker_list: List[str]):
