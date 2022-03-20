@@ -5,7 +5,7 @@ from finrl_meta.data_processors.processor_binance import BinanceProcessor
 from finrl_meta.data_processors.processor_ricequant import RicequantProcessor
 from finrl_meta.data_processors.processor_joinquant import JoinquantProcessor
 from finrl_meta.data_processors.processor_quandl import QuandlProcessor
-from finrl_meta.data_processors.processor_quantconnect import QuantConnectProcessor
+from finrl_meta.data_processors.processor_quantconnect import QuantconnectProcessor
 from finrl_meta.data_processors.processor_tushare import TushareProcessor
 from finrl_meta.data_processors.processor_baostock import BaostockProcessor
 import pandas as pd
@@ -29,7 +29,7 @@ class DataProcessor():
             "baostock": BaostockProcessor,
             "joinquant": JoinquantProcessor,
             "quandl":  QuandlProcessor,
-            "quantconnect":  QuantConnectProcessor,
+            "quantconnect":  QuantconnectProcessor,
             "ricequant":  RicequantProcessor,
             "tushare": TushareProcessor,
             "wrds":  WrdsProcessor,
