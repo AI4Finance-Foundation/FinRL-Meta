@@ -1,7 +1,7 @@
 # import DRL agents
-from drl_agents.elegantrl_models import DRLAgent as DRLAgent_erl
-from drl_agents.rllib_models import DRLAgent as DRLAgent_rllib
-from drl_agents.stablebaselines3_models import DRLAgent as DRLAgent_sb3
+from agents.elegantrl_models import DRLAgent as DRLAgent_erl
+from agents.rllib_models import DRLAgent as DRLAgent_rllib
+from agents.stablebaselines3_models import DRLAgent as DRLAgent_sb3
 # import data processor
 from finrl_meta.data_processor import DataProcessor
 
