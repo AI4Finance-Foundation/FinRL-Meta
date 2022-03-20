@@ -4,7 +4,7 @@ TRAINED_MODEL_DIR = "trained_models"
 TENSORBOARD_LOG_DIR = "tensorboard_log"
 RESULTS_DIR = "results"
 
-# time format: '%Y-%m-%d'
+# date format: '%Y-%m-%d'
 TRAIN_START_DATE = "2014-01-01"
 TRAIN_END_DATE = "2020-07-31"
 
@@ -26,7 +26,6 @@ TECHNICAL_INDICATORS_LIST = [
     "close_30_sma",
     "close_60_sma",
 ]
-# TECHNICAL_INDICATORS_LIST = ["macd","rsi_30", "cci_30", "dx_30"]
 
 
 # Model Parameters
@@ -59,7 +58,7 @@ RLlib_PARAMS = {"lr": 5e-5, "train_batch_size": 500, "gamma": 0.99}
 
 
 # Possible time zones
-TIME_ZONE_SHANGHAI = 'Asia/Shanghai'  ## Hang Seng HSI, SSE, CSI
+TIME_ZONE_SHANGHAI = 'Asia/Shanghai'  # Hang Seng HSI, SSE, CSI
 TIME_ZONE_USEASTERN = 'US/Eastern'  # Dow, Nasdaq, SP
 TIME_ZONE_PARIS = 'Europe/Paris'  # CAC,
 TIME_ZONE_BERLIN = 'Europe/Berlin'  # DAX, TECDAX, MDAX, SDAX
