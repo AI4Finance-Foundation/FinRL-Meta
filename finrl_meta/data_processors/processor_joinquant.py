@@ -6,9 +6,9 @@ from typing import List
 import jqdatasdk as jq
 import numpy as np
 
-from finrl_meta.data_processors.basic_processor import BasicProcessor
+from finrl_meta.data_processors.basic_processor import BaseProcessor
 
-class JoinquantProcessor(BasicProcessor):
+class JoinquantProcessor(BaseProcessor):
     def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
         if 'username' in kwargs.keys() and 'password' in kwargs.keys():

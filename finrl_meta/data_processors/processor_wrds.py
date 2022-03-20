@@ -11,13 +11,13 @@ except:
           'If you are using python>=3.7, please install it.')
     import trading_calendars as tc
     print('Use trading_calendars instead for wrds processor.')
-# from basic_processor import BasicProcessor
-from finrl_meta.data_processors.basic_processor import BasicProcessor
+# from basic_processor import BaseProcessor
+from finrl_meta.data_processors.basic_processor import BaseProcessor
 
 pd.options.mode.chained_assignment = None
 
 
-class WrdsProcessor(BasicProcessor):
+class WrdsProcessor(BaseProcessor):
     # def __init__(self,if_offline=False):
     #     if not if_offline:
     #         self.db = wrds.Connection()

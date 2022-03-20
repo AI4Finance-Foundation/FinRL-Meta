@@ -6,11 +6,11 @@ from typing import List
 import pandas as pd
 import requests
 
-from finrl_meta.data_processors.basic_processor import BasicProcessor
+from finrl_meta.data_processors.basic_processor import BaseProcessor
 from .func import download_n_unzip_file, convert_to_date_object, get_path
 
 
-class BinanceProcessor(BasicProcessor):
+class BinanceProcessor(BaseProcessor):
     def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
         self.url = "https://api.binance.com/api/v3/klines"

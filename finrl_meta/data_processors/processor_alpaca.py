@@ -11,8 +11,8 @@ except:
           'If you are using python>=3.7, please install it.')
     import trading_calendars as tc
     print('Use trading_calendars instead for alpaca processor.')
-# from basic_processor import BasicProcessor
-from finrl_meta.data_processors.basic_processor import BasicProcessor
+# from basic_processor import BaseProcessor
+from finrl_meta.data_processors.basic_processor import BaseProcessor
 from finrl_meta.data_processors.func import calc_time_zone
 
 from finrl_meta.config import (
@@ -27,7 +27,7 @@ BINANCE_BASE_URL,
 )
 
 
-class AlpacaProcessor(BasicProcessor):
+class AlpacaProcessor(BaseProcessor):
     # def __init__(self, API_KEY=None, API_SECRET=None, API_BASE_URL=None, api=None):
     #     if api is None:
     #         try:

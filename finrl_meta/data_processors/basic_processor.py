@@ -6,7 +6,7 @@ import stockstats
 import talib
 import copy
 
-class BasicProcessor:
+class BaseProcessor:
     def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
 
         assert data_source in {

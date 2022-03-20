@@ -15,8 +15,8 @@ except:
           'If you are using python>=3.7, please install it.')
     import trading_calendars as tc
     print('Use trading_calendars instead for yahoofinance processor..')
-# from basic_processor import BasicProcessor
-from finrl_meta.data_processors.basic_processor import BasicProcessor
+# from basic_processor import BaseProcessor
+from finrl_meta.data_processors.basic_processor import BaseProcessor
 from finrl_meta.data_processors.func import calc_time_zone
 
 from finrl_meta.config import (
@@ -32,7 +32,7 @@ BINANCE_BASE_URL,
 
 
 
-class BaostockProcessor(BasicProcessor):
+class BaostockProcessor(BaseProcessor):
     def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
 
