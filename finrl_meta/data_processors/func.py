@@ -1,4 +1,3 @@
-import datetime
 import os
 import urllib
 import zipfile
@@ -51,87 +50,8 @@ def calc_time_zone(ticker_list: List[str], time_zone_selfdefined: str, use_time_
         raise ValueError("Time zone is wrong.")
     return time_zone
 
-
-# e.g., '20210911' -> '2021-09-11'
-def add_hyphen_for_date(d: str) -> str:
-    return d[:4] + '-' + d[4:6] + '-' + d[6:]
-
-
-# e.g., '2021-09-11' -> '20210911'
-def remove_hyphen_for_date(d: str) -> str:
-    return d[:4] + d[5:7] + '-' + d[8:]
-
-
-# filename: str
-# output: stockname
-def calc_stockname_from_filename(filename):
-    return filename.split("/")[-1].split(".csv")[0]
-
-
-def calc_all_filenames(path):
-    dir_list = os.listdir(path)
-    dir_list.sort()
-    paths2 = []
-    for dir in dir_list:
-        filename = os.path.join(os.path.abspath(path), dir)
-        if ".csv" in filename and "#" not in filename and "~" not in filename:
-            paths2.append(filename)
-    return paths2
-
-
-def calc_stocknames(path):
-    filenames = calc_all_filenames(path)
-    res = []
-    for filename in filenames:
-        stockname = calc_stockname_from_filename(filename)
-        res.append(stockname)
-    return res
-
-
-def remove_all_files(remove, path_of_data):
-    assert remove in [0, 1]
-    if remove == 1:
-        os.system("rm -f " + path_of_data + "/*")
-    dir_list = os.listdir(path_of_data)
-    for file in dir_list:
-        if "~" in file:
-            os.system("rm -f " + path_of_data + "/" + file)
-    dir_list = os.listdir(path_of_data)
-
-    if remove == 1:
-        if len(dir_list) == 0:
-            print(f"dir_list: {dir_list}. Right.")
-        else:
-            print(
-                f"dir_list: {dir_list}. Wrong. You should remove all files by hands."
-            )
-        assert len(dir_list) == 0
-    else:
-        if len(dir_list) == 0:
-            print(f"dir_list: {dir_list}. Wrong. There is not data.")
-        else:
-            print(f"dir_list: {dir_list}. Right.")
-        assert len(dir_list) > 0
-
-
-def date2str(dat):
-    return datetime.date.strftime(dat, "%Y-%m-%d")
-
-
-def str2date(str_dat):
-    return datetime.datetime.strptime(str_dat, "%Y-%m-%d").date()
-
-
-### ticker download helpers
-
-def get_destination_dir(file_url):
-    store_directory = os.path.dirname(os.path.realpath(__file__))
-    return os.path.join(store_directory, file_url)
-
-
 def get_download_url(file_url):
     return f"{BINANCE_BASE_URL}{file_url}"
-
 
 # downloads zip, unzips zip and deltes zip
 def download_n_unzip_file(base_path, file_name, date_range=None):
