@@ -20,7 +20,7 @@ class BaseObs(object):
 
 
 class RuleObs(BaseObs):
-    """The observation for minute-level rule-based drl_agents, which consists of prediction, private state and direction information."""
+    """The observation for minute-level rule-based agents, which consists of prediction, private state and direction information."""
 
     def __init__(self, config):
         feature_size = 0

@@ -1,6 +1,6 @@
-from drl_agents.elegantrl_models import DRLAgent as DRLAgent_erl
-from drl_agents.rllib_models import DRLAgent as DRLAgent_rllib
-from drl_agents.stablebaselines3_models import DRLAgent as DRLAgent_sb3
+from agents.elegantrl_models import DRLAgent as DRLAgent_erl
+from agents.rllib_models import DRLAgent as DRLAgent_rllib
+from agents.stablebaselines3_models import DRLAgent as DRLAgent_sb3
 from finrl_meta.data_processor import DataProcessor
 
 
@@ -18,7 +18,7 @@ def train(start_date, end_date, ticker_list, data_source, time_interval,
     # build environment using processed data
     env_instance = env(config=data_config)
 
-    # read parameters and load drl_agents
+    # read parameters and load agents
     cwd = kwargs.get('cwd', './' + str(model_name))  # cwd: current_working_dir
 
     if drl_lib == 'elegantrl':
