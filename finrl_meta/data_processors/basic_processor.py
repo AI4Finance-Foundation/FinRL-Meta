@@ -7,7 +7,7 @@ import talib
 import copy
 
 class BaseProcessor:
-    def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
+    def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
 
         assert data_source in {
             "alpaca",
@@ -56,19 +56,19 @@ class BaseProcessor:
             self.dataframe.rename(columns={'code': 'tic'}, inplace=True)
 
         self.dataframe.dropna(inplace=True)
-        # adj_close: adjusted close price
-        if 'adj_close' not in self.dataframe.columns.values.tolist():
-            self.dataframe['adj_close'] = self.dataframe['close']
+        # adjusted_close: adjusted close price
+        if 'adjusted_close' not in self.dataframe.columns.values.tolist():
+            self.dataframe['adjusted_close'] = self.dataframe['close']
         self.dataframe.sort_values(by=['time', 'tic'], inplace=True)
-        self.dataframe = self.dataframe[['tic', 'time', 'open', 'high', 'low', 'close', 'adj_close', 'volume']]
+        self.dataframe = self.dataframe[['tic', 'time', 'open', 'high', 'low', 'close', 'adjusted_close', 'volume']]
 
     def get_trading_days(self, start: str, end: str) -> List[str]:
         if self.data_source in ["binance", "ccxt", "quantconnect", "ricequant", "tushare"]:
             print(f"Calculate get_trading_days not supported for {self.data_source} yet.")
             return None
 
-    # use_stockstats_or_talib: 0 (stockstats, default), or 1 (use talib). Users can choose the method.
-    def add_technical_indicator(self, tech_indicator_list: List[str], use_stockstats_or_talib: int = 0):
+    # select_stockstats_talib: 0 (stockstats, default), or 1 (use talib). Users can choose the method.
+    def add_technical_indicator(self, tech_indicator_list: List[str], select_stockstats_talib: int = 0):
         """
         calculate technical indicators
         use stockstats/talib package to add technical inidactors
@@ -86,9 +86,9 @@ class BaseProcessor:
             self.dataframe.drop(columns=["level_1"], inplace=True)
         if "level_0" in self.dataframe.columns and "tic" not in self.dataframe.columns:
             self.dataframe.rename(columns={"level_0": "tic"}, inplace=True)
-        assert use_stockstats_or_talib in {0, 1}
+        assert select_stockstats_talib in {0, 1}
         print("tech_indicator_list: ", tech_indicator_list)
-        if use_stockstats_or_talib == 0:  # use stockstats
+        if select_stockstats_talib == 0:  # use stockstats
             stock = stockstats.StockDataFrame.retype(self.dataframe)
             unique_ticker = stock.tic.unique()
             for indicator in tech_indicator_list:
@@ -213,7 +213,7 @@ class BaseProcessor:
         #         time_interval=self.time_interval,
         #     )
         #     df_vix = self.clean_data(df_vix)
-        #     vix = df_vix[["time", "adj_close"]]
+        #     vix = df_vix[["time", "adjusted_close"]]
         #     vix.columns = ["time", "vix"]
         #
         #     df = df.merge(vix, on="time")
@@ -256,7 +256,7 @@ class BaseProcessor:
         df = df.sort_values(["time", "tic"]).reset_index(drop=True)
         self.dataframe = df
 
-    def df_to_array(self, tech_indicator_list: list, if_vix: bool):
+    def df_to_array(self, tech_indicator_list: List[str], if_vix: bool):
         unique_ticker = self.dataframe.tic.unique()
         price_array = np.column_stack([self.dataframe[self.dataframe.tic == tic].close for tic in unique_ticker])
         common_tech_indicator_list = [i for i in tech_indicator_list if i in self.dataframe.columns.values.tolist()]

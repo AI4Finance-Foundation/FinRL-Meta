@@ -33,7 +33,7 @@ BINANCE_BASE_URL,
 
 
 class BaostockProcessor(BaseProcessor):
-    def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
+    def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
 
     # 日k线、周k线、月k线，以及5分钟、15分钟、30分钟和60分钟k线数据

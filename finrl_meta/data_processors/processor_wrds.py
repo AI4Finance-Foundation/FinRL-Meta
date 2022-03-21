@@ -21,7 +21,7 @@ class WrdsProcessor(BaseProcessor):
     # def __init__(self,if_offline=False):
     #     if not if_offline:
     #         self.db = wrds.Connection()
-    def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
+    def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
         if 'if_offline' in kwargs.keys() and not kwargs['if_offline']:
             self.db = wrds.Connection()

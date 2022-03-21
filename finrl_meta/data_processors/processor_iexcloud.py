@@ -22,7 +22,7 @@ class IexcloudProcessor(BaseProcessor):
 
         return "https://cloud.iexapis.com"
 
-    def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
+    def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
         self.base_url = self._get_base_url(mode=kwargs['mode'])
         self.token = kwargs['token'] or os.environ.get("IEX_TOKEN")
@@ -38,7 +38,7 @@ class IexcloudProcessor(BaseProcessor):
         Returns:
             pd.DataFrame: A pandas dataframe with end of day historical data
             for the specified tickers with the following columns:
-            date, tic, open, high, low, close, adj_close, volume.
+            date, tic, open, high, low, close, adjusted_close, volume.
 
         Examples:
             kwargs['mode'] = 'sandbox'
@@ -88,7 +88,7 @@ class IexcloudProcessor(BaseProcessor):
                 "volume",
             ]
         ]
-        price_data = price_data.rename(columns={"ticker": "tic", "date": "time", "fclose": "adj_close"})
+        price_data = price_data.rename(columns={"ticker": "tic", "date": "time", "fclose": "adjusted_close"})
 
         price_data.date = price_data.date.map(
             lambda x: datetime.fromtimestamp(x / 1000, pytz.UTC).strftime(

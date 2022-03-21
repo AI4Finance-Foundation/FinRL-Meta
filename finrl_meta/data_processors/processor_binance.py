@@ -11,7 +11,7 @@ from .func import download_n_unzip_file, convert_to_date_object, get_path
 
 
 class BinanceProcessor(BaseProcessor):
-    def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
+    def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
         self.url = "https://api.binance.com/api/v3/klines"
 
@@ -108,7 +108,7 @@ class BinanceProcessor(BaseProcessor):
         df[['open', 'high', 'low', 'close', 'volume']] = df[['open', 'high', 'low', 'close', 'volume']].astype(float)
 
         # No stock split and dividend announcement, hence adjusted close is the same as close
-        df['adj_close'] = df['close']
+        df['adjusted_close'] = df['close']
         df['datetime'] = df.datetime.apply(lambda x: dt.datetime.fromtimestamp(x / 1000.0))
         df.reset_index(drop=True, inplace=True)
 
@@ -130,7 +130,7 @@ class BinanceProcessor(BaseProcessor):
             df[['open','high','low','close','volume']] = df[['open','high','low','close','volume']].astype(float)
     
             # No stock split and dividend announcement, hence adjusted close is the same as close
-            df['adj_close'] = df['close']
+            df['adjusted_close'] = df['close']
             df['datetime'] = df.datetime.apply(lambda x: dt.datetime.fromtimestamp(x/1000.0))
             df['tic'] = symbol
             df = df.rename(columns = {'datetime':'time'})

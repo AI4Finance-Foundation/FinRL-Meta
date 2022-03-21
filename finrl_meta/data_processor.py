@@ -13,12 +13,12 @@ import pandas as pd
 import numpy as np
 import os
 import pickle
-
+from typing import List
 class DataProcessor():
     def processor_None(self):
         print("Not support for {self.data_source}")
 
-    def __init__(self, data_source, start_date, end_date, time_interval, **kwargs):
+    def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
         self.data_source = data_source
         self.start_date = start_date
         self.end_date = end_date
@@ -55,9 +55,9 @@ class DataProcessor():
         self.processor.clean_data()
         self.dataframe = self.processor.dataframe
 
-    def add_technical_indicator(self, tech_indicator_list, use_stockstats_or_talib: int = 0):
+    def add_technical_indicator(self, tech_indicator_list: List[str], select_stockstats_talib: int = 0):
         self.tech_indicator_list = tech_indicator_list
-        self.processor.add_technical_indicator(tech_indicator_list, use_stockstats_or_talib)
+        self.processor.add_technical_indicator(tech_indicator_list, select_stockstats_talib)
         self.dataframe = self.processor.dataframe
 
     def add_turbulence(self):
@@ -68,7 +68,7 @@ class DataProcessor():
         self.processor.add_vix()
         self.dataframe = self.processor.dataframe
 
-    def df_to_array(self, if_vix) -> np.array:
+    def df_to_array(self, if_vix: bool) -> np.array:
         price_array, tech_array, turbulence_array = self.processor.df_to_array(self.tech_indicator_list, if_vix)
         # fill nan with 0 for technical indicators
         tech_nan_positions = np.isnan(tech_array)
@@ -76,7 +76,7 @@ class DataProcessor():
 
         return price_array, tech_array, turbulence_array
 
-    def run(self, ticker_list, technical_indicator_list, if_vix, cache=False, use_stockstats_or_talib: int = 0):
+    def run(self, ticker_list: str, technical_indicator_list: List[str], if_vix: bool, cache: bool = False, select_stockstats_talib: int = 0):
 
         if self.time_interval == "1s" and self.data_source != "binance":
             raise ValueError("Currently 1s interval data is only supported with 'binance' as data source")
@@ -100,7 +100,7 @@ class DataProcessor():
                     pickle.dump(self.dataframe, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
-        self.add_technical_indicator(technical_indicator_list, use_stockstats_or_talib)
+        self.add_technical_indicator(technical_indicator_list, select_stockstats_talib)
         if if_vix:
             self.add_vix()
         price_array, tech_array, turbulence_array = self.df_to_array(if_vix)
@@ -143,7 +143,7 @@ def test_binance():
     dp = DataProcessor('binance', start_date, end_date, time_interval)
     technical_indicator_list = ['macd', 'rsi', 'cci', 'dx']  # self-defined technical indicator list is NOT supported yet
     if_vix = False
-    price_array, tech_array, turbulence_array = dp.run(ticker_list, technical_indicator_list, if_vix, cache=True, use_stockstats_or_talib=1)
+    price_array, tech_array, turbulence_array = dp.run(ticker_list, technical_indicator_list, if_vix, cache=True, select_stockstats_talib=1)
     print(price_array.shape, tech_array.shape)
 
 def test_yfinance():
@@ -163,7 +163,7 @@ def test_yfinance():
 
     technical_indicator_list = ['macd', 'rsi', 'cci', 'dx']  # self-defined technical indicator list is NOT supported yet
     if_vix = False
-    price_array, tech_array, turbulence_array = dp.run(ticker_list, technical_indicator_list, if_vix, cache=True, use_stockstats_or_talib=1)
+    price_array, tech_array, turbulence_array = dp.run(ticker_list, technical_indicator_list, if_vix, cache=True, select_stockstats_talib=1)
     print(price_array.shape, tech_array.shape)
 
 def test_baostock():

@@ -33,7 +33,7 @@ class TushareProcessor(BaseProcessor):
     
     """
 
-    def __init__(self, data_source: str, start_date, end_date, time_interval, **kwargs):
+    def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
         if 'token' not in kwargs.keys():
             raise ValueError("pleses input token!")
@@ -138,7 +138,7 @@ class TushareProcessor(BaseProcessor):
 
         self.dataframe = df3
 
-    # def add_technical_indicator(self, tech_indicator_list: List[str], use_stockstats_or_talib: int=0):
+    # def add_technical_indicator(self, tech_indicator_list: List[str], select_stockstats_talib: int=0):
     #     """
     #     calculate technical indicators
     #     use stockstats/talib package to add technical inidactors
@@ -155,7 +155,7 @@ class TushareProcessor(BaseProcessor):
     #     # df = df.reset_index(drop=False)
     #     # df = df.drop(columns=["level_1"])
     #     # df = df.rename(columns={"level_0": "tic", "date": "time"})
-    #     if use_stockstats_or_talib == 0:  # use stockstats
+    #     if select_stockstats_talib == 0:  # use stockstats
     #         stock = stockstats.StockDataFrame.retype(df.copy())
     #         unique_ticker = stock.tic.unique()
     #         #print(unique_ticker)
