@@ -1,6 +1,6 @@
 import pandas as pd
 from tqdm import tqdm
-from finrl_meta.data_processors.base_processor import BaseProcessor
+from finrl_meta.data_processors._base import BaseProcessor
 from typing import List
 import time
 import copy

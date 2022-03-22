@@ -5,7 +5,7 @@ import pickle
 from typing import List
 class DataProcessor():
     def processor_None(self):
-        print("Not support for {self.data_source}")
+        print(f"Not support for {self.data_source}")
 
     def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
         self.data_source = data_source
@@ -35,6 +35,8 @@ class DataProcessor():
             from finrl_meta.data_processors.tushare import TushareProcessor
         elif self.data_source == "yahoofinance":
             from finrl_meta.data_processors.yahoofinance import YahoofinanceProcessor
+        else:
+            print(f"Data source {self.data_source} is NOT supported yet.")
         processor_dict = {
             "alpaca": AlpacaProcessor,
             "binance": BinanceProcessor,
