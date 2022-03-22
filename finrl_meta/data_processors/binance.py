@@ -5,10 +5,24 @@ from typing import List
 
 import pandas as pd
 import requests
+import os
+import urllib
+import zipfile
+from datetime import *
+from pathlib import Path
 
-from finrl_meta.data_processors.base_processor import BaseProcessor
-from base_processor import download_n_unzip_file, convert_to_date_object, get_path
+from finrl_meta.data_processors._base import BaseProcessor
 
+from finrl_meta.config import (
+TIME_ZONE_SHANGHAI,
+TIME_ZONE_USEASTERN,
+TIME_ZONE_PARIS,
+TIME_ZONE_BERLIN,
+TIME_ZONE_JAKARTA,
+TIME_ZONE_SELFDEFINED,
+USE_TIME_ZONE_SELFDEFINED,
+BINANCE_BASE_URL,
+)
 
 class BinanceProcessor(BaseProcessor):
     def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
@@ -155,12 +169,89 @@ class BinanceProcessor(BaseProcessor):
         final_df.drop('datetime', inplace=True, axis=1)
         return final_df
 
+    def get_download_url(self, file_url):
+        return f"{BINANCE_BASE_URL}{file_url}"
+
+    # downloads zip, unzips zip and deltes zip
+    def download_n_unzip_file(self, base_path, file_name, date_range=None):
+        download_path = f"{base_path}{file_name}"
+        if date_range:
+            date_range = date_range.replace(" ", "_")
+            base_path = os.path.join(base_path, date_range)
+
+        # raw_cache_dir = get_destination_dir("./cache/tick_raw")
+        raw_cache_dir = "./cache/tick_raw"
+        zip_save_path = os.path.join(raw_cache_dir, file_name)
+
+        csv_name = os.path.splitext(file_name)[0] + ".csv"
+        csv_save_path = os.path.join(raw_cache_dir, csv_name)
+
+        fhandles = []
+
+        if os.path.exists(csv_save_path):
+            print(f"\nfile already exists! {csv_save_path}")
+            return [csv_save_path]
+
+        # make the "cache" directory (only)
+        if not os.path.exists(raw_cache_dir):
+            Path(raw_cache_dir).mkdir(parents=True, exist_ok=True)
+
+        try:
+            download_url = self.get_download_url(download_path)
+            dl_file = urllib.request.urlopen(download_url)
+            length = dl_file.getheader('content-length')
+            if length:
+                length = int(length)
+                blocksize = max(4096, length // 100)
+
+            with open(zip_save_path, 'wb') as out_file:
+                dl_progress = 0
+                print(f"\nFile Download: {zip_save_path}")
+                while True:
+                    buf = dl_file.read(blocksize)
+                    if not buf:
+                        break
+                    out_file.write(buf)
+                    # visuals
+                    # dl_progress += len(buf)
+                    # done = int(50 * dl_progress / length)
+                    # sys.stdout.write("\r[%s%s]" % ('#' * done, '.' * (50-done)) )
+                    # sys.stdout.flush()
+
+            # unzip and delete zip
+            file = zipfile.ZipFile(zip_save_path)
+            with zipfile.ZipFile(zip_save_path) as zip:
+                # guaranteed just 1 csv
+                csvpath = zip.extract(zip.namelist()[0], raw_cache_dir)
+                fhandles.append(csvpath)
+            os.remove(zip_save_path)
+            return fhandles
+
+        except urllib.error.HTTPError:
+            print(f"\nFile not found: {download_url}")
+
+    def convert_to_date_object(self, d):
+        year, month, day = [int(x) for x in d.split('-')]
+        return date(year, month, day)
+
+    def get_path(self, trading_type, market_data_type, time_period, symbol, interval=None):
+        trading_type_path = 'data/spot'
+        # currently just supporting spot
+        if trading_type != 'spot':
+            trading_type_path = f'data/futures/{trading_type}'
+        return (
+            f'{trading_type_path}/{time_period}/{market_data_type}/{symbol.upper()}/{interval}/'
+            if interval is not None
+            else f'{trading_type_path}/{time_period}/{market_data_type}/{symbol.upper()}/'
+        )
+
+
     # helpers for manipulating tick level data (1s intervals)
     def download_daily_aggTrades(self, symbols, num_symbols, dates, start_date, end_date):
         trading_type = "spot"
         date_range = start_date + " " + end_date
-        start_date = convert_to_date_object(start_date)
-        end_date = convert_to_date_object(end_date)
+        start_date = self.convert_to_date_object(start_date)
+        end_date = self.convert_to_date_object(end_date)
 
         print(f"Found {num_symbols} symbols")
 
@@ -169,11 +260,11 @@ class BinanceProcessor(BaseProcessor):
             map[symbol] = []
             print(f"[{current + 1}/{num_symbols}] - start download daily {symbol} aggTrades ")
             for date in dates:
-                current_date = convert_to_date_object(date)
+                current_date = self.convert_to_date_object(date)
                 if current_date >= start_date and current_date <= end_date:
-                    path = get_path(trading_type, "aggTrades", "daily", symbol)
+                    path = self.get_path(trading_type, "aggTrades", "daily", symbol)
                     file_name = f"{symbol.upper()}-aggTrades-{date}.zip"
-                    fhandle = download_n_unzip_file(path, file_name, date_range)
+                    fhandle = self.download_n_unzip_file(path, file_name, date_range)
                     map[symbol] += fhandle
         return map
 
@@ -189,7 +280,7 @@ class BinanceProcessor(BaseProcessor):
         num_symbols = len(tickers)
         # not adding tz yet
         # for ffill missing data on starting on first day 00:00:00 (if any)
-        tminus1 = (convert_to_date_object(startDate) - dt.timedelta(1)).strftime('%Y-%m-%d')
+        tminus1 = (self.convert_to_date_object(startDate) - dt.timedelta(1)).strftime('%Y-%m-%d')
         dates = pd.date_range(start=tminus1, end=endDate)
         dates = [date.strftime("%Y-%m-%d") for date in dates]
         return self.download_daily_aggTrades(tickers, num_symbols, dates, tminus1, endDate)
