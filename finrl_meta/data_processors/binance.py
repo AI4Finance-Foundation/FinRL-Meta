@@ -49,7 +49,7 @@ class BinanceProcessor(BaseProcessor):
             for i in ticker_list:
                 hist_data = self.dataframe_with_limit(symbol=i)
                 df = hist_data.iloc[:-1].dropna()
-                df['tic'] = i
+                df['ticker'] = i
                 final_df = final_df.append(df)
         self.dataframe = final_df
 
@@ -146,7 +146,7 @@ class BinanceProcessor(BaseProcessor):
             # No stock split and dividend announcement, hence adjusted close is the same as close
             df['adjusted_close'] = df['close']
             df['datetime'] = df.datetime.apply(lambda x: dt.datetime.fromtimestamp(x/1000.0))
-            df['tic'] = symbol
+            df['ticker'] = symbol
             df = df.rename(columns = {'datetime':'time'})
             df.reset_index(drop=True, inplace=True)
             merged_df = merged_df.append(df)
@@ -334,7 +334,7 @@ class BinanceProcessor(BaseProcessor):
                     security = security.append(dailyfinal)
 
             security.ffill(inplace=True)
-            security['tic'] = tic
+            security['ticker'] = tic
             final_df = final_df.append(security)
         return final_df
 
