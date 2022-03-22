@@ -38,7 +38,7 @@ import numpy as np
 import pandas as pd
 import torch
 
-from finrl_meta.data_processors.processor_ccxt import CCXTProcessor
+from finrl_meta.data_processors.ccxt import CCXTProcessor
 
 
 class AlpacaPaperTradingMultiCrypto():

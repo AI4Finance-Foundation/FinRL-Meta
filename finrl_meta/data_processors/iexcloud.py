@@ -7,7 +7,7 @@ import pandas_market_calendars as mcal
 import pytz
 import requests
 
-from basic_processor import BaseProcessor
+from base_processor import BaseProcessor
 
 
 class IexcloudProcessor(BaseProcessor):

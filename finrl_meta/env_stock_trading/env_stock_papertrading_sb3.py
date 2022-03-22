@@ -6,7 +6,7 @@ import alpaca_trade_api as tradeapi
 import numpy as np
 import pandas as pd
 
-from finrl_meta.data_processors.processor_alpaca import AlpacaProcessor
+from finrl_meta.data_processors.alpaca import AlpacaProcessor
 
 
 class AlpacaPaperTrading_sb3():

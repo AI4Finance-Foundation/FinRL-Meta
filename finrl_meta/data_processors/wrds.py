@@ -12,7 +12,7 @@ except:
     import trading_calendars as tc
     print('Use trading_calendars instead for wrds processor.')
 # from basic_processor import BaseProcessor
-from finrl_meta.data_processors.basic_processor import BaseProcessor
+from finrl_meta.data_processors.base_processor import BaseProcessor
 
 pd.options.mode.chained_assignment = None
 

@@ -6,8 +6,8 @@ from typing import List
 import pandas as pd
 import requests
 
-from finrl_meta.data_processors.basic_processor import BaseProcessor
-from .func import download_n_unzip_file, convert_to_date_object, get_path
+from finrl_meta.data_processors.base_processor import BaseProcessor
+from base_processor import download_n_unzip_file, convert_to_date_object, get_path
 
 
 class BinanceProcessor(BaseProcessor):
