@@ -8,24 +8,24 @@ class DataProcessor():
         print(f"Not support for {self.data_source}")
 
     def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
-        self.data_source = data_source
-        self.start_date = start_date
-        self.end_date = end_date
-        self.time_interval = time_interval
-        self.dataframe = pd.DataFrame()
+        self.data_source: str = data_source
+        self.start_date: str = start_date
+        self.end_date: str = end_date
+        self.time_interval: str = time_interval
+        self.dataframe: pd.DataFrame = pd.DataFrame()
         if self.data_source == "alpaca":
             from finrl_meta.data_processors.alpaca import AlpacaProcessor
-        if self.data_source == "baostock":
+        elif self.data_source == "baostock":
             from finrl_meta.data_processors.baostock import BaostockProcessor
-        if self.data_source == "wrds":
+        elif self.data_source == "wrds":
             from finrl_meta.data_processors.wrds import WrdsProcessor
-        if self.data_source == "binance":
+        elif self.data_source == "binance":
             from finrl_meta.data_processors.binance import BinanceProcessor
-        if self.data_source == "iexcloud":
+        elif self.data_source == "iexcloud":
             from finrl_meta.data_processors.iexcloud import IexcloudProcessor
-        if self.data_source == "joinquant":
+        elif self.data_source == "joinquant":
             from finrl_meta.data_processors.joinquant import JoinquantProcessor
-        if self.data_source == "quandl":
+        elif self.data_source == "quandl":
             from finrl_meta.data_processors.quandl import QuandlProcessor
         elif self.data_source == "quantconnect":
             from finrl_meta.data_processors.quantconnect import QuantconnectProcessor

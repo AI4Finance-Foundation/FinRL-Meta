@@ -24,7 +24,7 @@ class JoinquantProcessor(BaseProcessor):
             fields=["date", "open", "high", "low", "close", "volume"],
             end_dt=self.end_date,
         )
-        df = df.reset_index().rename(columns={'level_0': 'tic'})
+        df = df.reset_index().rename(columns={'level_0': 'ticker'})
         self.dataframe = df
 
 

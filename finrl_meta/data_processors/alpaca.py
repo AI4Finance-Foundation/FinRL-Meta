@@ -61,7 +61,7 @@ class AlpacaProcessor(BaseProcessor):
                 barset = self.api.get_barset(
                     [tic], self.time_interval, start=start_time, end=end_time, limit=500
                 ).df[tic]
-                barset["tic"] = tic
+                barset["ticker"] = tic
                 barset = barset.reset_index()
                 data_df = data_df.append(barset)
             print(("Data before ") + end_time + " is successfully fetched")
@@ -134,7 +134,7 @@ class AlpacaProcessor(BaseProcessor):
                         0.0,
                     ]
             tmp_df = tmp_df.astype(float)
-            tmp_df["tic"] = tic
+            tmp_df["ticker"] = tic
             new_df = new_df.append(tmp_df)
 
         new_df = new_df.reset_index()
@@ -159,7 +159,7 @@ class AlpacaProcessor(BaseProcessor):
     # ):
     #     df = df.rename(columns={"time": "date"})
     #     df = df.copy()
-    #     df = df.sort_values(by=["tic", "date"])
+    #     df = df.sort_values(by=["ticker", "date"])
     #     stock = Sdf.retype(df.copy())
     #     unique_ticker = stock.tic.unique()
     #     tech_indicator_list = tech_indicator_list
@@ -170,16 +170,16 @@ class AlpacaProcessor(BaseProcessor):
     #             # print(unique_ticker[i], i)
     #             temp_indicator = stock[stock.tic == unique_ticker[i]][indicator]
     #             temp_indicator = pd.DataFrame(temp_indicator)
-    #             temp_indicator["tic"] = unique_ticker[i]
+    #             temp_indicator["ticker"] = unique_ticker[i]
     #             # print(len(df[df.tic == unique_ticker[i]]['date'].to_list()))
     #             temp_indicator["date"] = df[df.tic == unique_ticker[i]][
     #                 "date"
     #             ].to_list()
     #             indicator_df = indicator_df.append(temp_indicator, ignore_index=True)
     #         df = df.merge(
-    #             indicator_df[["tic", "date", indicator]], on=["tic", "date"], how="left"
+    #             indicator_df[["ticker", "date", indicator]], on=["ticker", "date"], how="left"
     #         )
-    #     df = df.sort_values(by=["date", "tic"])
+    #     df = df.sort_values(by=["date", "ticker"])
     #     df = df.rename(columns={"date": "time"})
     #     print("Succesfully add technical indicators")
     #     return df
@@ -192,13 +192,13 @@ class AlpacaProcessor(BaseProcessor):
     #
     #     df = data.copy()
     #     df = df.merge(vix, on="time")
-    #     df = df.sort_values(["time", "tic"]).reset_index(drop=True)
+    #     df = df.sort_values(["time", "ticker"]).reset_index(drop=True)
     #     return df
 
     # def calculate_turbulence(self, data, time_period=252):
     #     # can add other market assets
     #     df = data.copy()
-    #     df_price_pivot = df.pivot(index="date", columns="tic", values="close")
+    #     df_price_pivot = df.pivot(index="date", columns="ticker", values="close")
     #     # use returns to calculate turbulence
     #     df_price_pivot = df_price_pivot.pct_change()
     #
@@ -252,7 +252,7 @@ class AlpacaProcessor(BaseProcessor):
     #     df = data.copy()
     #     turbulence_index = self.calculate_turbulence(df, time_period=time_period)
     #     df = df.merge(turbulence_index, on="date")
-    #     df = df.sort_values(["date", "tic"]).reset_index(drop=True)
+    #     df = df.sort_values(["date", "ticker"]).reset_index(drop=True)
     #     return df
 
     # def df_to_array(self, df, tech_indicator_list, if_vix):
@@ -292,7 +292,7 @@ class AlpacaProcessor(BaseProcessor):
         data_df = pd.DataFrame()
         for tic in ticker_list:
             barset = self.api.get_barset([tic], time_interval, limit=limit).df[tic]
-            barset["tic"] = tic
+            barset["ticker"] = tic
             barset = barset.reset_index()
             data_df = data_df.append(barset)
 
@@ -347,7 +347,7 @@ class AlpacaProcessor(BaseProcessor):
                         0.0,
                     ]
             tmp_df = tmp_df.astype(float)
-            tmp_df["tic"] = tic
+            tmp_df["ticker"] = tic
             new_df = new_df.append(tmp_df)
 
         new_df = new_df.reset_index()

@@ -78,19 +78,19 @@ class TushareProcessor(BaseProcessor):
             # print("{} ok".format(i))
             time.sleep(0.25)
 
-        self.dataframe.columns = ['tic', 'date', 'open', 'high', 'low', 'close', 'pre_close', 'change', 'pct_chg', 'volume',
+        self.dataframe.columns = ['ticker', 'date', 'open', 'high', 'low', 'close', 'pre_close', 'change', 'pct_chg', 'volume',
                            'amount']
-        self.dataframe.sort_values(by=['date', 'tic'], inplace=True)
+        self.dataframe.sort_values(by=['date', 'ticker'], inplace=True)
         self.dataframe.reset_index(drop=True, inplace=True)
 
-        self.dataframe = self.dataframe[['tic', 'date', 'open', 'high', 'low', 'close', 'volume']]
-        #self.dataframe.loc[:, 'tic'] = pd.DataFrame((self.dataframe['tic'].tolist()))
+        self.dataframe = self.dataframe[['ticker', 'date', 'open', 'high', 'low', 'close', 'volume']]
+        #self.dataframe.loc[:, 'ticker'] = pd.DataFrame((self.dataframe['ticker'].tolist()))
         self.dataframe["date"] = pd.to_datetime(self.dataframe["date"], format="%Y%m%d")
         self.dataframe["day"] = self.dataframe["date"].dt.dayofweek
         self.dataframe["date"] = self.dataframe.date.apply(lambda x: x.strftime("%Y-%m-%d"))
 
         self.dataframe.dropna(inplace=True)
-        self.dataframe.sort_values(by=['date', 'tic'], inplace=True)
+        self.dataframe.sort_values(by=['date', 'ticker'], inplace=True)
         self.dataframe.reset_index(drop=True, inplace=True)
 
         print("Shape of DataFrame: ", self.dataframe.shape)
@@ -99,7 +99,7 @@ class TushareProcessor(BaseProcessor):
     def clean_data(self):
         dfc = copy.deepcopy(self.dataframe)
 
-        dfcode = pd.DataFrame(columns=['tic'])
+        dfcode = pd.DataFrame(columns=['ticker'])
         dfdate = pd.DataFrame(columns=['date'])
 
         dfcode.tic = dfc.tic.unique()
@@ -115,13 +115,13 @@ class TushareProcessor(BaseProcessor):
             df1 = pd.merge(dfcode, dfdate, how="cross")
         except:
             print("Please wait for a few seconds...")
-            df1 = pd.DataFrame(columns=["tic", "date"])
+            df1 = pd.DataFrame(columns=["ticker", "date"])
             for i in range(dfcode.shape[0]):
                 for j in range(dfdate.shape[0]):
-                    df1 = df1.append(pd.DataFrame(data={"tic": dfcode.iat[i, 0], "date": dfdate.iat[j, 0]},
+                    df1 = df1.append(pd.DataFrame(data={"ticker": dfcode.iat[i, 0], "date": dfdate.iat[j, 0]},
                                                   index=[(i + 1) * (j + 1) - 1]))
 
-        df2 = pd.merge(df1, dfc, how="left", on=["tic", "date"])
+        df2 = pd.merge(df1, dfc, how="left", on=["ticker", "date"])
 
         # back fill missing data then front fill
         df3 = pd.DataFrame(columns=df2.columns)
@@ -132,7 +132,7 @@ class TushareProcessor(BaseProcessor):
         df3 = df3.fillna(0)
 
         # reshape dataframe
-        df3 = df3.sort_values(by=['date', 'tic']).reset_index(drop=True)
+        df3 = df3.sort_values(by=['date', 'ticker']).reset_index(drop=True)
 
         print("Shape of DataFrame: ", df3.shape)
 
@@ -154,7 +154,7 @@ class TushareProcessor(BaseProcessor):
     #
     #     # df = df.reset_index(drop=False)
     #     # df = df.drop(columns=["level_1"])
-    #     # df = df.rename(columns={"level_0": "tic", "date": "time"})
+    #     # df = df.rename(columns={"level_0": "ticker", "date": "time"})
     #     if select_stockstats_talib == 0:  # use stockstats
     #         stock = stockstats.StockDataFrame.retype(df.copy())
     #         unique_ticker = stock.tic.unique()
@@ -165,7 +165,7 @@ class TushareProcessor(BaseProcessor):
     #                 try:
     #                     temp_indicator = stock[stock.tic == unique_ticker[i]][indicator]
     #                     temp_indicator = pd.DataFrame(temp_indicator)
-    #                     temp_indicator["tic"] = unique_ticker[i]
+    #                     temp_indicator["ticker"] = unique_ticker[i]
     #                     temp_indicator["time"] = df[df.tic == unique_ticker[i]][
     #                         "time"
     #                     ].to_list()
@@ -176,7 +176,7 @@ class TushareProcessor(BaseProcessor):
     #                     print(e)
     #             #print(indicator_df)
     #             df = df.merge(
-    #                 indicator_df[["tic", "time", indicator]], on=["tic", "time"], how="left"
+    #                 indicator_df[["ticker", "time", indicator]], on=["ticker", "time"], how="left"
     #             )
     #     else:  # use talib
     #         final_df = pd.DataFrame()
@@ -190,7 +190,7 @@ class TushareProcessor(BaseProcessor):
     #             final_df = final_df.append(tic_df)
     #         df = final_df
     #
-    #     df = df.sort_values(by=["time", "tic"])
+    #     df = df.sort_values(by=["time", "ticker"])
     #     df = df.rename(columns={'time': 'date'})    # 1/11 added by hx
     #     df = df.dropna()
     #     print("Succesfully add technical indicators")
@@ -227,7 +227,7 @@ class TushareProcessor(BaseProcessor):
         :return: (df) pandas dataframe
         """
         data = df[(df[target_date_col] >= start) & (df[target_date_col] < end)]
-        data = data.sort_values([target_date_col, "tic"], ignore_index=True)
+        data = data.sort_values([target_date_col, "ticker"], ignore_index=True)
         data.index = data[target_date_col].factorize()[0]
         return data
 

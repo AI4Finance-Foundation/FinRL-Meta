@@ -39,7 +39,7 @@ class YahoofinanceProcessor(BaseProcessor):
         self.dataframe = pd.DataFrame()
         for tic in ticker_list:
             temp_df = yf.download(tic, start=self.start_date, end=self.end_date, interval=self.time_interval)
-            temp_df["tic"] = tic
+            temp_df["ticker"] = tic
             self.dataframe = self.dataframe.append(temp_df)
         # reset the index, we want to use numbers as index instead of dates
         self.dataframe.reset_index(inplace=True)
@@ -53,7 +53,7 @@ class YahoofinanceProcessor(BaseProcessor):
                 "close",
                 "adjusted_close",
                 "volume",
-                "tic",
+                "ticker",
             ]
         except NotImplementedError:
             print("the features are not supported currently")
@@ -67,7 +67,7 @@ class YahoofinanceProcessor(BaseProcessor):
         print("Shape of DataFrame: ", self.dataframe.shape)
         # print("Display DataFrame: ", data_df.head())
 
-        self.dataframe.sort_values(by=['date', 'tic'], inplace=True)
+        self.dataframe.sort_values(by=['date', 'ticker'], inplace=True)
         self.dataframe.reset_index(drop=True, inplace=True)
 
     def clean_data(self):
@@ -132,7 +132,7 @@ class YahoofinanceProcessor(BaseProcessor):
 
             # merge single ticker data to new DataFrame
             tmp_df = tmp_df.astype(float)
-            tmp_df['tic'] = tic
+            tmp_df['ticker'] = tic
             new_df = new_df.append(tmp_df)
 
             print(('Data clean for ') + tic + (' is finished.'))
@@ -153,7 +153,7 @@ class YahoofinanceProcessor(BaseProcessor):
     #     :return: (df) pandas dataframe
     #     """
     #     df = data.copy()
-    #     df = df.sort_values(by=['tic','time'])
+    #     df = df.sort_values(by=['ticker','time'])
     #     stock = Sdf.retype(df.copy())
     #     unique_ticker = stock.tic.unique()
     #
@@ -163,15 +163,15 @@ class YahoofinanceProcessor(BaseProcessor):
     #             try:
     #                 temp_indicator = stock[stock.tic == unique_ticker[i]][indicator]
     #                 temp_indicator = pd.DataFrame(temp_indicator)
-    #                 temp_indicator['tic'] = unique_ticker[i]
+    #                 temp_indicator['ticker'] = unique_ticker[i]
     #                 temp_indicator['time'] = df[df.tic == unique_ticker[i]]['time'].to_list()
     #                 indicator_df = indicator_df.append(
     #                     temp_indicator, ignore_index=True
     #                 )
     #             except Exception as e:
     #                 print(e)
-    #         df = df.merge(indicator_df[['tic','time',indicator]],on=['tic','time'],how='left')
-    #     df = df.sort_values(by=['time','tic'])
+    #         df = df.merge(indicator_df[['ticker','time',indicator]],on=['ticker','time'],how='left')
+    #     df = df.sort_values(by=['time','ticker'])
     #     return df
 
     # def add_turbulence(self, data):
@@ -183,14 +183,14 @@ class YahoofinanceProcessor(BaseProcessor):
     #     df = data.copy()
     #     turbulence_index = self.calculate_turbulence(df)
     #     df = df.merge(turbulence_index, on="time")
-    #     df = df.sort_values(["time", "tic"]).reset_index(drop=True)
+    #     df = df.sort_values(["time", "ticker"]).reset_index(drop=True)
     #     return df
     #
     # def calculate_turbulence(self, data, time_period = 252):
     #     """calculate turbulence index based on dow 30"""
     #     # can add other market assets
     #     df = data.copy()
-    #     df_price_pivot = df.pivot(index="time", columns="tic", values="close")
+    #     df_price_pivot = df.pivot(index="time", columns="ticker", values="close")
     #     # use returns to calculate turbulence
     #     df_price_pivot = df_price_pivot.pct_change()
     #
@@ -250,7 +250,7 @@ class YahoofinanceProcessor(BaseProcessor):
     #     vix.columns = ['time','vix']
     #
     #     df = df.merge(vix, on="time")
-    #     df = df.sort_values(["time", "tic"]).reset_index(drop=True)
+    #     df = df.sort_values(["time", "ticker"]).reset_index(drop=True)
     #     return df
 
     # def df_to_array(self, df, tech_indicator_list, if_vix):

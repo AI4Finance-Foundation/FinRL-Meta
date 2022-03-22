@@ -26,9 +26,9 @@ class RicequantProcessor(BaseProcessor):
     #     # raw df uses multi-index (tic,time), reset it to single index (time)
     #     df = df.reset_index(level=[0,1])
     #     # rename column order_book_id to tic
-    #     df = df.rename(columns={'order_book_id':'tic', 'datetime':'time'})
+    #     df = df.rename(columns={'order_book_id':'ticker', 'datetime':'time'})
     #     # reserve columns needed
-    #     df = df[['tic','time','open','high','low','close','volume']]
+    #     df = df[['ticker','time','open','high','low','close','volume']]
     #     # check if there is NaN values
     #     assert not df.isnull().values.any()
     #     return df
@@ -40,7 +40,7 @@ class RicequantProcessor(BaseProcessor):
     # def calculate_turbulence(self, data, time_period=252):
     #     # can add other market assets
     #     df = data.copy()
-    #     df_price_pivot = df.pivot(index="date", columns="tic", values="close")
+    #     df_price_pivot = df.pivot(index="date", columns="ticker", values="close")
     #     # use returns to calculate turbulence
     #     df_price_pivot = df_price_pivot.pct_change()
     #
@@ -90,7 +90,7 @@ class RicequantProcessor(BaseProcessor):
     #     df = data.copy()
     #     turbulence_index = self.calculate_turbulence(df, time_period=time_period)
     #     df = df.merge(turbulence_index, on="date")
-    #     df = df.sort_values(["date", "tic"]).reset_index(drop=True)
+    #     df = df.sort_values(["date", "ticker"]).reset_index(drop=True)
     #     return df
 
     # def df_to_array(self, df, tech_indicator_list, if_vix):
