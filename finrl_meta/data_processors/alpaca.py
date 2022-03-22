@@ -12,8 +12,8 @@ except:
     import trading_calendars as tc
     print('Use trading_calendars instead for alpaca processor.')
 # from basic_processor import BaseProcessor
-from finrl_meta.data_processors.basic_processor import BaseProcessor
-from finrl_meta.data_processors.func import calc_time_zone
+from finrl_meta.data_processors.base_processor import BaseProcessor
+from finrl_meta.data_processors.base_processor import calc_time_zone
 
 from finrl_meta.config import (
 TIME_ZONE_SHANGHAI,

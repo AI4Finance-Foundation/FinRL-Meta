@@ -7,7 +7,7 @@ import gym
 import numpy as np
 import pandas as pd
 
-from finrl_meta.data_processors.processor_alpaca import AlpacaProcessor
+from finrl_meta.data_processors.alpaca import AlpacaProcessor
 
 
 class StockEnvEmpty(gym.Env):

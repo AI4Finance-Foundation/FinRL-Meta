@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import torch
 
-from finrl_meta.data_processors.processor_alpaca import AlpacaProcessor
+from finrl_meta.data_processors.alpaca import AlpacaProcessor
 
 
 class AlpacaPaperTrading_erl():

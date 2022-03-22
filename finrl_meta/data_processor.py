@@ -1,14 +1,3 @@
-from finrl_meta.data_processors.processor_alpaca import AlpacaProcessor
-from finrl_meta.data_processors.processor_baostock import BaostockProcessor
-from finrl_meta.data_processors.processor_wrds import WrdsProcessor
-from finrl_meta.data_processors.processor_binance import BinanceProcessor
-from finrl_meta.data_processors.processor_iexcloud import IexcloudProcessor
-from finrl_meta.data_processors.processor_joinquant import JoinquantProcessor
-from finrl_meta.data_processors.processor_quandl import QuandlProcessor
-from finrl_meta.data_processors.processor_quantconnect import QuantconnectProcessor
-from finrl_meta.data_processors.processor_ricequant import RicequantProcessor
-from finrl_meta.data_processors.processor_tushare import TushareProcessor
-from finrl_meta.data_processors.processor_yahoofinance import YahoofinanceProcessor
 import pandas as pd
 import numpy as np
 import os
@@ -24,6 +13,28 @@ class DataProcessor():
         self.end_date = end_date
         self.time_interval = time_interval
         self.dataframe = pd.DataFrame()
+        if self.data_source == "alpaca":
+            from finrl_meta.data_processors.alpaca import AlpacaProcessor
+        if self.data_source == "baostock":
+            from finrl_meta.data_processors.baostock import BaostockProcessor
+        if self.data_source == "wrds":
+            from finrl_meta.data_processors.wrds import WrdsProcessor
+        if self.data_source == "binance":
+            from finrl_meta.data_processors.binance import BinanceProcessor
+        if self.data_source == "iexcloud":
+            from finrl_meta.data_processors.iexcloud import IexcloudProcessor
+        if self.data_source == "joinquant":
+            from finrl_meta.data_processors.joinquant import JoinquantProcessor
+        if self.data_source == "quandl":
+            from finrl_meta.data_processors.quandl import QuandlProcessor
+        elif self.data_source == "quantconnect":
+            from finrl_meta.data_processors.quantconnect import QuantconnectProcessor
+        elif self.data_source == "ricequant":
+            from finrl_meta.data_processors.ricequant import RicequantProcessor
+        elif self.data_source == "tushare":
+            from finrl_meta.data_processors.tushare import TushareProcessor
+        elif self.data_source == "yahoofinance":
+            from finrl_meta.data_processors.yahoofinance import YahoofinanceProcessor
         processor_dict = {
             "alpaca": AlpacaProcessor,
             "binance": BinanceProcessor,
