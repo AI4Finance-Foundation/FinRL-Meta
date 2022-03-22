@@ -65,20 +65,20 @@ class BaseProcessor:
         if self.data_source == 'ricequant':
             ''' RiceQuant data is already cleaned, we only need to transform data format here.
                 No need for filling NaN data'''
-            self.dataframe.rename(columns={'order_book_id': 'tic'}, inplace=True)
+            self.dataframe.rename(columns={'order_book_id': 'ticker'}, inplace=True)
             # raw df uses multi-index (tic,time), reset it to single index (time)
             self.dataframe.reset_index(level=[0, 1], inplace=True)
             # check if there is NaN values
             assert not self.dataframe.isnull().values.any()
         elif self.data_source == 'baostock':
-            self.dataframe.rename(columns={'code': 'tic'}, inplace=True)
+            self.dataframe.rename(columns={'code': 'ticker'}, inplace=True)
 
         self.dataframe.dropna(inplace=True)
         # adjusted_close: adjusted close price
         if 'adjusted_close' not in self.dataframe.columns.values.tolist():
             self.dataframe['adjusted_close'] = self.dataframe['close']
-        self.dataframe.sort_values(by=['time', 'tic'], inplace=True)
-        self.dataframe = self.dataframe[['tic', 'time', 'open', 'high', 'low', 'close', 'adjusted_close', 'volume']]
+        self.dataframe.sort_values(by=['time', 'ticker'], inplace=True)
+        self.dataframe = self.dataframe[['ticker', 'time', 'open', 'high', 'low', 'close', 'adjusted_close', 'volume']]
 
     def get_trading_days(self, start: str, end: str) -> List[str]:
         if self.data_source in ["binance", "ccxt", "quantconnect", "ricequant", "tushare"]:
@@ -102,8 +102,8 @@ class BaseProcessor:
         self.dataframe.reset_index(drop=False, inplace=True)
         if "level_1" in self.dataframe.columns:
             self.dataframe.drop(columns=["level_1"], inplace=True)
-        if "level_0" in self.dataframe.columns and "tic" not in self.dataframe.columns:
-            self.dataframe.rename(columns={"level_0": "tic"}, inplace=True)
+        if "level_0" in self.dataframe.columns and "ticker" not in self.dataframe.columns:
+            self.dataframe.rename(columns={"level_0": "ticker"}, inplace=True)
         assert select_stockstats_talib in {0, 1}
         print("tech_indicator_list: ", tech_indicator_list)
         if select_stockstats_talib == 0:  # use stockstats
@@ -116,7 +116,7 @@ class BaseProcessor:
                     try:
                         temp_indicator = stock[stock.tic == unique_ticker[i]][indicator]
                         temp_indicator = pd.DataFrame(temp_indicator)
-                        temp_indicator["tic"] = unique_ticker[i]
+                        temp_indicator["ticker"] = unique_ticker[i]
                         temp_indicator["time"] = self.dataframe[self.dataframe.tic == unique_ticker[i]][
                             "time"
                         ].to_list()
@@ -127,7 +127,7 @@ class BaseProcessor:
                         print(e)
                 if not indicator_df.empty:
                     self.dataframe = self.dataframe.merge(
-                        indicator_df[["tic", "time", indicator]], on=["tic", "time"], how="left"
+                        indicator_df[["ticker", "time", indicator]], on=["ticker", "time"], how="left"
                     )
         else:  # use talib
             final_df = pd.DataFrame()
@@ -141,7 +141,7 @@ class BaseProcessor:
                 final_df = final_df.append(tic_df)
             self.dataframe = final_df
 
-        self.dataframe.sort_values(by=["time", "tic"], inplace=True)
+        self.dataframe.sort_values(by=["time", "ticker"], inplace=True)
         time_to_drop = self.dataframe[self.dataframe.isna().any(axis=1)].time.unique()
         self.dataframe = self.dataframe[~self.dataframe.time.isin(time_to_drop)]
         print("Succesfully add technical indicators")
@@ -155,19 +155,19 @@ class BaseProcessor:
         # df = data.copy()
         # turbulence_index = self.calculate_turbulence(df)
         # df = df.merge(turbulence_index, on="time")
-        # df = df.sort_values(["time", "tic"]).reset_index(drop=True)
+        # df = df.sort_values(["time", "ticker"]).reset_index(drop=True)
         # return df
         if self.data_source in ["binance", "ccxt", "iexcloud", "joinquant", "quantconnect"]:
             print(f"Turbulence not supported for {self.data_source} yet. Return original DataFrame.")
         if self.data_source in ["alpaca", "ricequant", "tushare", "wrds", "yahoofinance"]:
             turbulence_index = self.calculate_turbulence()
             self.dataframe = self.dataframe.merge(turbulence_index, on="time")
-            self.dataframe.sort_values(["time", "tic"], inplace=True).reset_index(drop=True, inplace=True)
+            self.dataframe.sort_values(["time", "ticker"], inplace=True).reset_index(drop=True, inplace=True)
 
     def calculate_turbulence(self, time_period: int = 252) -> pd.DataFrame:
         """calculate turbulence index based on dow 30"""
         # can add other market assets
-        df_price_pivot = self.dataframe.pivot(index="time", columns="tic", values="close")
+        df_price_pivot = self.dataframe.pivot(index="time", columns="ticker", values="close")
         # use returns to calculate turbulence
         df_price_pivot = df_price_pivot.pct_change()
 
@@ -235,7 +235,7 @@ class BaseProcessor:
         #     vix.columns = ["time", "vix"]
         #
         #     df = df.merge(vix, on="time")
-        #     df = df.sort_values(["time", "tic"]).reset_index(drop=True)
+        #     df = df.sort_values(["time", "ticker"]).reset_index(drop=True)
         # elif self.data_source == 'alpaca':
         #     vix_df = self.download_data(["VIXY"], self.start, self.end, self.time_interval)
         #     cleaned_vix = self.clean_data(vix_df)
@@ -244,7 +244,7 @@ class BaseProcessor:
         #
         #     df = data.copy()
         #     df = df.merge(vix, on="time")
-        #     df = df.sort_values(["time", "tic"]).reset_index(drop=True)
+        #     df = df.sort_values(["time", "ticker"]).reset_index(drop=True)
         # elif self.data_source == 'wrds':
         #     vix_df = self.download_data(['vix'], self.start, self.end_date, self.time_interval)
         #     cleaned_vix = self.clean_data(vix_df)
@@ -252,7 +252,7 @@ class BaseProcessor:
         #
         #     df = data.copy()
         #     df = df.merge(vix, on="date")
-        #     df = df.sort_values(["date", "tic"]).reset_index(drop=True)
+        #     df = df.sort_values(["date", "ticker"]).reset_index(drop=True)
 
         if self.data_source == 'yahoofinance':
             ticker = "^VIX"
@@ -271,7 +271,7 @@ class BaseProcessor:
         cleaned_vix = self.dataframe.rename(columns={ticker: "vix"})
 
         df = df.merge(cleaned_vix, on="time")
-        df = df.sort_values(["time", "tic"]).reset_index(drop=True)
+        df = df.sort_values(["time", "ticker"]).reset_index(drop=True)
         self.dataframe = df
 
     def df_to_array(self, tech_indicator_list: List[str], if_vix: bool):
