@@ -75,7 +75,7 @@ def split_timeserious(df, key_ts='dt', freq='W', symbol=''):
 
 
 """
-python ./neo_finrl/data_processors/processor_fx.py GBPUSD W ./data/raw/GBPUSD_raw.csv
+python ./neo_finrl/data_processors/fx.py GBPUSD W ./data/raw/GBPUSD_raw.csv
 symbol="GBPUSD"
 freq = [H, D, W, M]
 file .csv, column names [time, Open, High, Low, Close, Vol]
