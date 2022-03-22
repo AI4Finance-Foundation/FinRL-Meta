@@ -1,7 +1,7 @@
 from typing import List
 
 # from basic_processor import BaseProcessor
-from finrl_meta.data_processors.base_processor import BaseProcessor
+from finrl_meta.data_processors._base import BaseProcessor
 
 from finrl_meta.config import (
 TIME_ZONE_SHANGHAI,
