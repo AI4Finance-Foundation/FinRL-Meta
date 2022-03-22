@@ -6,7 +6,7 @@ from typing import List
 import jqdatasdk as jq
 import numpy as np
 
-from finrl_meta.data_processors.basic_processor import BaseProcessor
+from finrl_meta.data_processors.base_processor import BaseProcessor
 
 class JoinquantProcessor(BaseProcessor):
     def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
