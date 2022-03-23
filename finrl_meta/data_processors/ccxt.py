@@ -6,11 +6,11 @@ import ccxt
 import numpy as np
 import pandas as pd
 
-# from basic_processor import BaseProcessor
-from finrl_meta.data_processors._base import BaseProcessor
+# from basic_processor import _Base
+from finrl_meta.data_processors._base import _Base
 
 
-class CCXTProcessor(BaseProcessor):
+class CCXTProcessor(_Base):
     def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
         self.binance = ccxt.binance()

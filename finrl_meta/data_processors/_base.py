@@ -39,7 +39,7 @@ MDAX_50_TICKER,
 SDAX_50_TICKER,
 )
 
-class BaseProcessor:
+class _Base:
     def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
         self.data_source: str = data_source
         self.start_date: str = start_date
@@ -361,8 +361,6 @@ class BaseProcessor:
             nonstandard_ticker = self.transfer_standard_ticker_to_nonstandard(ticker)
             nonstandard_tickers.append(nonstandard_ticker)
         return nonstandard_tickers
-
-
 
 def calc_time_zone(ticker_list: List[str], time_zone_selfdefined: str, use_time_zone_selfdefined: int) -> str:
     if use_time_zone_selfdefined == 1:
