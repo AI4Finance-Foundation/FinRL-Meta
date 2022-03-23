@@ -38,7 +38,7 @@ import numpy as np
 import pandas as pd
 import torch
 
-from finrl_meta.data_processors.ccxt import CCXTProcessor
+from finrl_meta.data_processors.ccxt import Ccxt
 
 
 class AlpacaPaperTradingMultiCrypto():
@@ -216,7 +216,7 @@ class AlpacaPaperTradingMultiCrypto():
             end_date = datetime.today().strftime("%Y%m%d %H:%M:%S")
 
         print('fetching latest ' + str(self.previous_candles) + ' candles..')
-        CCXT_instance = CCXTProcessor()
+        CCXT_instance = Ccxt()
         CCXT_instance.download_data(self.ticker_list, start_date, end_date, self.CCTX_time_interval)
 
         CCXT_instance.add_technical_indicators(self.ticker_list, self.tech_indicator_list)
