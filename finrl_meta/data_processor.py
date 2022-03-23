@@ -14,41 +14,44 @@ class DataProcessor():
         self.time_interval: str = time_interval
         self.dataframe: pd.DataFrame = pd.DataFrame()
         if self.data_source == "alpaca":
-            from finrl_meta.data_processors.alpaca import AlpacaProcessor
+            from finrl_meta.data_processors.alpaca import Alpaca
         elif self.data_source == "baostock":
-            from finrl_meta.data_processors.baostock import BaostockProcessor
+            from finrl_meta.data_processors.baostock import Baostock
+        elif self.data_source == "ccxt":
+            from finrl_meta.data_processors.ccxt import Ccxt
         elif self.data_source == "wrds":
-            from finrl_meta.data_processors.wrds import WrdsProcessor
+            from finrl_meta.data_processors.wrds import Wrds
         elif self.data_source == "binance":
-            from finrl_meta.data_processors.binance import BinanceProcessor
+            from finrl_meta.data_processors.binance import Binance
         elif self.data_source == "iexcloud":
-            from finrl_meta.data_processors.iexcloud import IexcloudProcessor
+            from finrl_meta.data_processors.iexcloud import Iexcloud
         elif self.data_source == "joinquant":
-            from finrl_meta.data_processors.joinquant import JoinquantProcessor
+            from finrl_meta.data_processors.joinquant import Joinquant
         elif self.data_source == "quandl":
-            from finrl_meta.data_processors.quandl import QuandlProcessor
+            from finrl_meta.data_processors.quandl import Quandl
         elif self.data_source == "quantconnect":
-            from finrl_meta.data_processors.quantconnect import QuantconnectProcessor
+            from finrl_meta.data_processors.quantconnect import Quantconnect
         elif self.data_source == "ricequant":
-            from finrl_meta.data_processors.ricequant import RicequantProcessor
+            from finrl_meta.data_processors.ricequant import Ricequant
         elif self.data_source == "tushare":
-            from finrl_meta.data_processors.tushare import TushareProcessor
+            from finrl_meta.data_processors.tushare import Tushare
         elif self.data_source == "yahoofinance":
-            from finrl_meta.data_processors.yahoofinance import YahoofinanceProcessor
+            from finrl_meta.data_processors.yahoofinance import Yahoofinance
         else:
             print(f"Data source {self.data_source} is NOT supported yet.")
         processor_dict = {
-            "alpaca": AlpacaProcessor,
-            "binance": BinanceProcessor,
-            "baostock": BaostockProcessor,
-            "iexcloud": IexcloudProcessor,
-            "joinquant": JoinquantProcessor,
-            "quandl":  QuandlProcessor,
-            "quantconnect":  QuantconnectProcessor,
-            "ricequant":  RicequantProcessor,
-            "tushare": TushareProcessor,
-            "wrds":  WrdsProcessor,
-            "yahoofinance":  YahoofinanceProcessor,
+            "alpaca": Alpaca,
+            "binance": Binance,
+            "baostock": Baostock,
+            "ccxt": Ccxt,
+            "iexcloud": Iexcloud,
+            "joinquant": Joinquant,
+            "quandl":  Quandl,
+            "quantconnect":  Quantconnect,
+            "ricequant":  Ricequant,
+            "tushare": Tushare,
+            "wrds":  Wrds,
+            "yahoofinance":  Yahoofinance,
         }
 
         try:

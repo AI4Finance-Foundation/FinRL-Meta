@@ -33,7 +33,7 @@ TIME_ZONE_SELFDEFINED = TIME_ZONE_USEASTERN  # If neither of the above is your t
 USE_TIME_ZONE_SELFDEFINED = 1  # 0 (default) or 1 (use the self defined)
 
 
-class QuandlProcessor(_Base):
+class Quandl(_Base):
 
     def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)

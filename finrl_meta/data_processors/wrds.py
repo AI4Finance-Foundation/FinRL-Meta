@@ -17,7 +17,7 @@ from finrl_meta.data_processors._base import _Base
 pd.options.mode.chained_assignment = None
 
 
-class WrdsProcessor(_Base):
+class Wrds(_Base):
     # def __init__(self,if_offline=False):
     #     if not if_offline:
     #         self.db = wrds.Connection()

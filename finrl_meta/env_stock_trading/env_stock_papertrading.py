@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import torch
 
-from finrl_meta.data_processors.alpaca import AlpacaProcessor
+from finrl_meta.data_processors.alpaca import Alpaca
 
 
 class AlpacaPaperTrading():
@@ -245,7 +245,7 @@ class AlpacaPaperTrading():
             self.stocks_cd[:] = 0
 
     def get_state(self):
-        alpaca = AlpacaProcessor(api=self.alpaca)
+        alpaca = Alpaca(api=self.alpaca)
         price, tech, turbulence = alpaca.fetch_latest_data(ticker_list=self.stockUniverse, time_interval='1Min',
                                                            tech_indicator_list=self.tech_indicator_list)
         turbulence_bool = 1 if turbulence >= self.turbulence_thresh else 0
