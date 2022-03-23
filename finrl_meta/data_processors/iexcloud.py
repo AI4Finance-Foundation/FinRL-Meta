@@ -10,7 +10,7 @@ import requests
 from _base import _Base
 
 
-class IexcloudProcessor(_Base):
+class Iexcloud(_Base):
     @classmethod
     def _get_base_url(self, mode: str) -> str:
 
@@ -43,7 +43,7 @@ class IexcloudProcessor(_Base):
         Examples:
             kwargs['mode'] = 'sandbox'
             kwargs['token'] = 'Tsk_d633e2ff10d463...'
-            >>> iex_dloader = IexcloudProcessor(data_source='iexcloud', **kwargs)
+            >>> iex_dloader = Iexcloud(data_source='iexcloud', **kwargs)
             >>> iex_dloader.download_data(ticker_list=["AAPL", "NVDA"],
                                         start_date='2014-01-01',
                                         end_date='2021-12-12',
@@ -109,7 +109,7 @@ class IexcloudProcessor(_Base):
             List[str]: List of all trading days in YYYY-dd-mm format.
 
         Examples:
-            >>> iex_dloader = IexcloudProcessor(data_source='iexcloud',
+            >>> iex_dloader = Iexcloud(data_source='iexcloud',
                                                 mode='sandbox',
                                                 token='Tsk_d633e2ff10d463...')
             >>> iex_dloader.get_trading_days(start='2014-01-01',

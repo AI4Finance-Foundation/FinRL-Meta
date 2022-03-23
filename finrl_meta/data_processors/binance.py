@@ -24,7 +24,7 @@ USE_TIME_ZONE_SELFDEFINED,
 BINANCE_BASE_URL,
 )
 
-class BinanceProcessor(_Base):
+class Binance(_Base):
     def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
         self.url = "https://api.binance.com/api/v3/klines"
