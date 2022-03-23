@@ -7,10 +7,10 @@ import pandas_market_calendars as mcal
 import pytz
 import requests
 
-from _base import BaseProcessor
+from _base import _Base
 
 
-class IexcloudProcessor(BaseProcessor):
+class IexcloudProcessor(_Base):
     @classmethod
     def _get_base_url(self, mode: str) -> str:
 

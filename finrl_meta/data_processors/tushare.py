@@ -1,6 +1,6 @@
 import pandas as pd
 from tqdm import tqdm
-from finrl_meta.data_processors._base import BaseProcessor
+from finrl_meta.data_processors._base import _Base
 from typing import List
 import time
 import copy
@@ -10,7 +10,7 @@ from copy import deepcopy
 warnings.filterwarnings("ignore")
 
 
-class TushareProcessor(BaseProcessor):
+class TushareProcessor(_Base):
     """Provides methods for retrieving daily stock data from tushare API
     Attributes
     ----------
