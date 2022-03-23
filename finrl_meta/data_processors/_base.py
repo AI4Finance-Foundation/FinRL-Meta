@@ -362,8 +362,6 @@ class BaseProcessor:
             nonstandard_tickers.append(nonstandard_ticker)
         return nonstandard_tickers
 
-
-
 def calc_time_zone(ticker_list: List[str], time_zone_selfdefined: str, use_time_zone_selfdefined: int) -> str:
     if use_time_zone_selfdefined == 1:
         time_zone = time_zone_selfdefined
