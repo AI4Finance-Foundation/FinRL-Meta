@@ -10,7 +10,7 @@ from copy import deepcopy
 warnings.filterwarnings("ignore")
 
 
-class TushareProcessor(_Base):
+class Tushare(_Base):
     """Provides methods for retrieving daily stock data from tushare API
     Attributes
     ----------
