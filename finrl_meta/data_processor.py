@@ -8,50 +8,47 @@ class DataProcessor():
         print(f"Not support for {self.data_source}")
 
     def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
-        self.data_source: str = data_source
-        self.start_date: str = start_date
-        self.end_date: str = end_date
-        self.time_interval: str = time_interval
-        self.dataframe: pd.DataFrame = pd.DataFrame()
+        self.data_source = data_source
+        self.start_date = start_date
+        self.end_date = end_date
+        self.time_interval = time_interval
+        self.dataframe = pd.DataFrame()
         if self.data_source == "alpaca":
-            from finrl_meta.data_processors.alpaca import Alpaca
-        elif self.data_source == "baostock":
-            from finrl_meta.data_processors.baostock import Baostock
-        elif self.data_source == "ccxt":
-            from finrl_meta.data_processors.ccxt import Ccxt
-        elif self.data_source == "wrds":
-            from finrl_meta.data_processors.wrds import Wrds
-        elif self.data_source == "binance":
-            from finrl_meta.data_processors.binance import Binance
-        elif self.data_source == "iexcloud":
-            from finrl_meta.data_processors.iexcloud import Iexcloud
-        elif self.data_source == "joinquant":
-            from finrl_meta.data_processors.joinquant import Joinquant
-        elif self.data_source == "quandl":
-            from finrl_meta.data_processors.quandl import Quandl
+            from finrl_meta.data_processors.alpaca import AlpacaProcessor
+        if self.data_source == "baostock":
+            from finrl_meta.data_processors.baostock import BaostockProcessor
+        if self.data_source == "wrds":
+            from finrl_meta.data_processors.wrds import WrdsProcessor
+        if self.data_source == "binance":
+            from finrl_meta.data_processors.binance import BinanceProcessor
+        if self.data_source == "iexcloud":
+            from finrl_meta.data_processors.iexcloud import IexcloudProcessor
+        if self.data_source == "joinquant":
+            from finrl_meta.data_processors.joinquant import JoinquantProcessor
+        if self.data_source == "quandl":
+            from finrl_meta.data_processors.quandl import QuandlProcessor
         elif self.data_source == "quantconnect":
-            from finrl_meta.data_processors.quantconnect import Quantconnect
+            from finrl_meta.data_processors.quantconnect import QuantconnectProcessor
         elif self.data_source == "ricequant":
-            from finrl_meta.data_processors.ricequant import Ricequant
+            from finrl_meta.data_processors.ricequant import RicequantProcessor
         elif self.data_source == "tushare":
-            from finrl_meta.data_processors.tushare import Tushare
+            from finrl_meta.data_processors.tushare import TushareProcessor
         elif self.data_source == "yahoofinance":
-            from finrl_meta.data_processors.yahoofinance import Yahoofinance
+            from finrl_meta.data_processors.yahoofinance import YahoofinanceProcessor
         else:
             print(f"Data source {self.data_source} is NOT supported yet.")
         processor_dict = {
-            "alpaca": Alpaca,
-            "binance": Binance,
-            "baostock": Baostock,
-            "ccxt": Ccxt,
-            "iexcloud": Iexcloud,
-            "joinquant": Joinquant,
-            "quandl":  Quandl,
-            "quantconnect":  Quantconnect,
-            "ricequant":  Ricequant,
-            "tushare": Tushare,
-            "wrds":  Wrds,
-            "yahoofinance":  Yahoofinance,
+            "alpaca": AlpacaProcessor,
+            "binance": BinanceProcessor,
+            "baostock": BaostockProcessor,
+            "iexcloud": IexcloudProcessor,
+            "joinquant": JoinquantProcessor,
+            "quandl":  QuandlProcessor,
+            "quantconnect":  QuantconnectProcessor,
+            "ricequant":  RicequantProcessor,
+            "tushare": TushareProcessor,
+            "wrds":  WrdsProcessor,
+            "yahoofinance":  YahoofinanceProcessor,
         }
 
         try:

@@ -2,10 +2,10 @@ from typing import List
 
 import rqdatac as ricequant
 
-from finrl_meta.data_processors._base import _Base
+from finrl_meta.data_processors._base import BaseProcessor
 
 
-class Ricequant(_Base):
+class RicequantProcessor(BaseProcessor):
     def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
         if kwargs['username'] is None or kwargs['password'] is None:
@@ -26,9 +26,9 @@ class Ricequant(_Base):
     #     # raw df uses multi-index (tic,time), reset it to single index (time)
     #     df = df.reset_index(level=[0,1])
     #     # rename column order_book_id to tic
-    #     df = df.rename(columns={'order_book_id':'ticker', 'datetime':'time'})
+    #     df = df.rename(columns={'order_book_id':'tic', 'datetime':'time'})
     #     # reserve columns needed
-    #     df = df[['ticker','time','open','high','low','close','volume']]
+    #     df = df[['tic','time','open','high','low','close','volume']]
     #     # check if there is NaN values
     #     assert not df.isnull().values.any()
     #     return df
@@ -40,7 +40,7 @@ class Ricequant(_Base):
     # def calculate_turbulence(self, data, time_period=252):
     #     # can add other market assets
     #     df = data.copy()
-    #     df_price_pivot = df.pivot(index="date", columns="ticker", values="close")
+    #     df_price_pivot = df.pivot(index="date", columns="tic", values="close")
     #     # use returns to calculate turbulence
     #     df_price_pivot = df_price_pivot.pct_change()
     #
@@ -90,7 +90,7 @@ class Ricequant(_Base):
     #     df = data.copy()
     #     turbulence_index = self.calculate_turbulence(df, time_period=time_period)
     #     df = df.merge(turbulence_index, on="date")
-    #     df = df.sort_values(["date", "ticker"]).reset_index(drop=True)
+    #     df = df.sort_values(["date", "tic"]).reset_index(drop=True)
     #     return df
 
     # def df_to_array(self, df, tech_indicator_list, if_vix):
