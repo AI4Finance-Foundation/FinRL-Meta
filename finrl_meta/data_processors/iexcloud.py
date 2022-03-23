@@ -7,10 +7,10 @@ import pandas_market_calendars as mcal
 import pytz
 import requests
 
-from _base import _Base
+from _base import BaseProcessor
 
 
-class IexcloudProcessor(_Base):
+class IexcloudProcessor(BaseProcessor):
     @classmethod
     def _get_base_url(self, mode: str) -> str:
 
@@ -88,7 +88,7 @@ class IexcloudProcessor(_Base):
                 "volume",
             ]
         ]
-        price_data = price_data.rename(columns={"date": "time", "fclose": "adjusted_close"})
+        price_data = price_data.rename(columns={"ticker": "tic", "date": "time", "fclose": "adjusted_close"})
 
         price_data.date = price_data.date.map(
             lambda x: datetime.fromtimestamp(x / 1000, pytz.UTC).strftime(

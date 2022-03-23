@@ -11,7 +11,7 @@ import zipfile
 from datetime import *
 from pathlib import Path
 
-from finrl_meta.data_processors._base import _Base
+from finrl_meta.data_processors._base import BaseProcessor
 
 from finrl_meta.config import (
 TIME_ZONE_SHANGHAI,
@@ -24,7 +24,7 @@ USE_TIME_ZONE_SELFDEFINED,
 BINANCE_BASE_URL,
 )
 
-class BinanceProcessor(_Base):
+class BinanceProcessor(BaseProcessor):
     def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
         self.url = "https://api.binance.com/api/v3/klines"
@@ -49,7 +49,7 @@ class BinanceProcessor(_Base):
             for i in ticker_list:
                 hist_data = self.dataframe_with_limit(symbol=i)
                 df = hist_data.iloc[:-1].dropna()
-                df['ticker'] = i
+                df['tic'] = i
                 final_df = final_df.append(df)
         self.dataframe = final_df
 
@@ -146,7 +146,7 @@ class BinanceProcessor(_Base):
             # No stock split and dividend announcement, hence adjusted close is the same as close
             df['adjusted_close'] = df['close']
             df['datetime'] = df.datetime.apply(lambda x: dt.datetime.fromtimestamp(x/1000.0))
-            df['ticker'] = symbol
+            df['tic'] = symbol
             df = df.rename(columns = {'datetime':'time'})
             df.reset_index(drop=True, inplace=True)
             merged_df = merged_df.append(df)
@@ -334,7 +334,7 @@ class BinanceProcessor(_Base):
                     security = security.append(dailyfinal)
 
             security.ffill(inplace=True)
-            security['ticker'] = tic
+            security['tic'] = tic
             final_df = final_df.append(security)
         return final_df
 

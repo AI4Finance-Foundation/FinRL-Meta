@@ -11,13 +11,13 @@ except:
           'If you are using python>=3.7, please install it.')
     import trading_calendars as tc
     print('Use trading_calendars instead for wrds processor.')
-# from basic_processor import _Base
-from finrl_meta.data_processors._base import _Base
+# from basic_processor import BaseProcessor
+from finrl_meta.data_processors._base import BaseProcessor
 
 pd.options.mode.chained_assignment = None
 
 
-class WrdsProcessor(_Base):
+class WrdsProcessor(BaseProcessor):
     # def __init__(self,if_offline=False):
     #     if not if_offline:
     #         self.db = wrds.Connection()
@@ -52,7 +52,7 @@ class WrdsProcessor(_Base):
         if empty:
             raise ValueError('Empty Data under input parameters!')
         result = temp
-        result = result.sort_values(by=['time', 'ticker'])
+        result = result.sort_values(by=['time', 'tic'])
         result = result.reset_index(drop=True)
         self.dataframe = result
 
@@ -80,7 +80,7 @@ class WrdsProcessor(_Base):
             data_v = temp_df['size'].resample(time_interval).agg({'size': 'sum'})
             volume = data_v['size'].values
             data_ohlc['volume'] = volume
-            data_ohlc['ticker'] = tic
+            data_ohlc['tic'] = tic
             if first_time:
                 final_df = data_ohlc.reset_index()
                 first_time = False
@@ -89,9 +89,9 @@ class WrdsProcessor(_Base):
         return final_df
 
     def clean_data(self):
-        df = self.dataframe[['time', 'open', 'high', 'low', 'close', 'volume', 'ticker']]
+        df = self.dataframe[['time', 'open', 'high', 'low', 'close', 'volume', 'tic']]
         # remove 16:00 data
-        tic_list = np.unique(df['ticker'].values)
+        tic_list = np.unique(df['tic'].values)
         ary = df.values
         rows_1600 = []
         for i in range(ary.shape[0]):
@@ -101,7 +101,7 @@ class WrdsProcessor(_Base):
                 rows_1600.append(i)
 
         df = df.drop(rows_1600)
-        df = df.sort_values(by=['ticker', 'time'])
+        df = df.sort_values(by=['tic', 'time'])
 
         # check missing rows
         tic_dic = {tic: [0, 0] for tic in tic_list}
@@ -120,15 +120,15 @@ class WrdsProcessor(_Base):
 
         df2 = df.copy()
         for tic in nan_tics:
-            tic_time = df[df['ticker'] == tic]['time'].values
+            tic_time = df[df['tic'] == tic]['time'].values
             missing_time = [i for i in normal_time if i not in tic_time]
             for time in missing_time:
                 temp_df = pd.DataFrame([[time, np.nan, np.nan, np.nan, np.nan, 0, tic]],
-                                       columns=['time', 'open', 'high', 'low', 'close', 'volume', 'ticker'])
+                                       columns=['time', 'open', 'high', 'low', 'close', 'volume', 'tic'])
                 df2 = df2.append(temp_df, ignore_index=True)
 
         # fill nan data
-        df = df2.sort_values(by=['ticker', 'time'])
+        df = df2.sort_values(by=['tic', 'time'])
         for i in range(df.shape[0]):
             if float(df.iloc[i]['volume']) == 0:
                 previous_close = df.iloc[i - 1]['close']
@@ -142,7 +142,7 @@ class WrdsProcessor(_Base):
         ary = df[['open', 'high', 'low', 'close', 'volume']].values
         assert np.isnan(np.min(ary)) == False
         # final preprocess
-        df = df[['time', 'open', 'high', 'low', 'close', 'volume', 'ticker']]
+        df = df[['time', 'open', 'high', 'low', 'close', 'volume', 'tic']]
         df = df.reset_index(drop=True)
         print('Data clean finished')
         self.dataframe = df
@@ -176,7 +176,7 @@ class WrdsProcessor(_Base):
     #         'close_30_sma', 'close_60_sma']):
     #     df = df.rename(columns={'time':'date'})
     #     df = df.copy()
-    #     df = df.sort_values(by=['ticker', 'date'])
+    #     df = df.sort_values(by=['tic', 'date'])
     #     stock = Sdf.retype(df.copy())
     #     unique_ticker = stock.tic.unique()
     #     tech_indicator_list = tech_indicator_list
@@ -187,21 +187,21 @@ class WrdsProcessor(_Base):
     #             # print(unique_ticker[i], i)
     #             temp_indicator = stock[stock.tic == unique_ticker[i]][indicator]
     #             temp_indicator = pd.DataFrame(temp_indicator)
-    #             temp_indicator['ticker'] = unique_ticker[i]
+    #             temp_indicator['tic'] = unique_ticker[i]
     #             # print(len(df[df.tic == unique_ticker[i]]['date'].to_list()))
     #             temp_indicator['date'] = df[df.tic == unique_ticker[i]]['date'].to_list()
     #             indicator_df = indicator_df.append(
     #                 temp_indicator, ignore_index=True
     #             )
-    #         df = df.merge(indicator_df[['ticker', 'date', indicator]], on=['ticker', 'date'], how='left')
-    #     df = df.sort_values(by=['date', 'ticker'])
+    #         df = df.merge(indicator_df[['tic', 'date', indicator]], on=['tic', 'date'], how='left')
+    #     df = df.sort_values(by=['date', 'tic'])
     #     print('Succesfully add technical indicators')
     #     return df
 
     # def calculate_turbulence(self,data, time_period=252):
     #     # can add other market assets
     #     df = data.copy()
-    #     df_price_pivot = df.pivot(index="date", columns="ticker", values="close")
+    #     df_price_pivot = df.pivot(index="date", columns="tic", values="close")
     #     # use returns to calculate turbulence
     #     df_price_pivot = df_price_pivot.pct_change()
     #
@@ -251,7 +251,7 @@ class WrdsProcessor(_Base):
     #     df = data.copy()
     #     turbulence_index = self.calculate_turbulence(df, time_period=time_period)
     #     df = df.merge(turbulence_index, on="date")
-    #     df = df.sort_values(["date", "ticker"]).reset_index(drop=True)
+    #     df = df.sort_values(["date", "tic"]).reset_index(drop=True)
     #     return df
 
     # def add_vix(self, data):
@@ -261,7 +261,7 @@ class WrdsProcessor(_Base):
     #
     #     df = data.copy()
     #     df = df.merge(vix, on="date")
-    #     df = df.sort_values(["date", "ticker"]).reset_index(drop=True)
+    #     df = df.sort_values(["date", "tic"]).reset_index(drop=True)
     #
     #     return df
 

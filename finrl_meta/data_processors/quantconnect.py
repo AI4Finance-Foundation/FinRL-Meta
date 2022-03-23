@@ -1,7 +1,7 @@
 from typing import List
 
-# from basic_processor import _Base
-from finrl_meta.data_processors._base import _Base
+# from basic_processor import BaseProcessor
+from finrl_meta.data_processors._base import BaseProcessor
 
 from finrl_meta.config import (
 TIME_ZONE_SHANGHAI,
@@ -16,7 +16,7 @@ BINANCE_BASE_URL,
 
 
 ## The code of this file is used in website, not locally.
-class QuantconnectProcessor(_Base):
+class QuantconnectProcessor(BaseProcessor):
     def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
 

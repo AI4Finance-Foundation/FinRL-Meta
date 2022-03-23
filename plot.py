@@ -85,7 +85,7 @@ def trx_plot(df_trade, df_actions, ticker_list):
         selling_signal = df_trx_temp_sign.apply(lambda x: x < 0)
 
         tic_plot = df_trade[
-            (df_trade["ticker"] == df_trx_temp.name)
+            (df_trade["tic"] == df_trx_temp.name)
             & (df_trade["date"].isin(df_trx.index))
             ]["close"]
         tic_plot.index = df_trx_temp.index
