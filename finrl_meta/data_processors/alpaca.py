@@ -80,7 +80,7 @@ class Alpaca(_Base):
         for i in range(len(times)):
             times[i] = str(times[i])
         data_df['time'] = times"""
-        return data_df
+        self.dataframe = data_df
 
     def clean_data(self):
         df = self.dataframe.copy()
