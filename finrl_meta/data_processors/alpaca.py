@@ -51,7 +51,6 @@ class Alpaca(_Base):
     ) -> pd.DataFrame:
 
         self.time_zone = calc_time_zone(ticker_list, TIME_ZONE_SELFDEFINED, USE_TIME_ZONE_SELFDEFINED)
-
         start_date = pd.Timestamp(self.start_date, tz=self.time_zone)
         end_date = pd.Timestamp(self.end_date, tz=self.time_zone) + pd.Timedelta(days=1)
         self.time_interval = time_interval
