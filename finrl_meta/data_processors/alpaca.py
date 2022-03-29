@@ -49,7 +49,6 @@ class Alpaca(_Base):
     def download_data(
             self, ticker_list, start_date, end_date, time_interval
     ) -> pd.DataFrame:
-
         self.time_zone = calc_time_zone(ticker_list, TIME_ZONE_SELFDEFINED, USE_TIME_ZONE_SELFDEFINED)
         start_date = pd.Timestamp(self.start_date, tz=self.time_zone)
         end_date = pd.Timestamp(self.end_date, tz=self.time_zone) + pd.Timedelta(days=1)
