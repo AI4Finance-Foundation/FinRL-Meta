@@ -60,13 +60,14 @@ class Alpaca(_Base):
             start_time = (date + pd.Timedelta("09:30:00")).isoformat()
             end_time = (date + pd.Timedelta("15:59:00")).isoformat()
             for tic in ticker_list:
-                barset = self.api.get_barset(
-                    [tic], time_interval, start=start_time, end=end_time, limit=500
-                ).df[tic]
+                barset = self.api.get_bars(
+                    tic, time_interval, start=start_time, end=end_time, limit=500
+                ).df
                 barset["tic"] = tic
                 barset = barset.reset_index()
                 data_df = data_df.append(barset)
             print(("Data before ") + end_time + " is successfully fetched")
+            # print(data_df.head())
             date = date + pd.Timedelta(days=1)
             if date.isoformat()[-14:-6] == "01:00:00":
                 date = date - pd.Timedelta("01:00:00")
@@ -74,10 +75,8 @@ class Alpaca(_Base):
                 date = date + pd.Timedelta("01:00:00")
             if date.isoformat()[-14:-6] != "00:00:00":
                 raise ValueError("Timezone Error")
-        """times = data_df['time'].values
-        for i in range(len(times)):
-            times[i] = str(times[i])
-        data_df['time'] = times"""
+
+        data_df['time'] = data_df['timestamp'].apply(lambda x: x.strftime('%Y-%m-%d %H:%M:%S'))
         self.dataframe = data_df
 
     def clean_data(self):
