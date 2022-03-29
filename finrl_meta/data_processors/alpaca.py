@@ -46,11 +46,15 @@ class Alpaca(_Base):
         else:
             self.api = kwargs['API']
 
-    def download_data(self, ticker_list: List[str]):
+    def download_data(
+            self, ticker_list, start_date, end_date, time_interval
+    ) -> pd.DataFrame:
+
         self.time_zone = calc_time_zone(ticker_list, TIME_ZONE_SELFDEFINED, USE_TIME_ZONE_SELFDEFINED)
 
         start_date = pd.Timestamp(self.start_date, tz=self.time_zone)
         end_date = pd.Timestamp(self.end_date, tz=self.time_zone) + pd.Timedelta(days=1)
+        self.time_interval = time_interval
 
         date = start_date
         data_df = pd.DataFrame()
@@ -59,7 +63,7 @@ class Alpaca(_Base):
             end_time = (date + pd.Timedelta("15:59:00")).isoformat()
             for tic in ticker_list:
                 barset = self.api.get_barset(
-                    [tic], self.time_interval, start=start_time, end=end_time, limit=500
+                    [tic], time_interval, start=start_time, end=end_time, limit=500
                 ).df[tic]
                 barset["tic"] = tic
                 barset = barset.reset_index()
@@ -76,7 +80,7 @@ class Alpaca(_Base):
         for i in range(len(times)):
             times[i] = str(times[i])
         data_df['time'] = times"""
-        self.dataframe = data_df
+        return data_df
 
     def clean_data(self):
         df = self.dataframe.copy()
