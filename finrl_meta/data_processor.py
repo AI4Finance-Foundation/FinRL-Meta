@@ -226,6 +226,4 @@ if __name__ == "__main__":
     # test_binance()
     # test_yfinance()
     # test_baostock()
-    # test_quandl()
-    # test_quandl()
     test_quandl()
