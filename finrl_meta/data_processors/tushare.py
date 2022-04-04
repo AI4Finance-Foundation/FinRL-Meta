@@ -9,34 +9,20 @@ from copy import deepcopy
 
 warnings.filterwarnings("ignore")
 
-
 class Tushare(_Base):
-    """Provides methods for retrieving daily stock data from tushare API
-    Attributes
+    """
+    key-value in kwargs
     ----------
-        start_date : str
-            start date of the data
-        end_date : str
-            end date of the data
-        ticker_list : list
-            a list of stock tickers 
         token : str
             get from https://waditu.com/ after registration
         adj: str
             Whether to use adjusted closing price. Default is None. 
             If you want to use forward adjusted closing price or 前复权. pleses use 'qfq'
             If you want to use backward adjusted closing price or 后复权. pleses use 'hfq'
-    Methods
-    -------
-    download_data()
-        Fetches data from tushare API
-    
     """
-
     def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
-        if 'token' not in kwargs.keys():
-            raise ValueError("pleses input token!")
+        assert 'token' in kwargs.keys(), "Please input token!"
         self.token = kwargs["token"]
         if 'adj' in kwargs.keys():
             self.adj = kwargs["adj"]
@@ -78,8 +64,7 @@ class Tushare(_Base):
             # print("{} ok".format(i))
             time.sleep(0.25)
 
-        self.dataframe.columns = ['tic', 'date', 'open', 'high', 'low', 'close', 'pre_close', 'change', 'pct_chg', 'volume',
-                           'amount']
+        self.dataframe.columns = ['tic', 'date', 'open', 'high', 'low', 'close', 'pre_close', 'change', 'pct_chg', 'volume', 'amount']
         self.dataframe.sort_values(by=['date', 'tic'], inplace=True)
         self.dataframe.reset_index(drop=True, inplace=True)
 
