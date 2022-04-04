@@ -3,6 +3,19 @@ import numpy as np
 import os
 import pickle
 from typing import List
+
+from finrl_meta.data_processors.alpaca import Alpaca
+from finrl_meta.data_processors.baostock import Baostock
+from finrl_meta.data_processors.wrds import Wrds
+from finrl_meta.data_processors.binance import Binance
+from finrl_meta.data_processors.iexcloud import Iexcloud
+from finrl_meta.data_processors.joinquant import Joinquant
+from finrl_meta.data_processors.quandl import Quandl
+from finrl_meta.data_processors.quantconnect import Quantconnect
+from finrl_meta.data_processors.ricequant import Ricequant
+from finrl_meta.data_processors.tushare import Tushare
+from finrl_meta.data_processors.yahoofinance import Yahoofinance
+
 class DataProcessor():
     def processor_None(self):
         print(f"Not support for {self.data_source}")
@@ -13,30 +26,6 @@ class DataProcessor():
         self.end_date = end_date
         self.time_interval = time_interval
         self.dataframe = pd.DataFrame()
-        if self.data_source == "alpaca":
-            from finrl_meta.data_processors.alpaca import Alpaca
-        if self.data_source == "baostock":
-            from finrl_meta.data_processors.baostock import Baostock
-        if self.data_source == "wrds":
-            from finrl_meta.data_processors.wrds import Wrds
-        if self.data_source == "binance":
-            from finrl_meta.data_processors.binance import Binance
-        if self.data_source == "iexcloud":
-            from finrl_meta.data_processors.iexcloud import Iexcloud
-        if self.data_source == "joinquant":
-            from finrl_meta.data_processors.joinquant import Joinquant
-        if self.data_source == "quandl":
-            from finrl_meta.data_processors.quandl import Quandl
-        elif self.data_source == "quantconnect":
-            from finrl_meta.data_processors.quantconnect import Quantconnect
-        elif self.data_source == "ricequant":
-            from finrl_meta.data_processors.ricequant import Ricequant
-        elif self.data_source == "tushare":
-            from finrl_meta.data_processors.tushare import Tushare
-        elif self.data_source == "yahoofinance":
-            from finrl_meta.data_processors.yahoofinance import Yahoofinance
-        else:
-            print(f"Data source {self.data_source} is NOT supported yet.")
         processor_dict = {
             "alpaca": Alpaca,
             "binance": Binance,
