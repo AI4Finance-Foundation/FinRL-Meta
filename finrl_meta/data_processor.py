@@ -4,17 +4,6 @@ import os
 import pickle
 from typing import List
 
-from finrl_meta.data_processors.alpaca import Alpaca
-from finrl_meta.data_processors.baostock import Baostock
-from finrl_meta.data_processors.wrds import Wrds
-from finrl_meta.data_processors.binance import Binance
-from finrl_meta.data_processors.iexcloud import Iexcloud
-from finrl_meta.data_processors.joinquant import Joinquant
-from finrl_meta.data_processors.quandl import Quandl
-from finrl_meta.data_processors.quantconnect import Quantconnect
-from finrl_meta.data_processors.ricequant import Ricequant
-from finrl_meta.data_processors.tushare import Tushare
-from finrl_meta.data_processors.yahoofinance import Yahoofinance
 
 class DataProcessor():
     def processor_None(self):
@@ -26,19 +15,45 @@ class DataProcessor():
         self.end_date = end_date
         self.time_interval = time_interval
         self.dataframe = pd.DataFrame()
-        processor_dict = {
-            "alpaca": Alpaca,
-            "binance": Binance,
-            "baostock": Baostock,
-            "iexcloud": Iexcloud,
-            "joinquant": Joinquant,
-            "quandl":  Quandl,
-            "quantconnect":  Quantconnect,
-            "ricequant":  Ricequant,
-            "tushare": Tushare,
-            "wrds":  Wrds,
-            "yahoofinance":  Yahoofinance,
-        }
+
+        if self.data_source == "alpaca":
+            from finrl_meta.data_processors.alpaca import Alpaca
+            processor_dict = {self.data_source: Alpaca}
+        if self.data_source == "baostock":
+            from finrl_meta.data_processors.baostock import Baostock
+            processor_dict = {self.data_source: Baostock}
+        if self.data_source == "binance":
+            from finrl_meta.data_processors.binance import Binance
+            processor_dict = {self.data_source: Binance}
+        if self.data_source == "ccxt":
+            from finrl_meta.data_processors.ccxt import Ccxt
+            processor_dict = {self.data_source: Ccxt}
+        if self.data_source == "iexcloud":
+            from finrl_meta.data_processors.iexcloud import Iexcloud
+            processor_dict = {self.data_source: Iexcloud}
+        if self.data_source == "joinquant":
+            from finrl_meta.data_processors.joinquant import Joinquant
+            processor_dict = {self.data_source: Joinquant}
+        if self.data_source == "quandl":
+            from finrl_meta.data_processors.quandl import Quandl
+            processor_dict = {self.data_source: Quandl}
+        elif self.data_source == "quantconnect":
+            from finrl_meta.data_processors.quantconnect import Quantconnect
+            processor_dict = {self.data_source: Quantconnect}
+        elif self.data_source == "ricequant":
+            from finrl_meta.data_processors.ricequant import Ricequant
+            processor_dict = {self.data_source: Ricequant}
+        elif self.data_source == "tushare":
+            from finrl_meta.data_processors.tushare import Tushare
+            processor_dict = {self.data_source: Tushare}
+        if self.data_source == "wrds":
+            from finrl_meta.data_processors.wrds import Wrds
+            processor_dict = {self.data_source: Wrds}
+        elif self.data_source == "yahoofinance":
+            from finrl_meta.data_processors.yahoofinance import Yahoofinance
+            processor_dict = {self.data_source: Yahoofinance}
+        else:
+            print(f"Data source {self.data_source} is NOT supported yet.")
 
         try:
             self.processor = processor_dict.get(self.data_source, self.processor_None())(data_source, start_date, end_date, time_interval, **kwargs)
