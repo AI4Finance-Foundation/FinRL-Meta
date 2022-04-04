@@ -22,12 +22,12 @@ class DataProcessor():
         if self.data_source == "baostock":
             from finrl_meta.data_processors.baostock import Baostock
             processor_dict = {self.data_source: Baostock}
-        if self.data_source == "ccxt":
-            from finrl_meta.data_processors.ccxt import Ccxt
-            processor_dict = {self.data_source: Ccxt}
         if self.data_source == "binance":
             from finrl_meta.data_processors.binance import Binance
             processor_dict = {self.data_source: Binance}
+        if self.data_source == "ccxt":
+            from finrl_meta.data_processors.ccxt import Ccxt
+            processor_dict = {self.data_source: Ccxt}
         if self.data_source == "iexcloud":
             from finrl_meta.data_processors.iexcloud import Iexcloud
             processor_dict = {self.data_source: Iexcloud}
