@@ -26,7 +26,7 @@ class Tushare(_Base):
         self.token = kwargs["token"]
         if 'adj' in kwargs.keys():
             self.adj = kwargs["adj"]
-            print(f"Using {self.adj} method")
+            print(f"Using {self.adj} method.")
         else:
             self.adj = None
 
@@ -39,20 +39,14 @@ class Tushare(_Base):
         )
 
     def download_data(self, ticker_list: List[str]):
-        """Fetches data from tushare API
-        Parameters
-        ----------
-        Returns
-        -------
+        """
         `pd.DataFrame`
             7 columns: A tick symbol, date, open, high, low, close and volume 
             for the specified stock ticker
         """
+        assert self.time_interval == "1d", "Not supported currently"
+
         self.ticker_list = ticker_list
-
-        if self.time_interval != "1d":
-            raise ValueError('not supported currently')
-
         ts.set_token(self.token)
 
         self.dataframe = pd.DataFrame()
