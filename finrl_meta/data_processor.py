@@ -163,7 +163,7 @@ def test_binance():
     price_array, tech_array, turbulence_array = dp.run(ticker_list, technical_indicator_list, if_vix, cache=True, select_stockstats_talib=1)
     print(price_array.shape, tech_array.shape)
 
-def test_yfinance():
+def test_yahoofinance():
 
     start_date = '2021-01-01'
     end_date = '2021-09-20'

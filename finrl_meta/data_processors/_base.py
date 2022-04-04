@@ -354,13 +354,6 @@ class _Base:
     def transfer_standard_ticker_to_nonstandard(self, ticker: str) -> str:
         return ticker
 
-    # ["600000.XSHG", "000612.XSHE"] -> ["sh.600000", "sz.000612"]
-    def transfer_standard_tickers_to_nonstandard(self, tickers: List[str]) -> List[str]:
-        nonstandard_tickers = []
-        for ticker in tickers:
-            nonstandard_ticker = self.transfer_standard_ticker_to_nonstandard(ticker)
-            nonstandard_tickers.append(nonstandard_ticker)
-        return nonstandard_tickers
 
 
 
