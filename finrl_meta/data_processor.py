@@ -16,46 +16,41 @@ class DataProcessor():
         self.time_interval = time_interval
         self.dataframe = pd.DataFrame()
 
-        processor_dict = {}
         if self.data_source == "alpaca":
             from finrl_meta.data_processors.alpaca import Alpaca
-            processor_dict.update({"alpaca": Alpaca})
+            processor_dict = {"alpaca": Alpaca}
         if self.data_source == "baostock":
             from finrl_meta.data_processors.baostock import Baostock
+            processor_dict = {"baostock": Baostock}
         if self.data_source == "wrds":
             from finrl_meta.data_processors.wrds import Wrds
+            processor_dict = {"wrds": Wrds}
         if self.data_source == "binance":
             from finrl_meta.data_processors.binance import Binance
+            processor_dict = {"binance": Binance}
         if self.data_source == "iexcloud":
             from finrl_meta.data_processors.iexcloud import Iexcloud
+            processor_dict = {"iexcloud": Iexcloud}
         if self.data_source == "joinquant":
             from finrl_meta.data_processors.joinquant import Joinquant
+            processor_dict = {"joinquant": Joinquant}
         if self.data_source == "quandl":
             from finrl_meta.data_processors.quandl import Quandl
+            processor_dict = {"quandl": Quandl}
         elif self.data_source == "quantconnect":
             from finrl_meta.data_processors.quantconnect import Quantconnect
+            processor_dict = {"quantconnect": Quantconnect}
         elif self.data_source == "ricequant":
             from finrl_meta.data_processors.ricequant import Ricequant
+            processor_dict = {"ricequant": Ricequant}
         elif self.data_source == "tushare":
             from finrl_meta.data_processors.tushare import Tushare
+            processor_dict = {"tushare": Tushare}
         elif self.data_source == "yahoofinance":
             from finrl_meta.data_processors.yahoofinance import Yahoofinance
+            processor_dict = {"yahoofinance": Yahoofinance}
         else:
             print(f"Data source {self.data_source} is NOT supported yet.")
-
-        processor_dict = {
-            "alpaca": Alpaca,
-            "binance": Binance,
-            "baostock": Baostock,
-            "iexcloud": Iexcloud,
-            "joinquant": Joinquant,
-            "quandl":  Quandl,
-            "quantconnect":  Quantconnect,
-            "ricequant":  Ricequant,
-            "tushare": Tushare,
-            "wrds":  Wrds,
-            "yahoofinance":  Yahoofinance,
-        }
 
         try:
             self.processor = processor_dict.get(self.data_source, self.processor_None())(data_source, start_date, end_date, time_interval, **kwargs)
