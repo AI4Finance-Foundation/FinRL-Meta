@@ -22,9 +22,9 @@ class DataProcessor():
         if self.data_source == "baostock":
             from finrl_meta.data_processors.baostock import Baostock
             processor_dict = {self.data_source: Baostock}
-        if self.data_source == "wrds":
-            from finrl_meta.data_processors.wrds import Wrds
-            processor_dict = {self.data_source: Wrds}
+        if self.data_source == "ccxt":
+            from finrl_meta.data_processors.ccxt import Ccxt
+            processor_dict = {self.data_source: Ccxt}
         if self.data_source == "binance":
             from finrl_meta.data_processors.binance import Binance
             processor_dict = {self.data_source: Binance}
@@ -46,6 +46,9 @@ class DataProcessor():
         elif self.data_source == "tushare":
             from finrl_meta.data_processors.tushare import Tushare
             processor_dict = {self.data_source: Tushare}
+        if self.data_source == "wrds":
+            from finrl_meta.data_processors.wrds import Wrds
+            processor_dict = {self.data_source: Wrds}
         elif self.data_source == "yahoofinance":
             from finrl_meta.data_processors.yahoofinance import Yahoofinance
             processor_dict = {self.data_source: Yahoofinance}
