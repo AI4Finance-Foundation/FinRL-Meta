@@ -42,13 +42,13 @@ class DataProcessor():
             processor_dict = {"quantconnect": Quantconnect}
         elif self.data_source == "ricequant":
             from finrl_meta.data_processors.ricequant import Ricequant
-            processor_dict = {"ricequant": Ricequant}
+            processor_dict = {self.data_source: Ricequant}
         elif self.data_source == "tushare":
             from finrl_meta.data_processors.tushare import Tushare
-            processor_dict = {"tushare": Tushare}
+            processor_dict = {self.data_source: Tushare}
         elif self.data_source == "yahoofinance":
             from finrl_meta.data_processors.yahoofinance import Yahoofinance
-            processor_dict = {"yahoofinance": Yahoofinance}
+            processor_dict = {self.data_source: Yahoofinance}
         else:
             print(f"Data source {self.data_source} is NOT supported yet.")
 
