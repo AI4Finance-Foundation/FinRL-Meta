@@ -18,28 +18,28 @@ class DataProcessor():
 
         if self.data_source == "alpaca":
             from finrl_meta.data_processors.alpaca import Alpaca
-            processor_dict = {"alpaca": Alpaca}
+            processor_dict = {self.data_source: Alpaca}
         if self.data_source == "baostock":
             from finrl_meta.data_processors.baostock import Baostock
-            processor_dict = {"baostock": Baostock}
+            processor_dict = {self.data_source: Baostock}
         if self.data_source == "wrds":
             from finrl_meta.data_processors.wrds import Wrds
-            processor_dict = {"wrds": Wrds}
+            processor_dict = {self.data_source: Wrds}
         if self.data_source == "binance":
             from finrl_meta.data_processors.binance import Binance
-            processor_dict = {"binance": Binance}
+            processor_dict = {self.data_source: Binance}
         if self.data_source == "iexcloud":
             from finrl_meta.data_processors.iexcloud import Iexcloud
-            processor_dict = {"iexcloud": Iexcloud}
+            processor_dict = {self.data_source: Iexcloud}
         if self.data_source == "joinquant":
             from finrl_meta.data_processors.joinquant import Joinquant
-            processor_dict = {"joinquant": Joinquant}
+            processor_dict = {self.data_source: Joinquant}
         if self.data_source == "quandl":
             from finrl_meta.data_processors.quandl import Quandl
-            processor_dict = {"quandl": Quandl}
+            processor_dict = {self.data_source: Quandl}
         elif self.data_source == "quantconnect":
             from finrl_meta.data_processors.quantconnect import Quantconnect
-            processor_dict = {"quantconnect": Quantconnect}
+            processor_dict = {self.data_source: Quantconnect}
         elif self.data_source == "ricequant":
             from finrl_meta.data_processors.ricequant import Ricequant
             processor_dict = {self.data_source: Ricequant}
