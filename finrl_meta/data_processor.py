@@ -56,7 +56,7 @@ class DataProcessor():
             print(f"Data source {self.data_source} is NOT supported yet.")
 
         try:
-            self.processor = processor_dict.get(self.data_source, self.processor_None())(data_source, start_date, end_date, time_interval, **kwargs)
+            self.processor = processor_dict.get(self.data_source)(data_source, start_date, end_date, time_interval, **kwargs)
             print(f'{self.data_source} successfully connected')
         except:
             raise ValueError(f'Please input correct account info for {self.data_source}!')
