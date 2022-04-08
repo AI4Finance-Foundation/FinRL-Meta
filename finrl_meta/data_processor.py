@@ -19,22 +19,22 @@ class DataProcessor():
         if self.data_source == "alpaca":
             from finrl_meta.data_processors.alpaca import Alpaca
             processor_dict = {self.data_source: Alpaca}
-        if self.data_source == "baostock":
+        elif self.data_source == "baostock":
             from finrl_meta.data_processors.baostock import Baostock
             processor_dict = {self.data_source: Baostock}
-        if self.data_source == "binance":
+        elif self.data_source == "binance":
             from finrl_meta.data_processors.binance import Binance
             processor_dict = {self.data_source: Binance}
-        if self.data_source == "ccxt":
+        elif self.data_source == "ccxt":
             from finrl_meta.data_processors.ccxt import Ccxt
             processor_dict = {self.data_source: Ccxt}
-        if self.data_source == "iexcloud":
+        elif self.data_source == "iexcloud":
             from finrl_meta.data_processors.iexcloud import Iexcloud
             processor_dict = {self.data_source: Iexcloud}
-        if self.data_source == "joinquant":
+        elif self.data_source == "joinquant":
             from finrl_meta.data_processors.joinquant import Joinquant
             processor_dict = {self.data_source: Joinquant}
-        if self.data_source == "quandl":
+        elif self.data_source == "quandl":
             from finrl_meta.data_processors.quandl import Quandl
             processor_dict = {self.data_source: Quandl}
         elif self.data_source == "quantconnect":
@@ -46,7 +46,7 @@ class DataProcessor():
         elif self.data_source == "tushare":
             from finrl_meta.data_processors.tushare import Tushare
             processor_dict = {self.data_source: Tushare}
-        if self.data_source == "wrds":
+        elif self.data_source == "wrds":
             from finrl_meta.data_processors.wrds import Wrds
             processor_dict = {self.data_source: Wrds}
         elif self.data_source == "yahoofinance":
