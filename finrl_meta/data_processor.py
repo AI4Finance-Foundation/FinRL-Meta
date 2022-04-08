@@ -6,8 +6,6 @@ from typing import List
 
 
 class DataProcessor():
-    def processor_None(self):
-        print(f"Not support for {self.data_source}")
 
     def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
         self.data_source = data_source
@@ -56,7 +54,7 @@ class DataProcessor():
             print(f"Data source {self.data_source} is NOT supported yet.")
 
         try:
-            self.processor = processor_dict.get(self.data_source, self.processor_None())(data_source, start_date, end_date, time_interval, **kwargs)
+            self.processor = processor_dict.get(self.data_source)(data_source, start_date, end_date, time_interval, **kwargs)
             print(f'{self.data_source} successfully connected')
         except:
             raise ValueError(f'Please input correct account info for {self.data_source}!')
