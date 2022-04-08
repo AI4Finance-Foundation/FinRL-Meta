@@ -6,8 +6,6 @@ from typing import List
 
 
 class DataProcessor():
-    def processor_None(self):
-        print(f"Not support for {self.data_source}")
 
     def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
         self.data_source = data_source
