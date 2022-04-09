@@ -93,6 +93,17 @@ class DataProcessor():
 
         return price_array, tech_array, turbulence_array
 
+    def data_split(self, df, start, end, target_date_col="date"):
+        """
+        split the dataset into training or testing using date
+        :param data: (df) pandas dataframe, start, end
+        :return: (df) pandas dataframe
+        """
+        data = df[(df[target_date_col] >= start) & (df[target_date_col] < end)]
+        data = data.sort_values([target_date_col, "tic"], ignore_index=True)
+        data.index = data[target_date_col].factorize()[0]
+        return data
+
     def run(self, ticker_list: str, technical_indicator_list: List[str], if_vix: bool, cache: bool = False, select_stockstats_talib: int = 0):
 
         if self.time_interval == "1s" and self.data_source != "binance":
