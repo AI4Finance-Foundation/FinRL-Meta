@@ -5,7 +5,6 @@ import numpy as np
 import pandas as pd
 from finrl_meta import config
 from finrl_meta.env_stock_trading.env_stock_trading  import StockTradingEnv
-from finrl_meta.data_processor import data_split
 from stable_baselines3 import A2C, DDPG, PPO, SAC, TD3
 from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.noise import (
