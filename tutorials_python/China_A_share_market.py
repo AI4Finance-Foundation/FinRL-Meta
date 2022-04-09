@@ -289,6 +289,8 @@ perf_stats_all = perf_func(returns=daily_return_base,
                            factor_returns=daily_return_base,
                            positions=None, transactions=None, turnover_denom="AGB")
 print("==============Baseline Strategy Stats===========")
-perf_stats_all
+
+print(f"perf_stats_all: {perf_stats_all}")
+
 
 
