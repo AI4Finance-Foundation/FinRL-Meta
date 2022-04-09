@@ -51,7 +51,7 @@ class DataProcessor():
             from finrl_meta.data_processors.yahoofinance import Yahoofinance
             processor_dict = {self.data_source: Yahoofinance}
         else:
-            print(f"Data source {self.data_source} is NOT supported yet.")
+            print(f"{self.data_source} is NOT supported yet.")
 
         try:
             self.processor = processor_dict.get(self.data_source)(data_source, start_date, end_date, time_interval, **kwargs)
