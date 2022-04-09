@@ -79,10 +79,10 @@ ticket_list = ['600000.SH', '600009.SH', '600016.SH', '600028.SH', '600030.SH',
                '600031.SH', '600036.SH', '600050.SH', '600104.SH', '600196.SH',
                '600276.SH', '600309.SH', '600519.SH', '600547.SH', '600570.SH']
 
-train_start_date = '2015-01-01'
-train_stop_date = '2019-08-01'
-val_start_date = '2019-08-01'
-val_stop_date = '2021-01-03'
+TRAIN_START_DATE = '2015-01-01'
+TRAIN_END_DATE= '2019-08-01'
+TRADE_START_DATE = '2019-08-01'
+TRADE_END_DATE = '2021-01-03'
 
 token = '27080ec403c0218f96f388bca1b1d85329d563c91a43672239619ef5'
 
@@ -90,8 +90,8 @@ token = '27080ec403c0218f96f388bca1b1d85329d563c91a43672239619ef5'
 
 # download and clean
 ts_processor = Tushare(data_source="tushare",
-                       start_date=train_start_date,
-                       end_date=val_stop_date,
+                       start_date=TRAIN_START_DATE,
+                       end_date=TRADE_END_DATE,
                        time_interval="1d",
                        token=token)
 ts_processor.download_data(ticker_list=ticket_list)
@@ -114,7 +114,7 @@ ts_processor.dataframe
 
 # %%
 
-train = ts_processor.data_split(ts_processor.dataframe, train_start_date, train_stop_date)
+train = ts_processor.data_split(ts_processor.dataframe, TRAIN_START_DATE, train_stop_date)
 len(train.tic.unique())
 
 # %%
@@ -206,7 +206,7 @@ trained_a2c = agent.train_model(model=model_a2c,
 
 # %%
 
-trade = ts_processor.data_split(ts_processor.dataframe, val_start_date, val_stop_date)
+trade = ts_processor.data_split(ts_processor.dataframe, TRADE_START_DATE, TRADE_END_DATE)
 env_kwargs = {
     "stock_dim": stock_dimension,
     "hmax": 1000,
@@ -240,7 +240,7 @@ df_actions
 # %%
 
 # %matplotlib inline
-plotter = ReturnPlotter(df_account_value, trade, val_start_date, val_stop_date)
+plotter = ReturnPlotter(df_account_value, trade, TRADE_START_DATE, TRADE_END_DATE)
 # plotter.plot_all()
 
 # %%
