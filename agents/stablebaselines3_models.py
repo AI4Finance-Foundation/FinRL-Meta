@@ -3,9 +3,9 @@ import time
 
 import numpy as np
 import pandas as pd
-from finrl import config
-from finrl.finrl_meta.env_stock_trading.env_stocktrading import StockTradingEnv
-from finrl.finrl_meta.preprocessor.preprocessors import data_split
+from finrl_meta import config
+from finrl_meta.env_stock_trading.env_stock_trading  import StockTradingEnv
+from finrl_meta.data_processors import data_split
 from stable_baselines3 import A2C, DDPG, PPO, SAC, TD3
 from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.noise import (
