@@ -230,7 +230,7 @@ df_account_value, df_actions = DRLAgent.DRL_prediction(model=trained_ddpg,
 # %%
 
 df_actions.to_csv("action.csv", index=False)
-df_actions
+print(f"df_actions: {df_actions}")
 
 # %% md
 
