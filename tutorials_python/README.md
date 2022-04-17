@@ -1,6 +1,6 @@
 OurMission: to provide user-friendly demos using python. Users can run them locally. Moreover, developers can dubug them locally to identify bugs; however, using notebooks is impossible.
 
-There are give parts: Introduction, Advance, Practical, Optimization, and Others.
+There are five parts: Introduction, Advance, Practical, Optimization, and Others.
 
 Part Introduction involves seveval basic demos, which are prepared for beginners.
 
