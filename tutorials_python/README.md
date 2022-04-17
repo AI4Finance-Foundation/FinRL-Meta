@@ -1,4 +1,4 @@
-OurMission: to provide user-friendly demos using python. Users/developers can run/debug them locally. 
+OurMission: to provide user-friendly demos using python. Users can run them locally. Moreover, developers can dubug them locally to identify bugs; however, using notebooks is impossible.
 
 There are give parts: Introduction, Advance, Practical, Optimization, and Others.
 
