@@ -3,8 +3,8 @@
 
 **Principles**: 
 
-1) Do not define any function, and put the functins to .py out of tutorials_notebook and tutorials_python.
-2) The first part is installing commands. Then the second part is copied from the corresponding .py from tutorials_python.
+1) Do not define any function, and put the functins to python files out of tutorials_notebook and tutorials_python.
+2) The codes will be copied to the corresponding notebook in tutorials_python.
 
 
 ## File Structure
