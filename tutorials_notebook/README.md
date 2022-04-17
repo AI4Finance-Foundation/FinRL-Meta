@@ -1,5 +1,10 @@
 **OurMission**: to provide user-friendly demos using notebooks. 
 
+**Principles**: 
+
+1) Do not define any function in notebooks, and put the functins to .py out of tutorials_notebook and tutorials_python.
+2) The first part is installing commands. Then the second part is copied from the corresponding .py from tutorials_python.
+
 ## File Structure
 
 There are five parts: Introduction, Advance, Practical, Optimization, and Others.
