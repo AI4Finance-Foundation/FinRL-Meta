@@ -1,5 +1,7 @@
 OurMission: to provide user-friendly demos using notebooks. 
 
+## File Structure
+
 There are five parts: Introduction, Advance, Practical, Optimization, and Others.
 
 Part Introduction involves seveval basic demos, which are prepared for beginners.
