@@ -1,5 +1,12 @@
 **OurMission**: to provide user-friendly demos using python. Users can run them locally. Moreover, developers can dubug them locally to identify bugs; however, using notebooks is impossible.
 
+
+**Principles**: 
+
+1) Do not define any function in notebooks, and put the functins to .py out of tutorials_notebook or tutorials_python.
+2) The first part is installing commands. 
+
+
 ## File Structure
 There are five parts: Introduction, Advance, Practical, Optimization, and Others.
 
