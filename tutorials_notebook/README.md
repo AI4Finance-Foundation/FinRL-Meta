@@ -15,9 +15,9 @@ Part Advance: advanced demos, e.g., ensemble stock trading.
 
 Part Practical: paper trading and live trading (in the future).
 
-Part Optimization puts hyperparameter tuning.
+Part Optimization: hyperparameter tuning.
 
-Part Others puts other demos.
+Part Others: other demos.
 
 In addition, notebooks in tutorials_notebook are mainly copied from tutorials_python except the front install commands.
 
