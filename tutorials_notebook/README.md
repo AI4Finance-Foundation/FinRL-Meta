@@ -7,7 +7,7 @@
 
 ## File Structure
 
-There are five parts: Introduction, Advance, Practical, Optimization, and Others.
+There are five parts.
 
 Part Introduction: basic demos, which are prepared for beginners.
 
