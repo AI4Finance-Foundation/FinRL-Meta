@@ -10,9 +10,9 @@
 ## File Structure
 There are five parts.
 
-Part Introduction involves seveval basic demos, which are prepared for beginners.
+Part Introduction: seveval basic demos, which are prepared for beginners.
 
-Part Advance involves some advanced demos, e.g., ensemble stock trading.
+Part Advance: some advanced demos, e.g., ensemble stock trading.
 
 Part Practical involves paper trading and live trading (in the future).
 
