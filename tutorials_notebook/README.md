@@ -1,4 +1,4 @@
-**OurMission**: to provide user-friendly demos using notebooks. 
+**Our Mission**: to provide user-friendly demos using notebooks. 
 
 **Principles**: 
 
