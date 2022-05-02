@@ -2,7 +2,7 @@
 
 **Principles**: 
 
-1) Do not define any function, and put these functins to .py out of tutorials_notebook and tutorials_python.
+1) Do not put definitions of functions to notebooks, which should be put to .py in the folders except tutorials_notebook and tutorials_python.
 2) The first part is installing commands. Then the second part is copied from the corresponding .py from tutorials_python.
 
 ## File Structure
