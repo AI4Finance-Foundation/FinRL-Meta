@@ -7,7 +7,6 @@
 
 ## File Structure
 
-There are five：
 
 1-Introduction: basic demos for beginners.
 
@@ -17,7 +16,7 @@ There are five：
 
 4-Optimization: hyperparameter tuning.
 
-5-Others.
+5-Others: other demos.
 
 
 
