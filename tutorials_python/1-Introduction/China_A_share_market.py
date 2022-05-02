@@ -1,7 +1,25 @@
 
 
-from pyfolio import timeseries
-import pyfolio
+import warnings
+
+warnings.filterwarnings("ignore")
+
+import pandas as pd
+from IPython import display
+
+display.set_matplotlib_formats("svg")
+
+from finrl_meta import config
+from finrl_meta.data_processor import DataProcessor
+from main import check_and_make_directories
+from finrl_meta.data_processors.tushare import Tushare, ReturnPlotter
+from finrl_meta.env_stock_trading.env_stocktrading_China_A_shares import StockTradingEnv
+from agents.stablebaselines3_models import DRLAgent
+import os
+from typing import List
+from argparse import ArgumentParser
+from finrl_meta import config
+from finrl_meta.config_tickers import DOW_30_TICKER
 from finrl_meta.config import (
     DATA_SAVE_DIR,
     TRAINED_MODEL_DIR,
@@ -21,25 +39,6 @@ from finrl_meta.config import (
     ALPACA_API_SECRET,
     ALPACA_API_BASE_URL,
 )
-from finrl_meta.config_tickers import DOW_30_TICKER
-from argparse import ArgumentParser
-from typing import List
-import os
-from agents.stablebaselines3_models import DRLAgent
-from finrl_meta.env_stock_trading.env_stocktrading_China_A_shares import StockTradingEnv
-from finrl_meta.data_processors.tushare import Tushare, ReturnPlotter
-from main import check_and_make_directories
-from finrl_meta.data_processor import DataProcessor
-from finrl_meta import config
-from IPython import display
-import pandas as pd
-import warnings
-
-warnings.filterwarnings("ignore")
-
-
-display.set_matplotlib_formats("svg")
-
 
 pd.options.display.max_columns = None
 
@@ -48,10 +47,11 @@ print("ALL Modules have been imported!")
 
 # %% md
 
-# Create folders
+### Create folders
 
 # %%
 
+import os
 
 '''
 use check_and_make_directories() to replace the following
@@ -66,13 +66,13 @@ if not os.path.exists("./results"):
     os.makedirs("./results")
 '''
 
-check_and_make_directories(
-    [DATA_SAVE_DIR, TRAINED_MODEL_DIR, TENSORBOARD_LOG_DIR, RESULTS_DIR])
+check_and_make_directories([DATA_SAVE_DIR, TRAINED_MODEL_DIR, TENSORBOARD_LOG_DIR, RESULTS_DIR])
+
 
 
 # %% md
 
-# Download data, cleaning and feature engineering
+### Download data, cleaning and feature engineering
 
 # %%
 
@@ -81,20 +81,18 @@ ticker_list = ['600000.SH', '600009.SH', '600016.SH', '600028.SH', '600030.SH',
                '600276.SH', '600309.SH', '600519.SH', '600547.SH', '600570.SH']
 
 TRAIN_START_DATE = '2015-01-01'
-TRAIN_END_DATE = '2019-08-01'
+TRAIN_END_DATE= '2019-08-01'
 TRADE_START_DATE = '2019-08-01'
 TRADE_END_DATE = '2020-01-03'
+
+
 
 
 TIME_INTERVAL = "1d"
 kwargs = {}
 kwargs['token'] = '27080ec403c0218f96f388bca1b1d85329d563c91a43672239619ef5'
-p = DataProcessor(
-    data_source='tushare',
-    start_date=TRAIN_START_DATE,
-    end_date=TRADE_END_DATE,
-    time_interval=TIME_INTERVAL,
-    **kwargs)
+p = DataProcessor(data_source='tushare', start_date=TRAIN_START_DATE, end_date=TRADE_END_DATE, time_interval=TIME_INTERVAL, **kwargs)
+
 
 
 # download and clean
@@ -113,7 +111,7 @@ print(f"p.dataframe: {p.dataframe}")
 
 # %% md
 
-# Split traning dataset
+### Split traning dataset
 
 train = p.data_split(p.dataframe, TRAIN_START_DATE, TRAIN_END_DATE)
 print(f"len(train.tic.unique()): {len(train.tic.unique())}")
@@ -138,7 +136,7 @@ print(f"Stock Dimension: {stock_dimension}, State Space: {state_space}")
 
 # %% md
 
-# Train
+### Train
 
 # %%
 
@@ -161,7 +159,7 @@ e_train_gym = StockTradingEnv(df=train, **env_kwargs)
 
 # %% md
 
-# DDPG
+## DDPG
 
 # %%
 
@@ -178,10 +176,7 @@ DDPG_PARAMS = {
     "action_noise": "normal",
 }
 POLICY_KWARGS = dict(net_arch=dict(pi=[64, 64], qf=[400, 300]))
-model_ddpg = agent.get_model(
-    "ddpg",
-    model_kwargs=DDPG_PARAMS,
-    policy_kwargs=POLICY_KWARGS)
+model_ddpg = agent.get_model("ddpg", model_kwargs=DDPG_PARAMS, policy_kwargs=POLICY_KWARGS)
 
 # %%
 
@@ -191,7 +186,7 @@ trained_ddpg = agent.train_model(model=model_ddpg,
 
 # %% md
 
-# A2C
+## A2C
 
 # %%
 
@@ -206,7 +201,7 @@ trained_a2c = agent.train_model(model=model_a2c,
 
 # %% md
 
-# Trade
+### Trade
 
 # %%
 
@@ -239,16 +234,12 @@ print(f"df_actions: {df_actions}")
 
 # %% md
 
-# Backtest
+### Backtest
 
 # %%
 
 # %matplotlib inline
-plotter = ReturnPlotter(
-    df_account_value,
-    trade,
-    TRADE_START_DATE,
-    TRADE_END_DATE)
+plotter = ReturnPlotter(df_account_value, trade, TRADE_START_DATE, TRADE_END_DATE)
 # plotter.plot_all()
 
 # %%
@@ -263,7 +254,7 @@ plotter.plot()
 
 # %% md
 
-# Use pyfolio
+#### Use pyfolio
 
 # %%
 
@@ -272,33 +263,34 @@ baseline_df = plotter.get_baseline("399300")
 
 # %%
 
+import pyfolio
+from pyfolio import timeseries
 
 daily_return = plotter.get_return(df_account_value)
 daily_return_base = plotter.get_return(baseline_df, value_col_name="close")
 
 perf_func = timeseries.perf_stats
-perf_stats_all = perf_func(
-    returns=daily_return,
-    factor_returns=daily_return_base,
-    positions=None,
-    transactions=None,
-    turnover_denom="AGB")
+perf_stats_all = perf_func(returns=daily_return,
+                           factor_returns=daily_return_base,
+                           positions=None, transactions=None, turnover_denom="AGB")
 print("==============DRL Strategy Stats===========")
 print(f"perf_stats_all: {perf_stats_all}")
 
 # %%
 
+import pyfolio
+from pyfolio import timeseries
 
 daily_return = plotter.get_return(df_account_value)
 daily_return_base = plotter.get_return(baseline_df, value_col_name="close")
 
 perf_func = timeseries.perf_stats
-perf_stats_all = perf_func(
-    returns=daily_return_base,
-    factor_returns=daily_return_base,
-    positions=None,
-    transactions=None,
-    turnover_denom="AGB")
+perf_stats_all = perf_func(returns=daily_return_base,
+                           factor_returns=daily_return_base,
+                           positions=None, transactions=None, turnover_denom="AGB")
 print("==============Baseline Strategy Stats===========")
 
 print(f"perf_stats_all: {perf_stats_all}")
+
+
+
