@@ -1,23 +1,22 @@
-**Our Mission**: to provide user-friendly demos using notebooks. 
+**Mission**: provide > 100 user-friendly demos in notebooks. 
 
 **Principles**: 
 
-1) Do not define any function, and put these functins to .py out of tutorials_notebook and tutorials_python.
-2) The first part is installing commands. Then the second part is copied from the corresponding .py from tutorials_python.
+1) Do not put definitions of functions in notebooks, which should be put in .py of the folders except tutorials_notebook and tutorials_python.
+2) The contents in notebooks are separated into two parts. The first part is installing commands. The second part is copied directly from the corresponding .py in tutorials_python.
 
 ## File Structure
 
-There are five parts.
 
-Part Introduction: basic demos, which are prepared for beginners.
+1-Introduction: basic demos for beginners.
 
-Part Advance: advanced demos, e.g., ensemble stock trading.
+2-Advance: advanced demos, e.g., ensemble stock trading.
 
-Part Practical: paper trading and live trading (in the future).
+3-Practical: paper trading and live trading (To Do).
 
-Part Optimization: hyperparameter tuning.
+4-Optimization: hyperparameter tuning.
 
-Part Others: other demos.
+5-Others: other demos.
 
 
 

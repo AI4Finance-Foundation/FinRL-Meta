@@ -1,24 +1,23 @@
-**Our Mission**: to provide user-friendly demos using python. Users can run them locally. Moreover, developers can dubug them locally to identify bugs; however, using notebooks is impossible.
+**Mission**: to provide user-friendly demos using python. Users can run them locally. Moreover, developers can dubug them locally to identify bugs; however, using notebooks is impossible.
 
 
 **Principles**: 
 
-1) Do not define any function, and put the functins to python files out of tutorials_notebook and tutorials_python.
+1) Do not put definitions of functions, which should be put in .py of the folders except tutorials_notebook and tutorials_python.
 2) The codes will be copied to the corresponding notebook in tutorials_notebook.
 
 
 ## File Structure
 
-There are five parts.
 
-Part Introduction: basic demos, which are prepared for beginners.
+1-Introduction: basic demos for beginners.
 
-Part Advance: advanced demos, e.g., ensemble stock trading.
+2-Advance: advanced demos, e.g., ensemble stock trading.
 
-Part Practical: paper trading and live trading (in the future).
+3-Practical: paper trading and live trading (To Do).
 
-Part Optimization: hyperparameter tuning.
+4-Optimization: hyperparameter tuning.
 
-Part Others: other demos.
+5-Others: other demos.
 
 
