@@ -16,13 +16,11 @@ def trade(start_date, end_date, ticker_list, data_source, time_interval,
         # read parameters
         try:
             net_dim = kwargs.get("net_dimension", 2 ** 7)
-            # current working directory
-            cwd = kwargs.get("cwd", "./" + str(model_name))
+            cwd = kwargs.get("cwd", "./" + str(model_name))  # current working directory
             state_dim = kwargs.get("state_dim")
             action_dim = kwargs.get("action_dim")
-        except BaseException:
-            raise ValueError(
-                'Fail to read parameters. Please check inputs for net_dim, cwd, state_dim, action_dim.')
+        except:
+            raise ValueError('Fail to read parameters. Please check inputs for net_dim, cwd, state_dim, action_dim.')
         # initialize paper trading env
         AlpacaPaperTrading(ticker_list, time_interval, drl_lib, model_name,
                            cwd, net_dim, state_dim, action_dim,
@@ -33,5 +31,4 @@ def trade(start_date, end_date, ticker_list, data_source, time_interval,
         AlpacaPaperTrading.run()
 
     else:
-        raise ValueError(
-            "Invalid mode input! Please input either 'backtesting' or 'paper_trading'.")
+        raise ValueError("Invalid mode input! Please input either 'backtesting' or 'paper_trading'.")
