@@ -9,7 +9,6 @@
 
 ## File Structure
 
-There are five parts.
 
 1-Introduction: basic demos for beginners.
 
