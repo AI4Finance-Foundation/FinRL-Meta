@@ -11,13 +11,13 @@ There are five parts.
 
 1-Introduction: basic demos, which are prepared for beginners.
 
-Advance: advanced demos, e.g., ensemble stock trading.
+2-Advance: advanced demos, e.g., ensemble stock trading.
 
-Practical: paper trading and live trading (in the future).
+3-Practical: paper trading and live trading (in the future).
 
-Optimization: hyperparameter tuning.
+4-Optimization: hyperparameter tuning.
 
-Others: other demos.
+5-Others: other demos.
 
 
 
