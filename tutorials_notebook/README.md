@@ -9,7 +9,7 @@
 
 There are five parts.
 
-1-Introduction: basic demos, which are prepared for beginners.
+1-Introduction: basic demos prepared for beginners.
 
 2-Advance: advanced demos, e.g., ensemble stock trading.
 
