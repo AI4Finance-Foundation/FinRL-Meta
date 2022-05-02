@@ -1,4 +1,4 @@
-**Mission**: to provide > 100 user-friendly demos using notebooks. 
+**Mission**: provide > 100 user-friendly demos in notebooks. 
 
 **Principles**: 
 
@@ -7,17 +7,17 @@
 
 ## File Structure
 
-There are five parts.
+There are five：
 
-1-Introduction: basic demos prepared for beginners.
+1-Introduction: basic demos for beginners.
 
 2-Advance: advanced demos, e.g., ensemble stock trading.
 
-3-Practical: paper trading and live trading (in the future).
+3-Practical: paper trading and live trading (To Do).
 
 4-Optimization: hyperparameter tuning.
 
-5-Others: other demos.
+5-Others.
 
 
 
