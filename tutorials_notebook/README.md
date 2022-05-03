@@ -1,4 +1,4 @@
-**Mission**: provide > 100 user-friendly demos in notebooks. 
+**Mission**: provide more than 100 user-friendly demos in notebooks. 
 
 **Principles**: 
 
