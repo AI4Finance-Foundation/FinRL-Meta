@@ -431,7 +431,7 @@ model_NN1.to(device)
 
 # State fold (no PurgedKFold build yet, ignore this)
 # took about 1hour to train when epochs=300
-epochs=100
+epochs = 100
 fold = 0
 for epoch in range(1, epochs + 1):
   correct_train, train_loss = train(fold, model_NN1, device, train_loader, optimizer, epoch)
