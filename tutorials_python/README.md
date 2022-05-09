@@ -1,6 +1,6 @@
 **Mission**: provide more than 100 user-friendly demos in python. 
 
-Users can run them locally. Moreover, developers can dubug them locally to identify bugs; however, using notebooks is impossible.
+Users can run them locally. Moreover, developers can dubug them locally; however, using notebooks is impossible.
 
 
 **Principles**: 
