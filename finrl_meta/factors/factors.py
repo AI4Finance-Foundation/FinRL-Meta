@@ -112,7 +112,7 @@ def DMA(S, A):            #求S的动态移动平均，A作平滑因子,必须 0
     for i in range(1,len(S)): Y[i]=A[i]*S[i]+(1-A[i])*Y[i-1]      #A支持序列 by jqz1226         
     return Y       
 
-class momentum_factors:
+class MomentumFactors:
     '''
     动量类因子
     '''
@@ -229,7 +229,7 @@ class momentum_factors:
     def bull_power(self, df, timeperiod=13):
         return (df['high_price'] - EMA(df['close_price'], timeperiod)) / df['close_price']
     
-class emotion_factors:
+class EmotionFactors:
     '''
     情绪类因子
     '''
