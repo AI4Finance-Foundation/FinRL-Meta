@@ -376,7 +376,7 @@ class extra_facters:
     # def VIX():
     #     pass
 
-class general_factors:
+class GeneralFactors:
     '''
     常见因子
     '''
