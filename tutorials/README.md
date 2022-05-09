@@ -1,9 +1,9 @@
 **Mission**: provide more than 100 user-friendly demos in notebooks and python. 
 
-In the python verison, users can run them locally. Moreover, developers can dubug them locally; however, using notebooks is impossible.
+In the python verison, users and developers can dubug them locally; however, using notebooks is impossible.
 
 
-**Principles**: 
+**Principles in python version**: 
 
 1) Do not put definitions of functions here, which should be put in .py of the folders except tutorials_notebook and tutorials_python.
 2) The codes will be copied to the corresponding notebook in tutorials_notebook.
