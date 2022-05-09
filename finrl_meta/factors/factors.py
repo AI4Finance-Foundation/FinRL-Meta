@@ -59,8 +59,7 @@ def spearmanr_corr(df_, target):
     return abs(df_Spearmanr).sort_values(by=[0], ascending=False)
 
 
-# 发行总量
-total_volume = 18900000
+# total_volume: 发行总量
 
 def RD(N,D=3):   return np.round(N,D)        #四舍五入取3位小数 
 def ABS(S):      return np.abs(S)            #返回N的绝对值
@@ -120,19 +119,19 @@ class MomentumFactors:
     def BIAS5(self, close, N=5):
         #（收盘价-收盘价的N日简单平均）/ 收盘价的N日简单平均*100，在此n取5
         mac = MA(close, N)
-        return (close - mac) /  (mac * 100)
+        return (close - mac) / (mac * 100)
     
     # 10日乖离率  'ic_mean': '-0.043967'
     def BIAS10(self, close, N=10):
         # （收盘价-收盘价的N日简单平均）/ 收盘价的N日简单平均*100，在此n取10
         mac =  MA(close, N)
-        return (close - mac) /  (mac * 100)
+        return (close - mac) / (mac * 100)
     
     # 60日乖离率 'ic_mean': '-0.039533'
     def BIAS60(self, close, N=60):
         # （收盘价-收盘价的N日简单平均）/ 收盘价的N日简单平均*100，在此n取60
         mac =  MA(close, N)
-        return (close - mac) /  (mac * 100)
+        return (close - mac) / (mac * 100)
     
     # 当前股价除以过去一个月股价均值再减1 'ic_mean': '-0.039303'
     def Price1M(self, close, N=21):
@@ -235,19 +234,19 @@ class EmotionFactors:
     '''
     # 换手率： 某一段时期内的成交量/发行总股数×100%
     # 5日平均换手率 'ic_mean': '-0.044'
-    def VOL5(self, S, N=5):
+    def VOL5(self, S, total_volume, N=5):
         # 5日换手率均值
         S = S / total_volume
         return pd.Series(S).rolling(N).mean()
 
     # 10日平均换手率 'ic_mean': '-0.040'
-    def VOL10(self, S, N=10):
+    def VOL10(self, S, total_volume, N=10):
         # 10日换手率的均值
         S = S / total_volume
         return pd.Series(S).rolling(N).mean()
 
     # 20日平均换手率 'ic_mean': '-0.035'
-    def VOL20(self, S, N=20):
+    def VOL20(self, S, total_volume, N=20):
         # 20日换手率的均值,单位为%
         S = S / total_volume
         return pd.Series(S).rolling(N).mean()
@@ -331,10 +330,10 @@ class EmotionFactors:
         return WVA.rolling(N).sum()
 
     # 换手率相对波动率 'ic_mean': '-0.042'
-    def turnover_volatility(self, volume, N=20):
+    def turnover_volatility(self, volume, total_volume, N=20):
         # 取20个交易日个股换手率的标准差
         turnover = volume / total_volume
-        return pd.Series(STD(turnover, 20))
+        return pd.Series(STD(turnover, N))
 
     # 人气指标 'ic_mean': '-0.031'
     def AR(self, df, N=26):
