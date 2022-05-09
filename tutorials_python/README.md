@@ -1,9 +1,11 @@
-**Mission**: to provide user-friendly demos using python. Users can run them locally. Moreover, developers can dubug them locally to identify bugs; however, using notebooks is impossible.
+**Mission**: provide more than 100 user-friendly demos in python. 
+
+Users can run them locally. Moreover, developers can dubug them locally; however, using notebooks is impossible.
 
 
 **Principles**: 
 
-1) Do not put definitions of functions, which should be put in .py of the folders except tutorials_notebook and tutorials_python.
+1) Do not put definitions of functions here, which should be put in .py of the folders except tutorials_notebook and tutorials_python.
 2) The codes will be copied to the corresponding notebook in tutorials_notebook.
 
 
@@ -14,7 +16,7 @@
 
 2-Advance: advanced demos, e.g., ensemble stock trading.
 
-3-Practical: paper trading and live trading (To Do).
+3-Practical: paper trading and live trading.
 
 4-Optimization: hyperparameter tuning.
 

@@ -1,4 +1,4 @@
-**Mission**: provide > 100 user-friendly demos in notebooks. 
+**Mission**: provide more than 100 user-friendly demos in notebooks. 
 
 **Principles**: 
 
@@ -12,7 +12,7 @@
 
 2-Advance: advanced demos, e.g., ensemble stock trading.
 
-3-Practical: paper trading and live trading (To Do).
+3-Practical: paper trading and live trading.
 
 4-Optimization: hyperparameter tuning.
 
