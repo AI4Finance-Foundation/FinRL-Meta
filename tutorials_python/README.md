@@ -5,7 +5,7 @@ Users can run them locally. Moreover, developers can dubug them locally; however
 
 **Principles**: 
 
-1) Do not put definitions of functions, which should be put in .py of the folders except tutorials_notebook and tutorials_python.
+1) Do not put definitions of functions here, which should be put in .py of the folders except tutorials_notebook and tutorials_python.
 2) The codes will be copied to the corresponding notebook in tutorials_notebook.
 
 
