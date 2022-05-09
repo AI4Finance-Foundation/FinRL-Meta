@@ -1,6 +1,6 @@
 **Mission**: provide more than 100 user-friendly demos in notebooks and python. 
 
-In the python verison, users and developers can dubug them locally; however, using notebooks is impossible.
+In the python verison, users and developers can debug them locally; however, using notebooks is impossible.
 
 
 **Principles of python version**: 
