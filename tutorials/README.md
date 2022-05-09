@@ -1,6 +1,5 @@
-**Mission**: provide more than 100 user-friendly demos in notebooks. 
+**Mission**: provide more than 100 user-friendly demos in notebooks and python. 
 
-**Mission**: provide more than 100 user-friendly demos in python. 
 
 Users can run them locally. Moreover, developers can dubug them locally; however, using notebooks is impossible.
 
