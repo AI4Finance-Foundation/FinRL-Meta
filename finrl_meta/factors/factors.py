@@ -227,7 +227,8 @@ class MomentumFactor:
     # 多头力道 'ic_mean': '-0.039968'
     def bull_power(self, df, timeperiod=13):
         return (df['high_price'] - EMA(df['close_price'], timeperiod)) / df['close_price']
-    
+
+
 class EmotionFactor:
     '''
     情绪类因子
