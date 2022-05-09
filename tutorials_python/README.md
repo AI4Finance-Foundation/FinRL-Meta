@@ -16,7 +16,7 @@ Users can run them locally. Moreover, developers can dubug them locally to ident
 
 2-Advance: advanced demos, e.g., ensemble stock trading.
 
-3-Practical: paper trading and live trading (To Do).
+3-Practical: paper trading and live trading.
 
 4-Optimization: hyperparameter tuning.
 
