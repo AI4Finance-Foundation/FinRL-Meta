@@ -117,45 +117,45 @@ class momentum_factors:
     动量类因子
     '''
     # 5日乖离率 'ic_mean': '-0.045657'
-    def BIAS5(close, N=5):
+    def BIAS5(self, close, N=5):
         #（收盘价-收盘价的N日简单平均）/ 收盘价的N日简单平均*100，在此n取5
-        mac =  MA(close, N)
+        mac = MA(close, N)
         return (close - mac) /  (mac * 100)
     
     # 10日乖离率  'ic_mean': '-0.043967'
-    def BIAS10(close, N=10):
+    def BIAS10(self, close, N=10):
         # （收盘价-收盘价的N日简单平均）/ 收盘价的N日简单平均*100，在此n取10
         mac =  MA(close, N)
         return (close - mac) /  (mac * 100)
     
     # 60日乖离率 'ic_mean': '-0.039533'
-    def BIAS60(close, N=60):
+    def BIAS60(self, close, N=60):
         # （收盘价-收盘价的N日简单平均）/ 收盘价的N日简单平均*100，在此n取60
         mac =  MA(close, N)
         return (close - mac) /  (mac * 100)
     
     # 当前股价除以过去一个月股价均值再减1 'ic_mean': '-0.039303'
-    def Price1M(close, N=21):
+    def Price1M(self, close, N=21):
         # 当日收盘价 / mean(过去一个月(21天)的收盘价) -1
         return close / close.rolling(N).mean() - 1
     
     # 当前股价除以过去三个月股价均值再减1 'ic_mean': '-0.034927'
-    def Price3M(close, N=61):
+    def Price3M(self, close, N=61):
         # 当日收盘价 / mean(过去三个月(61天)的收盘价) -1
         return close / close.rolling(N).mean() - 1
-    
-    # 6日收盘价格与日期线性回归系数 'ic_mean': '-0.030587'
-    def PLRC6():
-        #  计算 6 日收盘价格，与日期序号（1-6）的线性回归系数，(close / mean(close)) = beta * t + alpha
-        return
-    
-    # 12日收盘价格与日期线性回归系数 'ic_mean': '0.047087'
-    def PLRC12():
-        #  计算 12 日收盘价格，与日期序号（1-12）的线性回归系数，(close / mean(close)) = beta * t + alpha
-        return
+
+    # # 6日收盘价格与日期线性回归系数 'ic_mean': '-0.030587'
+    # def PLRC6(self):
+    #     #  计算 6 日收盘价格，与日期序号（1-6）的线性回归系数，(close / mean(close)) = beta * t + alpha
+    #     return
+    #
+    # # 12日收盘价格与日期线性回归系数 'ic_mean': '0.047087'
+    # def PLRC12():
+    #     #  计算 12 日收盘价格，与日期序号（1-12）的线性回归系数，(close / mean(close)) = beta * t + alpha
+    #     return
      
     # 6日变动速率（Price Rate of Change） 'ic_mean': '-0.030587'
-    def ROC6(close, N=6):
+    def ROC6(self, close, N=6):
         # ①AX=今天的收盘价—6天前的收盘价
         # ②BX=6天前的收盘价
         # ③ROC=AX/BX*100
@@ -164,51 +164,51 @@ class momentum_factors:
         return AX / (BX * 100)
     
     # 12日变动速率（Price Rate of Change） 'ic_mean': '-0.034748'
-    def ROC12(close, N=12):
+    def ROC12(self, close, N=12):
         # ①AX=今天的收盘价—12天前的收盘价 ②BX=12天前的收盘价 ③ROC=AX/BX*100
         BX = close.shift(N)
         AX = close - BX
         return AX / (BX * 100)
     
     # 20日变动速率（Price Rate of Change）  'ic_mean': '-0.031276'
-    def ROC20(close, N=20):
+    def ROC20(self, close, N=20):
         #  ①AX=今天的收盘价—20天前的收盘价 ②BX=20天前的收盘价 ③ROC=AX/BX*100
         BX = close.shift(N)
         AX = close - BX
         return AX / (BX * 100)
     
     # 单日价量趋势  'ic_mean': '-0.051037'
-    def single_day_VPT(df):
+    def single_day_VPT(self, df):
         # （今日收盘价 - 昨日收盘价）/ 昨日收盘价 * 当日成交量  # (复权方法为基于当日前复权)
         sft = df['close_price'].shift(1)
         return (df['close_price'] - sft) / sft * df['volume']
     
     # 单日价量趋势6日均值 'ic_mean': '-0.032458'
-    def single_day_VPT_6(df):
+    def single_day_VPT_6(self, df):
         # MA(single_day_VPT, 6)
         sft = df['close_price'].shift(1)
         return pd.Series(MA((df['close_price'] - sft) / sft * df['volume'], 6))
     
     # 单日价量趋势12均值 'ic_mean': '-0.031016'
-    def single_day_VPT_12(df):
+    def single_day_VPT_12(self, df):
         # MA(single_day_VPT, 12)
         sft = df['close_price'].shift(1)
         return pd.Series(MA((df['close_price'] - sft) / sft * df['volume'], 12))
     
     # 10日顺势指标 'ic_mean': '-0.038179'
-    def CCI10(df, N=10):
+    def CCI10(self, df, N=10):
         #  CCI:=(TYP-MA(TYP,N))/(0.015*AVEDEV(TYP,N)) TYP:=(HIGH+LOW+CLOSE)/3 N:=10
         TYP = (df['high_price'] + df['low_price'] + df['close_price']) / 3
         return (TYP - MA(TYP,N)) / (0.015 * AVEDEV(TYP,N))
     
     # 15日顺势指标 'ic_mean': '-0.035973'
-    def CCI15(df, N=15):
+    def CCI15(self, df, N=15):
         #  CCI:=(TYP-MA(TYP,N))/(0.015*AVEDEV(TYP,N)) TYP:=(HIGH+LOW+CLOSE)/3 N:=15
         TYP = (df['high_price'] + df['low_price'] + df['close_price']) / 3
         return (TYP - MA(TYP, N)) / (0.015 * AVEDEV(TYP, N))
     
     # 20日顺势指标 'ic_mean': '-0.033437'
-    def CCI20(df, N=20):
+    def CCI20(self, df, N=20):
         # CCI:=(TYP-MA(TYP,N))/(0.015*AVEDEV(TYP,N)) TYP:=(HIGH+LOW+CLOSE)/3 N:=20
         TYP = (df['high_price'] + df['low_price'] + df['close_price']) / 3
         return (TYP - MA(TYP, N)) / (0.015 * AVEDEV(TYP, N))
@@ -216,17 +216,17 @@ class momentum_factors:
     # 当前交易量相比过去1个月日均交易量 与过去过去20日日均收益率乘积 'ic_mean': '-0.032789'
     # def Volume1M(volume, profit):
     #     # 当日交易量 / 过去20日交易量MEAN * 过去20日收益率MEAN
-    def Volume1M(df, N=21):
+    def Volume1M(self, df, N=21):
         # 当日交易量 / 过去20日交易量MEAN * 过去20日收益率MEAN
         return df['volume'] / df['volume'].rolling(N).mean() * df['target'].rolling(N).mean()
     
-    # 1减去 过去一个月收益率排名与股票总数的比值 'ic_mean': '0.030226'
-    def Rank1M():
-        # 1-(Rank(个股20日收益) / 股票总数)
-        return 
+    # # 1减去 过去一个月收益率排名与股票总数的比值 'ic_mean': '0.030226'
+    # def Rank1M(self, ):
+    #     # 1-(Rank(个股20日收益) / 股票总数)
+    #     return
     
     # 多头力道 'ic_mean': '-0.039968'
-    def bull_power(df, timeperiod=13):
+    def bull_power(self, df, timeperiod=13):
         return (df['high_price'] - EMA(df['close_price'], timeperiod)) / df['close_price']
     
 class emotion_factors:
@@ -235,19 +235,19 @@ class emotion_factors:
     '''
     # 换手率： 某一段时期内的成交量/发行总股数×100%
     # 5日平均换手率 'ic_mean': '-0.044'
-    def VOL5(S, N=5):
+    def VOL5(self, S, N=5):
         # 5日换手率均值
         S = S / total_volume
         return pd.Series(S).rolling(N).mean()
 
     # 10日平均换手率 'ic_mean': '-0.040'
-    def VOL10(S, N=10):
+    def VOL10(self, S, N=10):
         # 10日换手率的均值
         S = S / total_volume
         return pd.Series(S).rolling(N).mean()
 
     # 20日平均换手率 'ic_mean': '-0.035'
-    def VOL20(S, N=20):
+    def VOL20(self, S, N=20):
         # 20日换手率的均值,单位为%
         S = S / total_volume
         return pd.Series(S).rolling(N).mean()
@@ -264,80 +264,80 @@ class emotion_factors:
 #         return VOL10(S) / VOL5(S, N=120)
 
     # 10日成交量标准差 'ic_mean': '-0.037'
-    def VSTD10(volume, N=10):
+    def VSTD10(self, volume, N=10):
         # 10日成交量去标准差
         return pd.Series(STD(volume, N))
 
     # 20日成交量标准差 'ic_mean': '-0.033'
-    def VSTD20(volume, N=20):
+    def VSTD20(self, volume, N=20):
         # 20日成交量去标准差
         return pd.Series(STD(volume, N))
 
     # 6日成交金额的标准差 'ic_mean': '-0.044'
-    def TVSTD6(df, N=6):
+    def TVSTD6(self, df, N=6):
         # 6日成交额的标准差
         trades = df['close_price'] * df['volume']
         return pd.Series(STD(trades, N))
 
     # 20日成交金额的标准差 'ic_mean': '-0.038'
-    def TVSTD20(df, N=20):
+    def TVSTD20(self, df, N=20):
         # 20日成交额的标准差
         trades = df['close_price'] * df['volume']
         return pd.Series(STD(trades, N))
     
     # 成交量的5日指数移动平均 'ic_mean': '-0.035'
-    def VEMA5(volume, N=5):
+    def VEMA5(self, volume, N=5):
         # 
         return pd.Series(EMA(volume, N))
 
     # 成交量的10日指数移动平均 'ic_mean': '-0.032'
-    def VEMA10(volume, N=10):
+    def VEMA10(self, volume, N=10):
         # 
         return pd.Series(EMA(volume, N))
 
     # 12日成交量的移动平均值 'ic_mean': '-0.031'
-    def VEMA12(volume, N=12):
+    def VEMA12(self, volume, N=12):
         # 
         return pd.Series(EMA(volume, N))
 
     # 成交量震荡 'ic_mean': '-0.039'
-    def VOSC(volume):
+    def VOSC(self, volume):
         # 'VEMA12'和'VEMA26'两者的差值，再求差值与'VEMA12'的比，最后将比值放大100倍，得到VOSC值
         ema12 =  EMA(volume, 12)
         return pd.Series((EMA(volume, 26) - ema12 / (ema12 * 100)))
 
     # 6日量变动速率指标 'ic_mean': '-0.032'
-    def VROC6(volume, N=6):
+    def VROC6(self, volume, N=6):
         # 成交量减N日前的成交量，再除以N日前的成交量，放大100倍，得到VROC值 ，n=6
         sft = volume.shift(N)
         return pd.Series((volume - sft) / (sft * 100))
 
     # 12日量变动速率指标 'ic_mean': '-0.040'
-    def VROC12(volume, N=12):
+    def VROC12(self, volume, N=12):
         # 成交量减N日前的成交量，再除以N日前的成交量，放大100倍，得到VROC值 ，n=12
         sft = volume.shift(N)
         return pd.Series((volume - sft) / (sft * 100))
 
     # 6日成交金额的移动平均值 'ic_mean': '-0.038'
-    def TVMA6(df, N=6):
+    def TVMA6(self, df, N=6):
         # 6日成交金额的移动平均值
         trades = df['close_price'] * df['volume']
         return pd.Series(MA(trades, N))
 
     # 威廉变异离散量 'ic_mean': '-0.031'
-    def WVAD(df, N=6):
+    def WVAD(self, df, N=6):
         # (收盘价－开盘价)/(最高价－最低价)×成交量，再做加和，使用过去6个交易日的数据
         WVA = (df['close_price'] - df['open_price']) / (df['high_price'] - df['low_price']) * df['volume']
         return WVA.rolling(N).sum()
 
     # 换手率相对波动率 'ic_mean': '-0.042'
-    def turnover_volatility(volume, N=20):
+    def turnover_volatility(self, volume, N=20):
         # 取20个交易日个股换手率的标准差
         turnover = volume / total_volume
         return pd.Series(STD(turnover, 20))
 
     # 人气指标 'ic_mean': '-0.031'
-    def AR(df, N=26):
+    def AR(self, df, N=26):
         # AR=N日内（当日最高价—当日开市价）之和 / N日内（当日开市价—当日最低价）之和 * 100，n设定为26
         ho = (df['high_price'] - df['open_price']).rolling(N).sum()
         ol = (df['open_price'] - df['low_price']).rolling(N).sum()
@@ -347,7 +347,7 @@ class extra_facters:
     '''
     特殊因子
     '''
-    def RSRS(df, N):
+    def RSRS(self, df, N):
         #用于记录回归后的beta值，即斜率
         ans = []
         #用于计算被决定系数加权修正后的贝塔值
@@ -373,20 +373,20 @@ class extra_facters:
         #计算右偏RSRS标准分
         return pd.Series(zscore*beta*r2)
     
-    def VIX():
-        pass
+    # def VIX():
+    #     pass
 
 class general_factors:
     '''
     常见因子
     '''
-    def MACD(CLOSE, SHORT=12, LONG=26, M=9):             # EMA的关系，S取120日，和雪球小数点2位相同
+    def MACD(self, CLOSE, SHORT=12, LONG=26, M=9):             # EMA的关系，S取120日，和雪球小数点2位相同
         DIF = EMA(CLOSE,SHORT)-EMA(CLOSE,LONG)  
         DEA = EMA(DIF,M)      
         MACD=(DIF-DEA)*2
         return RD(MACD)
 
-    def KDJ(df, KDJ_type, N=9, M1=3, M2=3):           # KDJ指标
+    def KDJ(self, df, KDJ_type, N=9, M1=3, M2=3):           # KDJ指标
         RSV = (df['close_price'] - LLV(df['low_price'], N)) / (HHV(df['high_price'], N) - LLV(df['low_price'], N)) * 100
         K = EMA(RSV, (M1*2-1))
         if KDJ_type == 'KDJ_K':
@@ -397,15 +397,15 @@ class general_factors:
             D = EMA(K, (M2*2-1))        
             return K*3-D*2
 
-    def RSI(CLOSE, N=24):                           # RSI指标,和通达信小数点2位相同
+    def RSI(self, CLOSE, N=24):                           # RSI指标,和通达信小数点2位相同
         DIF = CLOSE-REF(CLOSE, 1) 
         return RD(SMA(MAX(DIF, 0), N) / SMA(ABS(DIF), N) * 100)  
 
-    def WR(df, N=10):            #W&R 威廉指标
+    def WR(self, df, N=10):            #W&R 威廉指标
         WR = (HHV(df['high_price'], N) - df['close_price']) / (HHV(df['high_price'], N) - LLV(df['low_price'], N)) * 100
         return RD(WR)
 
-    def BOLL(CLOSE, BOLL_type, N=20, P=2):                       #BOLL指标，布林带    
+    def BOLL(self, CLOSE, BOLL_type, N=20, P=2):                       #BOLL指标，布林带
         MID = MA(CLOSE, N) 
         if BOLL_type == 'BOLL_mid':
             return MID
@@ -415,7 +415,7 @@ class general_factors:
             return MID - STD(CLOSE, N) * P
         # return RD(UPPER), RD(MID), RD(LOWER)
 
-    def PSY(CLOSE, PSY_type, N=12, M=6):  
+    def PSY(self, CLOSE, PSY_type, N=12, M=6):
         PSY=COUNT(CLOSE>REF(CLOSE,1),N)/N*100
         if PSY_type == 'PSY':
             return PSY
@@ -423,14 +423,14 @@ class general_factors:
             return MA(PSY,M)
         # return RD(PSY), RD(PSYMA)
 
-    def ATR(df, N=20):                    #真实波动N日平均值
+    def ATR(self, df, N=20):                    #真实波动N日平均值
         TR = MAX(MAX((df['high_price'] - df['low_price']), ABS(REF(df['close_price'], 1) - df['high_price'])), ABS(REF(df['close_price'], 1) - df['low_price']))
         return MA(TR, N)
 
-    def BBI(CLOSE,M1=3,M2=6,M3=12,M4=20):             #BBI多空指标   
+    def BBI(self, CLOSE,M1=3,M2=6,M3=12,M4=20):             #BBI多空指标
         return (MA(CLOSE,M1)+MA(CLOSE,M2)+MA(CLOSE,M3)+MA(CLOSE,M4))/4    
 
-    def DMI(df, DMI_type, M1=14,M2=6):               #动向指标：结果和同花顺，通达信完全一致
+    def DMI(self, df, DMI_type, M1=14,M2=6):               #动向指标：结果和同花顺，通达信完全一致
         TR = SUM(MAX(MAX(df['high_price'] - df['low_price'], ABS(df['high_price'] - REF(df['close_price'], 1))), ABS(df['low_price'] - REF(df['close_price'], 1))), M1)
         HD = df['high_price'] - REF(df['high_price'], 1)
         LD = REF(df['low_price'], 1) - df['low_price']
@@ -449,7 +449,7 @@ class general_factors:
             return (ADX + REF(ADX, M2)) / 2
         # return PDI, MDI, ADX, ADXR  
 
-    def TAQ(df, TAQ_type, N=6):                               #唐安奇通道(海龟)交易指标，大道至简，能穿越牛熊
+    def TAQ(self, df, TAQ_type, N=6):                               #唐安奇通道(海龟)交易指标，大道至简，能穿越牛熊
         UP=HHV(df['high_price'], N)
         DOWN=LLV(df['low_price'], N)
         #MID=(UP+DOWN)/2
@@ -461,7 +461,7 @@ class general_factors:
             return (UP+DOWN)/2
         # return UP,MID,DOWN
 
-    def KTN(df, KTN_type, N=20, M=10):                 #肯特纳交易通道, N选20日，ATR选10日
+    def KTN(self, df, KTN_type, N=20, M=10):                 #肯特纳交易通道, N选20日，ATR选10日
         MID=EMA((df['high_price'] + df['low_price'] + df['close_price'])/3, N)
         if KTN_type == 'KTN_mid':
             return MID
@@ -473,7 +473,7 @@ class general_factors:
             return MID-2*ATRN
         # return UPPER,MID,LOWER       
 
-    def TRIX(CLOSE, TRIX_type, M1=12, M2=20):                      #三重指数平滑平均线
+    def TRIX(self, CLOSE, TRIX_type, M1=12, M2=20):                      #三重指数平滑平均线
         TR = EMA(EMA(EMA(CLOSE, M1), M1), M1)
         TRIX = (TR - REF(TR, 1)) / REF(TR, 1) * 100
         if TRIX_type == 'TRIX':
@@ -482,11 +482,11 @@ class general_factors:
             return MA(TRIX, M2)
         # return TRIX, TRMA
 
-    def VR(df,M1=26):                            #VR容量比率
+    def VR(self, df, M1=26):                            #VR容量比率
         LC = REF(df['close_price'], 1)
         return SUM(IF(df['close_price'] > LC, df['volume'], 0), M1) / SUM(IF(df['close_price'] <= LC, df['volume'], 0), M1) * 100
 
-    def EMV(df, EMV_type, N=14, M=9):                     #简易波动指标 
+    def EMV(self, df, EMV_type, N=14, M=9):                     #简易波动指标
         VOLUME=MA(df['volume'], N)/df['volume']
         MID=100*(df['high_price'] + df['low_price'] - REF(df['high_price'] + df['low_price'], 1))/(df['high_price'] + df['low_price'])
         EMV=MA(MID*VOLUME*(df['high_price'] - df['low_price'])/MA(df['high_price'] - df['low_price'], N), N)
@@ -496,7 +496,7 @@ class general_factors:
             return MA(EMV,M)
         # return EMV,MAEMV
 
-    def DPO(CLOSE, DPO_type, M1=20, M2=10, M3=6):                  #区间震荡线
+    def DPO(self, CLOSE, DPO_type, M1=20, M2=10, M3=6):                  #区间震荡线
         DPO = CLOSE - REF(MA(CLOSE, M1), M2)
         if DPO_type == 'DPO':
             return DPO
@@ -504,17 +504,17 @@ class general_factors:
             return MA(DPO, M3)
         # return DPO, MADPO
 
-    def BRAR(df, M1=26):                 #BRAR-ARBR 情绪指标  
+    def BRAR(self, df, M1=26):                 #BRAR-ARBR 情绪指标
         # AR = SUM(HIGH - OPEN, M1) / SUM(OPEN - LOW, M1) * 100
         return SUM(MAX(0, df['high_price'] - REF(df['close_price'], 1)), M1) / SUM(MAX(0, REF(df['close_price'], 1) - df['low_price']), M1) * 100
         # return AR, BR
 
-    def DFMA(CLOSE, N1=10, N2=50, M=10):                    #平行线差指标 
+    def DFMA(self, CLOSE, N1=10, N2=50, M=10):                    #平行线差指标
         DIF=MA(CLOSE,N1)-MA(CLOSE,N2) 
         DIFMA=MA(DIF,M)   #通达信指标叫DMA 同花顺叫新DMA
         return DIFMA
 
-    def MTM(CLOSE, MTM_type, N=12,M=6):                             #动量指标
+    def MTM(self, CLOSE, MTM_type, N=12,M=6):                             #动量指标
         MTM=CLOSE-REF(CLOSE, N)
         if MTM_type == 'MTM':
             return MTM
@@ -522,7 +522,7 @@ class general_factors:
             return MA(MTM,M)
         # return MTM,MTMMA
 
-    def MASS(df, MASS_type, N1=9, N2=25, M=6):                   #梅斯线
+    def MASS(self, df, MASS_type, N1=9, N2=25, M=6):                   #梅斯线
         MASS=SUM(MA(df['high_price'] - df['low_price'], N1)/MA(MA(df['high_price'] - df['low_price'], N1), N1), N2)
         if MASS_type == 'MASS':
             return MASS
@@ -531,15 +531,15 @@ class general_factors:
         # MA_MASS=MA(MASS,M)
         # return MASS,MA_MASS
 
-    def OBV(df):                                  #能量潮指标
+    def OBV(self, df):                                  #能量潮指标
         return SUM(IF(df['close_price']>REF(df['close_price'], 1), df['volume'], IF(df['close_price']<REF(df['close_price'], 1), - df['volume'], 0)), 0)/10000
 
-    def MFI(df, N=14):                    #MFI指标是成交量的RSI指标
+    def MFI(self, df, N=14):                    #MFI指标是成交量的RSI指标
         TYP = (df['high_price'] + df['low_price'] + df['close_price'])/3
         V1 = SUM(IF(TYP>REF(TYP,1), TYP*df['volume'], 0), N)/SUM(IF(TYP<REF(TYP, 1), TYP*df['volume'], 0), N)  
         return 100-(100/(1+V1))     
 
-    def ASI(df, ASI_type, M1=26, M2=10):            #振动升降指标
+    def ASI(self, df, ASI_type, M1=26, M2=10):            #振动升降指标
         LC = REF(df['close_price'], 1)
         AA = ABS(df['high_price'] - LC)
         BB = ABS(df['low_price'] - LC)
@@ -555,7 +555,7 @@ class general_factors:
             return MA(ASI, M2)
         # return ASI,ASIT   
 
-    def XSII(df, XSII_type, N=102, M=7):              #薛斯通道II  
+    def XSII(self, df, XSII_type, N=102, M=7):              #薛斯通道II
         AA  = MA((2*df['close_price'] + df['high_price'] + df['low_price'])/4, 5)            #最新版DMA才支持 2021-12-4
         # TD1 = AA*N/100   TD2 = AA*(200-N) / 100
         if XSII_type == 'XSII_TD1':
