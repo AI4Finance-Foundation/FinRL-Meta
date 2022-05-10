@@ -5,7 +5,7 @@ In the python verison, users and developers can debug them locally; however, usi
 
 **Principles of python version**: 
 
-1) Do not put definitions of functions here, which should be put to .py of the folders except tutorials.
+1) Do not put definitions of functions here, which should be moved to .py of the folders except tutorials.
 2) The codes will be copied to the corresponding notebook.
 
 
