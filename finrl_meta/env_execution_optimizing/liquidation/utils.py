@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import numpy as np
 import pandas as pd
-from statsmodels.compat.python import zip_longest
+from statsmodels.compat.python import lzip
 from statsmodels.iolib.table import SimpleTable
 from statsmodels.iolib.tableformatting import fmt_2cols
 
@@ -26,7 +26,7 @@ def generate_table(left_col, right_col, table_title):
         right_col = [('%-21s' % ('  ' + k), v) for k, v in right_col]
 
         # Generate the right table
-        gen_stubs_right, gen_data_right = zip_longest(*right_col)
+        gen_stubs_right, gen_data_right = lzip(*right_col)
         gen_table_right = SimpleTable(gen_data_right,
                                       col_headers,
                                       gen_stubs_right,
@@ -37,7 +37,7 @@ def generate_table(left_col, right_col, table_title):
         gen_table_right = []
 
     # Generate the left table
-    gen_stubs_left, gen_data_left = zip_longest(*left_col)
+    gen_stubs_left, gen_data_left = lzip(*left_col)
     gen_table_left = SimpleTable(gen_data_left,
                                  col_headers,
                                  gen_stubs_left,
