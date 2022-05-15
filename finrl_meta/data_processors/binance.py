@@ -28,6 +28,7 @@ class Binance(_Base):
     def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
         self.url = "https://api.binance.com/api/v3/klines"
+        self.time_diff = None
 
     # main functions
     def download_data(self, ticker_list: List[str]):
@@ -157,11 +158,24 @@ class Binance(_Base):
         final_df = pd.DataFrame()
         last_datetime = self.start_time
         while True:
+
             new_df = self.get_binance_bars(last_datetime, symbol)
             if new_df is None:
                 break
+
+            if last_datetime == self.end_time:
+                break
+
             final_df = final_df.append(new_df)
-            last_datetime = max(new_df.datetime) + dt.timedelta(days=1)
+            # last_datetime = max(new_df.datetime) + dt.timedelta(days=1)
+            last_datetime = max(new_df.datetime)
+            if isinstance(last_datetime,pd.Timestamp):
+                last_datetime = last_datetime.to_pydatetime()
+
+            if self.time_diff == None:
+                self.time_diff = new_df.loc[1]['datetime'] - new_df.loc[0]['datetime']
+
+            last_datetime = last_datetime + self.time_diff
             last_datetime = self.stringify_dates(last_datetime)
 
         date_value = final_df['datetime'].apply(lambda x: x.strftime('%Y-%m-%d %H:%M:%S'))
