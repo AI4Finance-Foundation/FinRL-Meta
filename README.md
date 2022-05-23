@@ -1,4 +1,4 @@
-# FinRL-Meta: A Universe of Market Environments and Benchmarks for Financial Reinforcement Learning
+# FinRL-Meta: A Universe of Market Environments and Benchmarks for Data-Driven Financial Reinforcement Learning
 
 
 [![Downloads](https://pepy.tech/badge/finrl_meta)](https://pepy.tech/project/finrl_meta)
