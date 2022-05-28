@@ -11,7 +11,7 @@ In the python verison, users and developers can debug them locally; however, it 
 
 **Design Principles in notebook version**: 
 
-1) Do not put definitions of functions in notebooks, which should be put in .py of the folders except tutorials.
+1) Do not put definitions of functions in notebooks, which should be put to .py of the folders except tutorials.
 2) The contents in notebooks are separated into two parts. The first part is installing commands. The second part is copied directly from the corresponding .py in tutorials.
 
 ## File Structure
