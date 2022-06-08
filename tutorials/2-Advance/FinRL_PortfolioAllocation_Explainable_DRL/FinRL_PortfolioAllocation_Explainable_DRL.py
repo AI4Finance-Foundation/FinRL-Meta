@@ -984,7 +984,6 @@ fig.update_layout(legend=dict(
     xanchor="left",
     x=1
 ))
-
 fig.update_xaxes(showline=True, linecolor='black', showgrid=True, gridwidth=1, gridcolor='LightSteelBlue', mirror=True)
 fig.update_yaxes(showline=True, linecolor='black', showgrid=True, gridwidth=1, gridcolor='LightSteelBlue', mirror=True)
 fig.update_yaxes(zeroline=True, zerolinewidth=1, zerolinecolor='LightSteelBlue')
