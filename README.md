@@ -27,7 +27,7 @@ Also called **Neo_FinRL**: **N**ear real-market **E**nvironments f**o**r data-dr
 ## News and Tutorials
 
 + [DataDrivenInvestor] [FinRL-Meta: A Universe of Near Real-Market En­vironments for Data­-Driven Financial Reinforcement Learning](https://medium.datadriveninvestor.com/finrl-meta-a-universe-of-near-real-market-en-vironments-for-data-driven-financial-reinforcement-e1894e1ebfbd)
-+ [深圳特区报] [深港两城深度融合 用“创新”续写“春天的故事”](https://www.sh-stic.com/news_72/515.html) (香港特别行政区联络办公室)http://www.locpg.gov.cn/jsdt/2022-06/06/c_1211654176.htm)
++ [深圳特区报] [深港两城深度融合 用“创新”续写“春天的故事”](https://www.sh-stic.com/news_72/515.html) [香港特别行政区联络办公室]http://www.locpg.gov.cn/jsdt/2022-06/06/c_1211654176.htm)
 + [央广网] [2021 IDEA大会于福田圆满落幕：群英荟萃论道AI 多项目发布亮点纷呈](http://tech.cnr.cn/techph/20211123/t20211123_525669092.shtml)
 + [央广网] [2021 IDEA大会开启AI思想盛宴 沈向洋理事长发布六大前沿产品](https://baijiahao.baidu.com/s?id=1717101783873523790&wfr=spider&for=pc)
 + [IDEA新闻] [2021 IDEA大会发布产品FinRL-Meta——基于数据驱动的强化学习金融风险模拟系统](https://idea.edu.cn/news/20211213143128.html)
