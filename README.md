@@ -132,3 +132,6 @@ For future work, we plan to build a multi-agent-based market simulator that cons
 <img align="center" src=figs/Northwestern_University.png width="120"> &nbsp;&nbsp;
 <img align="center" src=figs/NYU_Shanghai_Logo.png width="200">	&nbsp;&nbsp;
 </div>
+
+
+**Disclaimer: Nothing herein is financial advice, and NOT a recommendation to trade real money. Please use common sense and always first consult a professional before trading or investing.**
