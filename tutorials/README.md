@@ -1,5 +1,5 @@
 <div align="center">
-<img align="center" src=[https://github.com/AI4Finance-Foundation/FinRL-Meta/blob/master/figs/FinRL-Meta_Tutorials.png]>
+<img align="center" src=https://github.com/AI4Finance-Foundation/FinRL-Meta/blob/master/figs/FinRL-Meta_Tutorials.png>
 </div>
 
 
