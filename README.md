@@ -40,15 +40,14 @@ Also called **Neo_FinRL**: **N**ear real-market **E**nvironments f**o**r data-dr
 + To reduce the data pre-processing burden, so that quants can focus on developing and optimizing strategies.
 
 ## Design Principles
-+ Plug-and-Play (PnP): Modularity; Handle different markets (say T0 vs. T+1)
-+ Completeness and universal:
++ **Plug-and-Play (PnP)**: Modularity; Handle different markets (say T0 vs. T+1)
++ **Completeness and universal:**
   Multiple markets; Various data sources (APIs, Excel, etc); User-friendly variables.
-+ Avoid hard-coded parameters
-+ Layer structure and extensibility: Three layers including: data layer, environment layer, and agent layer. Layers interact through end-to-end interfaces, achieving high extensibility. 
-+ Closing the sim-real gap using the “training-testing-trading” pipeline: simulation for training and connecting real-time APIs for testing/trading.
-+ Efficient data sampling: accelerate the data sampling process is the key to DRL training!  From the ElegantRL project. we know that multi-processing is powerful to reduce the training time (scheduling between CPU + GPU).
-+ Transparency: a virtual env that is invisible to the upper layer
-+ Flexibility and extensibility: Inheritance might be helpful here
++ **Layer structure and extensibility**: Three layers including: data layer, environment layer, and agent layer. Layers interact through end-to-end interfaces, achieving high extensibility. 
++ Closing the sim-real gap using the **“training-testing-trading” pipeline**: simulation for training and connecting real-time APIs for testing/trading.
++ **Efficient data sampling**: accelerate the data sampling process is the key to DRL training!  From the ElegantRL project. we know that multi-processing is powerful to reduce the training time (scheduling between CPU + GPU).
++ **Transparency**: a virtual env that is invisible to the upper layer
++ **Flexibility and extensibility**: Inheritance might be helpful here
 
 ## Overview 
 ![Overview image of FinRL-Meta](https://github.com/AI4Finance-Foundation/FinRL-Meta/blob/master/figs/neofinrl_overview.png)
@@ -92,7 +91,7 @@ Technical indicators users can add: 'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_
 
 
 ## Plug-and-Play (PnP)
-In the development pipeline, we separate market environments from the data layer and the agent layer. Any DRL agent can be directly plugged into our environments, then trained and tested. Different agents/algorithms can be compared by running on the same benchmark environment for fair evaluations. 
+In the development pipeline, we separate market environments from the data layer and the agent layer. Any DRL agent can be directly plugged into our environments, then trained and tested. Different agents/algorithms can be compared by running on the same benchmark environment for fair evaluations. The following DRL libraries are supported:
 + [ElegantRL](https://github.com/AI4Finance-Foundation/ElegantRL): Lightweight, efficient and stable DRL implementation using PyTorch.
 + [Stable-Baselines3](https://github.com/DLR-RM/stable-baselines3): Improved DRL algorithms based on OpenAI Baselines.
 + [RLlib](https://github.com/ray-project/ray): An open-source DRL library that offers high scalability and unified APIs.
