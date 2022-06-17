@@ -11,6 +11,7 @@ FinRL-Meta ([website](https://finrl.readthedocs.io/en/latest/finrl_meta/backgrou
 1. FinRL-Meta separates financial data processing from the design pipeline of DRL-based strategy and provides open-source data engineering tools for financial big data.
 2. FinRL-Meta provides hundreds of market environments for various trading tasks.
 3. FinRL-Meta enables multiprocessing simulation and training by exploiting thousands of GPU cores.
+4. FinRL-Meta provides tens of demos and tutorials, and also benchmarks that reproduce related papers.
 
 
 Also called **Neo_FinRL**: **N**ear real-market **E**nvironments f**o**r data-driven **Fin**ancial **R**einforcement **L**earning.
@@ -34,15 +35,16 @@ Also called **Neo_FinRL**: **N**ear real-market **E**nvironments f**o**r data-dr
 + [知乎] [FinRL-Meta基于数据驱动的强化学习金融元宇宙](https://zhuanlan.zhihu.com/p/437804814)
 
 ## Our Goals
++ To provide benchmark performance and facilitate fair comparisons, providing a standardized environment will allow researchers to evaluate different strategies in the same way. Also, it would help researchers to better understand the “black-box” nature (deep neural network-based) of DRL algorithms.
 + To reduce the simulation-reality gap: existing works use backtesting on historical data, while the real performance may be quite different when applying the algorithms to paper/live trading.
 + To reduce the data pre-processing burden, so that quants can focus on developing and optimizing strategies.
-+ To provide benchmark performance and facilitate fair comparisons, providing a standardized environment will allow researchers to evaluate different strategies in the same way. Also, it would help researchers to better understand the “black-box” nature (deep neural network-based) of DRL algorithms.
 
 ## Design Principles
 + Plug-and-Play (PnP): Modularity; Handle different markets (say T0 vs. T+1)
 + Completeness and universal:
   Multiple markets; Various data sources (APIs, Excel, etc); User-friendly variables.
 + Avoid hard-coded parameters
++ Layer structure and extensibility: Three layers including: data layer, environment layer, and agent layer. Layers interact through end-to-end interfaces, achieving high extensibility. 
 + Closing the sim-real gap using the “training-testing-trading” pipeline: simulation for training and connecting real-time APIs for testing/trading.
 + Efficient data sampling: accelerate the data sampling process is the key to DRL training!  From the ElegantRL project. we know that multi-processing is powerful to reduce the training time (scheduling between CPU + GPU).
 + Transparency: a virtual env that is invisible to the upper layer
@@ -50,7 +52,7 @@ Also called **Neo_FinRL**: **N**ear real-market **E**nvironments f**o**r data-dr
 
 ## Overview 
 ![Overview image of FinRL-Meta](https://github.com/AI4Finance-Foundation/FinRL-Meta/blob/master/figs/neofinrl_overview.png)
-We utilize a layered structure in FinRL-metaverse, as shown in the figure above. FinRL-metaverse consists of three layers: data layer, environment layer, and agent layer. Each layer executes its functions and is independent. Meanwhile, layers interact through end-to-end interfaces to implement the complete workflow of algorithm trading.
+We utilize a layered structure in FinRL-metaverse, as shown in the figure above. FinRL-metaverse consists of three layers: data layer, environment layer, and agent layer. Each layer executes its functions and is independent. Meanwhile, layers interact through end-to-end interfaces to implement the complete workflow of algorithm trading. For updates and substitutes inside a layer, this structure minimizes the impact on the whole system. Moreover, the layer structure allows easy extension of user-defined functions and fast updating of algorithms with high performance.
 
 ## DataOps
 
@@ -91,6 +93,9 @@ Technical indicators users can add: 'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_
 
 ## Plug-and-Play (PnP)
 In the development pipeline, we separate market environments from the data layer and the agent layer. Any DRL agent can be directly plugged into our environments, then trained and tested. Different agents/algorithms can be compared by running on the same benchmark environment for fair evaluations. 
++ [ElegantRL](https://github.com/AI4Finance-Foundation/ElegantRL): Lightweight, efficient and stable DRL implementation using PyTorch.
++ [Stable-Baselines3](https://github.com/DLR-RM/stable-baselines3): Improved DRL algorithms based on OpenAI Baselines.
++ [RLlib](https://github.com/ray-project/ray): An open-source DRL library that offers high scalability and unified APIs.
 
 A demonstration notebook for plug-and-play with ElegantRL, Stable Baselines3 and RLlib: [Plug and Play with DRL Agents](https://colab.research.google.com/github/AI4Finance-Foundation/FinRL-Meta/blob/main/Demo_Plug_and_Play_with_DRL_Libraries.ipynb)
 
