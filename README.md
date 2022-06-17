@@ -58,6 +58,8 @@ DataOps applies the ideas of lean development and DevOps to the data analytics f
 
 However, the DataOps methodology has not been applied to financial reinforcement learning researches. Most researchers access data, clean data, and extract technical indicators (features) in a case-by-case manner, which involves heavy manual work and may not guarantee the data quality.
 
+To deal with financial big data (usually unstructured), we follow the DataOps paradigm and implement an automatic pipeline in the following figure: task planning, data processing, training-testing-trading, and monitoring agents’ performance. Through this pipeline, we continuously produce DRL benchmarks on dynamic market datasets.
+
 <div align="center">
 <img align="center" src=figs/finrl_meta_dataops.png width="800">
 </div>
