@@ -53,8 +53,9 @@ Also called **Neo_FinRL**: **N**ear real-market **E**nvironments f**o**r data-dr
 We utilize a layered structure in FinRL-metaverse, as shown in the figure above. FinRL-metaverse consists of three layers: data layer, environment layer, and agent layer. Each layer executes its functions and is independent. Meanwhile, layers interact through end-to-end interfaces to implement the complete workflow of algorithm trading.
 
 ## DataOps
-DataOps is a series of principles and practices to improve the quality and reduce the cycle time of data science. It inherits the ideas of Agile development, DevOps, and lean manufacturing and applies them to the data science and machine learning field. FinRL-Meta follows the DataOps paradigm.
 
+DataOps applies the ideas of lean development and DevOps to the data analytics field. DataOps practices have been developed in companies and organizations to improve the quality of and efficiency of data analytics. These implementations consolidate various data sources, unify and automate the pipeline of data analytics, including data accessing, cleaning, analysis, and visualization.
+However, the DataOps methodology has not been applied to financial reinforcement learning re- searches. Most researchers access data, clean data, and extract technical indicators (features) in a case-by-case manner, which involves heavy manual work and may not guarantee the data quality.
 
 <div align="center">
 <img align="center" src=figs/finrl_meta_dataops.png width="800">
