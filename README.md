@@ -44,7 +44,7 @@ Also called **Neo_FinRL**: **N**ear real-market **E**nvironments f**o**r data-dr
 + **Completeness and universal:**
   Multiple markets; Various data sources (APIs, Excel, etc); User-friendly variables.
 + **Layer structure and extensibility**: Three layers including: data layer, environment layer, and agent layer. Layers interact through end-to-end interfaces, achieving high extensibility. 
-+ Closing the sim-real gap using the **“training-testing-trading” pipeline**: simulation for training and connecting real-time APIs for testing/trading.
++ **“Training-Testing-Trading” pipeline**: simulation for training and connecting real-time APIs for testing/trading, closing the sim-real gap.
 + **Efficient data sampling**: accelerate the data sampling process is the key to DRL training!  From the ElegantRL project. we know that multi-processing is powerful to reduce the training time (scheduling between CPU + GPU).
 + **Transparency**: a virtual env that is invisible to the upper layer
 + **Flexibility and extensibility**: Inheritance might be helpful here
