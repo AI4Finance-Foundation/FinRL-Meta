@@ -76,7 +76,7 @@ class Alpaca(_Base):
             if date.isoformat()[-14:-6] != "00:00:00":
                 raise ValueError("Timezone Error")
 
-        data_df['timestamp'] = data_df['timestamp'].apply(lambda x: x.strftime('%Y-%m-%d %H:%M:%S'))
+        data_df['time'] = data_df['timestamp'].apply(lambda x: x.strftime('%Y-%m-%d %H:%M:%S'))
         self.dataframe = data_df
 
     def clean_data(self):
@@ -84,7 +84,7 @@ class Alpaca(_Base):
         tic_list = np.unique(df.tic.values)
 
         trading_days = self.get_trading_days(start=self.start, end=self.end)
-        # produce full timestamp index
+        # produce full time index
         times = []
         for day in trading_days:
             current_time = pd.Timestamp(day + ' 09:30:00').tz_localize(self.time_zone)
