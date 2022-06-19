@@ -3,8 +3,10 @@
 numpy>=1.17.3
 pandas>=1.1.5
 stockstats
+vectorbt[full]>=0.22.0
 yfinance
 elegantrl
+
 #pyfolio
 # plot
 matplotlib
