@@ -104,7 +104,7 @@ A demonstration notebook for plug-and-play with ElegantRL, Stable Baselines3 and
 <img align="center" src=figs/timeline.png width="800">
 </div>
 
-We employ a training-testing-trading pipeline that the DRL approach follows a standard end-to-end pipeline. The DRL agent is first trained in a training environment and then fined-tuned (adjusting hyperparameters) in a validation environment. Then the validated agent is tested on historical datasets (backtesting). Finally, the tested agent will be de- ployed in paper trading or live trading markets.
+We employ a training-testing-trading pipeline that the DRL approach follows a standard end-to-end pipeline. The DRL agent is first trained in a training environment and then fined-tuned (adjusting hyperparameters) in a validation environment. Then the validated agent is tested on historical datasets (backtesting). Finally, the tested agent will be deployed in paper trading or live trading markets.
 
 This pipeline solves the **information leakage problem** because the trading data are never leaked when training/tuning the agents. 
 
