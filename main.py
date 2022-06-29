@@ -24,7 +24,6 @@ from finrl_meta.config import (
 )
 
 
-
 def build_parser():
     parser = ArgumentParser()
     parser.add_argument(
@@ -36,14 +35,11 @@ def build_parser():
     )
     return parser
 
-
 # "./" will be added in front of each directory
 def check_and_make_directories(directories: List[str]):
     for directory in directories:
         if not os.path.exists("./" + directory):
             os.makedirs("./" + directory)
-
-
 
 def main():
     parser = build_parser()
