@@ -1,4 +1,5 @@
-# FinRL Requirements
+# Requirements
+
 # data handling
 numpy>=1.17.3
 pandas>=1.1.5
@@ -7,7 +8,6 @@ vectorbt[full]>=0.22.0
 yfinance
 elegantrl
 
-#pyfolio
 # plot
 matplotlib
 
@@ -35,10 +35,8 @@ pytest
 setuptools>=41.4.0
 wheel>=0.33.6
 
-#hooks
+# hooks
 pre-commit
-
-
 
 # FinRL-meta
 pandas_market_calendars==3.2
