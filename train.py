@@ -56,7 +56,6 @@ def train(start_date, end_date, ticker_list, data_source, time_interval,
                                                 total_episodes=total_episodes)
         trained_model.save(cwd)
 
-
     elif drl_lib == 'stable_baselines3':
         total_timesteps = kwargs.get('total_timesteps', 1e6)
         agent_params = kwargs.get('agent_params')
@@ -70,5 +69,6 @@ def train(start_date, end_date, ticker_list, data_source, time_interval,
         print('Training finished!')
         trained_model.save(cwd)
         print('Trained model saved in ' + str(cwd))
+          
     else:
         raise ValueError('DRL library input is NOT supported. Please check.')
