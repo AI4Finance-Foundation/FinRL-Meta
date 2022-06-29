@@ -1,19 +1,5 @@
 from setuptools import setup
 
-# Read requirements.txt, ignore comments
-# try:
-#     REQUIRES = list()
-#     f = open("requirements.txt", "rb")
-#     for line in f.read().decode("utf-8").split("\n"):
-#         line = line.strip()
-#         if "#" in line:
-#             line = line[: line.find("#")].strip()
-#         if line:
-#             REQUIRES.append(line)
-# except FileNotFoundError:
-#     print("'requirements.txt' not found!")
-#     REQUIRES = list()
-
 setup(
     name="finrl_meta",
     version="0.3.0",
@@ -23,7 +9,7 @@ setup(
     license="MIT",
     # dependency_links=['git+https://github.com/quantopian/pyfolio.git#egg=pyfolio-0.9.2'],
     # install_requires=REQUIRES,
-    description="FinRL­-Meta: A Universe of Near Real­ Market En­vironments for Data­-Driven Financial Reinforcement Learning",
+    description="FinRL­-Meta: A Universe of ­ Market En­vironments for Data­-Driven Financial Reinforcement Learning",
     long_description="FinRL­-Meta: A Universe of Near Real­ Market En­vironments for Data­-Driven Financial Reinforcement Learning",
     classifiers=[
         # Trove classifiers
