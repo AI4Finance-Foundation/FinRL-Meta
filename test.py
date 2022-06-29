@@ -1,8 +1,6 @@
-# import DRL agents
 from agents.elegantrl_models import DRLAgent as DRLAgent_erl
 from agents.rllib_models import DRLAgent as DRLAgent_rllib
 from agents.stablebaselines3_models import DRLAgent as DRLAgent_sb3
-# import data processor
 from finrl_meta.data_processor import DataProcessor
 
 
@@ -28,7 +26,7 @@ def test(start_date, end_date, ticker_list, data_source, time_interval,
     }
     env_instance = env(config=env_config)
 
-    # load elegantrl needs state dim, action dim and net dim
+    # elegantrl needs state dim, action dim and net dim
     net_dimension = kwargs.get("net_dimension", 2 ** 7)
     cwd = kwargs.get("cwd", "./" + str(model_name))
     print("price_array: ", len(price_array))
