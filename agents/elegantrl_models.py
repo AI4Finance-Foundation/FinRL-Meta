@@ -1,18 +1,16 @@
-# RL models from elegantrl
+# DRL models from ElegantRL: https://github.com/AI4Finance-Foundation/ElegantRL
 import torch
-
 from elegantrl.agents import AgentDDPG
 from elegantrl.agents import AgentPPO
 from elegantrl.agents import AgentSAC
 from elegantrl.agents import AgentTD3
-from elegantrl.train.run import train_and_evaluate, init_agent
 from elegantrl.train.config import Arguments
+# from elegantrl.agents import AgentA2C
+from elegantrl.train.run import train_and_evaluate, init_agent
 
 MODELS = {"ddpg": AgentDDPG, "td3": AgentTD3, "sac": AgentSAC, "ppo": AgentPPO}
-#MODELS = {"ddpg": AgentDDPG, "td3": AgentTD3, "sac": AgentSAC, "ppo": AgentPPO, "a2c": AgentA2C}
 OFF_POLICY_MODELS = ["ddpg", "td3", "sac"]
 ON_POLICY_MODELS = ["ppo"]
-#ON_POLICY_MODELS = ["ppo", "a2c"]
 """MODEL_KWARGS = {x: config.__dict__[f"{x.upper()}_PARAMS"] for x in MODELS.keys()}
 
 NOISE = {
@@ -22,7 +20,7 @@ NOISE = {
 
 
 class DRLAgent:
-    """Provides implementations for DRL algorithms
+    """Implementations of DRL algorithms
     Attributes
     ----------
         env: gym environment class
@@ -43,7 +41,7 @@ class DRLAgent:
         self.price_array = price_array
         self.tech_array = tech_array
         self.turbulence_array = turbulence_array
-        
+
     def get_model(self, model_name, model_kwargs):
         env_config = {
             "price_array": self.price_array,
@@ -57,11 +55,7 @@ class DRLAgent:
         if model_name not in MODELS:
             raise NotImplementedError("NotImplementedError")
         model = Arguments(agent=agent, env=env)
-        if model_name in OFF_POLICY_MODELS:
-            model.if_off_policy = True
-        else:
-            model.if_off_policy = False
-
+        model.if_off_policy = model_name in OFF_POLICY_MODELS
         if model_kwargs is not None:
             try:
                 model.learning_rate = model_kwargs["learning_rate"]
@@ -81,7 +75,7 @@ class DRLAgent:
     def train_model(self, model, cwd, total_timesteps=5000):
         model.cwd = cwd
         model.break_step = total_timesteps
-        train_and_evaluate(args=model)
+        train_and_evaluate(model)
 
     @staticmethod
     def DRL_prediction(model_name, cwd, net_dimension, environment):
@@ -94,7 +88,7 @@ class DRLAgent:
         args.net_dim = net_dimension
         # load agent
         try:
-            agent = init_agent(args, gpu_id = 0)
+            agent = init_agent(args, gpu_id=0)
             act = agent.act
             device = agent.device
         except BaseException:
@@ -103,9 +97,8 @@ class DRLAgent:
         # test on the testing env
         _torch = torch
         state = environment.reset()
-        episode_returns = list()  # the cumulative_return / initial_account
-        episode_total_assets = list()
-        episode_total_assets.append(environment.initial_total_asset)
+        episode_returns = []  # the cumulative_return / initial_account
+        episode_total_assets = [environment.initial_total_asset]
         with _torch.no_grad():
             for i in range(environment.max_step):
                 s_tensor = _torch.as_tensor((state,), device=device)
@@ -116,10 +109,10 @@ class DRLAgent:
                 state, reward, done, _ = environment.step(action)
 
                 total_asset = (
-                    environment.cash
-                    + (
-                        environment.price_array[environment.time] * environment.stocks
-                    ).sum()
+                        environment.amount
+                        + (
+                                environment.price_ary[environment.day] * environment.stocks
+                        ).sum()
                 )
                 episode_total_assets.append(total_asset)
                 episode_return = total_asset / environment.initial_total_asset
