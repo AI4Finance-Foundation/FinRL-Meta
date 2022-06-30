@@ -1,4 +1,4 @@
-# RL models from RLlib ray
+# DRL models from RLlib
 import ray
 from ray.rllib.agents.a3c import a2c
 from ray.rllib.agents.ddpg import ddpg, td3
@@ -7,11 +7,12 @@ from ray.rllib.agents.sac import sac
 
 MODELS = {"a2c": a2c, "ddpg": ddpg, "td3": td3, "sac": sac, "ppo": ppo}
 
+
 # MODEL_KWARGS = {x: config.__dict__[f"{x.upper()}_PARAMS"] for x in MODELS.keys()}
 
 
 class DRLAgent:
-    """Provides implementations for DRL algorithms
+    """Implementations for DRL algorithms
 
     Attributes
     ----------
@@ -41,11 +42,11 @@ class DRLAgent:
         self.turbulence_array = turbulence_array
 
     def get_model(
-        self,
-        model_name,
-        # policy="MlpPolicy",
-        # policy_kwargs=None,
-        # model_kwargs=None,
+            self,
+            model_name,
+            # policy="MlpPolicy",
+            # policy_kwargs=None,
+            # model_kwargs=None,
     ):
         if model_name not in MODELS:
             raise NotImplementedError("NotImplementedError")
@@ -73,12 +74,13 @@ class DRLAgent:
 
         return model, model_config
 
-    def train_model(self, model, model_name, model_config, total_episodes=100):
+    def train_model(self, model, model_name, model_config, total_episodes=100, init_ray=True):
         if model_name not in MODELS:
             raise NotImplementedError("NotImplementedError")
-        ray.init(
-            ignore_reinit_error=True
-        )  # Other Ray APIs will not work until `ray.init()` is called.
+        if init_ray:
+            ray.init(
+                ignore_reinit_error=True
+            )  # Other Ray APIs will not work until `ray.init()` is called.
 
         if model_name == "ppo":
             trainer = model.PPOTrainer(env=self.env, config=model_config)
@@ -91,7 +93,7 @@ class DRLAgent:
         elif model_name == "sac":
             trainer = model.SACTrainer(env=self.env, config=model_config)
 
-        for i in range(total_episodes):
+        for _ in range(total_episodes):
             trainer.train()
 
         ray.shutdown()
@@ -104,12 +106,12 @@ class DRLAgent:
 
     @staticmethod
     def DRL_prediction(
-        model_name,
-        env,
-        price_array,
-        tech_array,
-        turbulence_array,
-        agent_path="./test_ppo/checkpoint_000100/checkpoint-100",
+            model_name,
+            env,
+            price_array,
+            tech_array,
+            turbulence_array,
+            agent_path="./test_ppo/checkpoint_000100/checkpoint-100",
     ):
         if model_name not in MODELS:
             raise NotImplementedError("NotImplementedError")
@@ -156,17 +158,16 @@ class DRLAgent:
 
         # test on the testing env
         state = env_instance.reset()
-        episode_returns = list()  # the cumulative_return / initial_account
-        episode_total_assets = list()
-        episode_total_assets.append(env_instance.initial_total_asset)
+        episode_returns = []  # the cumulative_return / initial_account
+        episode_total_assets = [env_instance.initial_total_asset]
         done = False
         while not done:
             action = trainer.compute_single_action(state)
             state, reward, done, _ = env_instance.step(action)
 
             total_asset = (
-                env_instance.cash
-                + (env_instance.price_array[env_instance.time] * env_instance.stocks).sum()
+                    env_instance.amount
+                    + (env_instance.price_ary[env_instance.day] * env_instance.stocks).sum()
             )
             episode_total_assets.append(total_asset)
             episode_return = total_asset / env_instance.initial_total_asset
