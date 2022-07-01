@@ -108,7 +108,7 @@ A demonstration notebook for plug-and-play with ElegantRL, Stable Baselines3 and
 
 We employ a training-testing-trading pipeline. First, a DRL agent is trained in a training dataset and fine-tuned (adjusting hyperparameters) in a testing dataset. Then, backtest the agent (on historical dataset), or depoy in a paper/live trading market.
 
-This pipeline address the **information leakage problem** by separating the training/testing-trading preriods.
+This pipeline address the **information leakage problem** by separating the training/testing and trading periods.
 
 Such a unified pipeline also allows fair comparisons among different algorithms.
 
