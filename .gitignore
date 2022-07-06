@@ -142,3 +142,6 @@ execution_optimizing_test.py
 test_ppo
 cache
 price_array.npy
+
+# vscode
+/.vscode
