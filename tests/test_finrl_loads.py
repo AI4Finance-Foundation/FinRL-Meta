@@ -28,6 +28,7 @@ def ticker_list_str():
 def ticker_list():
     return ["AAPL"]
 
+
 def test_yahoo_download(
     time_interval: str,
     start_date: str,
