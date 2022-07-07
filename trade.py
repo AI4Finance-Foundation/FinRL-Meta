@@ -1,6 +1,6 @@
 from test import test
 
-from finrl_meta.env_stock_trading.env_stock_papertrading import (
+from meta.env_stock_trading.env_stock_papertrading import (
     AlpacaPaperTrading,
 )
 

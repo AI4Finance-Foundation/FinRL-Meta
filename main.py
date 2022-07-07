@@ -2,25 +2,25 @@ import os
 from argparse import ArgumentParser
 from typing import List
 
-from finrl_meta import config
-from finrl_meta.config import ALPACA_API_BASE_URL
-from finrl_meta.config import ALPACA_API_KEY
-from finrl_meta.config import ALPACA_API_SECRET
-from finrl_meta.config import DATA_SAVE_DIR
-from finrl_meta.config import ERL_PARAMS
-from finrl_meta.config import INDICATORS
-from finrl_meta.config import RESULTS_DIR
-from finrl_meta.config import RLlib_PARAMS
-from finrl_meta.config import SAC_PARAMS
-from finrl_meta.config import TENSORBOARD_LOG_DIR
-from finrl_meta.config import TEST_END_DATE
-from finrl_meta.config import TEST_START_DATE
-from finrl_meta.config import TRADE_END_DATE
-from finrl_meta.config import TRADE_START_DATE
-from finrl_meta.config import TRAIN_END_DATE
-from finrl_meta.config import TRAIN_START_DATE
-from finrl_meta.config import TRAINED_MODEL_DIR
-from finrl_meta.config_tickers import DOW_30_TICKER
+from meta import config
+from meta.config import ALPACA_API_BASE_URL
+from meta.config import ALPACA_API_KEY
+from meta.config import ALPACA_API_SECRET
+from meta.config import DATA_SAVE_DIR
+from meta.config import ERL_PARAMS
+from meta.config import INDICATORS
+from meta.config import RESULTS_DIR
+from meta.config import RLlib_PARAMS
+from meta.config import SAC_PARAMS
+from meta.config import TENSORBOARD_LOG_DIR
+from meta.config import TEST_END_DATE
+from meta.config import TEST_START_DATE
+from meta.config import TRADE_END_DATE
+from meta.config import TRADE_START_DATE
+from meta.config import TRAIN_END_DATE
+from meta.config import TRAIN_START_DATE
+from meta.config import TRAINED_MODEL_DIR
+from meta.config_tickers import DOW_30_TICKER
 
 
 def build_parser():
