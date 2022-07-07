@@ -5,9 +5,8 @@ from copy import deepcopy
 from typing import List
 
 import pandas as pd
-from tqdm import tqdm
-
 from finrl_meta.data_processors._base import _Base
+from tqdm import tqdm
 
 warnings.filterwarnings("ignore")
 

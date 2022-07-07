@@ -5,7 +5,6 @@ from typing import List
 import ccxt
 import numpy as np
 import pandas as pd
-
 from finrl_meta.data_processors._base import _Base
 
 # from basic_processor import _Base

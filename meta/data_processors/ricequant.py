@@ -1,7 +1,6 @@
 from typing import List
 
 import rqdatac as ricequant
-
 from finrl_meta.data_processors._base import _Base
 
 

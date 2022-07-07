@@ -2,9 +2,8 @@
 """Paper: Multi-agent reinforcement learning for liquidation strategy analysis accepted by ICML 2019 AI in Finance: Applications and Infrastructure for Multi-Agent Learning. (https://arxiv.org/abs/1906.11046)"""
 from collections import deque
 
-import numpy as np
-
 import finrl_meta.env_execution_optimizing.liquidation.env_execution_optimizing as env
+import numpy as np
 from finrl_meta.env_execution_optimizing.liquidation import utils
 from finrl_meta.env_execution_optimizing.liquidation.ddpg_agent import Agent
 

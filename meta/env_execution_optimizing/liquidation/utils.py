@@ -1,5 +1,6 @@
 """Source: https://github.com/AI4Finance-Foundation/Liquidation-Analysis-using-Multi-Agent-Reinforcement-Learning-ICML-2019/blob/master/syntheticChrissAlmgren.py"""
 """Paper: Multi-agent reinforcement learning for liquidation strategy analysis accepted by ICML 2019 AI in Finance: Applications and Infrastructure for Multi-Agent Learning. (https://arxiv.org/abs/1906.11046)"""
+import finrl_meta.env_execution_optimizing.liquidation.env_execution_optimizing as sca
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import numpy as np
@@ -7,8 +8,6 @@ import pandas as pd
 from statsmodels.compat.python import lzip
 from statsmodels.iolib.table import SimpleTable
 from statsmodels.iolib.tableformatting import fmt_2cols
-
-import finrl_meta.env_execution_optimizing.liquidation.env_execution_optimizing as sca
 
 
 def generate_table(left_col, right_col, table_title):

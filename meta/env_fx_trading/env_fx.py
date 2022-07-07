@@ -4,13 +4,12 @@ import random
 
 import gym
 import numpy as np
-from gym import spaces
-from gym.utils import seeding
-from stable_baselines3.common.vec_env import DummyVecEnv
-
 from finrl_meta.env_fx_trading.util.log_render import render_to_file
 from finrl_meta.env_fx_trading.util.plot_chart import TradingChart
 from finrl_meta.env_fx_trading.util.read_config import EnvConfig
+from gym import spaces
+from gym.utils import seeding
+from stable_baselines3.common.vec_env import DummyVecEnv
 
 
 class tgym(gym.Env):
