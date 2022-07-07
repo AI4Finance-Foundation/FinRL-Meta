@@ -1,4 +1,3 @@
-
 SINGLE_TICKER = ["AAPL"]
 
 # Dow 30 constituents in 2021/10
@@ -33,7 +32,7 @@ DOW_30_TICKER = [
     "WBA",
     "WMT",
     "DIS",
-    "DOW"
+    "DOW",
 ]
 
 # Nasdaq 100 constituents at 2019/01
@@ -1429,4 +1428,3 @@ FX_TICKER = [
     "ZARJPY=X",
     "EURDKK=X",
 ]
-
