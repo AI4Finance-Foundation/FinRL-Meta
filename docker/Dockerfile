@@ -1,5 +1,7 @@
 FROM stablebaselines/rl-baselines3-zoo
 
+RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/$distro/$arch/3bf863cc.pub
+
 RUN apt-get update && apt-get install -q -y wget
 
 RUN wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
