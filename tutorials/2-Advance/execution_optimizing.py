@@ -4,9 +4,9 @@ from collections import deque
 
 import numpy as np
 
-import finrl_meta.env_execution_optimizing.liquidation.env_execution_optimizing as env
-from finrl_meta.env_execution_optimizing.liquidation import utils
-from finrl_meta.env_execution_optimizing.liquidation.ddpg_agent import Agent
+import meta.env_execution_optimizing.liquidation.env_execution_optimizing as env
+from meta.env_execution_optimizing.liquidation import utils
+from meta.env_execution_optimizing.liquidation.ddpg_agent import Agent
 
 # Get the default financial and AC Model parameters
 financial_params, ac_params = utils.get_env_param()

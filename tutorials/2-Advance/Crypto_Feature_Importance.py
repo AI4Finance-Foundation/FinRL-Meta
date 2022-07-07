@@ -9,10 +9,10 @@ from datetime import datetime, timedelta
 import datetime as dt
 import pickle
 
-from finrl_meta import config
-from finrl_meta.data_processor import DataProcessor
+from meta import config
+from meta.data_processor import DataProcessor
 from main import check_and_make_directories
-from finrl_meta.data_processors.binance import Binance
+from meta.data_processors.binance import Binance
 from talib.abstract import MACD, RSI, CCI, DX
 
 from sklearn import metrics
@@ -32,9 +32,9 @@ from IPython.display import display, HTML
 import os
 from typing import List
 from argparse import ArgumentParser
-from finrl_meta import config
-from finrl_meta.config_tickers import DOW_30_TICKER
-from finrl_meta.config import (
+from meta import config
+from meta.config_tickers import DOW_30_TICKER
+from meta.config import (
     DATA_SAVE_DIR,
     TRAINED_MODEL_DIR,
     TENSORBOARD_LOG_DIR,

@@ -1,13 +1,13 @@
 # RL models from elegantrl
 import torch
 
-from finrl_meta.env_future_trading.wt4elegantrl.elegantrl.agent import AgentA2C
-from finrl_meta.env_future_trading.wt4elegantrl.elegantrl.agent import AgentDDPG
-from finrl_meta.env_future_trading.wt4elegantrl.elegantrl.agent import AgentPPO
-from finrl_meta.env_future_trading.wt4elegantrl.elegantrl.agent import AgentSAC
-from finrl_meta.env_future_trading.wt4elegantrl.elegantrl.agent import AgentTD3
-from finrl_meta.env_future_trading.wt4elegantrl.elegantrl.run import Arguments
-from finrl_meta.env_future_trading.wt4elegantrl.elegantrl.run import train_and_evaluate
+from meta.env_future_trading.wt4elegantrl.elegantrl.agent import AgentA2C
+from meta.env_future_trading.wt4elegantrl.elegantrl.agent import AgentDDPG
+from meta.env_future_trading.wt4elegantrl.elegantrl.agent import AgentPPO
+from meta.env_future_trading.wt4elegantrl.elegantrl.agent import AgentSAC
+from meta.env_future_trading.wt4elegantrl.elegantrl.agent import AgentTD3
+from meta.env_future_trading.wt4elegantrl.elegantrl.run import Arguments
+from meta.env_future_trading.wt4elegantrl.elegantrl.run import train_and_evaluate
 
 MODELS = {
     "ddpg": AgentDDPG,

@@ -3,7 +3,7 @@ from typing import List
 import pandas as pd
 import pytest
 
-from finrl_meta.data_processor import DataProcessor
+from meta.data_processor import DataProcessor
 
 
 @pytest.fixture(scope="session")
