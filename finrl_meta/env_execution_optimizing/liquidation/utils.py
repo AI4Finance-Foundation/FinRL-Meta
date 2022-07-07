@@ -1,6 +1,5 @@
-'''Source: https://github.com/AI4Finance-Foundation/Liquidation-Analysis-using-Multi-Agent-Reinforcement-Learning-ICML-2019/blob/master/syntheticChrissAlmgren.py'''
-'''Paper: Multi-agent reinforcement learning for liquidation strategy analysis accepted by ICML 2019 AI in Finance: Applications and Infrastructure for Multi-Agent Learning. (https://arxiv.org/abs/1906.11046)'''
-
+"""Source: https://github.com/AI4Finance-Foundation/Liquidation-Analysis-using-Multi-Agent-Reinforcement-Learning-ICML-2019/blob/master/syntheticChrissAlmgren.py"""
+"""Paper: Multi-agent reinforcement learning for liquidation strategy analysis accepted by ICML 2019 AI in Finance: Applications and Infrastructure for Multi-Agent Learning. (https://arxiv.org/abs/1906.11046)"""
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import numpy as np
@@ -20,29 +19,33 @@ def generate_table(left_col, right_col, table_title):
     if right_col:
         # Add padding
         if len(right_col) < len(left_col):
-            right_col += [(' ', ' ')] * (len(left_col) - len(right_col))
+            right_col += [(" ", " ")] * (len(left_col) - len(right_col))
         elif len(right_col) > len(left_col):
-            left_col += [(' ', ' ')] * (len(right_col) - len(left_col))
-        right_col = [('%-21s' % ('  ' + k), v) for k, v in right_col]
+            left_col += [(" ", " ")] * (len(right_col) - len(left_col))
+        right_col = [("%-21s" % ("  " + k), v) for k, v in right_col]
 
         # Generate the right table
         gen_stubs_right, gen_data_right = lzip(*right_col)
-        gen_table_right = SimpleTable(gen_data_right,
-                                      col_headers,
-                                      gen_stubs_right,
-                                      title=table_title,
-                                      txt_fmt=fmt_2cols)
+        gen_table_right = SimpleTable(
+            gen_data_right,
+            col_headers,
+            gen_stubs_right,
+            title=table_title,
+            txt_fmt=fmt_2cols,
+        )
     else:
         # If there is no right table set the right table to empty
         gen_table_right = []
 
     # Generate the left table
     gen_stubs_left, gen_data_left = lzip(*left_col)
-    gen_table_left = SimpleTable(gen_data_left,
-                                 col_headers,
-                                 gen_stubs_left,
-                                 title=table_title,
-                                 txt_fmt=fmt_2cols)
+    gen_table_left = SimpleTable(
+        gen_data_left,
+        col_headers,
+        gen_stubs_left,
+        title=table_title,
+        txt_fmt=fmt_2cols,
+    )
 
     # Merge the left and right tables to make a single table
     gen_table_left.extend_right(gen_table_right)
@@ -54,32 +57,49 @@ def get_env_param():
     env = sca.MarketEnvironment()
 
     # Set the title for the financial parameters table
-    fp_title = 'Financial Parameters'
+    fp_title = "Financial Parameters"
 
     # Get the default financial parameters from the simulation environment
-    fp_left_col = [('Annual Volatility:', [f'{env.anv * 100:.0f}%']),
-                   ('Daily Volatility:', [f'{env.dpv * 100:.1f}%'])]
+    fp_left_col = [
+        ("Annual Volatility:", [f"{env.anv * 100:.0f}%"]),
+        ("Daily Volatility:", [f"{env.dpv * 100:.1f}%"]),
+    ]
 
-    fp_right_col = [('Bid-Ask Spread:', [f'{env.basp:.3f}']),
-                    ('Daily Trading Volume:', [f'{env.dtv:,.0f}'])]
+    fp_right_col = [
+        ("Bid-Ask Spread:", [f"{env.basp:.3f}"]),
+        ("Daily Trading Volume:", [f"{env.dtv:,.0f}"]),
+    ]
 
     # Set the title for the Almgren and Chriss Model parameters table
-    acp_title = 'Almgren and Chriss Model Parameters'
+    acp_title = "Almgren and Chriss Model Parameters"
 
     # Get the default Almgren and Chriss Model Parameters from the simulation environment
-    acp_left_col = [('Total Number of Shares for Agent1 to Sell:', [f'{env.total_shares1:,}']),
-                    ('Total Number of Shares for Agent2 to Sell:', [f'{env.total_shares2:,}']),
-                    ('Starting Price per Share:', [f'${env.startingPrice:.2f}']),
-                    ('Price Impact for Each 1% of Daily Volume Traded:', [f'${env.eta}']),
-                    ('Number of Days to Sell All the Shares:', [f'{env.liquidation_time}']),
-                    ('Number of Trades:', [f'{env.num_n}'])]
+    acp_left_col = [
+        (
+            "Total Number of Shares for Agent1 to Sell:",
+            [f"{env.total_shares1:,}"],
+        ),
+        (
+            "Total Number of Shares for Agent2 to Sell:",
+            [f"{env.total_shares2:,}"],
+        ),
+        ("Starting Price per Share:", [f"${env.startingPrice:.2f}"]),
+        ("Price Impact for Each 1% of Daily Volume Traded:", [f"${env.eta}"]),
+        (
+            "Number of Days to Sell All the Shares:",
+            [f"{env.liquidation_time}"],
+        ),
+        ("Number of Trades:", [f"{env.num_n}"]),
+    ]
 
-    acp_right_col = [('Fixed Cost of Selling per Share:', [f'${env.epsilon:.3f}']),
-                     ('Trader\'s Risk Aversion for Agent 1:', [f'{env.llambda1}']),
-                     ('Trader\'s Risk Aversion for Agent 2:', [f'{env.llambda2}']),
-                     ('Permanent Impact Constant:', [f'{env.gamma}']),
-                     ('Single Step Variance:', [f'{env.singleStepVariance:.3f}']),
-                     ('Time Interval between trades:', [f'{env.tau}'])]
+    acp_right_col = [
+        ("Fixed Cost of Selling per Share:", [f"${env.epsilon:.3f}"]),
+        ("Trader's Risk Aversion for Agent 1:", [f"{env.llambda1}"]),
+        ("Trader's Risk Aversion for Agent 2:", [f"{env.llambda2}"]),
+        ("Permanent Impact Constant:", [f"{env.gamma}"]),
+        ("Single Step Variance:", [f"{env.singleStepVariance:.3f}"]),
+        ("Time Interval between trades:", [f"{env.tau}"]),
+    ]
 
     # Generate tables with the default financial and AC Model parameters
     fp_table = generate_table(fp_left_col, fp_right_col, fp_title)
@@ -104,23 +124,23 @@ def plot_price_model(seed=0, num_days=1000):
         price_hist[i] = info.price
 
     # Print Average and Standard Deviation in Stock Price
-    print(f'Average Stock Price: ${price_hist.mean():,.2f}')
-    print(f'Standard Deviation in Stock Price: ${price_hist.std():,.2f}')
+    print(f"Average Stock Price: ${price_hist.mean():,.2f}")
+    print(f"Standard Deviation in Stock Price: ${price_hist.std():,.2f}")
     #     print('Standard Deviation of Random Noise: {:,.5f}'.format(np.sqrt(env.singleStepVariance * env.tau)))
 
     # Plot the price history for the given number of days
-    price_df = pd.DataFrame(data=price_hist, columns=['Stock'], dtype='float64')
-    ax = price_df.plot(colormap='cool', grid=False)
-    ax.set_facecolor(color='k')
+    price_df = pd.DataFrame(data=price_hist, columns=["Stock"], dtype="float64")
+    ax = price_df.plot(colormap="cool", grid=False)
+    ax.set_facecolor(color="k")
     ax = plt.gca()
-    yNumFmt = mticker.StrMethodFormatter('${x:,.2f}')
+    yNumFmt = mticker.StrMethodFormatter("${x:,.2f}")
     ax.yaxis.set_major_formatter(yNumFmt)
-    plt.ylabel('Stock Price')
-    plt.xlabel('days')
+    plt.ylabel("Stock Price")
+    plt.xlabel("days")
     plt.show()
 
 
-def get_optimal_vals(lq_time=60, nm_trades=60, tr_risk=1e-6, title=''):
+def get_optimal_vals(lq_time=60, nm_trades=60, tr_risk=1e-6, title=""):
     # Create a simulation environment
     env = sca.MarketEnvironment()
 
@@ -128,23 +148,33 @@ def get_optimal_vals(lq_time=60, nm_trades=60, tr_risk=1e-6, title=''):
     env.reset(liquid_time=lq_time, num_trades=nm_trades, lamb=tr_risk)
 
     # Set the title for the AC Optimal Strategy table
-    if title == '':
-        title = 'AC Optimal Strategy'
+    if title == "":
+        title = "AC Optimal Strategy"
     else:
-        title = 'AC Optimal Strategy for ' + title
+        title = "AC Optimal Strategy for " + title
 
     # Get the AC optimal values from the environment
     E = env.get_AC_expected_shortfall(env.total_shares)
     V = env.get_AC_variance(env.total_shares)
     U = env.compute_AC_utility(env.total_shares)
 
-    left_col = [('Number of Days to Sell All the Shares:', [f'{env.liquidation_time}']),
-                ('Half-Life of The Trade:', [f'{1 / env.kappa:,.1f}']),
-                ('Utility:', [f'${U:,.2f}'])]
+    left_col = [
+        (
+            "Number of Days to Sell All the Shares:",
+            [f"{env.liquidation_time}"],
+        ),
+        ("Half-Life of The Trade:", [f"{1 / env.kappa:,.1f}"]),
+        ("Utility:", [f"${U:,.2f}"]),
+    ]
 
-    right_col = [('Initial Portfolio Value:', [f'${env.total_shares * env.startingPrice:,.2f}']),
-                 ('Expected Shortfall:', [f'${E:,.2f}']),
-                 ('Standard Deviation of Shortfall:', [f'${np.sqrt(V):,.2f}'])]
+    right_col = [
+        (
+            "Initial Portfolio Value:",
+            [f"${env.total_shares * env.startingPrice:,.2f}"],
+        ),
+        ("Expected Shortfall:", [f"${E:,.2f}"]),
+        ("Standard Deviation of Shortfall:", [f"${np.sqrt(V):,.2f}"]),
+    ]
 
     # Generate the table with the AC optimal values
     return generate_table(left_col, right_col, title)
@@ -152,22 +182,26 @@ def get_optimal_vals(lq_time=60, nm_trades=60, tr_risk=1e-6, title=''):
 
 def get_min_param():
     # Get the minimum impact AC parameters
-    min_impact = get_optimal_vals(lq_time=250, nm_trades=250, tr_risk=1e-17, title='Minimum Impact')
+    min_impact = get_optimal_vals(
+        lq_time=250, nm_trades=250, tr_risk=1e-17, title="Minimum Impact"
+    )
 
     # Get the minimum variance AC parameters
-    min_var = get_optimal_vals(lq_time=1, nm_trades=1, tr_risk=0.0058, title='Minimum Variance')
+    min_var = get_optimal_vals(
+        lq_time=1, nm_trades=1, tr_risk=0.0058, title="Minimum Variance"
+    )
 
     return min_impact, min_var
 
 
 def get_crfs(trisk):
     # Create the annotation label
-    tr_st = f'{trisk:.0e}'
-    lnum = tr_st.split('e')[0]
-    lexp = tr_st.split('e')[1]
+    tr_st = f"{trisk:.0e}"
+    lnum = tr_st.split("e")[0]
+    lexp = tr_st.split("e")[1]
     if np.abs(np.int(lexp)) < 10:
-        lexp = lexp.replace('0', '', 1)
-    an_st = '$\lambda = ' + lnum + ' \\times 10^{' + lexp + '}$'
+        lexp = lexp.replace("0", "", 1)
+    an_st = "$\lambda = " + lnum + " \\times 10^{" + lexp + "}$"
 
     # Set the correction factors for the annotation label
     if trisk >= 1e-7 and trisk <= 4e-7:
@@ -207,7 +241,7 @@ def get_crfs(trisk):
         ycrf = 1.1
         scrf = 0.08
     elif trisk > 2e-5 and trisk <= 5e-5:
-        xcrf = 12.
+        xcrf = 12.0
         ycrf = 1.1
         scrf = 0.08
     elif trisk > 5e-5 and trisk <= 1e-4:
@@ -251,28 +285,34 @@ def plot_efficient_frontier(tr_risk=1e-6):
         V = np.append(V, env.get_AC_variance(env.total_shares))
         U = np.append(U, env.compute_AC_utility(env.total_shares))
 
-    # Plot E vs V and use U for the colorbar    
-    cm = plt.cm.get_cmap('gist_rainbow')
+    # Plot E vs V and use U for the colorbar
+    cm = plt.cm.get_cmap("gist_rainbow")
     sc = plt.scatter(V, E, s=20, c=U, cmap=cm)
-    plt.colorbar(sc, label='AC Utility', format=mticker.StrMethodFormatter('${x:,.0f}'))
+    plt.colorbar(sc, label="AC Utility", format=mticker.StrMethodFormatter("${x:,.0f}"))
     ax = plt.gca()
-    ax.set_facecolor('k')
+    ax.set_facecolor("k")
     ymin = E.min() * 0.7
     ymax = E.max() * 1.1
     plt.ylim(ymin, ymax)
-    yNumFmt = mticker.StrMethodFormatter('${x:,.0f}')
-    xNumFmt = mticker.StrMethodFormatter('{x:,.0f}')
+    yNumFmt = mticker.StrMethodFormatter("${x:,.0f}")
+    xNumFmt = mticker.StrMethodFormatter("{x:,.0f}")
     ax.yaxis.set_major_formatter(yNumFmt)
     ax.xaxis.set_major_formatter(xNumFmt)
-    plt.xlabel('Variance of Shortfall')
-    plt.ylabel('Expected Shortfall')
+    plt.xlabel("Variance of Shortfall")
+    plt.ylabel("Expected Shortfall")
 
     # Get the annotation label and the correction factors
     an_st, xcrf, ycrf, scrf = get_crfs(tr_risk)
 
     # Plot the annotation in the above plot
-    plt.annotate(an_st, xy=(tr_V, tr_E), xytext=(tr_V * xcrf, tr_E * ycrf), color='w', size='large',
-                 arrowprops=dict(facecolor='cyan', shrink=scrf, width=3, headwidth=10))
+    plt.annotate(
+        an_st,
+        xy=(tr_V, tr_E),
+        xytext=(tr_V * xcrf, tr_E * ycrf),
+        color="w",
+        size="large",
+        arrowprops=dict(facecolor="cyan", shrink=scrf, width=3, headwidth=10),
+    )
     plt.show()
 
 
@@ -283,7 +323,7 @@ def round_trade_list(trl):
     # Rounding the number of shares in the trading list sometimes results in selling more or less
     # shares than we have available. We calculate the difference between to total number of shares
     # sold in the original trading list and the number of shares sold in the rounded list.
-    # This difference will be used to correct for rounding errors. 
+    # This difference will be used to correct for rounding errors.
     res = np.around(trl.sum() - trl_rd.sum())
 
     # Correct the number of shares sold due to rounding errors if necessary
@@ -308,40 +348,69 @@ def plot_trade_list(lq_time=60, nm_trades=60, tr_risk=1e-6, show_trl=False):
     new_trl = np.insert(trade_list, 0, 0)
 
     # We create a dataframe with the trading list and trading trajectory
-    df = pd.DataFrame(data=list(range(nm_trades + 1)), columns=['Trade Number'], dtype='float64')
-    df['Stocks Sold'] = new_trl
-    df['Stocks Remaining'] = (np.ones(nm_trades + 1) * env.total_shares) - np.cumsum(new_trl)
+    df = pd.DataFrame(
+        data=list(range(nm_trades + 1)),
+        columns=["Trade Number"],
+        dtype="float64",
+    )
+    df["Stocks Sold"] = new_trl
+    df["Stocks Remaining"] = (np.ones(nm_trades + 1) * env.total_shares) - np.cumsum(
+        new_trl
+    )
 
     # Create a figure with 2 plots in 1 row
     fig, axes = plt.subplots(nrows=1, ncols=2)
 
     # Make a scatter plot of the trade list
-    df.iloc[1:].plot.scatter(x='Trade Number', y='Stocks Sold', c='Stocks Sold', colormap='gist_rainbow',
-                             alpha=1, sharex=False, s=50, colorbar=False, ax=axes[0])
+    df.iloc[1:].plot.scatter(
+        x="Trade Number",
+        y="Stocks Sold",
+        c="Stocks Sold",
+        colormap="gist_rainbow",
+        alpha=1,
+        sharex=False,
+        s=50,
+        colorbar=False,
+        ax=axes[0],
+    )
 
     # Plot a line through the points of the scatter plot of the trade list
-    axes[0].plot(df['Trade Number'].iloc[1:], df['Stocks Sold'].iloc[1:], linewidth=2.0, alpha=0.5)
-    axes[0].set_facecolor(color='k')
-    yNumFmt = mticker.StrMethodFormatter('{x:,.0f}')
+    axes[0].plot(
+        df["Trade Number"].iloc[1:],
+        df["Stocks Sold"].iloc[1:],
+        linewidth=2.0,
+        alpha=0.5,
+    )
+    axes[0].set_facecolor(color="k")
+    yNumFmt = mticker.StrMethodFormatter("{x:,.0f}")
     axes[0].yaxis.set_major_formatter(yNumFmt)
-    axes[0].set_title('Trading List')
+    axes[0].set_title("Trading List")
 
     # Make a scatter plot of the number of stocks remaining after each trade
-    df.plot.scatter(x='Trade Number', y='Stocks Remaining', c='Stocks Remaining', colormap='gist_rainbow',
-                    alpha=1, sharex=False, s=50, colorbar=False, ax=axes[1])
+    df.plot.scatter(
+        x="Trade Number",
+        y="Stocks Remaining",
+        c="Stocks Remaining",
+        colormap="gist_rainbow",
+        alpha=1,
+        sharex=False,
+        s=50,
+        colorbar=False,
+        ax=axes[1],
+    )
 
     # Plot a line through the points of the scatter plot of the number of stocks remaining after each trade
-    axes[1].plot(df['Trade Number'], df['Stocks Remaining'], linewidth=2.0, alpha=0.5)
-    axes[1].set_facecolor(color='k')
-    yNumFmt = mticker.StrMethodFormatter('{x:,.0f}')
+    axes[1].plot(df["Trade Number"], df["Stocks Remaining"], linewidth=2.0, alpha=0.5)
+    axes[1].set_facecolor(color="k")
+    yNumFmt = mticker.StrMethodFormatter("{x:,.0f}")
     axes[1].yaxis.set_major_formatter(yNumFmt)
-    axes[1].set_title('Trading Trajectory')
+    axes[1].set_title("Trading Trajectory")
 
     # Set the spacing between plots
     plt.subplots_adjust(wspace=0.4)
     plt.show()
 
-    print(f'\nNumber of Shares Sold: {new_trl.sum():,.0f}\n')
+    print(f"\nNumber of Shares Sold: {new_trl.sum():,.0f}\n")
 
     if show_trl:
         # Since we are not selling fractional shares we round up the shares in the trading list
@@ -349,12 +418,23 @@ def plot_trade_list(lq_time=60, nm_trades=60, tr_risk=1e-6, show_trl=False):
         #         rd_trl = new_trl
 
         # We create a dataframe with the modified trading list and trading trajectory
-        df2 = pd.DataFrame(data=list(range(nm_trades + 1)), columns=['Trade Number'], dtype='float64')
-        df2['Stocks Sold'] = rd_trl
-        df2['Stocks Remaining'] = (np.ones(nm_trades + 1) * env.total_shares) - np.cumsum(rd_trl)
+        df2 = pd.DataFrame(
+            data=list(range(nm_trades + 1)),
+            columns=["Trade Number"],
+            dtype="float64",
+        )
+        df2["Stocks Sold"] = rd_trl
+        df2["Stocks Remaining"] = (
+            np.ones(nm_trades + 1) * env.total_shares
+        ) - np.cumsum(rd_trl)
 
         return df2.style.hide_index().format(
-            {'Trade Number': '{:.0f}', 'Stocks Sold': '{:,.0f}', 'Stocks Remaining': '{:,.0f}'})
+            {
+                "Trade Number": "{:.0f}",
+                "Stocks Sold": "{:,.0f}",
+                "Stocks Remaining": "{:,.0f}",
+            }
+        )
 
 
 #         return df2.style.hide_index().format({'Trade Number': '{:.0f}', 'Stocks Sold': '{:e}', 'Stocks Remaining': '{:e}'})
@@ -393,20 +473,20 @@ def implement_trade_list(seed=0, lq_time=60, nm_trades=60, tr_risk=1e-6):
 
         # If all shares have been sold, stop making transactions and get the implementation sortfall
         if info.done:
-            print(f'Implementation Shortfall: ${info.implementation_shortfall:,.2f} \n')
+            print(f"Implementation Shortfall: ${info.implementation_shortfall:,.2f} \n")
             break
 
     # Plot the impacted price
-    price_df = pd.DataFrame(data=price_hist, columns=['Stock'], dtype='float64')
-    ax = price_df.plot(colormap='cool', grid=False)
-    ax.set_facecolor(color='k')
-    ax.set_title('Impacted Stock Price')
+    price_df = pd.DataFrame(data=price_hist, columns=["Stock"], dtype="float64")
+    ax = price_df.plot(colormap="cool", grid=False)
+    ax.set_facecolor(color="k")
+    ax.set_title("Impacted Stock Price")
     ax = plt.gca()
-    yNumFmt = mticker.StrMethodFormatter('${x:,.2f}')
+    yNumFmt = mticker.StrMethodFormatter("${x:,.2f}")
     ax.yaxis.set_major_formatter(yNumFmt)
-    plt.plot(price_hist, 'o')
-    plt.ylabel('Stock Price')
-    plt.xlabel('Trade Number')
+    plt.plot(price_hist, "o")
+    plt.ylabel("Stock Price")
+    plt.xlabel("Trade Number")
     plt.show()
 
 
@@ -430,10 +510,15 @@ def get_av_std(lq_time=60, nm_trades=60, tr_risk=1e-6, trs=100):
 
         # Print current episode every 100 episodes
         if (episode + 1) % 100 == 0:
-            print(f'Episode [{episode + 1}/{trs}]', end='\r', flush=True)
+            print(f"Episode [{episode + 1}/{trs}]", end="\r", flush=True)
 
         # Reset the enviroment
-        env.reset(seed=episode, liquid_time=lq_time, num_trades=nm_trades, lamb=tr_risk)
+        env.reset(
+            seed=episode,
+            liquid_time=lq_time,
+            num_trades=nm_trades,
+            lamb=tr_risk,
+        )
 
         # set the environment to make transactions
         env.start_transactions()
@@ -443,20 +528,24 @@ def get_av_std(lq_time=60, nm_trades=60, tr_risk=1e-6, trs=100):
             _, _, _, info = env.step(action)
 
             if info.done:
-                shortfall_hist = np.append(shortfall_hist, info.implementation_shortfall)
+                shortfall_hist = np.append(
+                    shortfall_hist, info.implementation_shortfall
+                )
                 break
 
-    print(f'Average Implementation Shortfall: ${shortfall_hist.mean():,.2f}')
-    print(f'Standard Deviation of the Implementation Shortfall: ${shortfall_hist.std():,.2f}')
+    print(f"Average Implementation Shortfall: ${shortfall_hist.mean():,.2f}")
+    print(
+        f"Standard Deviation of the Implementation Shortfall: ${shortfall_hist.std():,.2f}"
+    )
 
-    plt.plot(shortfall_hist, 'cyan', label='')
+    plt.plot(shortfall_hist, "cyan", label="")
     plt.xlim(0, trs)
     ax = plt.gca()
-    ax.set_facecolor('k')
-    ax.set_xlabel('Episode', fontsize=15)
-    ax.set_ylabel('Implementation Shortfall (US $)', fontsize=15)
-    ax.axhline(shortfall_hist.mean(), 0, 1, color='m', label='Average')
-    yNumFmt = mticker.StrMethodFormatter('${x:,.0f}')
+    ax.set_facecolor("k")
+    ax.set_xlabel("Episode", fontsize=15)
+    ax.set_ylabel("Implementation Shortfall (US $)", fontsize=15)
+    ax.axhline(shortfall_hist.mean(), 0, 1, color="m", label="Average")
+    yNumFmt = mticker.StrMethodFormatter("${x:,.0f}")
     ax.yaxis.set_major_formatter(yNumFmt)
     plt.legend()
     plt.show

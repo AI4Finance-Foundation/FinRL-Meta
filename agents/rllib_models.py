@@ -1,7 +1,8 @@
 # DRL models from RLlib
 import ray
 from ray.rllib.agents.a3c import a2c
-from ray.rllib.agents.ddpg import ddpg, td3
+from ray.rllib.agents.ddpg import ddpg
+from ray.rllib.agents.ddpg import td3
 from ray.rllib.agents.ppo import ppo
 from ray.rllib.agents.sac import sac
 
@@ -42,11 +43,11 @@ class DRLAgent:
         self.turbulence_array = turbulence_array
 
     def get_model(
-            self,
-            model_name,
-            # policy="MlpPolicy",
-            # policy_kwargs=None,
-            # model_kwargs=None,
+        self,
+        model_name,
+        # policy="MlpPolicy",
+        # policy_kwargs=None,
+        # model_kwargs=None,
     ):
         if model_name not in MODELS:
             raise NotImplementedError("NotImplementedError")
@@ -74,7 +75,14 @@ class DRLAgent:
 
         return model, model_config
 
-    def train_model(self, model, model_name, model_config, total_episodes=100, init_ray=True):
+    def train_model(
+        self,
+        model,
+        model_name,
+        model_config,
+        total_episodes=100,
+        init_ray=True,
+    ):
         if model_name not in MODELS:
             raise NotImplementedError("NotImplementedError")
         if init_ray:
@@ -106,12 +114,12 @@ class DRLAgent:
 
     @staticmethod
     def DRL_prediction(
-            model_name,
-            env,
-            price_array,
-            tech_array,
-            turbulence_array,
-            agent_path="./test_ppo/checkpoint_000100/checkpoint-100",
+        model_name,
+        env,
+        price_array,
+        tech_array,
+        turbulence_array,
+        agent_path="./test_ppo/checkpoint_000100/checkpoint-100",
     ):
         if model_name not in MODELS:
             raise NotImplementedError("NotImplementedError")
@@ -166,8 +174,8 @@ class DRLAgent:
             state, reward, done, _ = env_instance.step(action)
 
             total_asset = (
-                    env_instance.amount
-                    + (env_instance.price_ary[env_instance.day] * env_instance.stocks).sum()
+                env_instance.amount
+                + (env_instance.price_ary[env_instance.day] * env_instance.stocks).sum()
             )
             episode_total_assets.append(total_asset)
             episode_return = total_asset / env_instance.initial_total_asset

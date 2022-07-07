@@ -1,18 +1,26 @@
-import gym
 import time
-import torch
 import warnings
-import numpy as np
 from copy import deepcopy
 from numbers import Number
-from typing import Any, Dict, List, Union, Optional, Callable
+from typing import Any
+from typing import Callable
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Union
 
-from vecenv import BaseVectorEnv
-from tianshou.policy import BasePolicy
-from tianshou.data import Batch, ReplayBuffer, ListReplayBuffer, to_numpy
-from tianshou.exploration import BaseNoise
-from tianshou.env import DummyVectorEnv
+import gym
+import numpy as np
+import torch
+from tianshou.data import Batch
+from tianshou.data import ListReplayBuffer
+from tianshou.data import ReplayBuffer
+from tianshou.data import to_numpy
 from tianshou.data.collector import _batch_set_item
+from tianshou.env import DummyVectorEnv
+from tianshou.exploration import BaseNoise
+from tianshou.policy import BasePolicy
+from vecenv import BaseVectorEnv
 
 
 class Collector(object):
@@ -55,14 +63,25 @@ class Collector(object):
     def _default_rew_metric(x: Union[Number, np.number]) -> Union[Number, np.number]:
         # this internal function is designed for single-agent RL
         # for multi-agent RL, a reward_metric must be provided
-        assert np.asanyarray(x).size == 1, "Please specify the reward_metric " "since the reward is not a scalar."
+        assert np.asanyarray(x).size == 1, (
+            "Please specify the reward_metric " "since the reward is not a scalar."
+        )
         return x
 
     def reset(self) -> None:
         """Reset all related variables in the collector."""
         # use empty Batch for ``state`` so that ``self.data`` supports slicing
         # convert empty Batch to None when passing data to policy
-        self.data = Batch(state={}, obs={}, act={}, rew={}, done={}, info={}, obs_next={}, policy={})
+        self.data = Batch(
+            state={},
+            obs={},
+            act={},
+            rew={},
+            done={},
+            info={},
+            obs_next={},
+            policy={},
+        )
         self.reset_env()
         self.reset_buffer()
         self.reset_stat()
@@ -92,7 +111,9 @@ class Collector(object):
         self.data.obs = obs
         for b in self._cached_buf:
             b.reset()
-        self._ready_env_ids = np.array([x for x in self._ready_env_ids if x not in stop_id])
+        self._ready_env_ids = np.array(
+            [x for x in self._ready_env_ids if x not in stop_id]
+        )
 
     def _reset_state(self, id: Union[int, List[int]]) -> None:
         """Reset the hidden state: self.data.state[id]."""
@@ -181,7 +202,9 @@ class Collector(object):
         if isinstance(n_episode, list):
             assert len(n_episode) == self.get_env_num()
             finished_env_ids = [i for i in self._ready_env_ids if n_episode[i] <= 0]
-            self._ready_env_ids = np.array([x for x in self._ready_env_ids if x not in finished_env_ids])
+            self._ready_env_ids = np.array(
+                [x for x in self._ready_env_ids if x not in finished_env_ids]
+            )
         while True:
             if step_count >= 100000 and episode_count.sum() == 0:
                 warnings.warn(
@@ -241,9 +264,13 @@ class Collector(object):
                     log_fn(info)
             else:
                 # store computed actions, states, etc
-                _batch_set_item(whole_data, self._ready_env_ids, self.data, self.env_num)
+                _batch_set_item(
+                    whole_data, self._ready_env_ids, self.data, self.env_num
+                )
                 # fetch finished data
-                obs_next, rew, done, info = self.env.step(self.data.act, id=self._ready_env_ids)
+                obs_next, rew, done, info = self.env.step(
+                    self.data.act, id=self._ready_env_ids
+                )
                 self._ready_env_ids = np.array([i["env_id"] for i in info])
                 # get the stepped data
                 self.data = whole_data[self._ready_env_ids]
@@ -252,7 +279,9 @@ class Collector(object):
 
             step_time += time.time() - start
             # move data to self.data
-            self.data.update(obs_next=obs_next, rew=rew, done=done, info=[{} for i in info])
+            self.data.update(
+                obs_next=obs_next, rew=rew, done=done, info=[{} for i in info]
+            )
 
             if render:
                 self.env.render()
@@ -274,13 +303,20 @@ class Collector(object):
                     self._cached_buf[i].add(**self.data[j])
 
                 if done[j]:
-                    if not (isinstance(n_episode, list) and episode_count[i] >= n_episode[i]):
+                    if not (
+                        isinstance(n_episode, list) and episode_count[i] >= n_episode[i]
+                    ):
                         episode_count[i] += 1
-                        rewards.append(self._rew_metric(np.sum(self._cached_buf[i].rew, axis=0)))
+                        rewards.append(
+                            self._rew_metric(np.sum(self._cached_buf[i].rew, axis=0))
+                        )
                         step_count += len(self._cached_buf[i])
                         if self.buffer is not None:
                             self.buffer.update(self._cached_buf[i])
-                        if isinstance(n_episode, list) and episode_count[i] >= n_episode[i]:
+                        if (
+                            isinstance(n_episode, list)
+                            and episode_count[i] >= n_episode[i]
+                        ):
                             # env i has collected enough data, it has finished
                             finished_env_ids.append(i)
                     self._cached_buf[i].reset()
@@ -297,17 +333,23 @@ class Collector(object):
                     # env_ind_local.remove(_ready_env_ids.index(i))
                 if len(env_ind_local) > 0:
                     if self.preprocess_fn:
-                        obs_reset = self.preprocess_fn(obs=obs_reset).get("obs", obs_reset)
+                        obs_reset = self.preprocess_fn(obs=obs_reset).get(
+                            "obs", obs_reset
+                        )
                     obs_next[env_ind_local] = obs_reset
             reset_time += time.time() - start
             self.data.obs = obs_next
             if is_async:
                 # set data back
                 whole_data = deepcopy(whole_data)  # avoid reference in ListBuf
-                _batch_set_item(whole_data, self._ready_env_ids, self.data, self.env_num)
+                _batch_set_item(
+                    whole_data, self._ready_env_ids, self.data, self.env_num
+                )
                 # let self.data be the data in all environments again
                 self.data = whole_data
-            self._ready_env_ids = np.array([x for x in self._ready_env_ids if x not in finished_env_ids])
+            self._ready_env_ids = np.array(
+                [x for x in self._ready_env_ids if x not in finished_env_ids]
+            )
             if n_step:
                 if step_count >= n_step:
                     break

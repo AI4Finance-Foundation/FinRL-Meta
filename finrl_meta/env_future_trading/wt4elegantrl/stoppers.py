@@ -1,4 +1,4 @@
-class Stopper():
+class Stopper:
     pass
 
 

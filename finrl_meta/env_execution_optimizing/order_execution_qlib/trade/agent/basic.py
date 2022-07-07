@@ -1,12 +1,12 @@
-from tianshou.policy import BasePolicy
-from tianshou.data import Batch
 import numpy as np
 import torch
 from env import nan_weighted_avg
+from tianshou.data import Batch
+from tianshou.policy import BasePolicy
 
 
 class TWAP(BasePolicy):
-    """ The TWAP strategy. """
+    """The TWAP strategy."""
 
     def __init__(self, config):
         super().__init__()
@@ -26,7 +26,7 @@ class TWAP(BasePolicy):
 
 
 class VWAP(BasePolicy):
-    """ The VWAP strategy."""
+    """The VWAP strategy."""
 
     def __init__(self, config):
         super().__init__()
@@ -65,5 +65,7 @@ class AC(VWAP):
         t = t + 1
         k_tild = self.lamb / self.eta * sig * sig
         k = np.arccosh(k_tild / 2 + 1)
-        act = (np.sinh(k * (self.T - t)) - np.sinh(k * (self.T - t - 1))) / np.sinh(k * self.T)
+        act = (np.sinh(k * (self.T - t)) - np.sinh(k * (self.T - t - 1))) / np.sinh(
+            k * self.T
+        )
         return Batch(act=act, state=state)

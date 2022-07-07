@@ -1,14 +1,22 @@
-from features import Feature
-from stoppers import Stopper
 from abc import abstractmethod
-from gym.spaces import Space, Box, Discrete, MultiDiscrete
+
 from assessments import Assessment
+from features import Feature
+from gym.spaces import Box
+from gym.spaces import Discrete
+from gym.spaces import MultiDiscrete
+from gym.spaces import Space
+from numpy import around
+from numpy import float32
+from stoppers import Stopper
+from wtpy.StrategyDefs import BaseCtaStrategy
+from wtpy.StrategyDefs import BaseHftStrategy
+from wtpy.StrategyDefs import CtaContext
+from wtpy.StrategyDefs import HftContext
 from wtpy.WtBtEngine import EngineType
-from wtpy.StrategyDefs import BaseCtaStrategy, CtaContext, BaseHftStrategy, HftContext
-from numpy import around, float32
 
 
-class StateTransfer():
+class StateTransfer:
     @staticmethod
     @abstractmethod
     def Name() -> str:
@@ -48,7 +56,7 @@ class SimpleCTA(BaseCtaStrategy, StateTransfer):
     @staticmethod
     def Action(size: int) -> Space:
         # return Discrete(10)
-        return Box(low=-1., high=1., shape=(size, ), dtype=float32)
+        return Box(low=-1.0, high=1.0, shape=(size,), dtype=float32)
         # return MultiDiscrete([11]*size)
         # return dict(low=-1., high=1., shape=(size, ), dtype=float32)
 
@@ -56,7 +64,7 @@ class SimpleCTA(BaseCtaStrategy, StateTransfer):
         # print('setAction 1')
         # action -= 5
         # self._action_ = dict(zip(self._feature_.securities, [action-5]))
-        self._action_ = dict(zip(self._feature_.securities, around(action*3, 0)))
+        self._action_ = dict(zip(self._feature_.securities, around(action * 3, 0)))
         # print(self._action_)
         # try:
         #     self._action_ = dict(zip(self._feature_.securities, around(action, 0)))
@@ -65,9 +73,16 @@ class SimpleCTA(BaseCtaStrategy, StateTransfer):
         #     print(self.name(), action, type(action))
         # print('setAction 2')
 
-    def __init__(self, name: str, feature: Feature, assessment: Assessment, stopper: Stopper):
+    def __init__(
+        self,
+        name: str,
+        feature: Feature,
+        assessment: Assessment,
+        stopper: Stopper,
+    ):
         super(BaseCtaStrategy, self).__init__(
-            feature=feature, assessment=assessment, stopper=stopper)
+            feature=feature, assessment=assessment, stopper=stopper
+        )
         super().__init__(name)
         self._action_: dict = {}
         # print('TrainCTA')

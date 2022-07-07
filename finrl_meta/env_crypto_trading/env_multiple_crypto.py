@@ -4,8 +4,15 @@ import numpy as np
 
 
 class CryptoEnv:  # custom env
-    def __init__(self, config, lookback=1, initial_capital=1e6,
-                 buy_cost_pct=1e-3, sell_cost_pct=1e-3, gamma=0.99):
+    def __init__(
+        self,
+        config,
+        lookback=1,
+        initial_capital=1e6,
+        buy_cost_pct=1e-3,
+        sell_cost_pct=1e-3,
+        gamma=0.99,
+    ):
         self.lookback = lookback
         self.initial_total_asset = initial_capital
         self.initial_cash = initial_capital
@@ -13,8 +20,8 @@ class CryptoEnv:  # custom env
         self.sell_cost_pct = sell_cost_pct
         self.max_stock = 1
         self.gamma = gamma
-        self.price_array = config['price_array']
-        self.tech_array = config['tech_array']
+        self.price_array = config["price_array"]
+        self.tech_array = config["tech_array"]
         self._generate_action_normalizer()
         self.crypto_num = self.price_array.shape[1]
         self.max_step = self.price_array.shape[0] - lookback - 1
@@ -30,9 +37,11 @@ class CryptoEnv:  # custom env
         self.episode_return = 0.0
         self.gamma_return = 0.0
 
-        '''env information'''
-        self.env_name = 'MulticryptoEnv'
-        self.state_dim = 1 + (self.price_array.shape[1] + self.tech_array.shape[1]) * lookback
+        """env information"""
+        self.env_name = "MulticryptoEnv"
+        self.state_dim = (
+            1 + (self.price_array.shape[1] + self.tech_array.shape[1]) * lookback
+        )
         self.action_dim = self.price_array.shape[1]
         self.if_discrete = False
         self.target_return = 10
@@ -62,7 +71,9 @@ class CryptoEnv:  # custom env
                 self.cash += price[index] * sell_num_shares * (1 - self.sell_cost_pct)
 
         for index in np.where(actions > 0)[0]:  # buy_index:
-            if price[index] > 0:  # Buy only if the price is > 0 (no missing data in this particular date)
+            if (
+                price[index] > 0
+            ):  # Buy only if the price is > 0 (no missing data in this particular date)
                 buy_num_shares = min(self.cash // price[index], actions[index])
                 self.stocks[index] += buy_num_shares
                 self.cash -= price[index] * buy_num_shares * (1 + self.buy_cost_pct)
@@ -71,7 +82,7 @@ class CryptoEnv:  # custom env
         done = self.time == self.max_step
         state = self.get_state()
         next_total_asset = self.cash + (self.stocks * self.price_array[self.time]).sum()
-        reward = (next_total_asset - self.total_asset) * 2 ** -16
+        reward = (next_total_asset - self.total_asset) * 2**-16
         self.total_asset = next_total_asset
         self.gamma_return = self.gamma_return * self.gamma + reward
         self.cumu_return = self.total_asset / self.initial_cash
@@ -81,10 +92,10 @@ class CryptoEnv:  # custom env
         return state, reward, done, None
 
     def get_state(self):
-        state = np.hstack((self.cash * 2 ** -18, self.stocks * 2 ** -3))
+        state = np.hstack((self.cash * 2**-18, self.stocks * 2**-3))
         for i in range(self.lookback):
             tech_i = self.tech_array[self.time - i]
-            normalized_tech_i = tech_i * 2 ** -15
+            normalized_tech_i = tech_i * 2**-15
             state = np.hstack((state, normalized_tech_i)).astype(np.float32)
         return state
 
@@ -99,6 +110,7 @@ class CryptoEnv:  # custom env
             x = math.floor(math.log(price, 10))  # the order of magnitude
             action_norm_vector.append(1 / ((10) ** x))
 
-        action_norm_vector = np.asarray(
-            action_norm_vector) * 10000  # roughly control the maximum transaction amount for each action
+        action_norm_vector = (
+            np.asarray(action_norm_vector) * 10000
+        )  # roughly control the maximum transaction amount for each action
         self.action_norm_vector = np.asarray(action_norm_vector)

@@ -1,9 +1,21 @@
 # RL models from elegantrl
 import torch
-from finrl_meta.env_future_trading.wt4elegantrl.elegantrl.agent import AgentDDPG, AgentPPO, AgentSAC, AgentTD3, AgentA2C
-from finrl_meta.env_future_trading.wt4elegantrl.elegantrl.run import Arguments, train_and_evaluate
 
-MODELS = {"ddpg": AgentDDPG, "td3": AgentTD3, "sac": AgentSAC, "ppo": AgentPPO, "a2c": AgentA2C}
+from finrl_meta.env_future_trading.wt4elegantrl.elegantrl.agent import AgentA2C
+from finrl_meta.env_future_trading.wt4elegantrl.elegantrl.agent import AgentDDPG
+from finrl_meta.env_future_trading.wt4elegantrl.elegantrl.agent import AgentPPO
+from finrl_meta.env_future_trading.wt4elegantrl.elegantrl.agent import AgentSAC
+from finrl_meta.env_future_trading.wt4elegantrl.elegantrl.agent import AgentTD3
+from finrl_meta.env_future_trading.wt4elegantrl.elegantrl.run import Arguments
+from finrl_meta.env_future_trading.wt4elegantrl.elegantrl.run import train_and_evaluate
+
+MODELS = {
+    "ddpg": AgentDDPG,
+    "td3": AgentTD3,
+    "sac": AgentSAC,
+    "ppo": AgentPPO,
+    "a2c": AgentA2C,
+}
 OFF_POLICY_MODELS = ["ddpg", "td3", "sac"]
 ON_POLICY_MODELS = ["ppo", "a2c"]
 """MODEL_KWARGS = {x: config.__dict__[f"{x.upper()}_PARAMS"] for x in MODELS.keys()}
@@ -33,7 +45,7 @@ class DRLAgent:
 
     def __init__(self, env):
         self.env = env
-        
+
     def get_model(self, model_name, model_kwargs):
         env = self.env
         agent = MODELS[model_name]()
@@ -82,7 +94,7 @@ class DRLAgent:
             args.if_off_policy = False
         args.agent = model
         args.env = environment
-        #args.agent.if_use_cri_target = True  ##Not needed for test
+        # args.agent.if_use_cri_target = True  ##Not needed for test
 
         # load agent
         try:
@@ -108,7 +120,9 @@ class DRLAgent:
         episode_total_assets.append(environment.initial_total_asset)
         with _torch.no_grad():
             for i in range(environment.max_step):
-                s_tensor = _torch.as_tensor((state,), dtype=torch.float32, device=device)
+                s_tensor = _torch.as_tensor(
+                    (state,), dtype=torch.float32, device=device
+                )
                 a_tensor = act(s_tensor)  # action_tanh = act.forward()
                 action = (
                     a_tensor.detach().cpu().numpy()[0]

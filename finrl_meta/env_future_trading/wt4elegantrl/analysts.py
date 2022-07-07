@@ -1,9 +1,12 @@
-from ntpath import realpath
-from wtpy.apps import WtBtAnalyst
 from glob import glob
+from ntpath import realpath
+from os.path import basename
+from os.path import dirname
+
+from click import command
+from click import option
 from tqdm.auto import tqdm
-from os.path import dirname, basename
-from click import command, option
+from wtpy.apps import WtBtAnalyst
 
 # for i in tqdm(glob('./outputs_bt/*/funds.csv')):
 #     folder = dirname(i)
@@ -18,20 +21,27 @@ from click import command, option
 #     except:
 #         analyst.run('%s/%s_PnLAnalyzing.xlsx' % (folder, name))
 
+
 @command()
-@option('--path', '-p', 'path', default='./outputs_bt/*/')
+@option("--path", "-p", "path", default="./outputs_bt/*/")
 def run(path):
-    for i in tqdm(glob('%s/funds.csv'%path)):
+    for i in tqdm(glob("%s/funds.csv" % path)):
         folder = dirname(i)
         name = basename(folder)
         analyst = WtBtAnalyst()
         analyst.add_strategy(
-            name, folder='%s/'%folder, init_capital=500000, rf=0.04, annual_trading_days=240)
+            name,
+            folder="%s/" % folder,
+            init_capital=500000,
+            rf=0.04,
+            annual_trading_days=240,
+        )
         try:
-            analyst.run_new('%s/%s_PnLAnalyzing.xlsx' % (folder, name))
+            analyst.run_new("%s/%s_PnLAnalyzing.xlsx" % (folder, name))
             # analyst.run('%s/%s_PnLAnalyzing.xlsx' % (folder, name))
         except:
-            analyst.run('%s/%s_PnLAnalyzing.xlsx' % (folder, name))
+            analyst.run("%s/%s_PnLAnalyzing.xlsx" % (folder, name))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     run()

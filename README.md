@@ -43,13 +43,13 @@ Previously called **Neo_FinRL**: **N**ear real-market **E**nvironments f**o**r d
 + **Plug-and-Play (PnP)**: Modularity; Handle different markets (say T0 vs. T+1)
 + **Completeness and universal:**
   Multiple markets; Various data sources (APIs, Excel, etc); User-friendly variables.
-+ **Layer structure and extensibility**: Three layers including: data layer, environment layer, and agent layer. Layers interact through end-to-end interfaces, achieving high extensibility. 
++ **Layer structure and extensibility**: Three layers including: data layer, environment layer, and agent layer. Layers interact through end-to-end interfaces, achieving high extensibility.
 + **“Training-Testing-Trading” pipeline**: simulation for training and connecting real-time APIs for testing/trading, closing the sim-real gap.
 + **Efficient data sampling**: accelerate the data sampling process is the key to DRL training!  From the ElegantRL project. we know that multi-processing is powerful to reduce the training time (scheduling between CPU + GPU).
 + **Transparency**: a virtual env that is invisible to the upper layer
 + **Flexibility and extensibility**: Inheritance might be helpful here
 
-## Overview 
+## Overview
 ![Overview image of FinRL-Meta](https://github.com/AI4Finance-Foundation/FinRL-Meta/blob/master/figs/neofinrl_overview.png)
 We utilize a layered structure in FinRL-Meta, as shown in the figure above, that consists of three layers: data layer, environment layer, and agent layer. Each layer executes its functions and is independent. Meanwhile, layers interact through end-to-end interfaces to implement the complete workflow of algorithm trading. Moreover, the layer structure allows easy extension of user-defined functions.
 
@@ -66,7 +66,7 @@ To deal with financial big data (unstructured), we follow the DataOps paradigm a
 </div>
 
 
-Supported Data Sources: 
+Supported Data Sources:
 |Data Source |Type |Range and Frequency |Request Limits|Raw Data|Preprocessed Data|
 |  ----  |  ----  |  ----  |  ----  |  ----  |  ----  |
 |[Alpaca](https://alpaca.markets/docs/introduction/)| US Stocks, ETFs| 2015-now, 1min| Account-specific| OHLCV| Prices&Indicators|
@@ -83,15 +83,15 @@ Supported Data Sources:
 
 
 
-OHLCV: open, high, low, and close prices; volume 
+OHLCV: open, high, low, and close prices; volume
 
 adjusted_close: adjusted close price
 
-Technical indicators users can add: 'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30', 'close_30_sma', 'close_60_sma'. Users also can add their features. 
+Technical indicators users can add: 'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30', 'close_30_sma', 'close_60_sma'. Users also can add their features.
 
 
 ## Plug-and-Play (PnP)
-In the development pipeline, we separate market environments from the data layer and the agent layer. A DRL agent can be directly plugged into our environments. Different agents/algorithms can be compared by running on the same benchmark environment for fair evaluations. 
+In the development pipeline, we separate market environments from the data layer and the agent layer. A DRL agent can be directly plugged into our environments. Different agents/algorithms can be compared by running on the same benchmark environment for fair evaluations.
 
 The following DRL libraries are supported:
 + [ElegantRL](https://github.com/AI4Finance-Foundation/ElegantRL): Lightweight, efficient and stable DRL implementation using PyTorch.
@@ -120,7 +120,7 @@ For future work, we plan to build a multi-agent-based market simulator that cons
 <div align="center">
 <img align="center" src=figs/finrl_metaverse.png width="800">
 </div>
-	
+
 
 ## Citing FinRL-Meta
 ```

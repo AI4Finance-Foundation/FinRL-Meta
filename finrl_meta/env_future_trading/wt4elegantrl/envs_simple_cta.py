@@ -1,16 +1,13 @@
-from features import Indicator
 from assessments import SimpleAssessment
+from envs import WtEnv
+from envs import WtSubProcessEnv
+from features import Indicator
 from stoppers import SimpleStopper
 from strategies import SimpleCTA
-from envs import WtEnv, WtSubProcessEnv
 
 
 class SimpleCTAEnv(WtEnv):
-    def __init__(self,
-                 time_range: tuple,
-                 slippage: int = 0,
-                 mode: int = 1
-                 ):
+    def __init__(self, time_range: tuple, slippage: int = 0, mode: int = 1):
         assets = 180000
 
         # 角色：数据研究人员、强化学习研究人员、策略研究人员
@@ -21,11 +18,12 @@ class SimpleCTAEnv(WtEnv):
         # 特征工程的因子定义和生成，主要使用者是数据研究人员
         # 特征工程的因子后处理，主要使用者是强化学习研究人员
         feature: Indicator = Indicator(
-            code='DCE.c.HOT', period=Indicator.M5, roll=1, assets=assets)  # 每一个特征工程必须指定一个主要标的
+            code="DCE.c.HOT", period=Indicator.M5, roll=1, assets=assets
+        )  # 每一个特征工程必须指定一个主要标的
 
         # 按需添加其他标的
-        feature.addSecurity(code='DCE.cs.HOT')
-        feature.addSecurity(code='DCE.m.HOT')
+        feature.addSecurity(code="DCE.cs.HOT")
+        feature.addSecurity(code="DCE.m.HOT")
         # feature.addSecurity(code='CZCE.RM.HOT')
         # feature.addSecurity(code='CZCE.JR.HOT')
         # feature.addSecurity(code='CZCE.TA.HOT')
@@ -37,7 +35,7 @@ class SimpleCTAEnv(WtEnv):
         # feature.addSecurity(code='SHFE.ni.HOT')
 
         # 分别使用5分钟、15分钟、日线建立多周期因子
-        for period in (feature.M5, ):  # feature.M5, feature.M10,
+        for period in (feature.M5,):  # feature.M5, feature.M10,
             # feature.price(period)
             # feature.volume(period)
             # feature.roc(period)
@@ -71,25 +69,31 @@ class SimpleCTAEnv(WtEnv):
         )
 
     def _debug_(self):
-        print('%s: assets %s, reward %s, reward_sum %s' % (
-            self._name_(self._iter_), self._assessment_.curr_assets-self._assessment_.init_assets, self._assessment_.reward, sum(self._assessment_.rewards)))
+        print(
+            "%s: assets %s, reward %s, reward_sum %s"
+            % (
+                self._name_(self._iter_),
+                self._assessment_.curr_assets - self._assessment_.init_assets,
+                self._assessment_.reward,
+                sum(self._assessment_.rewards),
+            )
+        )
 
 
 class SimpleCTASubProcessEnv(WtSubProcessEnv):
-    def __init__(self,
-                 time_range: tuple,
-                 slippage: int = 0,
-                 mode: int = 1):
+    def __init__(self, time_range: tuple, slippage: int = 0, mode: int = 1):
         super().__init__(
             cli=SimpleCTAEnv,
             time_range=time_range,
             slippage=slippage,
-            mode=mode)
+            mode=mode,
+        )
 
 
-if __name__ == '__main__':
-    env: WtEnv = SimpleCTASubProcessEnv(time_start=201901011600,
-                                        time_end=202001011600, mode=2)
+if __name__ == "__main__":
+    env: WtEnv = SimpleCTASubProcessEnv(
+        time_start=201901011600, time_end=202001011600, mode=2
+    )
 
     print(env.action_space.contains)
 
@@ -105,10 +109,11 @@ if __name__ == '__main__':
             print(
                 # 'action:', action,
                 # 'obs:', obs,
-                'reward:', reward,
+                "reward:",
+                reward,
                 # 'done:', done
             )
         #     break
         # break
-        print('第%s次训练完成，执行%s步, 市值%s。' % (i+1, n, env.assets))
+        print("第%s次训练完成，执行%s步, 市值%s。" % (i + 1, n, env.assets))
     env.close()

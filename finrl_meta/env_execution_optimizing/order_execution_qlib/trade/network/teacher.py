@@ -1,11 +1,11 @@
-import torch
-import numpy as np
-from torch import nn
-import torch.nn.functional as F
-from copy import deepcopy
 import sys
+from copy import deepcopy
 
+import numpy as np
+import torch
+import torch.nn.functional as F
 from tianshou.data import to_torch
+from torch import nn
 
 
 class Teacher_Extractor(nn.Module):
@@ -18,20 +18,36 @@ class Teacher_Extractor(nn.Module):
 
         self.rnn = nn.GRU(64, hidden_size, batch_first=True)
         self.rnn2 = nn.GRU(64, hidden_size, batch_first=True)
-        self.dnn = nn.Sequential(nn.Linear(2, 64), nn.ReLU(),)
-        self.cnn = nn.Sequential(nn.Conv1d(self.cnn_shape[1], 3, 3), nn.ReLU(),)
-        self.raw_fc = nn.Sequential(nn.Linear((self.cnn_shape[0] - 2) * 3, 64), nn.ReLU(),)
+        self.dnn = nn.Sequential(
+            nn.Linear(2, 64),
+            nn.ReLU(),
+        )
+        self.cnn = nn.Sequential(
+            nn.Conv1d(self.cnn_shape[1], 3, 3),
+            nn.ReLU(),
+        )
+        self.raw_fc = nn.Sequential(
+            nn.Linear((self.cnn_shape[0] - 2) * 3, 64),
+            nn.ReLU(),
+        )
 
         self.fc = nn.Sequential(
-            nn.Linear(hidden_size * 2, hidden_size), nn.ReLU(), nn.Linear(hidden_size, 32), nn.ReLU(),
+            nn.Linear(hidden_size * 2, hidden_size),
+            nn.ReLU(),
+            nn.Linear(hidden_size, 32),
+            nn.ReLU(),
         )
 
     def forward(self, inp):
         inp = to_torch(inp, dtype=torch.float32, device=self.device)
         seq_len = inp[:, -1].to(torch.long)
         batch_size = inp.shape[0]
-        raw_in = inp[:, : 6 * 240].reshape(-1, 30, 6).transpose(1, 2) ## public part of state
-        dnn_in = inp[:, 6 * 240 : -1].reshape(batch_size, -1, 2) ## private part of state
+        raw_in = (
+            inp[:, : 6 * 240].reshape(-1, 30, 6).transpose(1, 2)
+        )  ## public part of state
+        dnn_in = inp[:, 6 * 240 : -1].reshape(
+            batch_size, -1, 2
+        )  ## private part of state
         cnn_out = self.cnn(raw_in).view(batch_size, 8, -1)
         rnn_in = self.raw_fc(cnn_out)
         rnn2_in = self.dnn(dnn_in)

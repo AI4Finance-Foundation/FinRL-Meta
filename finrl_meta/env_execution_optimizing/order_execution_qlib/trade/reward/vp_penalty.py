@@ -1,4 +1,5 @@
 import numpy as np
+
 from .base import Instant_Reward
 
 
@@ -18,7 +19,9 @@ class VP_Penalty_small(Instant_Reward):
         assert target > 0
         reward = performance_raise * v_t / target
         reward -= self.penalty * (v_t / target) ** 2
-        assert not (np.isnan(reward) or np.isinf(reward)), f"{performance_raise}, {v_t}, {target}"
+        assert not (
+            np.isnan(reward) or np.isinf(reward)
+        ), f"{performance_raise}, {v_t}, {target}"
         return reward / 100
 
 
@@ -33,5 +36,7 @@ class VP_Penalty_small_vec(VP_Penalty_small):
         assert target > 0
         reward = performance_raise * v_t.sum() / target
         reward -= self.penalty * ((v_t / target) ** 2).sum()
-        assert not (np.isnan(reward) or np.isinf(reward)), f"{performance_raise}, {v_t}, {target}"
+        assert not (
+            np.isnan(reward) or np.isinf(reward)
+        ), f"{performance_raise}, {v_t}, {target}"
         return reward / 100

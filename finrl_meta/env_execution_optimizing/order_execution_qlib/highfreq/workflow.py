@@ -1,35 +1,42 @@
 #  Copyright (c) Microsoft Corporation.
 #  Licensed under the MIT License.
-
+import pickle
 import sys
-import fire
 from pathlib import Path
 
-import qlib
-import pickle
+import fire
 import numpy as np
 import pandas as pd
-from qlib.config import REG_CN, HIGH_FREQ_CONFIG
-from qlib.contrib.model.gbdt import LGBModel
+import qlib
+from highfreq_ops import BFillNan
+from highfreq_ops import Cut
+from highfreq_ops import Date
+from highfreq_ops import DayLast
+from highfreq_ops import FFillNan
+from highfreq_ops import get_calendar_day
+from highfreq_ops import IsNull
+from highfreq_ops import Select
+from qlib.config import HIGH_FREQ_CONFIG
+from qlib.config import REG_CN
 from qlib.contrib.data.handler import Alpha158
+from qlib.contrib.evaluate import backtest as normal_backtest
+from qlib.contrib.evaluate import risk_analysis
+from qlib.contrib.model.gbdt import LGBModel
 from qlib.contrib.strategy.strategy import TopkDropoutStrategy
-from qlib.contrib.evaluate import (
-    backtest as normal_backtest,
-    risk_analysis,
-)
-
-from qlib.utils import init_instance_by_config, exists_qlib_data
+from qlib.data.data import Cal
 from qlib.data.dataset.handler import DataHandlerLP
 from qlib.data.ops import Operators
-from qlib.data.data import Cal
 from qlib.tests.data import GetData
-
-from highfreq_ops import get_calendar_day, DayLast, FFillNan, BFillNan, Date, Select, IsNull, Cut
+from qlib.utils import exists_qlib_data
+from qlib.utils import init_instance_by_config
 
 
 class HighfreqWorkflow(object):
 
-    SPEC_CONF = {"custom_ops": [DayLast, FFillNan, BFillNan, Date, Select, IsNull, Cut], "expression_cache": None}
+    SPEC_CONF = {
+        "custom_ops": [DayLast, FFillNan, BFillNan, Date, Select, IsNull, Cut],
+        "expression_cache": None,
+    }
 
     MARKET = "all"
     BENCHMARK = "SH000300"
@@ -45,7 +52,13 @@ class HighfreqWorkflow(object):
         "fit_start_time": start_time,
         "fit_end_time": train_end_time,
         "instruments": MARKET,
-        "infer_processors": [{"class": "HighFreqNorm", "module_path": "highfreq_processor", "kwargs": {}}],
+        "infer_processors": [
+            {
+                "class": "HighFreqNorm",
+                "module_path": "highfreq_processor",
+                "kwargs": {},
+            }
+        ],
     }
     DATA_HANDLER_CONFIG1 = {
         "start_time": start_time,
@@ -179,12 +192,12 @@ class HighfreqWorkflow(object):
         print(xtest, backtest_test)
         return
 
-
     def get_high_freq_data(self, data_path):
         self._init_qlib()
         self._prepare_calender_cache()
 
         import os
+
         dataset = init_instance_by_config(self.task["dataset"])
         xtrain, xtest = dataset.prepare(["train", "test"])
         normed_feature = pd.concat([xtrain, xtest]).sort_index()
@@ -195,12 +208,11 @@ class HighfreqWorkflow(object):
         for k, v in dic.items():
             v.to_pickle(feature_path + f"{k}.pkl")
 
-
         dataset_backtest = init_instance_by_config(self.task["dataset_backtest"])
         backtest_train, backtest_test = dataset_backtest.prepare(["train", "test"])
         backtest = pd.concat([backtest_train, backtest_test]).sort_index()
-        backtest['date'] = backtest.index.map(lambda x: x[1].date())
-        backtest.set_index('date', append=True, drop=True, inplace=True)
+        backtest["date"] = backtest.index.map(lambda x: x[1].date())
+        backtest.set_index("date", append=True, drop=True, inplace=True)
         dic = dict(tuple(backtest.groupby("instrument")))
         backtest_path = os.path.join(data_path, "backtest/")
         if not os.path.exists(backtest_path):
@@ -210,8 +222,7 @@ class HighfreqWorkflow(object):
 
 
 if __name__ == "__main__":
-    #fire.Fire(HighfreqWorkflow)
-    data_path = '../data/'
+    # fire.Fire(HighfreqWorkflow)
+    data_path = "../data/"
     workflow = HighfreqWorkflow()
     workflow.get_high_freq_data(data_path)
-

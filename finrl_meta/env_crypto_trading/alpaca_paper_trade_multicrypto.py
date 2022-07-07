@@ -27,11 +27,11 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
 import math
 import threading
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
+from datetime import timedelta
 
 import alpaca_trade_api as tradeapi
 import numpy as np
@@ -41,19 +41,32 @@ import torch
 from finrl_meta.data_processors.ccxt import Ccxt
 
 
-class AlpacaPaperTradingMultiCrypto():
-
-    def __init__(self, ticker_list, time_interval, drl_lib, agent, cwd, net_dim,
-                 state_dim, action_dim, API_KEY, API_SECRET,
-                 API_BASE_URL, tech_indicator_list,
-                 max_stock=1e2, latency=None):
+class AlpacaPaperTradingMultiCrypto:
+    def __init__(
+        self,
+        ticker_list,
+        time_interval,
+        drl_lib,
+        agent,
+        cwd,
+        net_dim,
+        state_dim,
+        action_dim,
+        API_KEY,
+        API_SECRET,
+        API_BASE_URL,
+        tech_indicator_list,
+        max_stock=1e2,
+        latency=None,
+    ):
         # load agent
         self.drl_lib = drl_lib
-        if agent != 'ppo':
-            raise ValueError('Agent input is NOT supported yet.')
+        if agent != "ppo":
+            raise ValueError("Agent input is NOT supported yet.")
 
-        if drl_lib == 'elegantrl':
+        if drl_lib == "elegantrl":
             from elegantrl.agent import AgentPPO
+
             # load agent
             try:
                 agent = AgentPPO()
@@ -62,26 +75,28 @@ class AlpacaPaperTradingMultiCrypto():
                 self.act = agent.act
                 self.device = agent.device
             except:
-                raise ValueError('Fail to load agent!')
+                raise ValueError("Fail to load agent!")
         # connect to Alpaca trading API
         try:
-            self.alpaca = tradeapi.REST(API_KEY, API_SECRET, API_BASE_URL, 'v2')
-            print('Connected to Alpaca API!')
+            self.alpaca = tradeapi.REST(API_KEY, API_SECRET, API_BASE_URL, "v2")
+            print("Connected to Alpaca API!")
         except:
-            raise ValueError('Fail to connect Alpaca. Please check account info and internet connection.')
+            raise ValueError(
+                "Fail to connect Alpaca. Please check account info and internet connection."
+            )
 
         # CCXT uses different time_interval than Alpaca (confusing I know)
         self.CCTX_time_interval = time_interval
 
         # read trading time interval
-        if self.CCTX_time_interval == '1m':
+        if self.CCTX_time_interval == "1m":
             self.time_interval = 60
-        elif self.CCTX_time_interval == '1h':
-            self.time_interval = 60 ** 2
-        elif self.CCTX_time_interval == '1d':
-            self.time_interval = 60 ** 2 * 24
+        elif self.CCTX_time_interval == "1h":
+            self.time_interval = 60**2
+        elif self.CCTX_time_interval == "1d":
+            self.time_interval = 60**2 * 24
         else:
-            raise ValueError('Time interval input is NOT supported yet.')
+            raise ValueError("Time interval input is NOT supported yet.")
 
         # read trading settings
         self.tech_indicator_list = tech_indicator_list
@@ -95,7 +110,9 @@ class AlpacaPaperTradingMultiCrypto():
         self.stocks = np.asarray([0] * len(ticker_list))  # stocks holding
         self.stocks_cd = np.zeros_like(self.stocks)
         self.cash = None  # cash record
-        self.stocks_df = pd.DataFrame(self.stocks, columns=['stocks'], index=ticker_list)
+        self.stocks_df = pd.DataFrame(
+            self.stocks, columns=["stocks"], index=ticker_list
+        )
         self.asset_list = []
         self.price = np.asarray([0] * len(ticker_list))
 
@@ -117,7 +134,7 @@ class AlpacaPaperTradingMultiCrypto():
             temp_time = time1 - time0
             total_time += temp_time
         latency = total_time / test_times
-        print('latency for data processing: ', latency)
+        print("latency for data processing: ", latency)
         return latency
 
     def run(self):
@@ -125,8 +142,8 @@ class AlpacaPaperTradingMultiCrypto():
         for order in orders:
             self.alpaca.cancel_order(order.id)
         while True:
-            print('\n' + '#################### NEW CANDLE ####################')
-            print('#################### NEW CANDLE ####################' + '\n')
+            print("\n" + "#################### NEW CANDLE ####################")
+            print("#################### NEW CANDLE ####################" + "\n")
 
             trade = threading.Thread(target=self.trade)
             trade.start()
@@ -142,29 +159,31 @@ class AlpacaPaperTradingMultiCrypto():
         state = self.get_state()
 
         # Get action
-        if self.drl_lib != 'elegantrl':
-            raise ValueError('The DRL library input is NOT supported yet. Please check your input.')
+        if self.drl_lib != "elegantrl":
+            raise ValueError(
+                "The DRL library input is NOT supported yet. Please check your input."
+            )
 
         with torch.no_grad():
             s_tensor = torch.as_tensor((state,), device=self.device)
             a_tensor = self.act(s_tensor)
             action = a_tensor.detach().cpu().numpy()[0]
         action = (action * self.max_stock).astype(float)
-        print('\n' + 'ACTION:    ', action, '\n')
+        print("\n" + "ACTION:    ", action, "\n")
         # Normalize action
         action_norm_vector = []
         for price in self.price:
-            print('PRICE:    ', price)
+            print("PRICE:    ", price)
             x = math.floor(math.log(price, 10)) - 2
-            print('MAG:      ', x)
+            print("MAG:      ", x)
             action_norm_vector.append(1 / ((10) ** x))
-            print('NORM VEC: ', action_norm_vector)
+            print("NORM VEC: ", action_norm_vector)
 
         for i in range(self.action_dim):
             norm_vector_i = action_norm_vector[i]
             action[i] = action[i] * norm_vector_i
 
-        print('\n' + 'NORMALIZED ACTION:    ', action, '\n')
+        print("\n" + "NORMALIZED ACTION:    ", action, "\n")
 
         # Trade
         self.stocks_cd += 1
@@ -174,10 +193,12 @@ class AlpacaPaperTradingMultiCrypto():
 
             qty = abs(float(sell_num_shares))
             qty = round(qty, self.action_decimals)
-            print('SELL, qty:', qty)
+            print("SELL, qty:", qty)
 
             respSO = []
-            tSubmitOrder = threading.Thread(target=self.submitOrder(qty, self.stockUniverse[index], 'sell', respSO))
+            tSubmitOrder = threading.Thread(
+                target=self.submitOrder(qty, self.stockUniverse[index], "sell", respSO)
+            )
             tSubmitOrder.start()
             tSubmitOrder.join()
             self.cash = float(self.alpaca.get_account().cash)
@@ -185,55 +206,71 @@ class AlpacaPaperTradingMultiCrypto():
 
         for index in np.where(action > min_action)[0]:  # buy_index:
             tmp_cash = max(self.cash, 0)
-            print('current cash:', tmp_cash)
+            print("current cash:", tmp_cash)
             # Adjusted part to accept decimal places up to two
-            buy_num_shares = min(tmp_cash / self.price[index], abs(float(action[index])))
+            buy_num_shares = min(
+                tmp_cash / self.price[index], abs(float(action[index]))
+            )
 
             qty = abs(float(buy_num_shares))
             qty = round(qty, self.action_decimals)
-            print('BUY, qty:', qty)
+            print("BUY, qty:", qty)
 
             respSO = []
-            tSubmitOrder = threading.Thread(target=self.submitOrder(qty, self.stockUniverse[index], 'buy', respSO))
+            tSubmitOrder = threading.Thread(
+                target=self.submitOrder(qty, self.stockUniverse[index], "buy", respSO)
+            )
             tSubmitOrder.start()
             tSubmitOrder.join()
             self.cash = float(self.alpaca.get_account().cash)
             self.stocks_cd[index] = 0
 
-        print('Trade finished')
+        print("Trade finished")
 
     def get_state(self):
         datetime_today = datetime.today()
 
-        if self.CCTX_time_interval == '1m':
-            start_date = (datetime_today - timedelta(minutes=self.previous_candles)).strftime("%Y%m%d %H:%M:%S")
+        if self.CCTX_time_interval == "1m":
+            start_date = (
+                datetime_today - timedelta(minutes=self.previous_candles)
+            ).strftime("%Y%m%d %H:%M:%S")
             end_date = datetime.today().strftime("%Y%m%d %H:%M:%S")
-        elif self.CCTX_time_interval == '1h':
-            start_date = (datetime_today - timedelta(hours=self.previous_candles)).strftime("%Y%m%d %H:%M:%S")
+        elif self.CCTX_time_interval == "1h":
+            start_date = (
+                datetime_today - timedelta(hours=self.previous_candles)
+            ).strftime("%Y%m%d %H:%M:%S")
             end_date = datetime.today().strftime("%Y%m%d %H:%M:%S")
-        elif self.CCTX_time_interval == '1d':
-            start_date = (datetime_today - timedelta(days=self.previous_candles)).strftime("%Y%m%d %H:%M:%S")
+        elif self.CCTX_time_interval == "1d":
+            start_date = (
+                datetime_today - timedelta(days=self.previous_candles)
+            ).strftime("%Y%m%d %H:%M:%S")
             end_date = datetime.today().strftime("%Y%m%d %H:%M:%S")
 
-        print('fetching latest ' + str(self.previous_candles) + ' candles..')
+        print("fetching latest " + str(self.previous_candles) + " candles..")
         CCXT_instance = Ccxt()
-        CCXT_instance.download_data(self.ticker_list, start_date, end_date, self.CCTX_time_interval)
+        CCXT_instance.download_data(
+            self.ticker_list, start_date, end_date, self.CCTX_time_interval
+        )
 
-        CCXT_instance.add_technical_indicators(self.ticker_list, self.tech_indicator_list)
+        CCXT_instance.add_technical_indicators(
+            self.ticker_list, self.tech_indicator_list
+        )
 
-        price_array, tech_array, _ = CCXT_instance.df_to_ary(self.ticker_list, self.tech_indicator_list)
+        price_array, tech_array, _ = CCXT_instance.df_to_ary(
+            self.ticker_list, self.tech_indicator_list
+        )
 
         self.price_array = price_array
         self.tech_array = tech_array
 
-        print('downloaded candles..')
+        print("downloaded candles..")
 
         positions = self.alpaca.list_positions()
         stocks = [0] * len(self.stockUniverse)
 
         for position in positions:
             ind = self.stockUniverse.index(position.symbol)
-            stocks[ind] = (abs(int(float(position.qty))))
+            stocks[ind] = abs(int(float(position.qty)))
 
         stocks = np.asarray(stocks, dtype=float)
         cash = float(self.alpaca.get_account().cash)
@@ -244,33 +281,53 @@ class AlpacaPaperTradingMultiCrypto():
         self.price = price_array[-1]
 
         # Stack cash and stocks
-        state = np.hstack((self.cash * 2 ** -18, self.stocks * 2 ** -3))
+        state = np.hstack((self.cash * 2**-18, self.stocks * 2**-3))
         for i in range(self.lookback):
             tech_i = self.tech_array[-1 - i]
-            normalized_tech_i = tech_i * 2 ** -15
+            normalized_tech_i = tech_i * 2**-15
             state = np.hstack((state, normalized_tech_i)).astype(np.float32)
 
-        print('\n' + 'STATE:')
+        print("\n" + "STATE:")
         print(state)
 
         return state
 
     def submitOrder(self, qty, stock, side, resp):
-        if (qty > 0):
+        if qty > 0:
             try:
                 self.alpaca.submit_order(stock, qty, side, "market", "day")
-                print("Market order of | "
-                      + str(qty)
-                      + " "
-                      + stock
-                      + " " + side + " | completed.")
+                print(
+                    "Market order of | "
+                    + str(qty)
+                    + " "
+                    + stock
+                    + " "
+                    + side
+                    + " | completed."
+                )
                 resp.append(True)
             except Exception as e:
-                print('ALPACA API ERROR: ', e)
-                print("Order of | " + str(qty) + " " + stock + " " + side + " | did not go through.")
+                print("ALPACA API ERROR: ", e)
+                print(
+                    "Order of | "
+                    + str(qty)
+                    + " "
+                    + stock
+                    + " "
+                    + side
+                    + " | did not go through."
+                )
                 resp.append(False)
         else:
-            print("Quantity is 0, order of | " + str(qty) + " " + stock + " " + side + " | not completed.")
+            print(
+                "Quantity is 0, order of | "
+                + str(qty)
+                + " "
+                + stock
+                + " "
+                + side
+                + " | not completed."
+            )
             resp.append(True)
 
     @staticmethod

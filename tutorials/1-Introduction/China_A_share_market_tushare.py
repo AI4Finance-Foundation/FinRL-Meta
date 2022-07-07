@@ -1,5 +1,3 @@
-
-
 import warnings
 
 warnings.filterwarnings("ignore")
@@ -13,7 +11,9 @@ from finrl_meta import config
 from finrl_meta.data_processor import DataProcessor
 from main import check_and_make_directories
 from finrl_meta.data_processors.tushare import Tushare, ReturnPlotter
-from finrl_meta.env_stock_trading.env_stocktrading_China_A_shares import StockTradingEnv
+from finrl_meta.env_stock_trading.env_stocktrading_China_A_shares import (
+    StockTradingEnv,
+)
 from agents.stablebaselines3_models import DRLAgent
 import os
 from typing import List
@@ -53,7 +53,7 @@ print("ALL Modules have been imported!")
 
 import os
 
-'''
+"""
 use check_and_make_directories() to replace the following
 
 if not os.path.exists("./datasets"):
@@ -64,10 +64,11 @@ if not os.path.exists("./tensorboard_log"):
     os.makedirs("./tensorboard_log")
 if not os.path.exists("./results"):
     os.makedirs("./results")
-'''
+"""
 
-check_and_make_directories([DATA_SAVE_DIR, TRAINED_MODEL_DIR, TENSORBOARD_LOG_DIR, RESULTS_DIR])
-
+check_and_make_directories(
+    [DATA_SAVE_DIR, TRAINED_MODEL_DIR, TENSORBOARD_LOG_DIR, RESULTS_DIR]
+)
 
 
 # %% md
@@ -76,23 +77,40 @@ check_and_make_directories([DATA_SAVE_DIR, TRAINED_MODEL_DIR, TENSORBOARD_LOG_DI
 
 # %%
 
-ticker_list = ['600000.SH', '600009.SH', '600016.SH', '600028.SH', '600030.SH',
-               '600031.SH', '600036.SH', '600050.SH', '600104.SH', '600196.SH',
-               '600276.SH', '600309.SH', '600519.SH', '600547.SH', '600570.SH']
+ticker_list = [
+    "600000.SH",
+    "600009.SH",
+    "600016.SH",
+    "600028.SH",
+    "600030.SH",
+    "600031.SH",
+    "600036.SH",
+    "600050.SH",
+    "600104.SH",
+    "600196.SH",
+    "600276.SH",
+    "600309.SH",
+    "600519.SH",
+    "600547.SH",
+    "600570.SH",
+]
 
-TRAIN_START_DATE = '2015-01-01'
-TRAIN_END_DATE= '2019-08-01'
-TRADE_START_DATE = '2019-08-01'
-TRADE_END_DATE = '2020-01-03'
-
-
+TRAIN_START_DATE = "2015-01-01"
+TRAIN_END_DATE = "2019-08-01"
+TRADE_START_DATE = "2019-08-01"
+TRADE_END_DATE = "2020-01-03"
 
 
 TIME_INTERVAL = "1d"
 kwargs = {}
-kwargs['token'] = '27080ec403c0218f96f388bca1b1d85329d563c91a43672239619ef5'
-p = DataProcessor(data_source='tushare', start_date=TRAIN_START_DATE, end_date=TRADE_END_DATE, time_interval=TIME_INTERVAL, **kwargs)
-
+kwargs["token"] = "27080ec403c0218f96f388bca1b1d85329d563c91a43672239619ef5"
+p = DataProcessor(
+    data_source="tushare",
+    start_date=TRAIN_START_DATE,
+    end_date=TRADE_END_DATE,
+    time_interval=TIME_INTERVAL,
+    **kwargs,
+)
 
 
 # download and clean
@@ -152,7 +170,7 @@ env_kwargs = {
     "tech_indicator_list": config.INDICATORS,
     "print_verbosity": 1,
     "initial_buy": True,
-    "hundred_each_trade": True
+    "hundred_each_trade": True,
 }
 
 e_train_gym = StockTradingEnv(df=train, **env_kwargs)
@@ -176,13 +194,15 @@ DDPG_PARAMS = {
     "action_noise": "normal",
 }
 POLICY_KWARGS = dict(net_arch=dict(pi=[64, 64], qf=[400, 300]))
-model_ddpg = agent.get_model("ddpg", model_kwargs=DDPG_PARAMS, policy_kwargs=POLICY_KWARGS)
+model_ddpg = agent.get_model(
+    "ddpg", model_kwargs=DDPG_PARAMS, policy_kwargs=POLICY_KWARGS
+)
 
 # %%
 
-trained_ddpg = agent.train_model(model=model_ddpg,
-                                 tb_log_name='ddpg',
-                                 total_timesteps=10000)
+trained_ddpg = agent.train_model(
+    model=model_ddpg, tb_log_name="ddpg", total_timesteps=10000
+)
 
 # %% md
 
@@ -195,9 +215,9 @@ model_a2c = agent.get_model("a2c")
 
 # %%
 
-trained_a2c = agent.train_model(model=model_a2c,
-                                tb_log_name='a2c',
-                                total_timesteps=50000)
+trained_a2c = agent.train_model(
+    model=model_a2c, tb_log_name="a2c", total_timesteps=50000
+)
 
 # %% md
 
@@ -218,14 +238,15 @@ env_kwargs = {
     "tech_indicator_list": config.INDICATORS,
     "print_verbosity": 1,
     "initial_buy": False,
-    "hundred_each_trade": True
+    "hundred_each_trade": True,
 }
 e_trade_gym = StockTradingEnv(df=trade, **env_kwargs)
 
 # %%
 
-df_account_value, df_actions = DRLAgent.DRL_prediction(model=trained_ddpg,
-                                                       environment=e_trade_gym)
+df_account_value, df_actions = DRLAgent.DRL_prediction(
+    model=trained_ddpg, environment=e_trade_gym
+)
 
 # %%
 
@@ -270,9 +291,13 @@ daily_return = plotter.get_return(df_account_value)
 daily_return_base = plotter.get_return(baseline_df, value_col_name="close")
 
 perf_func = timeseries.perf_stats
-perf_stats_all = perf_func(returns=daily_return,
-                           factor_returns=daily_return_base,
-                           positions=None, transactions=None, turnover_denom="AGB")
+perf_stats_all = perf_func(
+    returns=daily_return,
+    factor_returns=daily_return_base,
+    positions=None,
+    transactions=None,
+    turnover_denom="AGB",
+)
 print("==============DRL Strategy Stats===========")
 print(f"perf_stats_all: {perf_stats_all}")
 
@@ -285,12 +310,13 @@ daily_return = plotter.get_return(df_account_value)
 daily_return_base = plotter.get_return(baseline_df, value_col_name="close")
 
 perf_func = timeseries.perf_stats
-perf_stats_all = perf_func(returns=daily_return_base,
-                           factor_returns=daily_return_base,
-                           positions=None, transactions=None, turnover_denom="AGB")
+perf_stats_all = perf_func(
+    returns=daily_return_base,
+    factor_returns=daily_return_base,
+    positions=None,
+    transactions=None,
+    turnover_denom="AGB",
+)
 print("==============Baseline Strategy Stats===========")
 
 print(f"perf_stats_all: {perf_stats_all}")
-
-
-

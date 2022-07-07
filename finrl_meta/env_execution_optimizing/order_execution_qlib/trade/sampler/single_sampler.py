@@ -1,10 +1,10 @@
-import pandas as pd
-import numpy as np
-from multiprocessing.context import Process
-from multiprocessing import Queue
-
 import os
 import sys
+from multiprocessing import Queue
+from multiprocessing.context import Process
+
+import numpy as np
+import pandas as pd
 
 sys.path.append("..")
 
@@ -37,7 +37,9 @@ class Sampler:
     def __init__(self, config):
         self.raw_dir = config["raw_dir"] + "/"
         self.order_dir = config["order_dir"] + "/"
-        self.ins_list = [f[:-11] for f in os.listdir(self.order_dir) if f.endswith("target")]
+        self.ins_list = [
+            f[:-11] for f in os.listdir(self.order_dir) if f.endswith("target")
+        ]
         self.features = config["features"]
         self.queue = Queue(1000)
         self.child = None
@@ -58,7 +60,9 @@ class Sampler:
                 order_df = pd.read_pickle(order_dir + ins + ".pkl.target")
                 feature_df_list = []
                 for feature in features:
-                    feature_df_list.append(pd.read_pickle(f"{feature['loc']}/{ins}.pkl"))
+                    feature_df_list.append(
+                        pd.read_pickle(f"{feature['loc']}/{ins}.pkl")
+                    )
                 raw_df = pd.read_pickle(raw_dir + ins + ".pkl.backtest")
                 date_list = order_df.index.get_level_values(0).tolist()
                 index = 0
@@ -77,7 +81,16 @@ class Sampler:
             day_raw_df_index, day_raw_df_value, day_raw_df_column = toArray(day_raw_df)
             day_feature_dfs_ = toArray(day_feature_dfs)
             queue.put(
-                (ins, date, day_raw_df_value, day_raw_df_column, day_raw_df_index, day_feature_dfs_, target, is_buy,),
+                (
+                    ins,
+                    date,
+                    day_raw_df_value,
+                    day_raw_df_column,
+                    day_raw_df_index,
+                    day_feature_dfs_,
+                    target,
+                    is_buy,
+                ),
                 block=True,
             )
 
@@ -90,7 +103,13 @@ class Sampler:
         if self.child is None:
             self.child = Process(
                 target=self._worker,
-                args=(self.order_dir, self.raw_dir, self.features, self.ins_list, self.queue,),
+                args=(
+                    self.order_dir,
+                    self.raw_dir,
+                    self.features,
+                    self.ins_list,
+                    self.queue,
+                ),
                 daemon=True,
             )
             self.child.start()
@@ -145,7 +164,11 @@ class TestSampler(Sampler):
                 for df in df_list:
                     day_df_list.append(df.loc[ins, date].values)
                 day_feature_dfs = np.array(day_df_list)
-                day_raw_df_index, day_raw_df_value, day_raw_df_column = toArray(day_raw_df)
+                (
+                    day_raw_df_index,
+                    day_raw_df_value,
+                    day_raw_df_column,
+                ) = toArray(day_raw_df)
                 day_feature_dfs_ = toArray(day_feature_dfs)
                 queue.put(
                     (
@@ -171,14 +194,22 @@ class TestSampler(Sampler):
         """
         if order_dir:
             self.order_dir = order_dir
-            self.ins_list = [f[:-11] for f in os.listdir(self.order_dir) if f.endswith("target")]
+            self.ins_list = [
+                f[:-11] for f in os.listdir(self.order_dir) if f.endswith("target")
+            ]
         if not self.child is None:
             self.child.terminate()
             while not self.queue.empty():
                 self.queue.get()
         self.child = Process(
             target=self._worker,
-            args=(self.order_dir, self.raw_dir, self.features, self.ins_list, self.queue,),
+            args=(
+                self.order_dir,
+                self.raw_dir,
+                self.features,
+                self.ins_list,
+                self.queue,
+            ),
             daemon=True,
         )
         self.child.start()

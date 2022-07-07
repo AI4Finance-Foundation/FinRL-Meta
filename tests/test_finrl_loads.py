@@ -1,7 +1,9 @@
-import pytest
-from finrl_meta.data_processor import DataProcessor
 from typing import List
+
 import pandas as pd
+import pytest
+
+from finrl_meta.data_processor import DataProcessor
 
 
 @pytest.fixture(scope="session")
@@ -47,4 +49,3 @@ def test_yahoo_download(
     dp.download_data(ticker_list)
     assert isinstance(dp.dataframe, pd.DataFrame)
     assert dp.dataframe.shape == (210, 9) or dp.dataframe.shape == (209, 9)
-

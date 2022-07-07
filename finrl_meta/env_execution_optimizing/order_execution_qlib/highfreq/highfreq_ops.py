@@ -1,10 +1,12 @@
+import importlib
+
 import numpy as np
 import pandas as pd
-import importlib
-from qlib.data.ops import ElemOperator, PairOperator
 from qlib.config import C
 from qlib.data.cache import H
 from qlib.data.data import Cal
+from qlib.data.ops import ElemOperator
+from qlib.data.ops import PairOperator
 
 
 def get_calendar_day(freq="day", future=False):
@@ -26,7 +28,9 @@ def get_calendar_day(freq="day", future=False):
     if flag in H["c"]:
         _calendar = H["c"][flag]
     else:
-        _calendar = np.array(list(map(lambda x: x.date(), Cal.load_calendar(freq, future))))
+        _calendar = np.array(
+            list(map(lambda x: x.date(), Cal.load_calendar(freq, future)))
+        )
         H["c"][flag] = _calendar
     return _calendar
 
@@ -127,8 +131,12 @@ class Select(PairOperator):
     """
 
     def _load_internal(self, instrument, start_index, end_index, freq):
-        series_condition = self.feature_left.load(instrument, start_index, end_index, freq)
-        series_feature = self.feature_right.load(instrument, start_index, end_index, freq)
+        series_condition = self.feature_left.load(
+            instrument, start_index, end_index, freq
+        )
+        series_feature = self.feature_right.load(
+            instrument, start_index, end_index, freq
+        )
         return series_feature.loc[series_condition]
 
 

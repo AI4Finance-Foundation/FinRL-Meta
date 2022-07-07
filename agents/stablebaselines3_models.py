@@ -3,15 +3,18 @@ import time
 
 import numpy as np
 import pandas as pd
-from finrl_meta import config
-from finrl_meta.env_stock_trading.env_stock_trading  import StockTradingEnv
-from stable_baselines3 import A2C, DDPG, PPO, SAC, TD3
+from stable_baselines3 import A2C
+from stable_baselines3 import DDPG
+from stable_baselines3 import PPO
+from stable_baselines3 import SAC
+from stable_baselines3 import TD3
 from stable_baselines3.common.callbacks import BaseCallback
-from stable_baselines3.common.noise import (
-    NormalActionNoise,
-    OrnsteinUhlenbeckActionNoise,
-)
+from stable_baselines3.common.noise import NormalActionNoise
+from stable_baselines3.common.noise import OrnsteinUhlenbeckActionNoise
 from stable_baselines3.common.vec_env import DummyVecEnv
+
+from finrl_meta import config
+from finrl_meta.env_stock_trading.env_stock_trading import StockTradingEnv
 
 # RL models from stable-baselines
 
@@ -214,7 +217,7 @@ class DRLEnsembleAgent:
             "results/account_value_validation_{}_{}.csv".format(model_name, iteration)
         )
         sharpe = (
-            (4 ** 0.5)
+            (4**0.5)
             * df_total_value["daily_return"].mean()
             / df_total_value["daily_return"].std()
         )
@@ -317,7 +320,11 @@ class DRLEnsembleAgent:
         return last_state
 
     def run_ensemble_strategy(
-        self, A2C_model_kwargs, PPO_model_kwargs, DDPG_model_kwargs, timesteps_dict
+        self,
+        A2C_model_kwargs,
+        PPO_model_kwargs,
+        DDPG_model_kwargs,
+        timesteps_dict,
     ):
         """Ensemble Strategy that combines PPO, A2C and DDPG"""
         print("============Start Ensemble Strategy============")
@@ -457,7 +464,10 @@ class DRLEnsembleAgent:
             # print("==============Model Training===========")
             print("======A2C Training========")
             model_a2c = self.get_model(
-                "a2c", self.train_env, policy="MlpPolicy", model_kwargs=A2C_model_kwargs
+                "a2c",
+                self.train_env,
+                policy="MlpPolicy",
+                model_kwargs=A2C_model_kwargs,
             )
             model_a2c = self.train_model(
                 model_a2c,
@@ -506,7 +516,10 @@ class DRLEnsembleAgent:
 
             print("======PPO Training========")
             model_ppo = self.get_model(
-                "ppo", self.train_env, policy="MlpPolicy", model_kwargs=PPO_model_kwargs
+                "ppo",
+                self.train_env,
+                policy="MlpPolicy",
+                model_kwargs=PPO_model_kwargs,
             )
             model_ppo = self.train_model(
                 model_ppo,

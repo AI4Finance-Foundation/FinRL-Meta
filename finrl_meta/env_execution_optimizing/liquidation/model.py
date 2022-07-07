@@ -1,8 +1,6 @@
-'''Source: https://github.com/AI4Finance-Foundation/Liquidation-Analysis-using-Multi-Agent-Reinforcement-Learning-ICML-2019/blob/master/syntheticChrissAlmgren.py'''
-'''Paper: Multi-agent reinforcement learning for liquidation strategy analysis accepted by ICML 2019 AI in Finance: Applications and Infrastructure for Multi-Agent Learning. (https://arxiv.org/abs/1906.11046)'''
-
+"""Source: https://github.com/AI4Finance-Foundation/Liquidation-Analysis-using-Multi-Agent-Reinforcement-Learning-ICML-2019/blob/master/syntheticChrissAlmgren.py"""
+"""Paper: Multi-agent reinforcement learning for liquidation strategy analysis accepted by ICML 2019 AI in Finance: Applications and Infrastructure for Multi-Agent Learning. (https://arxiv.org/abs/1906.11046)"""
 import numpy as np
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -10,7 +8,7 @@ import torch.nn.functional as F
 
 def hidden_init(layer):
     fan_in = layer.weight.data.size()[0]
-    lim = 1. / np.sqrt(fan_in)
+    lim = 1.0 / np.sqrt(fan_in)
     return (-lim, lim)
 
 

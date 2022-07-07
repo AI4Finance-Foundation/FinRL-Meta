@@ -9,14 +9,14 @@ def render_to_file(**kwargs):
     profit = balance - balance_initial
     tr_lines = ""
     tr_lines_comma = ""
-    _header = ''
-    _header_comma = ''
+    _header = ""
+    _header_comma = ""
     if log_header:
         _header = f'{"Ticket":>8}{"Symbol":8}{"Type":8}{"ActionTime":>20} \
                             {"ActionPrice":14}{"MaxDD":8}{"CloseTime":>20}{"ClosePrice":14} \
                             {"Reward":8}{"SL":8}{"PT":8}{"DateDuration":20}{"Status":8}\n'
 
-        _header_comma = 'Ticket,Symbol,Type,ActionTime,ActionPrice,MaxDD,CloseTime,ClosePrice,Reward,SL,PT,DateDuration,Status\n'
+        _header_comma = "Ticket,Symbol,Type,ActionTime,ActionPrice,MaxDD,CloseTime,ClosePrice,Reward,SL,PT,DateDuration,Status\n"
 
     if tranaction_close_this_step:
         for _tr in tranaction_close_this_step:
@@ -34,7 +34,7 @@ def render_to_file(**kwargs):
     if done_information:
         log += done_information
     if log:
-        with open(log_filename, 'a+') as _f:
+        with open(log_filename, "a+") as _f:
             _f.write(log)
             _f.close()
 

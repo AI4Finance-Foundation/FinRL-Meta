@@ -1,31 +1,30 @@
-'''Source: https://github.com/microsoft/qlib/tree/high-freq-execution/examples/trade/'''
+"""Source: https://github.com/microsoft/qlib/tree/high-freq-execution/examples/trade/"""
 #  Copyright (c) Microsoft Corporation.
 #  Licensed under the MIT License.
-
-import os
-import sys
-import fire
-import time
-import venv
+import functools
 import glob
+import inspect
+import os
 import shutil
 import signal
-import inspect
-import tempfile
-import traceback
-import functools
 import statistics
 import subprocess
+import sys
+import tempfile
+import time
+import traceback
+import venv
 from datetime import datetime
-from pathlib import Path
 from operator import xor
+from pathlib import Path
 from pprint import pprint
 
+import fire
 import qlib
 from qlib.config import REG_CN
+from qlib.utils import exists_qlib_data
 from qlib.workflow import R
 from qlib.workflow.cli import workflow
-from qlib.utils import exists_qlib_data
 
 
 # init qlib
@@ -59,7 +58,10 @@ def only_allow_defined_args(function_to_decorate):
             valid_names.remove("self")
         for arg_name in kwargs:
             if arg_name not in valid_names:
-                raise ValueError("Unknown argument seen '%s', expected: [%s]" % (arg_name, ", ".join(valid_names)))
+                raise ValueError(
+                    "Unknown argument seen '%s', expected: [%s]"
+                    % (arg_name, ", ".join(valid_names))
+                )
         return function_to_decorate(*args, **kwargs)
 
     return _return_wrapped
@@ -79,8 +81,16 @@ def cal_mean_std(results) -> dict:
     for fn in results:
         mean_std[fn] = dict()
         for metric in results[fn]:
-            mean = statistics.mean(results[fn][metric]) if len(results[fn][metric]) > 1 else results[fn][metric][0]
-            std = statistics.stdev(results[fn][metric]) if len(results[fn][metric]) > 1 else 0
+            mean = (
+                statistics.mean(results[fn][metric])
+                if len(results[fn][metric]) > 1
+                else results[fn][metric][0]
+            )
+            std = (
+                statistics.stdev(results[fn][metric])
+                if len(results[fn][metric]) > 1
+                else 0
+            )
             mean_std[fn][metric] = [mean, std]
     return mean_std
 
@@ -95,13 +105,21 @@ def create_env():
     python_path = env_path / "bin" / "python"  # TODO: FIX ME!
     sys.stderr.write("\n")
     # get anaconda activate path
-    conda_activate = Path(os.environ["CONDA_PREFIX"]) / "bin" / "activate"  # TODO: FIX ME!
+    conda_activate = (
+        Path(os.environ["CONDA_PREFIX"]) / "bin" / "activate"
+    )  # TODO: FIX ME!
     return env_path, python_path, conda_activate
 
 
 # function to execute the cmd
 def execute(cmd):
-    with subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=1, universal_newlines=True, shell=True) as p:
+    with subprocess.Popen(
+        cmd,
+        stdout=subprocess.PIPE,
+        bufsize=1,
+        universal_newlines=True,
+        shell=True,
+    ) as p:
         for line in p.stdout:
             sys.stdout.write(line.split("\b")[0])
             if "\b" in line:
@@ -126,7 +144,9 @@ def get_all_folders(models, exclude) -> dict:
     elif models is None:
         models = [f.name.lower() for f in os.scandir("benchmarks")]
     else:
-        raise ValueError("Input models type is not supported. Please provide str or list without space.")
+        raise ValueError(
+            "Input models type is not supported. Please provide str or list without space."
+        )
     for f in os.scandir("benchmarks"):
         add = xor(bool(f.name.lower() in models), bool(exclude))
         if add:
@@ -160,9 +180,15 @@ def get_all_results(folders) -> dict:
             if recorders[recorder_id].status == "FINISHED":
                 recorder = R.get_recorder(recorder_id=recorder_id, experiment_name=fn)
                 metrics = recorder.list_metrics()
-                result["annualized_return_with_cost"].append(metrics["excess_return_with_cost.annualized_return"])
-                result["information_ratio_with_cost"].append(metrics["excess_return_with_cost.information_ratio"])
-                result["max_drawdown_with_cost"].append(metrics["excess_return_with_cost.max_drawdown"])
+                result["annualized_return_with_cost"].append(
+                    metrics["excess_return_with_cost.annualized_return"]
+                )
+                result["information_ratio_with_cost"].append(
+                    metrics["excess_return_with_cost.information_ratio"]
+                )
+                result["max_drawdown_with_cost"].append(
+                    metrics["excess_return_with_cost.max_drawdown"]
+                )
                 result["ic"].append(metrics["IC"])
                 result["icir"].append(metrics["ICIR"])
                 result["rank_ic"].append(metrics["Rank IC"])
@@ -298,8 +324,14 @@ def run(times=1, models=None, dataset="Alpha360", exclude=False):
     pprint(errors)
     sys.stderr.write("\n")
     # move results folder
-    shutil.move(exp_path, exp_path + f"_{dataset}_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}")
-    shutil.move("table.md", f"table_{dataset}_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}.md")
+    shutil.move(
+        exp_path,
+        exp_path + f"_{dataset}_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}",
+    )
+    shutil.move(
+        "table.md",
+        f"table_{dataset}_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}.md",
+    )
 
 
 if __name__ == "__main__":
