@@ -3,6 +3,10 @@ from typing import List
 import pandas as pd
 import pytest
 
+from meta.config_tickers import DOW_30_TICKER
+from meta.config_tickers import NAS_100_TICKER
+from meta.config_tickers import SINGLE_TICKER
+from meta.config_tickers import SP_500_TICKER
 from meta.data_processor import DataProcessor
 
 
@@ -21,21 +25,16 @@ def time_interval():
     return "1d"
 
 
-@pytest.fixture(scope="session")
-def ticker_list_str():
-    return "AAPL"
-
-
-@pytest.fixture(scope="session")
-def ticker_list():
-    return ["AAPL"]
-
-
-def test_yahoo_download(
+@pytest.mark.parametrize(
+    "ticker_input, expected_df_size",
+    [(SINGLE_TICKER, 210), (DOW_30_TICKER, 6300)],
+)
+def test_data_processor(
     time_interval: str,
     start_date: str,
     end_date: str,
-    ticker_list: List[str],
+    ticker_input: List[str],
+    expected_df_size: int,
 ) -> None:
     """
     Tests the Yahoo Downloader and the returned data shape
@@ -46,6 +45,9 @@ def test_yahoo_download(
     assert isinstance(end_date, str)
     data_source = "yahoofinance"
     dp = DataProcessor(data_source, start_date, end_date, time_interval)
-    dp.download_data(ticker_list)
+    dp.download_data(ticker_input)
     assert isinstance(dp.dataframe, pd.DataFrame)
-    assert dp.dataframe.shape == (210, 9) or dp.dataframe.shape == (209, 9)
+    assert dp.dataframe.shape == (
+        expected_df_size,
+        9,
+    ) or dp.dataframe.shape == (expected_df_size - 1, 9)
