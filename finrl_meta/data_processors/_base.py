@@ -360,15 +360,17 @@ class _Base:
 
 
 def calc_time_zone(ticker_list: List[str], time_zone_selfdefined: str, use_time_zone_selfdefined: int) -> str:
+    assert isinstance(ticker_list, list)
+    ticker_list = ticker_list[0]
     if use_time_zone_selfdefined == 1:
         time_zone = time_zone_selfdefined
-    elif ticker_list in [HSI_50_TICKER, SSE_50_TICKER, CSI_300_TICKER]:
+    elif ticker_list in HSI_50_TICKER + SSE_50_TICKER + CSI_300_TICKER:
         time_zone = TIME_ZONE_SHANGHAI
-    elif ticker_list in [DOW_30_TICKER, NAS_100_TICKER, SP_500_TICKER]:
+    elif ticker_list in DOW_30_TICKER + NAS_100_TICKER + SP_500_TICKER:
         time_zone = TIME_ZONE_USEASTERN
     elif ticker_list == CAC_40_TICKER:
         time_zone = TIME_ZONE_PARIS
-    elif ticker_list in [DAX_30_TICKER, TECDAX_TICKER, MDAX_50_TICKER, SDAX_50_TICKER]:
+    elif ticker_list in DAX_30_TICKER + TECDAX_TICKER + MDAX_50_TICKER + SDAX_50_TICKER:
         time_zone = TIME_ZONE_BERLIN
     elif ticker_list == LQ45_TICKER:
         time_zone = TIME_ZONE_JAKARTA
