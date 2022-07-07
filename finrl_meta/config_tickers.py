@@ -32,7 +32,7 @@ DOW_30_TICKER = [
     "WBA",
     "WMT",
     "DIS",
-    "DOW",
+    "DOW"
 ]
 
 # Nasdaq 100 constituents at 2019/01
@@ -136,7 +136,7 @@ NAS_100_TICKER = [
     "VRSN",
     "LULU",
     "WLTW",
-    "UAL",
+    "UAL"
 ]
 
 # SP 500 constituents at 2019
@@ -641,7 +641,7 @@ SP_500_TICKER = [
     "YUM",
     "ZBH",
     "ZION",
-    "ZTS",
+    "ZTS"
 ]
 
 # Hang Seng Index constituents at 2019/01
@@ -695,7 +695,7 @@ HSI_50_TICKER = [
     "2382.HK",
     "1093.HK",
     "1177.HK",
-    "2313.HK",
+    "2313.HK"
 ]
 
 # SSE 50 Index constituents at 2019
@@ -762,7 +762,7 @@ SSE_50_TICKER = [
     "600588.XSHG",
     "601658.XSHG",
     "601816.XSHG",
-    "603160.XSHG",
+    "603160.XSHG"
 ]
 
 # CSI 300 Index constituents at 2019
@@ -1066,8 +1066,7 @@ CSI_300_TICKER = [
     "300433.XSHE",
     "300498.XSHE",
     "300601.XSHE",
-    "300628.XSHE",
-]
+    "300628.XSHE"]
 
 # CAC 40 constituents at 2019/01
 # Check https://www.bnains.org/archives/histocac/compocac.php for CAC 40 constituents
@@ -1111,8 +1110,7 @@ CAC_40_TICKER = [
     "FR.PA",
     "VIE.PA",
     "DG.PA",
-    "VIV.PA",
-]
+    "VIV.PA"]
 
 # DAX 30 constituents at 2021/02
 DAX_30_TICKER = [
@@ -1145,8 +1143,7 @@ DAX_30_TICKER = [
     "ADS.DE",
     "HEI.DE",
     "DBK.DE",
-    "IFX.DE",
-]
+    "IFX.DE"]
 
 # TecDAX constituents at 2021/02
 TECDAX_TICKER = [
@@ -1176,8 +1173,7 @@ TECDAX_TICKER = [
     "SRT3.DE",
     "UTDI.DE",
     "WAF.DE",
-    "WDI.DE",
-]
+    "WDI.DE"]
 
 # MDAX 50 constituents at 2021/02
 MDAX_50_TICKER = [
@@ -1226,8 +1222,7 @@ MDAX_50_TICKER = [
     "TLX.DE",
     "UN01.DE",
     "WCH.DE",
-    "ZAL.DE",
-]
+    "ZAL.DE"]
 
 # SDAX 50 constituents at 2021/02
 SDAX_50_TICKER = [
@@ -1271,8 +1266,7 @@ SDAX_50_TICKER = [
     "WSU.DE",
     "WUW.DE",
     "ZIL2.DE",
-    "ZO1.DE",
-]
+    "ZO1.DE"]
 
 # LQ45 constituents at 2021/10
 LQ45_TICKER = [
@@ -1320,8 +1314,7 @@ LQ45_TICKER = [
     "TPIA.JK",
     "UNTR.JK",
     "UNVR.JK",
-    "WIKA.JK",
-]
+    "WIKA.JK"]
 
 # SRI-KEHATI.JK - Sustainable Responsible Investm
 SRI_KEHATI_TICKER = [
@@ -1349,8 +1342,7 @@ SRI_KEHATI_TICKER = [
     "UNVR.JK",
     "WIKA.JK",
     "WSKT.JK",
-    "WTON.JK",
-]
+    "WTON.JK"]
 
 # FX Ticker
 FX_TICKER = [
@@ -1426,5 +1418,4 @@ FX_TICKER = [
     "XAGUSD=X",
     "XAUUSD=X",
     "ZARJPY=X",
-    "EURDKK=X",
-]
+    "EURDKK=X"]
