@@ -11,19 +11,34 @@ import torch
 from finrl_meta.data_processors.alpaca import Alpaca
 
 
-class AlpacaPaperTrading_erl():
-
-    def __init__(self, ticker_list, time_interval, agent, cwd, net_dim,
-                 state_dim, action_dim, API_KEY, API_SECRET,
-                 API_BASE_URL, tech_indicator_list, turbulence_thresh=30,
-                 max_stock=1e2, latency=None):
+class AlpacaPaperTrading_erl:
+    def __init__(
+        self,
+        ticker_list,
+        time_interval,
+        agent,
+        cwd,
+        net_dim,
+        state_dim,
+        action_dim,
+        API_KEY,
+        API_SECRET,
+        API_BASE_URL,
+        tech_indicator_list,
+        turbulence_thresh=30,
+        max_stock=1e2,
+        latency=None,
+    ):
         # load agent
-        if agent == 'ppo':
+        if agent == "ppo":
             from elegantrl.agent import AgentPPO
             from elegantrl.run import Arguments, init_agent
+
             # load agent
-            config = {'state_dim': state_dim,
-                      'action_dim': action_dim, }
+            config = {
+                "state_dim": state_dim,
+                "action_dim": action_dim,
+            }
             args = Arguments(agent=AgentPPO, env=StockEnvEmpty(config))
             args.cwd = cwd
             args.net_dim = net_dim
@@ -36,27 +51,29 @@ class AlpacaPaperTrading_erl():
                 raise ValueError("Fail to load agent!")
 
         else:
-            raise ValueError('Agent input is NOT supported yet.')
+            raise ValueError("Agent input is NOT supported yet.")
 
         # connect to Alpaca trading API
         try:
-            self.alpaca = tradeapi.REST(API_KEY, API_SECRET, API_BASE_URL, 'v2')
+            self.alpaca = tradeapi.REST(API_KEY, API_SECRET, API_BASE_URL, "v2")
         except:
-            raise ValueError('Fail to connect Alpaca. Please check account info and internet connection.')
+            raise ValueError(
+                "Fail to connect Alpaca. Please check account info and internet connection."
+            )
 
         # read trading time interval
-        if time_interval == '1s':
+        if time_interval == "1s":
             self.time_interval = 1
-        elif time_interval == '5s':
+        elif time_interval == "5s":
             self.time_interval = 5
-        elif time_interval == '1Min':
+        elif time_interval == "1Min":
             self.time_interval = 60
-        elif time_interval == '5Min':
+        elif time_interval == "5Min":
             self.time_interval = 60 * 5
-        elif time_interval == '15Min':
+        elif time_interval == "15Min":
             self.time_interval = 60 * 15
         else:
-            raise ValueError('Time interval input is NOT supported yet.')
+            raise ValueError("Time interval input is NOT supported yet.")
 
         # read trading settings
         self.tech_indicator_list = tech_indicator_list
@@ -67,7 +84,9 @@ class AlpacaPaperTrading_erl():
         self.stocks = np.asarray([0] * len(ticker_list))  # stocks holding
         self.stocks_cd = np.zeros_like(self.stocks)
         self.cash = None  # cash record
-        self.stocks_df = pd.DataFrame(self.stocks, columns=['stocks'], index=ticker_list)
+        self.stocks_df = pd.DataFrame(
+            self.stocks, columns=["stocks"], index=ticker_list
+        )
         self.asset_list = []
         self.price = np.asarray([0] * len(ticker_list))
         self.stockUniverse = ticker_list
@@ -83,7 +102,7 @@ class AlpacaPaperTrading_erl():
             temp_time = time1 - time0
             total_time += temp_time
         latency = total_time / test_times
-        print('latency for data processing: ', latency)
+        print("latency for data processing: ", latency)
         return latency
 
     def run(self):
@@ -101,18 +120,20 @@ class AlpacaPaperTrading_erl():
 
             # Figure out when the market will close so we can prepare to sell beforehand.
             clock = self.alpaca.get_clock()
-            closingTime = clock.next_close.replace(tzinfo=datetime.timezone.utc).timestamp()
+            closingTime = clock.next_close.replace(
+                tzinfo=datetime.timezone.utc
+            ).timestamp()
             currTime = clock.timestamp.replace(tzinfo=datetime.timezone.utc).timestamp()
             self.timeToClose = closingTime - currTime
 
-            if (self.timeToClose < (60)):
+            if self.timeToClose < (60):
                 # Close all positions when 1 minutes til market close.
                 print("Market closing soon. Stop trading.")
                 break
 
-                '''# Close all positions when 1 minutes til market close.
+                """# Close all positions when 1 minutes til market close.
                 print("Market closing soon.  Closing positions.")
-        
+
                 positions = self.alpaca.list_positions()
                 for position in positions:
                   if(position.side == 'long'):
@@ -124,10 +145,10 @@ class AlpacaPaperTrading_erl():
                   tSubmitOrder = threading.Thread(target=self.submitOrder(qty, position.symbol, orderSide, respSO))
                   tSubmitOrder.start()
                   tSubmitOrder.join()
-        
+
                 # Run script again after market close for next trading day.
                 print("Sleeping until market close (15 minutes).")
-                time.sleep(60 * 15)'''
+                time.sleep(60 * 15)"""
 
             else:
                 trade = threading.Thread(target=self.trade)
@@ -140,9 +161,11 @@ class AlpacaPaperTrading_erl():
 
     def awaitMarketOpen(self):
         isOpen = self.alpaca.get_clock().is_open
-        while (not isOpen):
+        while not isOpen:
             clock = self.alpaca.get_clock()
-            openingTime = clock.next_open.replace(tzinfo=datetime.timezone.utc).timestamp()
+            openingTime = clock.next_open.replace(
+                tzinfo=datetime.timezone.utc
+            ).timestamp()
             currTime = clock.timestamp.replace(tzinfo=datetime.timezone.utc).timestamp()
             timeToOpen = int((openingTime - currTime) / 60)
             print(str(timeToOpen) + " minutes til market open.")
@@ -165,7 +188,11 @@ class AlpacaPaperTrading_erl():
                 sell_num_shares = min(self.stocks[index], -action[index])
                 qty = abs(int(sell_num_shares))
                 respSO = []
-                tSubmitOrder = threading.Thread(target=self.submitOrder(qty, self.stockUniverse[index], 'sell', respSO))
+                tSubmitOrder = threading.Thread(
+                    target=self.submitOrder(
+                        qty, self.stockUniverse[index], "sell", respSO
+                    )
+                )
                 tSubmitOrder.start()
                 tSubmitOrder.join()
                 self.cash = float(self.alpaca.get_account().cash)
@@ -176,10 +203,16 @@ class AlpacaPaperTrading_erl():
                     tmp_cash = 0
                 else:
                     tmp_cash = self.cash
-                buy_num_shares = min(tmp_cash // self.price[index], abs(int(action[index])))
+                buy_num_shares = min(
+                    tmp_cash // self.price[index], abs(int(action[index]))
+                )
                 qty = abs(int(buy_num_shares))
                 respSO = []
-                tSubmitOrder = threading.Thread(target=self.submitOrder(qty, self.stockUniverse[index], 'buy', respSO))
+                tSubmitOrder = threading.Thread(
+                    target=self.submitOrder(
+                        qty, self.stockUniverse[index], "buy", respSO
+                    )
+                )
                 tSubmitOrder.start()
                 tSubmitOrder.join()
                 self.cash = float(self.alpaca.get_account().cash)
@@ -188,13 +221,15 @@ class AlpacaPaperTrading_erl():
         else:  # sell all when turbulence
             positions = self.alpaca.list_positions()
             for position in positions:
-                if (position.side == 'long'):
-                    orderSide = 'sell'
+                if position.side == "long":
+                    orderSide = "sell"
                 else:
-                    orderSide = 'buy'
+                    orderSide = "buy"
                 qty = abs(int(float(position.qty)))
                 respSO = []
-                tSubmitOrder = threading.Thread(target=self.submitOrder(qty, position.symbol, orderSide, respSO))
+                tSubmitOrder = threading.Thread(
+                    target=self.submitOrder(qty, position.symbol, orderSide, respSO)
+                )
                 tSubmitOrder.start()
                 tSubmitOrder.join()
 
@@ -202,18 +237,23 @@ class AlpacaPaperTrading_erl():
 
     def get_state(self):
         alpaca = Alpaca(api=self.alpaca)
-        price, tech, turbulence = alpaca.fetch_latest_data(ticker_list=self.stockUniverse, time_interval='1Min',
-                                                           tech_indicator_list=self.tech_indicator_list)
+        price, tech, turbulence = alpaca.fetch_latest_data(
+            ticker_list=self.stockUniverse,
+            time_interval="1Min",
+            tech_indicator_list=self.tech_indicator_list,
+        )
         turbulence_bool = 1 if turbulence >= self.turbulence_thresh else 0
 
-        turbulence = (self.sigmoid_sign(turbulence, self.turbulence_thresh) * 2 ** -5).astype(np.float32)
+        turbulence = (
+            self.sigmoid_sign(turbulence, self.turbulence_thresh) * 2**-5
+        ).astype(np.float32)
 
-        tech = tech * 2 ** -7
+        tech = tech * 2**-7
         positions = self.alpaca.list_positions()
         stocks = [0] * len(self.stockUniverse)
         for position in positions:
             ind = self.stockUniverse.index(position.symbol)
-            stocks[ind] = (abs(int(float(position.qty))))
+            stocks[ind] = abs(int(float(position.qty)))
 
         stocks = np.asarray(stocks, dtype=float)
         cash = float(self.alpaca.get_account().cash)
@@ -222,30 +262,57 @@ class AlpacaPaperTrading_erl():
         self.turbulence_bool = turbulence_bool
         self.price = price
 
-        amount = np.array(max(self.cash, 1e4) * (2 ** -12), dtype=np.float32)
-        scale = np.array(2 ** -6, dtype=np.float32)
-        state = np.hstack((amount,
-                           turbulence,
-                           self.turbulence_bool,
-                           price * scale,
-                           self.stocks * scale,
-                           self.stocks_cd,
-                           tech,
-                           )).astype(np.float32)
+        amount = np.array(max(self.cash, 1e4) * (2**-12), dtype=np.float32)
+        scale = np.array(2**-6, dtype=np.float32)
+        state = np.hstack(
+            (
+                amount,
+                turbulence,
+                self.turbulence_bool,
+                price * scale,
+                self.stocks * scale,
+                self.stocks_cd,
+                tech,
+            )
+        ).astype(np.float32)
         print(len(self.stockUniverse))
         return state
 
     def submitOrder(self, qty, stock, side, resp):
-        if (qty > 0):
+        if qty > 0:
             try:
                 self.alpaca.submit_order(stock, qty, side, "market", "day")
-                print("Market order of | " + str(qty) + " " + stock + " " + side + " | completed.")
+                print(
+                    "Market order of | "
+                    + str(qty)
+                    + " "
+                    + stock
+                    + " "
+                    + side
+                    + " | completed."
+                )
                 resp.append(True)
             except:
-                print("Order of | " + str(qty) + " " + stock + " " + side + " | did not go through.")
+                print(
+                    "Order of | "
+                    + str(qty)
+                    + " "
+                    + stock
+                    + " "
+                    + side
+                    + " | did not go through."
+                )
                 resp.append(False)
         else:
-            print("Quantity is 0, order of | " + str(qty) + " " + stock + " " + side + " | not completed.")
+            print(
+                "Quantity is 0, order of | "
+                + str(qty)
+                + " "
+                + stock
+                + " "
+                + side
+                + " | not completed."
+            )
             resp.append(True)
 
     @staticmethod
@@ -259,17 +326,21 @@ class AlpacaPaperTrading_erl():
 class StockEnvEmpty(gym.Env):
     # Empty Env used for loading rllib agent
     def __init__(self, config):
-        state_dim = config['state_dim']
-        action_dim = config['action_dim']
+        state_dim = config["state_dim"]
+        action_dim = config["action_dim"]
         self.env_num = 1
         self.max_step = 10000
-        self.env_name = 'StockEnvEmpty'
+        self.env_name = "StockEnvEmpty"
         self.state_dim = state_dim
         self.action_dim = action_dim
         self.if_discrete = False
         self.target_return = 9999
-        self.observation_space = gym.spaces.Box(low=-3000, high=3000, shape=(state_dim,), dtype=np.float32)
-        self.action_space = gym.spaces.Box(low=-1, high=1, shape=(action_dim,), dtype=np.float32)
+        self.observation_space = gym.spaces.Box(
+            low=-3000, high=3000, shape=(state_dim,), dtype=np.float32
+        )
+        self.action_space = gym.spaces.Box(
+            low=-1, high=1, shape=(action_dim,), dtype=np.float32
+        )
 
     def reset(self):
         return

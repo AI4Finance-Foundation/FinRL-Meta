@@ -1,39 +1,43 @@
 import datetime as dt
 import json
-import urllib
-from typing import List
-
-import pandas as pd
-import requests
 import os
 import urllib
 import zipfile
 from datetime import *
 from pathlib import Path
+from typing import List
 
+import pandas as pd
+import requests
+
+from finrl_meta.config import BINANCE_BASE_URL
+from finrl_meta.config import TIME_ZONE_BERLIN
+from finrl_meta.config import TIME_ZONE_JAKARTA
+from finrl_meta.config import TIME_ZONE_PARIS
+from finrl_meta.config import TIME_ZONE_SELFDEFINED
+from finrl_meta.config import TIME_ZONE_SHANGHAI
+from finrl_meta.config import TIME_ZONE_USEASTERN
+from finrl_meta.config import USE_TIME_ZONE_SELFDEFINED
 from finrl_meta.data_processors._base import _Base
 
-from finrl_meta.config import (
-TIME_ZONE_SHANGHAI,
-TIME_ZONE_USEASTERN,
-TIME_ZONE_PARIS,
-TIME_ZONE_BERLIN,
-TIME_ZONE_JAKARTA,
-TIME_ZONE_SELFDEFINED,
-USE_TIME_ZONE_SELFDEFINED,
-BINANCE_BASE_URL,
-)
 
 class Binance(_Base):
-    def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
+    def __init__(
+        self,
+        data_source: str,
+        start_date: str,
+        end_date: str,
+        time_interval: str,
+        **kwargs,
+    ):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
         self.url = "https://api.binance.com/api/v3/klines"
         self.time_diff = None
 
     # main functions
     def download_data(self, ticker_list: List[str]):
-        startTime = dt.datetime.strptime(self.start_date, '%Y-%m-%d')
-        endTime = dt.datetime.strptime(self.end_date, '%Y-%m-%d')
+        startTime = dt.datetime.strptime(self.start_date, "%Y-%m-%d")
+        endTime = dt.datetime.strptime(self.end_date, "%Y-%m-%d")
 
         self.start_time = self.stringify_dates(startTime)
         self.end_time = self.stringify_dates(endTime)
@@ -50,7 +54,7 @@ class Binance(_Base):
             for i in ticker_list:
                 hist_data = self.dataframe_with_limit(symbol=i)
                 df = hist_data.iloc[:-1].dropna()
-                df['tic'] = i
+                df["tic"] = i
                 final_df = final_df.append(df)
         self.dataframe = final_df
 
@@ -98,60 +102,79 @@ class Binance(_Base):
         return str(int(date.timestamp() * 1000))
 
     def get_binance_bars(self, last_datetime, symbol):
-        '''
+        """
         klines api returns data in the following order:
-        open_time, open_price, high_price, low_price, close_price, 
-        volume, close_time, quote_asset_volume, n_trades, 
-        taker_buy_base_asset_volume, taker_buy_quote_asset_volume, 
+        open_time, open_price, high_price, low_price, close_price,
+        volume, close_time, quote_asset_volume, n_trades,
+        taker_buy_base_asset_volume, taker_buy_quote_asset_volume,
         ignore
-        '''
-        req_params = {"symbol": symbol, 'interval': self.interval,
-                      'startTime': last_datetime, 'endTime': self.end_time,
-                      'limit': self.limit}
+        """
+        req_params = {
+            "symbol": symbol,
+            "interval": self.interval,
+            "startTime": last_datetime,
+            "endTime": self.end_time,
+            "limit": self.limit,
+        }
         # For debugging purposes, uncomment these lines and if they throw an error
         # then you may have an error in req_params
         # r = requests.get(self.url, params=req_params)
-        # print(r.text) 
+        # print(r.text)
         df = pd.DataFrame(requests.get(self.url, params=req_params).json())
 
         if df.empty:
             return None
 
         df = df.iloc[:, 0:6]
-        df.columns = ['datetime', 'open', 'high', 'low', 'close', 'volume']
+        df.columns = ["datetime", "open", "high", "low", "close", "volume"]
 
-        df[['open', 'high', 'low', 'close', 'volume']] = df[['open', 'high', 'low', 'close', 'volume']].astype(float)
+        df[["open", "high", "low", "close", "volume"]] = df[
+            ["open", "high", "low", "close", "volume"]
+        ].astype(float)
 
         # No stock split and dividend announcement, hence adjusted close is the same as close
-        df['adjusted_close'] = df['close']
-        df['datetime'] = df.datetime.apply(lambda x: dt.datetime.fromtimestamp(x / 1000.0))
+        df["adjusted_close"] = df["close"]
+        df["datetime"] = df.datetime.apply(
+            lambda x: dt.datetime.fromtimestamp(x / 1000.0)
+        )
         df.reset_index(drop=True, inplace=True)
 
         return df
-    
+
     def get_newest_bars(self, symbols, interval, limit):
         merged_df = pd.DataFrame()
         for symbol in symbols:
-            req_params = {"symbol": symbol, 'interval': interval, 'limit': limit}
-    
-            df = pd.DataFrame(requests.get(self.url, params=req_params).json(), index=range(limit))
-            
+            req_params = {
+                "symbol": symbol,
+                "interval": interval,
+                "limit": limit,
+            }
+
+            df = pd.DataFrame(
+                requests.get(self.url, params=req_params).json(),
+                index=range(limit),
+            )
+
             if df.empty:
                 return None
-            
+
             df = df.iloc[:, 0:6]
-            df.columns = ['datetime','open','high','low','close','volume']
-    
-            df[['open','high','low','close','volume']] = df[['open','high','low','close','volume']].astype(float)
-    
+            df.columns = ["datetime", "open", "high", "low", "close", "volume"]
+
+            df[["open", "high", "low", "close", "volume"]] = df[
+                ["open", "high", "low", "close", "volume"]
+            ].astype(float)
+
             # No stock split and dividend announcement, hence adjusted close is the same as close
-            df['adjusted_close'] = df['close']
-            df['datetime'] = df.datetime.apply(lambda x: dt.datetime.fromtimestamp(x/1000.0))
-            df['tic'] = symbol
-            df = df.rename(columns = {'datetime':'time'})
+            df["adjusted_close"] = df["close"]
+            df["datetime"] = df.datetime.apply(
+                lambda x: dt.datetime.fromtimestamp(x / 1000.0)
+            )
+            df["tic"] = symbol
+            df = df.rename(columns={"datetime": "time"})
             df.reset_index(drop=True, inplace=True)
             merged_df = merged_df.append(df)
-            
+
         return merged_df
 
     def dataframe_with_limit(self, symbol):
@@ -169,18 +192,20 @@ class Binance(_Base):
             final_df = final_df.append(new_df)
             # last_datetime = max(new_df.datetime) + dt.timedelta(days=1)
             last_datetime = max(new_df.datetime)
-            if isinstance(last_datetime,pd.Timestamp):
+            if isinstance(last_datetime, pd.Timestamp):
                 last_datetime = last_datetime.to_pydatetime()
 
             if self.time_diff == None:
-                self.time_diff = new_df.loc[1]['datetime'] - new_df.loc[0]['datetime']
+                self.time_diff = new_df.loc[1]["datetime"] - new_df.loc[0]["datetime"]
 
             last_datetime = last_datetime + self.time_diff
             last_datetime = self.stringify_dates(last_datetime)
 
-        date_value = final_df['datetime'].apply(lambda x: x.strftime('%Y-%m-%d %H:%M:%S'))
-        final_df.insert(0, 'time', date_value)
-        final_df.drop('datetime', inplace=True, axis=1)
+        date_value = final_df["datetime"].apply(
+            lambda x: x.strftime("%Y-%m-%d %H:%M:%S")
+        )
+        final_df.insert(0, "time", date_value)
+        final_df.drop("datetime", inplace=True, axis=1)
         return final_df
 
     def get_download_url(self, file_url):
@@ -213,12 +238,12 @@ class Binance(_Base):
         try:
             download_url = self.get_download_url(download_path)
             dl_file = urllib.request.urlopen(download_url)
-            length = dl_file.getheader('content-length')
+            length = dl_file.getheader("content-length")
             if length:
                 length = int(length)
                 blocksize = max(4096, length // 100)
 
-            with open(zip_save_path, 'wb') as out_file:
+            with open(zip_save_path, "wb") as out_file:
                 dl_progress = 0
                 print(f"\nFile Download: {zip_save_path}")
                 while True:
@@ -245,23 +270,31 @@ class Binance(_Base):
             print(f"\nFile not found: {download_url}")
 
     def convert_to_date_object(self, d):
-        year, month, day = [int(x) for x in d.split('-')]
+        year, month, day = [int(x) for x in d.split("-")]
         return date(year, month, day)
 
-    def get_path(self, trading_type, market_data_type, time_period, symbol, interval=None):
-        trading_type_path = 'data/spot'
+    def get_path(
+        self,
+        trading_type,
+        market_data_type,
+        time_period,
+        symbol,
+        interval=None,
+    ):
+        trading_type_path = "data/spot"
         # currently just supporting spot
-        if trading_type != 'spot':
-            trading_type_path = f'data/futures/{trading_type}'
+        if trading_type != "spot":
+            trading_type_path = f"data/futures/{trading_type}"
         return (
-            f'{trading_type_path}/{time_period}/{market_data_type}/{symbol.upper()}/{interval}/'
+            f"{trading_type_path}/{time_period}/{market_data_type}/{symbol.upper()}/{interval}/"
             if interval is not None
-            else f'{trading_type_path}/{time_period}/{market_data_type}/{symbol.upper()}/'
+            else f"{trading_type_path}/{time_period}/{market_data_type}/{symbol.upper()}/"
         )
 
-
     # helpers for manipulating tick level data (1s intervals)
-    def download_daily_aggTrades(self, symbols, num_symbols, dates, start_date, end_date):
+    def download_daily_aggTrades(
+        self, symbols, num_symbols, dates, start_date, end_date
+    ):
         trading_type = "spot"
         date_range = start_date + " " + end_date
         start_date = self.convert_to_date_object(start_date)
@@ -272,7 +305,9 @@ class Binance(_Base):
         map = {}
         for current, symbol in enumerate(symbols):
             map[symbol] = []
-            print(f"[{current + 1}/{num_symbols}] - start download daily {symbol} aggTrades ")
+            print(
+                f"[{current + 1}/{num_symbols}] - start download daily {symbol} aggTrades "
+            )
             for date in dates:
                 current_date = self.convert_to_date_object(date)
                 if current_date >= start_date and current_date <= end_date:
@@ -284,8 +319,15 @@ class Binance(_Base):
 
     def fetch_aggTrades(self, startDate: str, endDate: str, tickers: List[str]):
         # all valid symbols traded on v3 api
-        response = urllib.request.urlopen("https://api.binance.com/api/v3/exchangeInfo").read()
-        valid_symbols = list(map(lambda symbol: symbol['symbol'], json.loads(response)['symbols']))
+        response = urllib.request.urlopen(
+            "https://api.binance.com/api/v3/exchangeInfo"
+        ).read()
+        valid_symbols = list(
+            map(
+                lambda symbol: symbol["symbol"],
+                json.loads(response)["symbols"],
+            )
+        )
 
         for tic in tickers:
             if tic not in valid_symbols:
@@ -294,32 +336,48 @@ class Binance(_Base):
         num_symbols = len(tickers)
         # not adding tz yet
         # for ffill missing data on starting on first day 00:00:00 (if any)
-        tminus1 = (self.convert_to_date_object(startDate) - dt.timedelta(1)).strftime('%Y-%m-%d')
+        tminus1 = (self.convert_to_date_object(startDate) - dt.timedelta(1)).strftime(
+            "%Y-%m-%d"
+        )
         dates = pd.date_range(start=tminus1, end=endDate)
         dates = [date.strftime("%Y-%m-%d") for date in dates]
-        return self.download_daily_aggTrades(tickers, num_symbols, dates, tminus1, endDate)
+        return self.download_daily_aggTrades(
+            tickers, num_symbols, dates, tminus1, endDate
+        )
 
     # Dict[str]:List[str] -> pd.DataFrame
     def combine_raw(self, map):
         # same format as jingyang's current data format
         final_df = pd.DataFrame()
         # using AggTrades with headers from https://github.com/binance/binance-public-data/
-        colNames = ["AggregatetradeId", "Price", "volume", "FirsttradeId", "LasttradeId", "time", "buyerWasMaker",
-                    "tradeWasBestPriceMatch"]
+        colNames = [
+            "AggregatetradeId",
+            "Price",
+            "volume",
+            "FirsttradeId",
+            "LasttradeId",
+            "time",
+            "buyerWasMaker",
+            "tradeWasBestPriceMatch",
+        ]
         for tic in map.keys():
             security = pd.DataFrame()
             for i, csv in enumerate(map[tic]):
-                dailyticks = pd.read_csv(csv,
-                                         names=colNames,
-                                         index_col=["time"],
-                                         parse_dates=['time'],
-                                         date_parser=lambda epoch: pd.to_datetime(epoch, unit='ms'))
-                dailyfinal = dailyticks.resample('1s').agg({'Price': 'ohlc', 'volume': 'sum'})
+                dailyticks = pd.read_csv(
+                    csv,
+                    names=colNames,
+                    index_col=["time"],
+                    parse_dates=["time"],
+                    date_parser=lambda epoch: pd.to_datetime(epoch, unit="ms"),
+                )
+                dailyfinal = dailyticks.resample("1s").agg(
+                    {"Price": "ohlc", "volume": "sum"}
+                )
                 dailyfinal.columns = dailyfinal.columns.droplevel(0)
                 # favor continuous series
                 # dailyfinal.dropna(inplace=True)
 
-                # implemented T-1 day ffill day start missing values 
+                # implemented T-1 day ffill day start missing values
                 # guaranteed first csv is tminus1 day
                 if i == 0:
                     tmr = dailyfinal.index[0].date() + dt.timedelta(1)
@@ -327,7 +385,7 @@ class Binance(_Base):
                     last_time_stamp_dt = dailyfinal.index[-1].to_pydatetime()
                     s_delta = (tmr_dt - last_time_stamp_dt).seconds
                     lastsample = dailyfinal.iloc[-1:]
-                    lastsample.index = lastsample.index.shift(s_delta, 's')
+                    lastsample.index = lastsample.index.shift(s_delta, "s")
                 else:
                     day_dt = dailyfinal.index[0].date()
                     day_str = day_dt.strftime("%Y-%m-%d")
@@ -336,10 +394,13 @@ class Binance(_Base):
                         # append last sample
                         dailyfinal = lastsample.append(dailyfinal)
                     # otherwise, just reindex and ffill
-                    dailyfinal = dailyfinal.reindex(pd.date_range(day_str, nextday_str, freq="1s")[:-1], method='ffill')
+                    dailyfinal = dailyfinal.reindex(
+                        pd.date_range(day_str, nextday_str, freq="1s")[:-1],
+                        method="ffill",
+                    )
                     # save reference info (guaranteed to be :59)
                     lastsample = dailyfinal.iloc[-1:]
-                    lastsample.index = lastsample.index.shift(1, 's')
+                    lastsample.index = lastsample.index.shift(1, "s")
 
                     if dailyfinal.shape[0] != 86400:
                         raise ValueError("everyday should have 86400 datapoints")
@@ -348,7 +409,7 @@ class Binance(_Base):
                     security = security.append(dailyfinal)
 
             security.ffill(inplace=True)
-            security['tic'] = tic
+            security["tic"] = tic
             final_df = final_df.append(security)
         return final_df
 

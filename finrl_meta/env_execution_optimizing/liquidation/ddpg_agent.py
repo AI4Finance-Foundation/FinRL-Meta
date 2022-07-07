@@ -1,16 +1,17 @@
-'''Source: https://github.com/AI4Finance-Foundation/Liquidation-Analysis-using-Multi-Agent-Reinforcement-Learning-ICML-2019/blob/master/syntheticChrissAlmgren.py'''
-'''Paper: Multi-agent reinforcement learning for liquidation strategy analysis accepted by ICML 2019 AI in Finance: Applications and Infrastructure for Multi-Agent Learning. (https://arxiv.org/abs/1906.11046)'''
-
+"""Source: https://github.com/AI4Finance-Foundation/Liquidation-Analysis-using-Multi-Agent-Reinforcement-Learning-ICML-2019/blob/master/syntheticChrissAlmgren.py"""
+"""Paper: Multi-agent reinforcement learning for liquidation strategy analysis accepted by ICML 2019 AI in Finance: Applications and Infrastructure for Multi-Agent Learning. (https://arxiv.org/abs/1906.11046)"""
 import copy
 import random
-from collections import namedtuple, deque
+from collections import deque
+from collections import namedtuple
 
 import numpy as np
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
 
-from finrl_meta.env_execution_optimizing.liquidation.model import Actor, Critic
+from finrl_meta.env_execution_optimizing.liquidation.model import Actor
+from finrl_meta.env_execution_optimizing.liquidation.model import Critic
 
 BUFFER_SIZE = int(1e4)  # replay buffer size
 BATCH_SIZE = 128  # minibatch size
@@ -23,12 +24,12 @@ WEIGHT_DECAY = 0  # L2 weight decay
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
-class Agent():
+class Agent:
     """Interacts with and learns from the environment."""
 
     def __init__(self, state_size, action_size, random_seed):
         """Initialize an Agent object.
-        
+
         Params
         ======
             state_size (int): dimension of each state
@@ -47,7 +48,11 @@ class Agent():
         # Critic Network (w/ Target Network)
         self.critic_local = Critic(state_size, action_size, random_seed).to(device)
         self.critic_target = Critic(state_size, action_size, random_seed).to(device)
-        self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=LR_CRITIC, weight_decay=WEIGHT_DECAY)
+        self.critic_optimizer = optim.Adam(
+            self.critic_local.parameters(),
+            lr=LR_CRITIC,
+            weight_decay=WEIGHT_DECAY,
+        )
 
         # Noise process
         self.noise = OUNoise(action_size, random_seed)
@@ -89,7 +94,7 @@ class Agent():
 
         Params
         ======
-            experiences (Tuple[torch.Tensor]): tuple of (s, a, r, s', done) tuples 
+            experiences (Tuple[torch.Tensor]): tuple of (s, a, r, s', done) tuples
             gamma (float): discount factor
         """
         states, actions, rewards, next_states, dones = experiences
@@ -129,16 +134,20 @@ class Agent():
         ======
             local_model: PyTorch model (weights will be copied from)
             target_model: PyTorch model (weights will be copied to)
-            tau (float): interpolation parameter 
+            tau (float): interpolation parameter
         """
-        for target_param, local_param in zip(target_model.parameters(), local_model.parameters()):
-            target_param.data.copy_(tau * local_param.data + (1.0 - tau) * target_param.data)
+        for target_param, local_param in zip(
+            target_model.parameters(), local_model.parameters()
+        ):
+            target_param.data.copy_(
+                tau * local_param.data + (1.0 - tau) * target_param.data
+            )
 
 
 class OUNoise:
     """Ornstein-Uhlenbeck process."""
 
-    def __init__(self, size, seed, mu=0., theta=0.15, sigma=0.2):
+    def __init__(self, size, seed, mu=0.0, theta=0.15, sigma=0.2):
         """Initialize parameters and noise process."""
         self.mu = mu * np.ones(size)
         self.theta = theta
@@ -153,7 +162,9 @@ class OUNoise:
     def sample(self):
         """Update internal state and return it as a noise sample."""
         x = self.state
-        dx = self.theta * (self.mu - x) + self.sigma * np.array([random.random() for i in range(len(x))])
+        dx = self.theta * (self.mu - x) + self.sigma * np.array(
+            [random.random() for i in range(len(x))]
+        )
         self.state = x + dx
         return self.state
 
@@ -171,7 +182,10 @@ class ReplayBuffer:
         self.action_size = action_size
         self.memory = deque(maxlen=buffer_size)  # internal memory (deque)
         self.batch_size = batch_size
-        self.experience = namedtuple("Experience", field_names=["state", "action", "reward", "next_state", "done"])
+        self.experience = namedtuple(
+            "Experience",
+            field_names=["state", "action", "reward", "next_state", "done"],
+        )
         self.seed = random.seed(seed)
 
     def add(self, state, action, reward, next_state, done):
@@ -183,13 +197,41 @@ class ReplayBuffer:
         """Randomly sample a batch of experiences from memory."""
         experiences = random.sample(self.memory, k=self.batch_size)
 
-        states = torch.from_numpy(np.vstack([e.state for e in experiences if e is not None])).float().to(device)
-        actions = torch.from_numpy(np.vstack([e.action for e in experiences if e is not None])).float().to(device)
-        rewards = torch.from_numpy(np.vstack([e.reward for e in experiences if e is not None])).float().to(device)
-        next_states = torch.from_numpy(np.vstack([e.next_state for e in experiences if e is not None])).float().to(
-            device)
-        dones = torch.from_numpy(np.vstack([e.done for e in experiences if e is not None]).astype(np.uint8)).float().to(
-            device)
+        states = (
+            torch.from_numpy(np.vstack([e.state for e in experiences if e is not None]))
+            .float()
+            .to(device)
+        )
+        actions = (
+            torch.from_numpy(
+                np.vstack([e.action for e in experiences if e is not None])
+            )
+            .float()
+            .to(device)
+        )
+        rewards = (
+            torch.from_numpy(
+                np.vstack([e.reward for e in experiences if e is not None])
+            )
+            .float()
+            .to(device)
+        )
+        next_states = (
+            torch.from_numpy(
+                np.vstack([e.next_state for e in experiences if e is not None])
+            )
+            .float()
+            .to(device)
+        )
+        dones = (
+            torch.from_numpy(
+                np.vstack([e.done for e in experiences if e is not None]).astype(
+                    np.uint8
+                )
+            )
+            .float()
+            .to(device)
+        )
 
         return (states, actions, rewards, next_states, dones)
 

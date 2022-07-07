@@ -2,8 +2,9 @@ import json
 import time
 from threading import Thread
 
+
 def fileToJson(filename, encoding="utf-8"):
-    f = open(filename, 'r')
+    f = open(filename, "r")
     content = f.read()
     f.close()
     try:
@@ -11,34 +12,36 @@ def fileToJson(filename, encoding="utf-8"):
     except:
         return None
 
+
 class BaseIndexWriter:
-    '''
+    """
     基础指标输出工具
-    '''
+    """
 
     def __init__(self):
         return
 
-    def write_indicator(self, id:str, tag:str, time:int, data:dict):
-        '''
+    def write_indicator(self, id: str, tag: str, time: int, data: dict):
+        """
         将指标数据出\n
         @id     指标ID\n
         @tag    数据标记\n
         @time   指标时间\n
         @data   数据对象，一个dict
-        '''
+        """
         raise Exception("Basic writer cannot output index data to any media")
 
 
 class BaseDataReporter:
-    '''
+    """
     数据报告器
-    '''
-    TaskReportRTData        = 1
-    TaskReportSettleData    = 2
-    TaskReportInitData      = 3
+    """
 
-    def __init__(self, id:str):
+    TaskReportRTData = 1
+    TaskReportSettleData = 2
+    TaskReportInitData = 3
+
+    def __init__(self, id: str):
         self.__inited__ = False
         self.__id__ = id
         return
@@ -49,7 +52,7 @@ class BaseDataReporter:
         self.__tasks__ = list()
         self.__stopped__ = False
 
-        #读取策略标记
+        # 读取策略标记
         filename = "./generated/marker.json"
         obj = fileToJson(filename)
         if obj is not None:
@@ -88,7 +91,7 @@ class BaseDataReporter:
                 time.sleep(1)
                 continue
             else:
-                taskid = self.__tasks__.pop(0)                
+                taskid = self.__tasks__.pop(0)
                 if taskid == self.TaskReportRTData:
                     self.__do_report_rt_data__()
                 elif taskid == self.TaskReportSettleData:
@@ -127,4 +130,3 @@ class BaseDataReporter:
         self.__tasks__.append(self.TaskReportInitData)
         if self.__thrd_task__ is None:
             self.__start__()
-        

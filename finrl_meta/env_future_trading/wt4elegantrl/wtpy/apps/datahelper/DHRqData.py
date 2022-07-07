@@ -1,47 +1,50 @@
-from wtpy.apps.datahelper.DHDefs import BaseDataHelper, DBHelper
-import rqdatac as rq
-from datetime import datetime, timedelta
 import json
 import os
+from datetime import datetime
+from datetime import timedelta
 
-def exchgStdToRQ(exchg:str) -> str:
-    if exchg == 'SSE':
+import rqdatac as rq
+from wtpy.apps.datahelper.DHDefs import BaseDataHelper
+from wtpy.apps.datahelper.DHDefs import DBHelper
+
+
+def exchgStdToRQ(exchg: str) -> str:
+    if exchg == "SSE":
         return "XSHG"
-    elif exchg == 'SZSE':
+    elif exchg == "SZSE":
         return "XSHE"
     else:
         return exchg
 
-def exchgRQToStd(exchg:str) -> str:
-    if exchg == 'XSHG':
+
+def exchgRQToStd(exchg: str) -> str:
+    if exchg == "XSHG":
         return "SSE"
-    elif exchg == 'XSHE':
+    elif exchg == "XSHE":
         return "SZSE"
     else:
         return exchg
 
-def stdCodeToRQ(stdCode:str):
+
+def stdCodeToRQ(stdCode: str):
     stdCode = stdCode.upper()
     items = stdCode.split(".")
     exchg = exchgStdToRQ(items[0])
     if len(items) == 2:
         # 简单股票代码，格式如SSE.600000
         return items[1] + "." + exchg
-    elif items[1] in ["IDX","ETF","STK","OPT"]:
+    elif items[1] in ["IDX", "ETF", "STK", "OPT"]:
         # 标准股票代码，格式如SSE.IDX.000001
         return items[2] + "." + exchg
     elif len(items) == 3:
         # 标准期货代码，格式如CFFEX.IF.2103
-        if items[2] != 'HOT':
-            return ''.join(items[1:])
+        if items[2] != "HOT":
+            return "".join(items[1:])
         else:
             return items[1] + "88"
 
-    
-
 
 class DHRqData(BaseDataHelper):
-
     def __init__(self):
         BaseDataHelper.__init__(self)
         print("Rqdata helper has been created.")
@@ -55,60 +58,56 @@ class DHRqData(BaseDataHelper):
         self.isAuthed = True
         print("Rqdata has been authorized.")
 
-    def dmpCodeListToFile(self, filename:str, hasIndex:bool=True, hasStock:bool=True):
-        stocks = {
-            "SSE":{},
-            "SZSE":{}
-        }
-        
-        #个股列表
+    def dmpCodeListToFile(
+        self, filename: str, hasIndex: bool = True, hasStock: bool = True
+    ):
+        stocks = {"SSE": {}, "SZSE": {}}
+
+        # 个股列表
         if hasStock:
             print("Fetching stock list...")
-            df_stocks = rq.all_instruments(type='CS', market="cn")
+            df_stocks = rq.all_instruments(type="CS", market="cn")
             for idx, row in df_stocks.iterrows():
                 rawcode = row["order_book_id"][:6]
                 exchg = row["exchange"]
-                if exchg == 'XSHG':
+                if exchg == "XSHG":
                     exchg = "SSE"
                 else:
                     exchg = "SZSE"
                 sInfo = dict()
-                sInfo["exchg"] = exchg                    
+                sInfo["exchg"] = exchg
                 sInfo["code"] = rawcode
                 sInfo["name"] = row["symbol"]
-                sInfo["product"] = "STK"            
-                
+                sInfo["product"] = "STK"
+
                 stocks[sInfo["exchg"]][rawcode] = sInfo
 
         if hasIndex:
-            #上证指数列表
+            # 上证指数列表
             print("Fetching index list...")
-            df_stocks = rq.all_instruments(type='INDX', market="cn")
+            df_stocks = rq.all_instruments(type="INDX", market="cn")
             for idx, row in df_stocks.iterrows():
                 rawcode = row["order_book_id"][:6]
                 exchg = row["exchange"]
-                if exchg == 'XSHG':
+                if exchg == "XSHG":
                     exchg = "SSE"
                 else:
                     exchg = "SZSE"
                 sInfo = dict()
-                sInfo["exchg"] = exchg                    
+                sInfo["exchg"] = exchg
                 sInfo["code"] = rawcode
                 sInfo["name"] = row["symbol"]
-                sInfo["product"] = "IDX"            
-                
+                sInfo["product"] = "IDX"
+
                 stocks[sInfo["exchg"]][rawcode] = sInfo
 
         print("Writing code list into file %s..." % (filename))
-        f = open(filename, 'w')
+        f = open(filename, "w")
         f.write(json.dumps(stocks, sort_keys=True, indent=4, ensure_ascii=False))
         f.close()
 
-    def dmpAdjFactorsToFile(self, codes:list, filename:str):
-        stocks = {
-            "SSE":{},
-            "SZSE":{}
-        }
+    def dmpAdjFactorsToFile(self, codes: list, filename: str):
+        stocks = {"SSE": {}, "SZSE": {}}
 
         count = 0
         length = len(codes)
@@ -120,53 +119,68 @@ class DHRqData(BaseDataHelper):
 
             stocks[exchg][code] = list()
             print("Fetching adjust factors of %s(%d/%s)..." % (code, count, length))
-            df_factors = rq.get_ex_factor(order_book_ids=rq_code, start_date="1990-01-01")
-    
+            df_factors = rq.get_ex_factor(
+                order_book_ids=rq_code, start_date="1990-01-01"
+            )
+
             for idx, row in df_factors.iterrows():
-                date = row['announcement_date'].to_pydatetime()
+                date = row["announcement_date"].to_pydatetime()
                 date = date + timedelta(days=1)
-                factor = float(row['ex_cum_factor'])
-                stocks[exchg][code].append({
-                    "date": int(date.strftime("%Y%m%d")),
-                    "factor": factor
-                })
-        
+                factor = float(row["ex_cum_factor"])
+                stocks[exchg][code].append(
+                    {"date": int(date.strftime("%Y%m%d")), "factor": factor}
+                )
+
         print("Writing adjust factors into file %s..." % (filename))
-        f = open(filename, 'w+')
+        f = open(filename, "w+")
         f.write(json.dumps(stocks, sort_keys=True, indent=4, ensure_ascii=False))
         f.close()
 
-    def dmpBarsToFile(self, folder:str, codes:list, start_date:datetime=None, end_date:datetime=None, period:str="day"):
+    def dmpBarsToFile(
+        self,
+        folder: str,
+        codes: list,
+        start_date: datetime = None,
+        end_date: datetime = None,
+        period: str = "day",
+    ):
         if start_date is None:
             start_date = datetime(year=1990, month=1, day=1)
-        
+
         if end_date is None:
             end_date = datetime.now()
 
-        freq = ''
+        freq = ""
         isDay = False
-        filetag = ''
-        if period == 'day':
-            freq = '1d'
+        filetag = ""
+        if period == "day":
+            freq = "1d"
             isDay = True
-            filetag = 'd'
+            filetag = "d"
         elif period == "min5":
-            freq = '5m'
-            filetag = 'm5'
+            freq = "5m"
+            filetag = "m5"
         elif period == "min1":
-            freq = '1m'
-            filetag = 'm1'
+            freq = "1m"
+            filetag = "m1"
         else:
             raise Exception("Unrecognized period")
-        
+
         count = 0
         length = len(codes)
         for stdCode in codes:
             count += 1
             rq_code = stdCodeToRQ(stdCode)
-            
+
             print("Fetching %s bars of %s(%d/%s)..." % (period, stdCode, count, length))
-            df_bars = rq.get_price(order_book_ids = rq_code,start_date=start_date, end_date=end_date,frequency=freq,adjust_type='none',expect_df=True)
+            df_bars = rq.get_price(
+                order_book_ids=rq_code,
+                start_date=start_date,
+                end_date=end_date,
+                frequency=freq,
+                adjust_type="none",
+                expect_df=True,
+            )
             content = "date,time,open,high,low,close,volume,turnover,hold\n"
             total_nums = len(df_bars)
             cur_num = 0
@@ -174,7 +188,7 @@ class DHRqData(BaseDataHelper):
                 trade_date = row.name[1].to_pydatetime()
                 date = trade_date.strftime("%Y-%m-%d")
                 if isDay:
-                    time = '0'
+                    time = "0"
                 else:
                     time = trade_date.strftime("%H:%M:%S")
                 o = str(row["open"])
@@ -200,11 +214,8 @@ class DHRqData(BaseDataHelper):
             f.write(content)
             f.close()
 
-    def dmpAdjFactorsToDB(self, dbHelper:DBHelper, codes:list):
-        stocks = {
-            "SSE":{},
-            "SZSE":{}
-        }
+    def dmpAdjFactorsToDB(self, dbHelper: DBHelper, codes: list):
+        stocks = {"SSE": {}, "SZSE": {}}
 
         count = 0
         length = len(codes)
@@ -216,50 +227,65 @@ class DHRqData(BaseDataHelper):
 
             stocks[exchg][code] = list()
             print("Fetching adjust factors of %s(%d/%s)..." % (code, count, length))
-            df_factors = rq.get_ex_factor(order_book_ids=rq_code, start_date="1990-01-01")
-    
+            df_factors = rq.get_ex_factor(
+                order_book_ids=rq_code, start_date="1990-01-01"
+            )
+
             for idx, row in df_factors.iterrows():
-                date = row['announcement_date'].to_pydatetime()
+                date = row["announcement_date"].to_pydatetime()
                 date = date + timedelta(days=1)
-                factor = float(row['ex_cum_factor'])
-                stocks[exchg][code].append({
-                    "date": int(date.strftime("%Y%m%d")),
-                    "factor": factor
-                })
-        
+                factor = float(row["ex_cum_factor"])
+                stocks[exchg][code].append(
+                    {"date": int(date.strftime("%Y%m%d")), "factor": factor}
+                )
+
         print("Writing adjust factors into database...")
         dbHelper.writeFactors(stocks)
 
-    def dmpBarsToDB(self, dbHelper:DBHelper, codes:list, start_date:datetime=None, end_date:datetime=None, period:str="day"):
+    def dmpBarsToDB(
+        self,
+        dbHelper: DBHelper,
+        codes: list,
+        start_date: datetime = None,
+        end_date: datetime = None,
+        period: str = "day",
+    ):
         if start_date is None:
             start_date = datetime(year=1990, month=1, day=1)
-        
+
         if end_date is None:
             end_date = datetime.now()
 
-        freq = ''
+        freq = ""
         isDay = False
-        if period == 'day':
-            freq = '1d'
+        if period == "day":
+            freq = "1d"
             isDay = True
         elif period == "min5":
-            freq = '5m'
+            freq = "5m"
         elif period == "min1":
-            freq = '1m'
+            freq = "1m"
         else:
             raise Exception("Unrecognized period")
-        
+
         count = 0
         length = len(codes)
         for stdCode in codes:
             items = stdCode.split(".")
             exchg = items[0]
-            code = stdCode[(len(exchg)+1):]
+            code = stdCode[(len(exchg) + 1) :]
             rq_code = stdCodeToRQ(stdCode)
             count += 1
-            
+
             print("Fetching %s bars of %s(%d/%s)..." % (period, stdCode, count, length))
-            df_bars = rq.get_price(order_book_ids = rq_code,start_date=start_date, end_date=end_date,frequency=freq,adjust_type='none',expect_df=True)
+            df_bars = rq.get_price(
+                order_book_ids=rq_code,
+                start_date=start_date,
+                end_date=end_date,
+                frequency=freq,
+                adjust_type="none",
+                expect_df=True,
+            )
             bars = list()
             total_nums = len(df_bars)
             cur_num = 0
@@ -271,7 +297,7 @@ class DHRqData(BaseDataHelper):
                 else:
                     time = int(trade_date.strftime("%H%M"))
                 curBar = {
-                    "exchange":exchg,
+                    "exchange": exchg,
                     "code": code,
                     "date": date,
                     "time": time,
@@ -280,7 +306,7 @@ class DHRqData(BaseDataHelper):
                     "low": row["open"],
                     "close": row["open"],
                     "volume": row["volume"],
-                    "turnover": row["total_turnover"]
+                    "turnover": row["total_turnover"],
                 }
 
                 if "settlement" in row:

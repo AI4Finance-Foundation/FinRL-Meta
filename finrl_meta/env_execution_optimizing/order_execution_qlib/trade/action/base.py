@@ -1,5 +1,8 @@
 import numpy as np
-from gym.spaces import Discrete, Box, Tuple, MultiDiscrete
+from gym.spaces import Box
+from gym.spaces import Discrete
+from gym.spaces import MultiDiscrete
+from gym.spaces import Tuple
 
 
 class Base_Action(object):

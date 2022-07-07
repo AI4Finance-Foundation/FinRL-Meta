@@ -1,4 +1,4 @@
-## Source 
+## Source
 All the codes are collected from qlib: ```https://github.com/microsoft/qlib/tree/high-freq-execution/examples/highfreq```
 
 ```

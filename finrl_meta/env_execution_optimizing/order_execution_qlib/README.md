@@ -1,4 +1,4 @@
-## Source 
+## Source
 All the codes of this file (finrl_meta/env_execution_optimizing/order_execution_qlib) are collected from ```https://github.com/microsoft/qlib/tree/high-freq-execution/examples/```
 
 ```

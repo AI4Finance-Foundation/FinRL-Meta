@@ -1,24 +1,24 @@
-'''Source: https://github.com/microsoft/qlib/tree/high-freq-execution/examples/trade/'''
+"""Source: https://github.com/microsoft/qlib/tree/high-freq-execution/examples/trade/"""
 #  Copyright (c) Microsoft Corporation.
 #  Licensed under the MIT License.
-
 import sys
 from pathlib import Path
 
-import qlib
 import pandas as pd
+import qlib
 from qlib.config import REG_CN
-from qlib.contrib.model.gbdt import LGBModel
 from qlib.contrib.data.handler import Alpha158
+from qlib.contrib.evaluate import backtest as normal_backtest
+from qlib.contrib.evaluate import risk_analysis
+from qlib.contrib.model.gbdt import LGBModel
 from qlib.contrib.strategy.strategy import TopkDropoutStrategy
-from qlib.contrib.evaluate import (
-    backtest as normal_backtest,
-    risk_analysis,
-)
-from qlib.utils import exists_qlib_data, init_instance_by_config, flatten_dict
-from qlib.workflow import R
-from qlib.workflow.record_temp import SignalRecord, PortAnaRecord
 from qlib.tests.data import GetData
+from qlib.utils import exists_qlib_data
+from qlib.utils import flatten_dict
+from qlib.utils import init_instance_by_config
+from qlib.workflow import R
+from qlib.workflow.record_temp import PortAnaRecord
+from qlib.workflow.record_temp import SignalRecord
 
 if __name__ == "__main__":
 

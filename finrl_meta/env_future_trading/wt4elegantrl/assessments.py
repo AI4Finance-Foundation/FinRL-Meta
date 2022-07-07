@@ -1,9 +1,11 @@
 from abc import abstractmethod
+
 import numpy as np
-from wtpy.StrategyDefs import CtaContext, HftContext
+from wtpy.StrategyDefs import CtaContext
+from wtpy.StrategyDefs import HftContext
 
 
-class Assessment():
+class Assessment:
     def __init__(self, init_assets=1000000):
         self._init_assets_ = init_assets
         self.reset()
@@ -63,19 +65,19 @@ class SimpleAssessment(Assessment):  # 借鉴了neofinrl
         # 总手续费
         # fee = context.stra_get_fund_data(3)
 
-        self.__assets__.append(self._init_assets_+dynbalance)  # 账户实时的动态权益
-        
-        
+        self.__assets__.append(self._init_assets_ + dynbalance)  # 账户实时的动态权益
+
         if len(self.__reward__) > 1:
-            reward = (self.__assets__[-1]-self.__assets__[-2]) \
-                / self._init_assets_ * 12 #* 0.382
+            reward = (
+                (self.__assets__[-1] - self.__assets__[-2]) / self._init_assets_ * 12
+            )  # * 0.382
 
             # if (reward < 0 and self.__reward__[-1] < 0) or \
             #         (reward > 0 and self.__reward__[-1] > 0):
             #     self.__successive__ += 1
             # else:
             #     self.__successive__ = 1
-                
+
             # reward *= self.__successive__
 
             # if self.__assets__[-1] > self.__assets__[-2]: #
@@ -136,14 +138,14 @@ class SimpleAssessment(Assessment):  # 借鉴了neofinrl
             # reward += (self.__assets__[-1]-min(self.__assets__[:-1])) \
             #     / self._init_assets_ * 0.382
 
-            '''
+            """
             2021/11/01
 
             if self.__assets__[-1] > self.__assets__[-2]:
                 self.__successive__ += 1
             else:
                 self.__successive__ = 1
-                
+
             reward = -0.00001
             reward += (self.__assets__[-1] /
                     self.__assets__[-2] - 1) * 0.382 * self.__successive__
@@ -151,7 +153,7 @@ class SimpleAssessment(Assessment):  # 借鉴了neofinrl
             reward += max_assets * (5 if max_assets > 0 else 1)
             min_assets = (self.__assets__[-1]/min(self.__assets__[:-1])-1) * 0.382
             reward += min_assets * (5 if min_assets < 0 else 1)
-            '''
+            """
         else:
             reward = -0.01
 

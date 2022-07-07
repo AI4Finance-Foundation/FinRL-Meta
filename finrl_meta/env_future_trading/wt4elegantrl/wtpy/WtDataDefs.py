@@ -1,10 +1,11 @@
 import numpy as np
 from pandas import DataFrame
 
+
 class WtKlineData:
-    def __init__(self, size:int, bAlloc:bool = True):
-        self.capacity:int = size
-        self.size:int = 0
+    def __init__(self, size: int, bAlloc: bool = True):
+        self.capacity: int = size
+        self.size: int = 0
 
         if bAlloc:
             self.bartimes = np.zeros(self.capacity, np.int64)
@@ -21,7 +22,7 @@ class WtKlineData:
             self.closes = None
             self.volumes = None
 
-    def append_bar(self, newBar:dict):
+    def append_bar(self, newBar: dict):
 
         pos = self.size
         if pos == self.capacity:
@@ -43,19 +44,19 @@ class WtKlineData:
         self.volumes[pos] = newBar["volume"]
 
     def is_empty(self) -> bool:
-        return self.size==0
+        return self.size == 0
 
     def clear(self):
         self.size = 0
 
-        self.bartimes:np.ndarray = np.zeros(self.capacity, np.int64)
-        self.opens:np.ndarray = np.zeros(self.capacity)
-        self.highs:np.ndarray = np.zeros(self.capacity)
-        self.lows:np.ndarray = np.zeros(self.capacity)
-        self.closes:np.ndarray = np.zeros(self.capacity)
-        self.volumes:np.ndarray = np.zeros(self.capacity)
+        self.bartimes: np.ndarray = np.zeros(self.capacity, np.int64)
+        self.opens: np.ndarray = np.zeros(self.capacity)
+        self.highs: np.ndarray = np.zeros(self.capacity)
+        self.lows: np.ndarray = np.zeros(self.capacity)
+        self.closes: np.ndarray = np.zeros(self.capacity)
+        self.volumes: np.ndarray = np.zeros(self.capacity)
 
-    def get_bar(self, iLoc:int = -1) -> dict:
+    def get_bar(self, iLoc: int = -1) -> dict:
         if self.is_empty():
             return None
 
@@ -69,7 +70,7 @@ class WtKlineData:
 
         return lastBar
 
-    def slice(self, iStart:int = 0, iEnd:int = -1, bCopy:bool = False):
+    def slice(self, iStart: int = 0, iEnd: int = -1, bCopy: bool = False):
         if self.is_empty():
             return None
 
@@ -96,25 +97,28 @@ class WtKlineData:
         return ret
 
     def to_df(self) -> DataFrame:
-        ret = DataFrame({
-            "bartime":self.bartimes,
-            "open":self.opens,
-            "high":self.highs,
-            "low":self.lows,
-            "close":self.closes,
-            "volume":self.volumes
-        })
+        ret = DataFrame(
+            {
+                "bartime": self.bartimes,
+                "open": self.opens,
+                "high": self.highs,
+                "low": self.lows,
+                "close": self.closes,
+                "volume": self.volumes,
+            }
+        )
         ret.set_index(self.bartimes)
         return ret
 
+
 class WtHftData:
-    def __init__(self, capacity:int):
-        self.capacity:int = capacity
-        self.size:int = 0
+    def __init__(self, capacity: int):
+        self.capacity: int = capacity
+        self.size: int = 0
 
-        self.items = [None]*capacity
+        self.items = [None] * capacity
 
-    def append_item(self, newItem:dict):
+    def append_item(self, newItem: dict):
         pos = self.size
         if pos == self.capacity:
             self.items[:-1] = self.items[1:]
@@ -125,13 +129,13 @@ class WtHftData:
         self.items[pos] = newItem
 
     def is_empty(self) -> bool:
-        return self.size==0
+        return self.size == 0
 
     def clear(self):
         self.size = 0
-        self.items = []*self.capacity
+        self.items = [] * self.capacity
 
-    def get_item(self, iLoc:int=-1) -> dict:
+    def get_item(self, iLoc: int = -1) -> dict:
         if self.is_empty():
             return None
 

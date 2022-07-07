@@ -1,16 +1,21 @@
 import datetime
 from typing import List
+
 import numpy as np
 import pandas as pd
 import pytz
 import wrds
+
 try:
     import exchange_calendars as tc
 except:
-    print('Cannot import exchange_calendars.', 
-          'If you are using python>=3.7, please install it.')
+    print(
+        "Cannot import exchange_calendars.",
+        "If you are using python>=3.7, please install it.",
+    )
     import trading_calendars as tc
-    print('Use trading_calendars instead for wrds processor.')
+
+    print("Use trading_calendars instead for wrds processor.")
 # from basic_processor import _Base
 from finrl_meta.data_processors._base import _Base
 
@@ -21,15 +26,24 @@ class Wrds(_Base):
     # def __init__(self,if_offline=False):
     #     if not if_offline:
     #         self.db = wrds.Connection()
-    def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
+    def __init__(
+        self,
+        data_source: str,
+        start_date: str,
+        end_date: str,
+        time_interval: str,
+        **kwargs
+    ):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
-        if 'if_offline' in kwargs.keys() and not kwargs['if_offline']:
+        if "if_offline" in kwargs.keys() and not kwargs["if_offline"]:
             self.db = wrds.Connection()
 
-    def download_data(self, ticker_list: List[str],  if_save_tempfile=False,  filter_shares=0):
+    def download_data(
+        self, ticker_list: List[str], if_save_tempfile=False, filter_shares=0
+    ):
 
         dates = self.get_trading_days(self.start_date, self.end_date)
-        print('Trading days: ')
+        print("Trading days: ")
         print(dates)
         first_time = True
         empty = True
@@ -40,47 +54,49 @@ class Wrds(_Base):
             if not x[1]:
                 empty = False
                 dataset = x[0]
-                dataset = self.preprocess_to_ohlcv(dataset, time_interval=(str(self.time_interval) + 'S'))
-                print('Data for date: ' + i + ' finished')
+                dataset = self.preprocess_to_ohlcv(
+                    dataset, time_interval=(str(self.time_interval) + "S")
+                )
+                print("Data for date: " + i + " finished")
                 if first_time:
                     temp = dataset
                     first_time = False
                 else:
                     temp = pd.concat([temp, dataset])
                 if if_save_tempfile:
-                    temp.to_csv('./temp.csv')
+                    temp.to_csv("./temp.csv")
         if empty:
-            raise ValueError('Empty Data under input parameters!')
+            raise ValueError("Empty Data under input parameters!")
         result = temp
-        result = result.sort_values(by=['time', 'tic'])
+        result = result.sort_values(by=["time", "tic"])
         result = result.reset_index(drop=True)
         self.dataframe = result
 
-    def preprocess_to_ohlcv(self, df, time_interval='60S'):
-        df = df[['date', 'time_m', 'sym_root', 'size', 'price']]
-        tic_list = np.unique(df['sym_root'].values)
+    def preprocess_to_ohlcv(self, df, time_interval="60S"):
+        df = df[["date", "time_m", "sym_root", "size", "price"]]
+        tic_list = np.unique(df["sym_root"].values)
         final_df = None
         first_time = True
         for i in range(len(tic_list)):
             tic = tic_list[i]
             time_list = []
-            temp_df = df[df['sym_root'] == tic]
+            temp_df = df[df["sym_root"] == tic]
             for i in range(temp_df.shape[0]):
-                date = temp_df['date'].iloc[i]
-                time_m = temp_df['time_m'].iloc[i]
-                time = str(date) + ' ' + str(time_m)
+                date = temp_df["date"].iloc[i]
+                time_m = temp_df["time_m"].iloc[i]
+                time = str(date) + " " + str(time_m)
                 try:
-                    time = datetime.datetime.strptime(time, '%Y-%m-%d %H:%M:%S.%f')
+                    time = datetime.datetime.strptime(time, "%Y-%m-%d %H:%M:%S.%f")
                 except:
-                    time = datetime.datetime.strptime(time, '%Y-%m-%d %H:%M:%S')
+                    time = datetime.datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
                 time_list.append(time)
-            temp_df['time'] = time_list
-            temp_df = temp_df.set_index('time')
-            data_ohlc = temp_df['price'].resample(time_interval).ohlc()
-            data_v = temp_df['size'].resample(time_interval).agg({'size': 'sum'})
-            volume = data_v['size'].values
-            data_ohlc['volume'] = volume
-            data_ohlc['tic'] = tic
+            temp_df["time"] = time_list
+            temp_df = temp_df.set_index("time")
+            data_ohlc = temp_df["price"].resample(time_interval).ohlc()
+            data_v = temp_df["size"].resample(time_interval).agg({"size": "sum"})
+            volume = data_v["size"].values
+            data_ohlc["volume"] = volume
+            data_ohlc["tic"] = tic
             if first_time:
                 final_df = data_ohlc.reset_index()
                 first_time = False
@@ -89,19 +105,19 @@ class Wrds(_Base):
         return final_df
 
     def clean_data(self):
-        df = self.dataframe[['time', 'open', 'high', 'low', 'close', 'volume', 'tic']]
+        df = self.dataframe[["time", "open", "high", "low", "close", "volume", "tic"]]
         # remove 16:00 data
-        tic_list = np.unique(df['tic'].values)
+        tic_list = np.unique(df["tic"].values)
         ary = df.values
         rows_1600 = []
         for i in range(ary.shape[0]):
             row = ary[i]
             time = row[0]
-            if str(time)[-8:] == '16:00:00':
+            if str(time)[-8:] == "16:00:00":
                 rows_1600.append(i)
 
         df = df.drop(rows_1600)
-        df = df.sort_values(by=['tic', 'time'])
+        df = df.sort_values(by=["tic", "time"])
 
         # check missing rows
         tic_dic = {tic: [0, 0] for tic in tic_list}
@@ -113,61 +129,83 @@ class Wrds(_Base):
             if volume != 0:
                 tic_dic[tic][0] += 1
             tic_dic[tic][1] += 1
-        constant = np.unique(df['time'].values).shape[0]
+        constant = np.unique(df["time"].values).shape[0]
         nan_tics = [tic for tic, value in tic_dic.items() if value[1] != constant]
         # fill missing rows
-        normal_time = np.unique(df['time'].values)
+        normal_time = np.unique(df["time"].values)
 
         df2 = df.copy()
         for tic in nan_tics:
-            tic_time = df[df['tic'] == tic]['time'].values
+            tic_time = df[df["tic"] == tic]["time"].values
             missing_time = [i for i in normal_time if i not in tic_time]
             for time in missing_time:
-                temp_df = pd.DataFrame([[time, np.nan, np.nan, np.nan, np.nan, 0, tic]],
-                                       columns=['time', 'open', 'high', 'low', 'close', 'volume', 'tic'])
+                temp_df = pd.DataFrame(
+                    [[time, np.nan, np.nan, np.nan, np.nan, 0, tic]],
+                    columns=[
+                        "time",
+                        "open",
+                        "high",
+                        "low",
+                        "close",
+                        "volume",
+                        "tic",
+                    ],
+                )
                 df2 = df2.append(temp_df, ignore_index=True)
 
         # fill nan data
-        df = df2.sort_values(by=['tic', 'time'])
+        df = df2.sort_values(by=["tic", "time"])
         for i in range(df.shape[0]):
-            if float(df.iloc[i]['volume']) == 0:
-                previous_close = df.iloc[i - 1]['close']
-                if str(previous_close) == 'nan':
-                    raise ValueError('Error nan price')
+            if float(df.iloc[i]["volume"]) == 0:
+                previous_close = df.iloc[i - 1]["close"]
+                if str(previous_close) == "nan":
+                    raise ValueError("Error nan price")
                 df.iloc[i, 1] = previous_close
                 df.iloc[i, 2] = previous_close
                 df.iloc[i, 3] = previous_close
                 df.iloc[i, 4] = previous_close
         # check if nan
-        ary = df[['open', 'high', 'low', 'close', 'volume']].values
+        ary = df[["open", "high", "low", "close", "volume"]].values
         assert np.isnan(np.min(ary)) == False
         # final preprocess
-        df = df[['time', 'open', 'high', 'low', 'close', 'volume', 'tic']]
+        df = df[["time", "open", "high", "low", "close", "volume", "tic"]]
         df = df.reset_index(drop=True)
-        print('Data clean finished')
+        print("Data clean finished")
         self.dataframe = df
 
     def get_trading_days(self, start, end):
-        nyse = tc.get_calendar('NYSE')
-        df = nyse.sessions_in_range(pd.Timestamp(start, tz=pytz.UTC),
-                                    pd.Timestamp(end, tz=pytz.UTC))
+        nyse = tc.get_calendar("NYSE")
+        df = nyse.sessions_in_range(
+            pd.Timestamp(start, tz=pytz.UTC), pd.Timestamp(end, tz=pytz.UTC)
+        )
         return [str(day)[:10] for day in df]
 
-    def data_fetch_wrds(self, date='2021-05-01', stock_set=('AAPL'), filter_shares=0, time_interval=60):
+    def data_fetch_wrds(
+        self,
+        date="2021-05-01",
+        stock_set=("AAPL"),
+        filter_shares=0,
+        time_interval=60,
+    ):
         # start_date, end_date should be in the same year
-        current_date = datetime.datetime.strptime(date, '%Y-%m-%d')
-        lib = 'taqm_' + str(current_date.year)  # taqm_2021
-        table = 'ctm_' + current_date.strftime('%Y%m%d')  # ctm_20210501
+        current_date = datetime.datetime.strptime(date, "%Y-%m-%d")
+        lib = "taqm_" + str(current_date.year)  # taqm_2021
+        table = "ctm_" + current_date.strftime("%Y%m%d")  # ctm_20210501
 
-        parm = {'syms': stock_set, 'num_shares': filter_shares}
+        parm = {"syms": stock_set, "num_shares": filter_shares}
         try:
-            data = self.db.raw_sql("select * from " + lib + '.' + table +
-                                   " where sym_root in %(syms)s and time_m between '9:30:00' and '16:00:00' and size > %(num_shares)s and sym_suffix is null",
-                                   params=parm)
+            data = self.db.raw_sql(
+                "select * from "
+                + lib
+                + "."
+                + table
+                + " where sym_root in %(syms)s and time_m between '9:30:00' and '16:00:00' and size > %(num_shares)s and sym_suffix is null",
+                params=parm,
+            )
             if_empty = False
             return data, if_empty
         except:
-            print('Data for date: ' + date + ' error')
+            print("Data for date: " + date + " error")
             if_empty = True
             return None, if_empty
 

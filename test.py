@@ -4,17 +4,29 @@ from agents.stablebaselines3_models import DRLAgent as DRLAgent_sb3
 from finrl_meta.data_processor import DataProcessor
 
 
-def test(start_date, end_date, ticker_list, data_source, time_interval,
-         technical_indicator_list, drl_lib, env, model_name, if_vix=True,
-         **kwargs):
+def test(
+    start_date,
+    end_date,
+    ticker_list,
+    data_source,
+    time_interval,
+    technical_indicator_list,
+    drl_lib,
+    env,
+    model_name,
+    if_vix=True,
+    **kwargs
+):
     # process data using unified data processor
     dp = DataProcessor(data_source, start_date, end_date, time_interval, **kwargs)
-    price_array, tech_array, turbulence_array = dp.run(ticker_list, 
-                                                       technical_indicator_list,
-                                                       if_vix)
-    data_config = {'price_array': price_array,
-                   'tech_array': tech_array,
-                   'turbulence_array': turbulence_array}
+    price_array, tech_array, turbulence_array = dp.run(
+        ticker_list, technical_indicator_list, if_vix
+    )
+    data_config = {
+        "price_array": price_array,
+        "tech_array": tech_array,
+        "turbulence_array": turbulence_array,
+    }
     # build environment using processed data
     env_instance = env(config=data_config)
 
@@ -27,7 +39,7 @@ def test(start_date, end_date, ticker_list, data_source, time_interval,
     env_instance = env(config=env_config)
 
     # elegantrl needs state dim, action dim and net dim
-    net_dimension = kwargs.get("net_dimension", 2 ** 7)
+    net_dimension = kwargs.get("net_dimension", 2**7)
     cwd = kwargs.get("cwd", "./" + str(model_name))
     print("price_array: ", len(price_array))
 

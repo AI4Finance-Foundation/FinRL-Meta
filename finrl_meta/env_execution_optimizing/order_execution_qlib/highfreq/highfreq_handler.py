@@ -1,7 +1,8 @@
-from qlib.data.dataset.handler import DataHandler, DataHandlerLP
+from qlib.data.dataset.handler import DataHandler
+from qlib.data.dataset.handler import DataHandlerLP
 from qlib.data.dataset.processor import Processor
-from qlib.utils import get_cls_kwargs
 from qlib.log import TimeInspector
+from qlib.utils import get_cls_kwargs
 
 
 class HighFreqHandler(DataHandlerLP):
@@ -64,7 +65,11 @@ class HighFreqHandler(DataHandlerLP):
             if shift == 0:
                 template_norm = "Cut({0}/Ref(DayLast({1}), 240), 240, None)"
             else:
-                template_norm = "Cut(Ref({0}, " + str(shift) + ")/Ref(DayLast({1}), 240), 240, None)"
+                template_norm = (
+                    "Cut(Ref({0}, "
+                    + str(shift)
+                    + ")/Ref(DayLast({1}), 240), 240, None)"
+                )
 
             feature_ops = template_norm.format(
                 template_if.format(
@@ -149,7 +154,9 @@ class HighFreqBacktestHandler(DataHandler):
         # Because there is no vwap field in the yahoo data, a method similar to Simpson integration is used to approximate vwap
         simpson_vwap = "($open + 2*$high + 2*$low + $close)/6"
         fields += [
-            "Cut({0}, 240, None)".format(template_fillnan.format(template_paused.format("$close"))),
+            "Cut({0}, 240, None)".format(
+                template_fillnan.format(template_paused.format("$close"))
+            ),
         ]
         names += ["$close0"]
         fields += [

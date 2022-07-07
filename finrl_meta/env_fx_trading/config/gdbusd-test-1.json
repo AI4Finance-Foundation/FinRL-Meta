@@ -65,6 +65,6 @@
         "rsi_30":{"color":"white","shape":""},
         "dx_30":{"color":"pink","shape":""},
         "close_30_sma":{"color":"orange","shape":""},
-        "close_60_sma":{"color":"grey","shape":""}        
+        "close_60_sma":{"color":"grey","shape":""}
     }
 }

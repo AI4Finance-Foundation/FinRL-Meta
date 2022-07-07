@@ -1,14 +1,22 @@
-import gym
-import time
 import ctypes
-import numpy as np
+import time
 from collections import OrderedDict
+from multiprocessing import Array
+from multiprocessing import connection
+from multiprocessing import Pipe
+from multiprocessing import Queue
 from multiprocessing.context import Process
-from multiprocessing import Array, Pipe, connection, Queue
-from typing import Any, List, Tuple, Union, Callable, Optional
+from typing import Any
+from typing import Callable
+from typing import List
+from typing import Optional
+from typing import Tuple
+from typing import Union
 
-from tianshou.env.worker import EnvWorker
+import gym
+import numpy as np
 from tianshou.env.utils import CloudpickleWrapper
+from tianshou.env.worker import EnvWorker
 
 
 _NP_TO_CT = {
@@ -100,7 +108,10 @@ def _worker(
 
     """
 
-    def _encode_obs(obs: Union[dict, tuple, np.ndarray], buffer: Union[dict, tuple, ShArray],) -> None:
+    def _encode_obs(
+        obs: Union[dict, tuple, np.ndarray],
+        buffer: Union[dict, tuple, ShArray],
+    ) -> None:
         """
 
         :param obs: Union[dict:
@@ -168,7 +179,9 @@ def _worker(
 class SubprocEnvWorker(EnvWorker):
     """Subprocess worker used in SubprocVectorEnv and ShmemVectorEnv."""
 
-    def __init__(self, env_fn: Callable[[], gym.Env], share_memory: bool = False) -> None:
+    def __init__(
+        self, env_fn: Callable[[], gym.Env], share_memory: bool = False
+    ) -> None:
         super().__init__(env_fn)
         self.parent_remote, self.child_remote = Pipe()
         self.share_memory = share_memory
@@ -196,7 +209,9 @@ class SubprocEnvWorker(EnvWorker):
     def _decode_obs(self) -> Union[dict, tuple, np.ndarray]:
         """ """
 
-        def decode_obs(buffer: Optional[Union[dict, tuple, ShArray]]) -> Union[dict, tuple, np.ndarray]:
+        def decode_obs(
+            buffer: Optional[Union[dict, tuple, ShArray]]
+        ) -> Union[dict, tuple, np.ndarray]:
             """
 
             :param buffer: Optional[Union[dict:
@@ -238,7 +253,9 @@ class SubprocEnvWorker(EnvWorker):
 
     @staticmethod
     def wait(  # type: ignore
-        workers: List["SubprocEnvWorker"], wait_num: int, timeout: Optional[float] = None,
+        workers: List["SubprocEnvWorker"],
+        wait_num: int,
+        timeout: Optional[float] = None,
     ) -> List["SubprocEnvWorker"]:
         """
 
@@ -277,7 +294,9 @@ class SubprocEnvWorker(EnvWorker):
     def toggle_log(self, log):
         self.parent_remote.send(["toggle_log", log])
 
-    def get_result(self,) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    def get_result(
+        self,
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """ """
         obs, rew, done, info = self.parent_remote.recv()
         if self.share_memory:
@@ -381,9 +400,13 @@ class BaseVectorEnv(gym.Env):
 
         self.env_num = len(env_fns)
         self.wait_num = wait_num or len(env_fns)
-        assert 1 <= self.wait_num <= len(env_fns), f"wait_num should be in [1, {len(env_fns)}], but got {wait_num}"
+        assert (
+            1 <= self.wait_num <= len(env_fns)
+        ), f"wait_num should be in [1, {len(env_fns)}], but got {wait_num}"
         self.timeout = timeout
-        assert self.timeout is None or self.timeout > 0, f"timeout is {timeout}, it should be positive if provided!"
+        assert (
+            self.timeout is None or self.timeout > 0
+        ), f"timeout is {timeout}, it should be positive if provided!"
         self.is_async = self.wait_num != len(env_fns) or timeout is not None or testing
         self.waiting_conn: List[EnvWorker] = []
         # environments in self.ready_id is actually ready
@@ -399,7 +422,9 @@ class BaseVectorEnv(gym.Env):
 
     def _assert_is_not_closed(self) -> None:
         """ """
-        assert not self.is_closed, f"Methods of {self.__class__.__name__} cannot be called after " "close."
+        assert not self.is_closed, (
+            f"Methods of {self.__class__.__name__} cannot be called after " "close."
+        )
 
     def __len__(self) -> int:
         """Return len(self), which is the number of environments."""
@@ -431,7 +456,9 @@ class BaseVectorEnv(gym.Env):
         """
         return [getattr(worker, key) for worker in self.workers]
 
-    def _wrap_id(self, id: Optional[Union[int, List[int], np.ndarray]] = None) -> Union[List[int], np.ndarray]:
+    def _wrap_id(
+        self, id: Optional[Union[int, List[int], np.ndarray]] = None
+    ) -> Union[List[int], np.ndarray]:
         """
 
         :param id: Optional[Union[int:
@@ -458,10 +485,16 @@ class BaseVectorEnv(gym.Env):
 
         """
         for i in id:
-            assert i not in self.waiting_id, f"Cannot interact with environment {i} which is stepping now."
-            assert i in self.ready_id, f"Can only interact with ready environments {self.ready_id}."
+            assert (
+                i not in self.waiting_id
+            ), f"Cannot interact with environment {i} which is stepping now."
+            assert (
+                i in self.ready_id
+            ), f"Can only interact with ready environments {self.ready_id}."
 
-    def reset(self, id: Optional[Union[int, List[int], np.ndarray]] = None) -> np.ndarray:
+    def reset(
+        self, id: Optional[Union[int, List[int], np.ndarray]] = None
+    ) -> np.ndarray:
         """Reset the state of some envs and return initial observations.
         If id is None, reset the state of all the environments and return
         initial observations, otherwise reset the specific environments with
@@ -517,7 +550,11 @@ class BaseVectorEnv(gym.Env):
         """ """
         self.sampler.reset()
 
-    def step(self, action: np.ndarray, id: Optional[Union[int, List[int], np.ndarray]] = None) -> List[np.ndarray]:
+    def step(
+        self,
+        action: np.ndarray,
+        id: Optional[Union[int, List[int], np.ndarray]] = None,
+    ) -> List[np.ndarray]:
         """Run one timestep of some environments' dynamics.
         If id is None, run one timestep of all the environments’ dynamics;
         otherwise run one timestep for some environments with given id,  either
@@ -562,7 +599,9 @@ class BaseVectorEnv(gym.Env):
                 self.ready_id = [x for x in self.ready_id if x not in id]
             ready_conns: List[EnvWorker] = []
             while not ready_conns:
-                ready_conns = self.worker_class.wait(self.waiting_conn, self.wait_num, self.timeout)
+                ready_conns = self.worker_class.wait(
+                    self.waiting_conn, self.wait_num, self.timeout
+                )
             result = []
             for conn in ready_conns:
                 waiting_index = self.waiting_conn.index(conn)
@@ -574,7 +613,9 @@ class BaseVectorEnv(gym.Env):
                 self.ready_id.append(env_id)
         return list(map(np.stack, zip(*result)))
 
-    def seed(self, seed: Optional[Union[int, List[int]]] = None) -> List[Optional[List[int]]]:
+    def seed(
+        self, seed: Optional[Union[int, List[int]]] = None
+    ) -> List[Optional[List[int]]]:
         """Set the seed for all environments.
         Accept ``None``, an int (which will extend ``i`` to
         ``[i, i + 1, i + 2, ...]``) or a list.
@@ -608,7 +649,10 @@ class BaseVectorEnv(gym.Env):
         """
         self._assert_is_not_closed()
         if self.is_async and len(self.waiting_id) > 0:
-            raise RuntimeError(f"Environments {self.waiting_id} are still stepping, cannot " "render them now.")
+            raise RuntimeError(
+                f"Environments {self.waiting_id} are still stepping, cannot "
+                "render them now."
+            )
         return [w.render(**kwargs) for w in self.workers]
 
     def close(self) -> None:
@@ -659,7 +703,14 @@ class SubprocVectorEnv(BaseVectorEnv):
             """
             return SubprocEnvWorker(fn, share_memory=False)
 
-        super().__init__(env_fns, worker_fn, sampler, testing, wait_num=wait_num, timeout=timeout)
+        super().__init__(
+            env_fns,
+            worker_fn,
+            sampler,
+            testing,
+            wait_num=wait_num,
+            timeout=timeout,
+        )
 
 
 class ShmemVectorEnv(BaseVectorEnv):
@@ -692,4 +743,11 @@ class ShmemVectorEnv(BaseVectorEnv):
             """
             return SubprocEnvWorker(fn, share_memory=True)
 
-        super().__init__(env_fns, worker_fn, sampler, testing, wait_num=wait_num, timeout=timeout)
+        super().__init__(
+            env_fns,
+            worker_fn,
+            sampler,
+            testing,
+            wait_num=wait_num,
+            timeout=timeout,
+        )

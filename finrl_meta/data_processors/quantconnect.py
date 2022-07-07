@@ -1,23 +1,28 @@
 from typing import List
 
-# from basic_processor import _Base
+from finrl_meta.config import BINANCE_BASE_URL
+from finrl_meta.config import TIME_ZONE_BERLIN
+from finrl_meta.config import TIME_ZONE_JAKARTA
+from finrl_meta.config import TIME_ZONE_PARIS
+from finrl_meta.config import TIME_ZONE_SELFDEFINED
+from finrl_meta.config import TIME_ZONE_SHANGHAI
+from finrl_meta.config import TIME_ZONE_USEASTERN
+from finrl_meta.config import USE_TIME_ZONE_SELFDEFINED
 from finrl_meta.data_processors._base import _Base
 
-from finrl_meta.config import (
-TIME_ZONE_SHANGHAI,
-TIME_ZONE_USEASTERN,
-TIME_ZONE_PARIS,
-TIME_ZONE_BERLIN,
-TIME_ZONE_JAKARTA,
-TIME_ZONE_SELFDEFINED,
-USE_TIME_ZONE_SELFDEFINED,
-BINANCE_BASE_URL,
-)
+# from basic_processor import _Base
 
 
 ## The code of this file is used in website, not locally.
 class Quantconnect(_Base):
-    def __init__(self, data_source: str, start_date: str, end_date: str, time_interval: str, **kwargs):
+    def __init__(
+        self,
+        data_source: str,
+        start_date: str,
+        end_date: str,
+        time_interval: str,
+        **kwargs
+    ):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
 
     # def data_fetch(start_time, end_time, stock_list, resolution=Resolution.Daily) :
@@ -36,7 +41,12 @@ class Quantconnect(_Base):
         qb = QuantBook()
         for stock in ticker_list:
             qb.AddEquity(stock)
-        history = qb.History(qb.Securities.Keys, self.start_date, self.end_date, self.time_interval)
+        history = qb.History(
+            qb.Securities.Keys,
+            self.start_date,
+            self.end_date,
+            self.time_interval,
+        )
         self.dataframe = history
 
     # def preprocess(df, stock_list):

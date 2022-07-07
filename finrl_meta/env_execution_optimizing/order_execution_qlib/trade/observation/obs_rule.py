@@ -1,8 +1,12 @@
-import pandas as pd
-import numpy as np
-from gym.spaces import Discrete, Box, Tuple, MultiDiscrete
-import math
 import json
+import math
+
+import numpy as np
+import pandas as pd
+from gym.spaces import Box
+from gym.spaces import Discrete
+from gym.spaces import MultiDiscrete
+from gym.spaces import Tuple
 
 
 class BaseObs(object):
@@ -60,7 +64,9 @@ class RuleObs(BaseObs):
                 prediction = [df_list[i].reshape(-1) for i in range(len(df_list))]
             for i, p in enumerate(prediction):
                 if len(p) < interval_num:
-                    prediction[i] = np.concatenate((p, np.zeros(interval_num - len(p))), axis=-1)
+                    prediction[i] = np.concatenate(
+                        (p, np.zeros(interval_num - len(p))), axis=-1
+                    )
             # res = np.stack(prediction).transpose().reshape(-1)
             return np.concatenate(prediction)
         for i in range(len(self.features)):
@@ -71,7 +77,9 @@ class RuleObs(BaseObs):
                 if time == -1:
                     predictions += [0.0] * size
                 else:
-                    predictions += df[size * time : size * (time + 1)].reshape(-1).tolist()
+                    predictions += (
+                        df[size * time : size * (time + 1)].reshape(-1).tolist()
+                    )
             elif feature["type"] == "daily":
                 predictions += df.reshape(-1)[:size].tolist()
             elif feature["type"] == "range":
@@ -81,18 +89,24 @@ class RuleObs(BaseObs):
                     predictions += df[time : size + time].reshape(-1).tolist()
             elif feature["type"] == "interval":
                 if len(df[interval * size : (interval + 1) * size].reshape(-1)) == size:
-                    predictions += df[interval * size : (interval + 1) * size].reshape(-1).tolist()
+                    predictions += (
+                        df[interval * size : (interval + 1) * size].reshape(-1).tolist()
+                    )
                 else:
                     predictions += [0.0] * size
             elif feature["type"] == "step":
                 if len(df[size * (time + 1) : size * (time + 2)].reshape(-1)) == size:
-                    predictions += df[size * (time + 1) : size * (time + 2)].reshape(-1).tolist()
+                    predictions += (
+                        df[size * (time + 1) : size * (time + 2)].reshape(-1).tolist()
+                    )
                 else:
                     predictions += [0.0] * size
 
         return np.array(predictions)
 
-    def get_obs(self, raw_df, feature_dfs, t, interval, position, target, is_buy, *args, **kargs):
+    def get_obs(
+        self, raw_df, feature_dfs, t, interval, position, target, is_buy, *args, **kargs
+    ):
         private_state = np.array([position, target, t, self.max_step_num])
         prediction_state = self.get_feature_res(feature_dfs, t, interval)
         return {
