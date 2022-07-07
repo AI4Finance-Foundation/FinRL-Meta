@@ -13,8 +13,8 @@ if not os.path.exists("./" + config.RESULTS_DIR):
     os.makedirs("./" + config.RESULTS_DIR)
 
 
-from FinRL.finrl.finrl_meta.preprocessor.yahoodownloader import YahooDownloader
-from FinRL.finrl.finrl_meta.preprocessor.preprocessors import (
+from FinRL.finrl.meta.preprocessor.yahoodownloader import YahooDownloader
+from FinRL.finrl.meta.preprocessor.preprocessors import (
     FeatureEngineer,
     data_split,
 )

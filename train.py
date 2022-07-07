@@ -1,7 +1,7 @@
 from agents.elegantrl_models import DRLAgent as DRLAgent_erl
 from agents.rllib_models import DRLAgent as DRLAgent_rllib
 from agents.stablebaselines3_models import DRLAgent as DRLAgent_sb3
-from finrl_meta.data_processor import DataProcessor
+from meta.data_processor import DataProcessor
 
 
 def train(

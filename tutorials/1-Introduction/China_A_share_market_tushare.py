@@ -7,20 +7,20 @@ from IPython import display
 
 display.set_matplotlib_formats("svg")
 
-from finrl_meta import config
-from finrl_meta.data_processor import DataProcessor
+from meta import config
+from meta.data_processor import DataProcessor
 from main import check_and_make_directories
-from finrl_meta.data_processors.tushare import Tushare, ReturnPlotter
-from finrl_meta.env_stock_trading.env_stocktrading_China_A_shares import (
+from meta.data_processors.tushare import Tushare, ReturnPlotter
+from meta.env_stock_trading.env_stocktrading_China_A_shares import (
     StockTradingEnv,
 )
 from agents.stablebaselines3_models import DRLAgent
 import os
 from typing import List
 from argparse import ArgumentParser
-from finrl_meta import config
-from finrl_meta.config_tickers import DOW_30_TICKER
-from finrl_meta.config import (
+from meta import config
+from meta.config_tickers import DOW_30_TICKER
+from meta.config import (
     DATA_SAVE_DIR,
     TRAINED_MODEL_DIR,
     TENSORBOARD_LOG_DIR,
