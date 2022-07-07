@@ -16,20 +16,18 @@ except:
     import trading_calendars as tc
 
     print("Use trading_calendars instead for yahoofinance processor..")
-# from basic_processor import _Base
-from finrl_meta.data_processors._base import _Base
-from finrl_meta.data_processors._base import calc_time_zone
 
 from finrl_meta.config import (
-    TIME_ZONE_SHANGHAI,
-    TIME_ZONE_USEASTERN,
-    TIME_ZONE_PARIS,
+    BINANCE_BASE_URL,
     TIME_ZONE_BERLIN,
     TIME_ZONE_JAKARTA,
+    TIME_ZONE_PARIS,
     TIME_ZONE_SELFDEFINED,
+    TIME_ZONE_SHANGHAI,
+    TIME_ZONE_USEASTERN,
     USE_TIME_ZONE_SELFDEFINED,
-    BINANCE_BASE_URL,
 )
+from finrl_meta.data_processors._base import _Base, calc_time_zone
 
 
 class Yahoofinance(_Base):
@@ -47,8 +45,6 @@ class Yahoofinance(_Base):
         self.time_zone = calc_time_zone(
             ticker_list, TIME_ZONE_SELFDEFINED, USE_TIME_ZONE_SELFDEFINED
         )
-
-        # Download and save the data in a pandas DataFrame:
         self.dataframe = pd.DataFrame()
         for tic in ticker_list:
             temp_df = yf.download(
@@ -59,10 +55,8 @@ class Yahoofinance(_Base):
             )
             temp_df["tic"] = tic
             self.dataframe = self.dataframe.append(temp_df)
-        # reset the index, we want to use numbers as index instead of dates
         self.dataframe.reset_index(inplace=True)
         try:
-            # convert the column names to standardized names
             self.dataframe.columns = [
                 "date",
                 "open",
@@ -75,30 +69,21 @@ class Yahoofinance(_Base):
             ]
         except NotImplementedError:
             print("the features are not supported currently")
-        # create day of the week column (monday = 0)
         self.dataframe["day"] = self.dataframe["date"].dt.dayofweek
-        # convert date to standard string format, easy to filter
         self.dataframe["date"] = self.dataframe.date.apply(
             lambda x: x.strftime("%Y-%m-%d")
         )
-        # drop missing data
         self.dataframe.dropna(inplace=True)
         self.dataframe.reset_index(drop=True, inplace=True)
         print("Shape of DataFrame: ", self.dataframe.shape)
-        # print("Display DataFrame: ", data_df.head())
-
         self.dataframe.sort_values(by=["date", "tic"], inplace=True)
         self.dataframe.reset_index(drop=True, inplace=True)
 
     def clean_data(self):
-
         df = self.dataframe.copy()
         df = df.rename(columns={"date": "time"})
         time_interval = self.time_interval
-        # get ticker list
         tic_list = np.unique(df.tic.values)
-
-        # get complete time index
         trading_days = self.get_trading_days(start=self.start_date, end=self.end_date)
         if time_interval == "1D":
             times = trading_days
@@ -115,12 +100,9 @@ class Yahoofinance(_Base):
             raise ValueError(
                 "Data clean at given time interval is not supported for YahooFinance data."
             )
-
-        # fill NaN data
         new_df = pd.DataFrame()
         for tic in tic_list:
             print(("Clean data for ") + tic)
-            # create empty DataFrame using complete time index
             tmp_df = pd.DataFrame(
                 columns=[
                     "open",
@@ -191,141 +173,8 @@ class Yahoofinance(_Base):
         # reset index and rename columns
         new_df = new_df.reset_index()
         new_df = new_df.rename(columns={"index": "time"})
-
         print("Data clean all finished!")
-
         self.dataframe = new_df
-
-    # def add_technical_indicator(self, data, tech_indicator_list):
-    #     """
-    #     calculate technical indicators
-    #     use stockstats package to add technical inidactors
-    #     :param data: (df) pandas dataframe
-    #     :return: (df) pandas dataframe
-    #     """
-    #     df = data.copy()
-    #     df = df.sort_values(by=['tic','time'])
-    #     stock = Sdf.retype(df.copy())
-    #     unique_ticker = stock.tic.unique()
-    #
-    #     for indicator in tech_indicator_list:
-    #         indicator_df = pd.DataFrame()
-    #         for i in range(len(unique_ticker)):
-    #             try:
-    #                 temp_indicator = stock[stock.tic == unique_ticker[i]][indicator]
-    #                 temp_indicator = pd.DataFrame(temp_indicator)
-    #                 temp_indicator['tic'] = unique_ticker[i]
-    #                 temp_indicator['time'] = df[df.tic == unique_ticker[i]]['time'].to_list()
-    #                 indicator_df = indicator_df.append(
-    #                     temp_indicator, ignore_index=True
-    #                 )
-    #             except Exception as e:
-    #                 print(e)
-    #         df = df.merge(indicator_df[['tic','time',indicator]],on=['tic','time'],how='left')
-    #     df = df.sort_values(by=['time','tic'])
-    #     return df
-
-    # def add_turbulence(self, data):
-    #     """
-    #     add turbulence index from a precalcualted dataframe
-    #     :param data: (df) pandas dataframe
-    #     :return: (df) pandas dataframe
-    #     """
-    #     df = data.copy()
-    #     turbulence_index = self.calculate_turbulence(df)
-    #     df = df.merge(turbulence_index, on="time")
-    #     df = df.sort_values(["time", "tic"]).reset_index(drop=True)
-    #     return df
-    #
-    # def calculate_turbulence(self, data, time_period = 252):
-    #     """calculate turbulence index based on dow 30"""
-    #     # can add other market assets
-    #     df = data.copy()
-    #     df_price_pivot = df.pivot(index="time", columns="tic", values="close")
-    #     # use returns to calculate turbulence
-    #     df_price_pivot = df_price_pivot.pct_change()
-    #
-    #     unique_date = df.date.unique()
-    #     # start after a year
-    #     start = time_period
-    #     turbulence_index = [0] * start
-    #     # turbulence_index = [0]
-    #     count = 0
-    #     for i in range(start, len(unique_date)):
-    #         current_price = df_price_pivot[df_price_pivot.index == unique_date[i]]
-    #         # use one year rolling window to calcualte covariance
-    #         hist_price = df_price_pivot[
-    #             (df_price_pivot.index < unique_date[i])
-    #             & (df_price_pivot.index >= unique_date[i - time_period])
-    #         ]
-    #         # Drop tickers which has number missing values more than the "oldest" ticker
-    #         filtered_hist_price = hist_price.iloc[hist_price.isna().sum().min():].dropna(axis=1)
-    #
-    #         cov_temp = filtered_hist_price.cov()
-    #         current_temp = current_price[[x for x in filtered_hist_price]] - np.mean(filtered_hist_price, axis=0)
-    #         #cov_temp = hist_price.cov()
-    #         #current_temp=(current_price - np.mean(hist_price,axis=0))
-    #
-    #         temp = current_temp.values.dot(np.linalg.pinv(cov_temp)).dot(
-    #             current_temp.values.T
-    #         )
-    #         if temp > 0:
-    #             count += 1
-    #             if count > 2:
-    #                 turbulence_temp = temp[0][0]
-    #             else:
-    #                 # avoid large outlier because of the calculation just begins
-    #                 turbulence_temp = 0
-    #         else:
-    #             turbulence_temp = 0
-    #         turbulence_index.append(turbulence_temp)
-    #
-    #     turbulence_index = pd.DataFrame(
-    #         {"time": df_price_pivot.index, "turbulence": turbulence_index}
-    #     )
-    #     return turbulence_index
-
-    # def add_vix(self, data):
-    #     """
-    #     add vix from yahoo finance
-    #     :param data: (df) pandas dataframe
-    #     :return: (df) pandas dataframe
-    #     """
-    #     df = data.copy()
-    #     df_vix = self.download_data(start_date= df.time.min(),
-    #                                 end_date= df.time.max(),
-    #                                 ticker_list = ["^VIX"],
-    #                                 time_interval = self.time_interval)
-    #     df_vix = self.clean_data(df_vix)
-    #     vix = df_vix[['time','adjusted_close']]
-    #     vix.columns = ['time','vix']
-    #
-    #     df = df.merge(vix, on="time")
-    #     df = df.sort_values(["time", "tic"]).reset_index(drop=True)
-    #     return df
-
-    # def df_to_array(self, df, tech_indicator_list, if_vix):
-    #     """transform final df to numpy arrays"""
-    #     unique_ticker = df.tic.unique()
-    #     print(unique_ticker)
-    #     if_first_time = True
-    #     for tic in unique_ticker:
-    #         if if_first_time:
-    #             price_array = df[df.tic==tic][['adjusted_close']].values
-    #             #price_ary = df[df.tic==tic]['close'].values
-    #             tech_array = df[df.tic==tic][tech_indicator_list].values
-    #             if if_vix:
-    #                 risk_array = df[df.tic==tic]['vix'].values
-    #             else:
-    #                 risk_array = df[df.tic==tic]['turbulence'].values
-    #             if_first_time = False
-    #         else:
-    #             price_array = np.hstack([price_array, df[df.tic==tic][['adjusted_close']].values])
-    #             tech_array = np.hstack([tech_array, df[df.tic==tic][tech_indicator_list].values])
-    #     assert price_array.shape[0] == tech_array.shape[0]
-    #     assert tech_array.shape[0] == risk_array.shape[0]
-    #     print('Successfully transformed into array')
-    #     return price_array, tech_array, risk_array
 
     def get_trading_days(self, start, end):
         nyse = tc.get_calendar("NYSE")
