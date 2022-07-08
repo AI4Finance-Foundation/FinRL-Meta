@@ -54,10 +54,10 @@ def test_yahoo_data_processor(
         expected_df_size,
         9,
     ) or dp.dataframe.shape == (expected_df_size - 1, 9)
-    dp.clean_data()
-    assert dp.dataframe.shape[1] == 8
-    # dp.add_technical_indicator(tech_indicator_list, select_stockstats_talib=0)
-    # assert dp.dataframe.shape[1] == 8 + len(tech_indicator_list)
+    with pytest.raises(ValueError):
+        dp.clean_data()
+    dp.add_technical_indicator(tech_indicator_list, select_stockstats_talib=0)
+    assert dp.dataframe.shape[1] == 8 + len(tech_indicator_list) + 2
 
 
 @pytest.mark.parametrize(
@@ -87,5 +87,5 @@ def test_binance_data_processor(
     ) or dp.dataframe.shape == (expected_df_size_binance - 1, 8)
     dp.clean_data()
     assert dp.dataframe.shape[1] == 8
-    # dp.add_technical_indicator(tech_indicator_list, select_stockstats_talib=0)
-    # assert dp.dataframe.shape[1] == 8 + len(tech_indicator_list) + 1
+    dp.add_technical_indicator(tech_indicator_list, select_stockstats_talib=0)
+    assert dp.dataframe.shape[1] == 8 + len(tech_indicator_list) + 1
