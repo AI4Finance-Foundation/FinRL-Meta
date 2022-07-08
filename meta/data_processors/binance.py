@@ -55,7 +55,7 @@ class Binance(_Base):
                 hist_data = self.dataframe_with_limit(symbol=i)
                 df = hist_data.iloc[:-1].dropna()
                 df["tic"] = i
-                final_df = final_df.append(df)
+                final_df = pd.concat([final_df, df], axis=0, join="outer")
         self.dataframe = final_df
 
     # def clean_data(self, df):
@@ -189,7 +189,7 @@ class Binance(_Base):
             if last_datetime == self.end_time:
                 break
 
-            final_df = final_df.append(new_df)
+            final_df = pd.concat([final_df, new_df], axis=0, join="outer")
             # last_datetime = max(new_df.datetime) + dt.timedelta(days=1)
             last_datetime = max(new_df.datetime)
             if isinstance(last_datetime, pd.Timestamp):
