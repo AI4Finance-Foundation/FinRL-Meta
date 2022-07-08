@@ -1,3 +1,4 @@
+import copy
 from typing import List
 
 import pandas as pd
@@ -50,14 +51,22 @@ def test_yahoo_data_processor(
     dp = DataProcessor(data_source, start_date, end_date, time_interval)
     dp.download_data(ticker_input)
     assert isinstance(dp.dataframe, pd.DataFrame)
-    assert dp.dataframe.shape == (
-        expected_df_size,
-        9,
-    ) or dp.dataframe.shape == (expected_df_size - 1, 9)
+    assert (
+        dp.dataframe.shape
+        == (
+            expected_df_size,
+            9,
+        )
+        or dp.dataframe.shape == (expected_df_size - 1, 9)
+        or dp.dataframe.shape == (expected_df_size - 30, 9)
+    )
+    dp2 = copy.deepcopy(dp)
     with pytest.raises(ValueError):
-        dp.clean_data()
-    dp.add_technical_indicator(tech_indicator_list, select_stockstats_talib=0)
-    assert dp.dataframe.shape[1] == 8 + len(tech_indicator_list) + 2
+        dp2.clean_data()
+    dp2.add_technical_indicator(tech_indicator_list, select_stockstats_talib=0)
+    assert dp2.dataframe.shape[1] == 8 + len(tech_indicator_list) + 2
+    dp3 = copy.deepcopy(dp)
+    dp3.add_technical_indicator(tech_indicator_list, select_stockstats_talib=1)
 
 
 @pytest.mark.parametrize(
@@ -81,11 +90,17 @@ def test_binance_data_processor(
     dp = DataProcessor(data_source, start_date, end_date, time_interval)
     dp.download_data(ticker_input_binance)
     assert isinstance(dp.dataframe, pd.DataFrame)
-    assert dp.dataframe.shape == (
-        expected_df_size_binance,
-        8,
-    ) or dp.dataframe.shape == (expected_df_size_binance - 1, 8)
-    dp.clean_data()
-    assert dp.dataframe.shape[1] == 8
-    dp.add_technical_indicator(tech_indicator_list, select_stockstats_talib=0)
-    assert dp.dataframe.shape[1] == 8 + len(tech_indicator_list) + 1
+    assert (
+        dp.dataframe.shape
+        == (
+            expected_df_size_binance,
+            8,
+        )
+        or dp.dataframe.shape == (expected_df_size_binance - 1, 8)
+        or dp.dataframe.shape == (expected_df_size_binance + 1, 8)
+    )
+    dp2 = copy.deepcopy(dp)
+    dp2.clean_data()
+    assert dp2.dataframe.shape[1] == 8
+    dp2.add_technical_indicator(tech_indicator_list, select_stockstats_talib=0)
+    assert dp2.dataframe.shape[1] == 8 + len(tech_indicator_list) + 1
