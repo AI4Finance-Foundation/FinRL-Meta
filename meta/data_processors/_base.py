@@ -144,8 +144,11 @@ class _Base:
                         temp_indicator["time"] = self.dataframe[
                             self.dataframe.tic == unique_ticker[i]
                         ]["time"].to_list()
-                        indicator_df = indicator_df.append(
-                            temp_indicator, ignore_index=True
+                        indicator_df = pd.concat(
+                            [indicator_df, temp_indicator],
+                            axis=0,
+                            join="outer",
+                            ignore_index=True,
                         )
                     except Exception as e:
                         print(e)
