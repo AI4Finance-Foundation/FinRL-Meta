@@ -4,9 +4,7 @@ import pandas as pd
 import pytest
 
 from meta.config_tickers import DOW_30_TICKER
-from meta.config_tickers import NAS_100_TICKER
 from meta.config_tickers import SINGLE_TICKER
-from meta.config_tickers import SP_500_TICKER
 from meta.data_processor import DataProcessor
 
 
@@ -26,10 +24,36 @@ def time_interval():
 
 
 @pytest.mark.parametrize(
+    "ticker_input_binance, expected_df_size_binance",
+    [(["BTCUSDT"], 302), (["ETHUSDT"], 302)],
+)
+def test_binance_data_processor(
+    time_interval: str,
+    start_date: str,
+    end_date: str,
+    ticker_input_binance: List[str],
+    expected_df_size_binance: int,
+) -> None:
+    """
+    Tests the Binance Downloader and the returned data shape
+    """
+    assert isinstance(start_date, str)
+    assert isinstance(end_date, str)
+    data_source = "binance"
+    dp = DataProcessor(data_source, start_date, end_date, time_interval)
+    dp.download_data(ticker_input_binance)
+    assert isinstance(dp.dataframe, pd.DataFrame)
+    assert dp.dataframe.shape == (
+        expected_df_size_binance,
+        8,
+    ) or dp.dataframe.shape == (expected_df_size_binance - 1, 8)
+
+
+@pytest.mark.parametrize(
     "ticker_input, expected_df_size",
     [(SINGLE_TICKER, 210), (DOW_30_TICKER, 6300)],
 )
-def test_data_processor(
+def test_yahoo_data_processor(
     time_interval: str,
     start_date: str,
     end_date: str,
@@ -38,8 +62,6 @@ def test_data_processor(
 ) -> None:
     """
     Tests the Yahoo Downloader and the returned data shape
-    Tries to retrieve Apple's stock data, 1day interval, from Yahoo Finance
-    A list with 1 element is passed to the ticker: ['AAPL']
     """
     assert isinstance(start_date, str)
     assert isinstance(end_date, str)
