@@ -104,3 +104,5 @@ def test_binance_data_processor(
     assert dp2.dataframe.shape[1] == 8
     dp2.add_technical_indicator(tech_indicator_list, select_stockstats_talib=0)
     assert dp2.dataframe.shape[1] == 8 + len(tech_indicator_list) + 1
+    dp3 = copy.deepcopy(dp)
+    dp3.add_technical_indicator(tech_indicator_list, select_stockstats_talib=1)
