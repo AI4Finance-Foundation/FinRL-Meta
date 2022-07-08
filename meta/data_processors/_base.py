@@ -185,7 +185,7 @@ class _Base:
                     tic_df["close"],
                     timeperiod=14,
                 )
-                final_df = final_df.append(tic_df)
+                final_df = pd.concat([final_df, tic_df], axis=0, join="outer")
             self.dataframe = final_df
 
         self.dataframe.sort_values(by=["time", "tic"], inplace=True)
