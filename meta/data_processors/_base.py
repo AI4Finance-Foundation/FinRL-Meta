@@ -295,7 +295,7 @@ class _Base:
             print(
                 f"VIX is not applicable for {self.data_source}. Return original DataFrame"
             )
-            return
+            return None
 
         # if self.data_source == 'yahoofinance':
         #     df = data.copy()
@@ -329,14 +329,14 @@ class _Base:
         #     df = df.merge(vix, on="date")
         #     df = df.sort_values(["date", "tic"]).reset_index(drop=True)
 
-        if self.data_source == "yahoofinance":
+        elif self.data_source == "yahoofinance":
             ticker = "^VIX"
         elif self.data_source == "alpaca":
             ticker = "VIXY"
         elif self.data_source == "wrds":
             ticker = "vix"
         else:
-            return
+            pass
         df = self.dataframe.copy()
         self.dataframe = [ticker]
         self.download_data(self.start, self.end, self.time_interval)

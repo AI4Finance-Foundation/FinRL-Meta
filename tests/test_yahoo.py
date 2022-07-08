@@ -1,0 +1,130 @@
+import copy
+from typing import List
+
+import pandas as pd
+import pytest
+
+from meta.config import INDICATORS
+from meta.config_tickers import DOW_30_TICKER
+from meta.config_tickers import SINGLE_TICKER
+from meta.data_processor import DataProcessor
+
+
+@pytest.fixture(scope="session")
+def start_date():
+    return "2021-01-01"
+
+
+@pytest.fixture(scope="session")
+def end_date():
+    return "2021-10-31"
+
+
+@pytest.fixture(scope="session")
+def time_interval():
+    return "1d"
+
+
+@pytest.fixture(scope="session")
+def tech_indicator_list():
+    return INDICATORS
+
+
+pytestmark = pytest.mark.parametrize(
+    "ticker_input, expected_df_size",
+    [(SINGLE_TICKER, 210), (DOW_30_TICKER, 6300)],
+)
+
+
+def test_yahoo_data_processor(
+    time_interval: str,
+    start_date: str,
+    end_date: str,
+    ticker_input: List[str],
+    expected_df_size: int,
+    tech_indicator_list: List[str],
+) -> None:
+    """
+    Tests the Yahoo Downloader and the returned data shape
+    """
+    assert isinstance(start_date, str)
+    assert isinstance(end_date, str)
+    data_source = "yahoofinance"
+    dp = DataProcessor(data_source, start_date, end_date, time_interval)
+    dp.download_data(ticker_input)
+    assert isinstance(dp.dataframe, pd.DataFrame)
+    assert (
+        dp.dataframe.shape
+        == (
+            expected_df_size,
+            9,
+        )
+        or dp.dataframe.shape == (expected_df_size - 1, 9)
+        or dp.dataframe.shape == (expected_df_size - 30, 9)
+    )
+
+
+def test_yahoo_clean_data(
+    time_interval: str,
+    start_date: str,
+    end_date: str,
+    ticker_input: List[str],
+    tech_indicator_list: List[str],
+) -> None:
+    """
+    Tests the Yahoo Downloader and the clean_data() function
+    """
+    data_source = "yahoofinance"
+    dp = DataProcessor(data_source, start_date, end_date, time_interval)
+    dp.download_data(ticker_input)
+    with pytest.raises(ValueError):
+        dp.clean_data()
+
+
+def test_yahoo_add_ti_stockstats(
+    time_interval: str,
+    start_date: str,
+    end_date: str,
+    ticker_input: List[str],
+    tech_indicator_list: List[str],
+) -> None:
+    """
+    Tests the Yahoo Downloader and the returned data shape
+    """
+    data_source = "yahoofinance"
+    dp = DataProcessor(data_source, start_date, end_date, time_interval)
+    dp.download_data(ticker_input)
+    dp.add_technical_indicator(tech_indicator_list, select_stockstats_talib=0)
+    assert dp.dataframe.shape[1] == 8 + len(tech_indicator_list) + 2
+
+
+def test_yahoo_add_ti_taLib(
+    time_interval: str,
+    start_date: str,
+    end_date: str,
+    ticker_input: List[str],
+    tech_indicator_list: List[str],
+) -> None:
+    """
+    Tests the Yahoo Downloader and the returned data shape
+    """
+    data_source = "yahoofinance"
+    dp = DataProcessor(data_source, start_date, end_date, time_interval)
+    dp.download_data(ticker_input)
+    dp.add_technical_indicator(tech_indicator_list, select_stockstats_talib=1)
+
+
+@pytest.mark.parametrize("if_vic", [True, False])
+def test_yahoo_run(
+    time_interval: str,
+    start_date: str,
+    end_date: str,
+    ticker_input: List[str],
+    tech_indicator_list: List[str],
+    if_vix,
+) -> None:
+    data_source = "yahoofinance"
+    dp = DataProcessor(data_source, start_date, end_date, time_interval)
+    price_array, tech_array, turbulence_array = dp.run(
+        ticker_input, tech_indicator_list, if_vix
+    )
