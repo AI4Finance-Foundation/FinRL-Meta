@@ -3,6 +3,7 @@ from typing import List
 import pandas as pd
 import pytest
 
+from meta.config import INDICATORS
 from meta.config_tickers import DOW_30_TICKER
 from meta.config_tickers import SINGLE_TICKER
 from meta.data_processor import DataProcessor
@@ -23,30 +24,9 @@ def time_interval():
     return "1d"
 
 
-@pytest.mark.parametrize(
-    "ticker_input_binance, expected_df_size_binance",
-    [(["BTCUSDT"], 302), (["ETHUSDT"], 302)],
-)
-def test_binance_data_processor(
-    time_interval: str,
-    start_date: str,
-    end_date: str,
-    ticker_input_binance: List[str],
-    expected_df_size_binance: int,
-) -> None:
-    """
-    Tests the Binance Downloader and the returned data shape
-    """
-    assert isinstance(start_date, str)
-    assert isinstance(end_date, str)
-    data_source = "binance"
-    dp = DataProcessor(data_source, start_date, end_date, time_interval)
-    dp.download_data(ticker_input_binance)
-    assert isinstance(dp.dataframe, pd.DataFrame)
-    assert dp.dataframe.shape == (
-        expected_df_size_binance,
-        8,
-    ) or dp.dataframe.shape == (expected_df_size_binance - 1, 8)
+@pytest.fixture(scope="session")
+def tech_indicator_list():
+    return INDICATORS
 
 
 @pytest.mark.parametrize(
@@ -59,6 +39,7 @@ def test_yahoo_data_processor(
     end_date: str,
     ticker_input: List[str],
     expected_df_size: int,
+    tech_indicator_list: List[str],
 ) -> None:
     """
     Tests the Yahoo Downloader and the returned data shape
@@ -73,3 +54,38 @@ def test_yahoo_data_processor(
         expected_df_size,
         9,
     ) or dp.dataframe.shape == (expected_df_size - 1, 9)
+    dp.clean_data()
+    assert dp.dataframe.shape[1] == 8
+    # dp.add_technical_indicator(tech_indicator_list, select_stockstats_talib=0)
+    # assert dp.dataframe.shape[1] == 8 + len(tech_indicator_list)
+
+
+@pytest.mark.parametrize(
+    "ticker_input_binance, expected_df_size_binance",
+    [(["BTCUSDT"], 302), (["ETHUSDT"], 302)],
+)
+def test_binance_data_processor(
+    time_interval: str,
+    start_date: str,
+    end_date: str,
+    ticker_input_binance: List[str],
+    expected_df_size_binance: int,
+    tech_indicator_list: List[str],
+) -> None:
+    """
+    Tests the Binance Downloader and the returned data shape
+    """
+    assert isinstance(start_date, str)
+    assert isinstance(end_date, str)
+    data_source = "binance"
+    dp = DataProcessor(data_source, start_date, end_date, time_interval)
+    dp.download_data(ticker_input_binance)
+    assert isinstance(dp.dataframe, pd.DataFrame)
+    assert dp.dataframe.shape == (
+        expected_df_size_binance,
+        8,
+    ) or dp.dataframe.shape == (expected_df_size_binance - 1, 8)
+    dp.clean_data()
+    assert dp.dataframe.shape[1] == 8
+    # dp.add_technical_indicator(tech_indicator_list, select_stockstats_talib=0)
+    # assert dp.dataframe.shape[1] == 8 + len(tech_indicator_list) + 1
