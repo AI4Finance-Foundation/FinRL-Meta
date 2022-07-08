@@ -172,14 +172,14 @@ class _Base:
                     slowperiod=26,
                     signalperiod=9,
                 )
-                tic_df["rsi"] = talib.RSI(tic_df["close"], timeperiod=14)
-                tic_df["cci"] = talib.CCI(
+                tic_df.loc["rsi"] = talib.RSI(tic_df["close"], timeperiod=14)
+                tic_df.loc["cci"] = talib.CCI(
                     tic_df["high"],
                     tic_df["low"],
                     tic_df["close"],
                     timeperiod=14,
                 )
-                tic_df["dx"] = talib.DX(
+                tic_df.loc["dx"] = talib.DX(
                     tic_df["high"],
                     tic_df["low"],
                     tic_df["close"],
