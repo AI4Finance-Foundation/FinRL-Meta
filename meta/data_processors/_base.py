@@ -160,9 +160,9 @@ class _Base:
             for i in self.dataframe.tic.unique():
                 tic_df = self.dataframe[self.dataframe.tic == i]
                 (
-                    tic_df["macd"],
-                    tic_df["macd_signal"],
-                    tic_df["macd_hist"],
+                    tic_df.loc["macd"],
+                    tic_df.loc["macd_signal"],
+                    tic_df.loc["macd_hist"],
                 ) = talib.MACD(
                     tic_df["close"],
                     fastperiod=12,
