@@ -227,30 +227,6 @@ def test_joinquant():
     pass
 
 
-def test_binance():
-    ticker_list = ["BTCUSDT", "ETHUSDT", "ADAUSDT", "BNBUSDT"]
-    start_date = "2021-09-01"
-    end_date = "2021-09-20"
-    time_interval = "5m"
-
-    dp = DataProcessor("binance", start_date, end_date, time_interval)
-    technical_indicator_list = [
-        "macd",
-        "rsi",
-        "cci",
-        "dx",
-    ]  # self-defined technical indicator list is NOT supported yet
-    if_vix = False
-    price_array, tech_array, turbulence_array = dp.run(
-        ticker_list,
-        technical_indicator_list,
-        if_vix,
-        cache=True,
-        select_stockstats_talib=1,
-    )
-    print(price_array.shape, tech_array.shape)
-
-
 def test_quandl():
     TRADE_START_DATE = "2020-09-01"
     TRADE_END_DATE = "2021-09-11"
