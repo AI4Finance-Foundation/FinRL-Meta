@@ -359,9 +359,9 @@ def test_quandl():
     pass
 
 
-if __name__ == "__main__":
-    # test_joinquant()
-    # test_binance()
-    # test_yahoofinance()
-    test_baostock()
-    # test_quandl()
+# if __name__ == "__main__":
+#     # test_joinquant()
+#     # test_binance()
+#     # test_yahoofinance()
+#     test_baostock()
+#     # test_quandl()
