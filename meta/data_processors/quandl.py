@@ -1,12 +1,12 @@
-import quandl
-
-"""Reference: https://github.com/AI4Finance-LLC/FinRL"""
-
 from typing import List
+
 import numpy as np
 import pandas as pd
 import pytz
+import quandl
 import yfinance as yf
+
+"""Reference: https://github.com/AI4Finance-LLC/FinRL"""
 
 try:
     import exchange_calendars as tc
