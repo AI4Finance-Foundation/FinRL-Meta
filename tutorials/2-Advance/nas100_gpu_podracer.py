@@ -1,3 +1,14 @@
+import logging
+
+logger = logging.getLogger()
+logger.setLevel("DEBUG")
+file_handler = logging.FileHandler("./log.txt", mode="a", encoding="utf-8")
+file_handler.setLevel("DEBUG")
+file_handler.setFormatter(
+    logging.Formatter(fmt="%(lineno)s---%(asctime)s---%(message)s")
+)
+logger.addHandler(file_handler)
+
 import sys
 
 import numpy as np
@@ -48,7 +59,7 @@ def demo_nas100_GPU_Podracer():  # 1.7+ 2.0+
         if_trade=True, gamma=args.gamma, turbulence_thresh=15
     ).draw_cumulative_return(args, _torch=torch)
     episode_returns = np.asarray(episode_returns, dtype=float)
-    print(episode_returns[-1])
+    logging.info(episode_returns[-1])
     np.save("./episode_returns.npy", episode_returns)
 
 

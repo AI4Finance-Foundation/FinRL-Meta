@@ -1,3 +1,14 @@
+import logging
+
+logger = logging.getLogger()
+logger.setLevel("DEBUG")
+file_handler = logging.FileHandler("./log.txt", mode="a", encoding="utf-8")
+file_handler.setLevel("DEBUG")
+file_handler.setFormatter(
+    logging.Formatter(fmt="%(lineno)s---%(asctime)s---%(message)s")
+)
+logger.addHandler(file_handler)
+
 import jqdatasdk as jq
 from neo_finrl.agents.elegantrl.agent import *
 from neo_finrl.agents.elegantrl.run import *
@@ -20,7 +31,7 @@ unit = "15m"
 end_dt = "2021-05-10"
 jq_df = data_fetch(stock_list, num, unit, end_dt)
 jq_ary = preprocess(jq_df, stock_list)
-print(jq_ary.shape)
+logging.info(jq_ary.shape)
 args = Arguments(if_on_policy=True, gpu_id=0)
 args.agent = AgentPPO()
 

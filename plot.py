@@ -1,3 +1,14 @@
+import logging
+
+logger = logging.getLogger()
+logger.setLevel("DEBUG")
+file_handler = logging.FileHandler("./log.txt", mode="a", encoding="utf-8")
+file_handler.setLevel("DEBUG")
+file_handler.setFormatter(
+    logging.Formatter(fmt="%(lineno)s---%(asctime)s---%(message)s")
+)
+logger.addHandler(file_handler)
+
 from copy import deepcopy
 
 import matplotlib.dates as mdates
@@ -36,7 +47,7 @@ def backtest_stats(account_value, value_col_name="account_value"):
         transactions=None,
         turnover_denom="AGB",
     )
-    print(perf_stats_all)
+    logging.info(perf_stats_all)
     return perf_stats_all
 
 

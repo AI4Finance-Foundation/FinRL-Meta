@@ -1,3 +1,14 @@
+import logging
+
+logger = logging.getLogger()
+logger.setLevel("DEBUG")
+file_handler = logging.FileHandler("./log.txt", mode="a", encoding="utf-8")
+file_handler.setLevel("DEBUG")
+file_handler.setFormatter(
+    logging.Formatter(fmt="%(lineno)s---%(asctime)s---%(message)s")
+)
+logger.addHandler(file_handler)
+
 import os
 
 from FinRL.finrl import config
@@ -203,9 +214,9 @@ class StockPortfolioEnv(gym.Env):
             plt.savefig("results/rewards.png")
             plt.close()
 
-            print("=================================")
-            print("begin_total_asset:{}".format(self.asset_memory[0]))
-            print("end_total_asset:{}".format(self.portfolio_value))
+            logging.info("=================================")
+            logging.info("begin_total_asset:{}".format(self.asset_memory[0]))
+            logging.info("end_total_asset:{}".format(self.portfolio_value))
 
             df_daily_return = pd.DataFrame(self.portfolio_return_memory)
             df_daily_return.columns = ["daily_return"]
@@ -215,8 +226,8 @@ class StockPortfolioEnv(gym.Env):
                     * df_daily_return["daily_return"].mean()
                     / df_daily_return["daily_return"].std()
                 )
-                print("Sharpe: ", sharpe)
-            print("=================================")
+                logging.info("Sharpe: ", sharpe)
+            logging.info("=================================")
 
             return self.state, self.reward, self.terminal, {}
 
@@ -286,8 +297,8 @@ class StockPortfolioEnv(gym.Env):
     def save_asset_memory(self):
         date_list = self.date_memory
         portfolio_return = self.portfolio_return_memory
-        # print(len(date_list))
-        # print(len(asset_list))
+        # logging.info(len(date_list))
+        # logging.info(len(asset_list))
         df_account_value = pd.DataFrame(
             {"date": date_list, "daily_return": portfolio_return}
         )
@@ -318,10 +329,10 @@ class StockPortfolioEnv(gym.Env):
 
 stock_dimension = len(train.tic.unique())
 state_space = stock_dimension
-print(f"Stock Dimension: {stock_dimension}, State Space: {state_space}")
+logging.info(f"Stock Dimension: {stock_dimension}, State Space: {state_space}")
 tech_indicator_list = ["macd", "rsi_30", "cci_30", "dx_30"]
 feature_dimension = len(tech_indicator_list)
-print(f"Feature Dimension: {feature_dimension}")
+logging.info(f"Feature Dimension: {feature_dimension}")
 
 env_kwargs = {
     "hmax": 100,
@@ -337,7 +348,7 @@ env_kwargs = {
 e_train_gym = StockPortfolioEnv(df=train, **env_kwargs)
 
 env_train, _ = e_train_gym.get_sb_env()
-print(type(env_train))
+logging.info(type(env_train))
 
 from FinRL.finrl.agents.stablebaselines3.models import DRLAgent
 

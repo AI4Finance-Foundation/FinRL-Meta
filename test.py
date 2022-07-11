@@ -1,3 +1,14 @@
+import logging
+
+logger = logging.getLogger()
+logger.setLevel("DEBUG")
+file_handler = logging.FileHandler("./log.txt", mode="a", encoding="utf-8")
+file_handler.setLevel("DEBUG")
+file_handler.setFormatter(
+    logging.Formatter(fmt="%(lineno)s---%(asctime)s---%(message)s")
+)
+logger.addHandler(file_handler)
+
 from agents.elegantrl_models import DRLAgent as DRLAgent_erl
 from agents.rllib_models import DRLAgent as DRLAgent_rllib
 from agents.stablebaselines3_models import DRLAgent as DRLAgent_sb3
@@ -41,7 +52,7 @@ def test(
     # elegantrl needs state dim, action dim and net dim
     net_dimension = kwargs.get("net_dimension", 2**7)
     cwd = kwargs.get("cwd", "./" + str(model_name))
-    print("price_array: ", len(price_array))
+    logging.info("price_array: ", len(price_array))
 
     if drl_lib == "elegantrl":
         episode_total_assets = DRLAgent_erl.DRL_prediction(
