@@ -6,9 +6,11 @@ import logging
 
 logger = logging.getLogger()
 logger.setLevel("DEBUG")
-file_handler = logging.FileHandler("./log.txt", mode='a', encoding="utf-8")
+file_handler = logging.FileHandler("./log.txt", mode="a", encoding="utf-8")
 file_handler.setLevel("DEBUG")
-file_handler.setFormatter(logging.Formatter(fmt="%(lineno)s---%(asctime)s---%(message)s"))
+file_handler.setFormatter(
+    logging.Formatter(fmt="%(lineno)s---%(asctime)s---%(message)s")
+)
 logger.addHandler(file_handler)
 
 import pandas as pd
@@ -572,7 +574,9 @@ logging.info("labels in prediction:", np.unique(y_pred_nn1), "\n")
 
 # print report
 label_names = ["long", "no bet", "short"]
-logging.info(classification_report(y_test.astype(int), y_pred_nn1, target_names=label_names))
+logging.info(
+    classification_report(y_test.astype(int), y_pred_nn1, target_names=label_names)
+)
 
 
 def perturbation_rank(model, x, y, names):

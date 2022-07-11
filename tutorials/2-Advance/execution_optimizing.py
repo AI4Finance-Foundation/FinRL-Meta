@@ -4,9 +4,11 @@ import logging
 
 logger = logging.getLogger()
 logger.setLevel("DEBUG")
-file_handler = logging.FileHandler("./log.txt", mode='a', encoding="utf-8")
+file_handler = logging.FileHandler("./log.txt", mode="a", encoding="utf-8")
 file_handler.setLevel("DEBUG")
-file_handler.setFormatter(logging.Formatter(fmt="%(lineno)s---%(asctime)s---%(message)s"))
+file_handler.setFormatter(
+    logging.Formatter(fmt="%(lineno)s---%(asctime)s---%(message)s")
+)
 logger.addHandler(file_handler)
 
 from collections import deque
@@ -92,7 +94,9 @@ for episode in range(episodes):
             shortfall_deque2.append(info.implementation_shortfall2)
             break
 
-    if (episode + 1) % 100 == 0:  # logging.info average shortfall over last 100 episodes
+    if (
+        episode + 1
+    ) % 100 == 0:  # logging.info average shortfall over last 100 episodes
         logging.info(
             "\rEpisode [{}/{}]\tAverage Shortfall for Agent1: ${:,.2f}".format(
                 episode + 1, episodes, np.mean(shortfall_deque1)

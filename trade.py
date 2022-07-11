@@ -1,8 +1,7 @@
-from test import test
-
 from meta.env_stock_trading.env_stock_papertrading import (
     AlpacaPaperTrading,
 )
+from test import test
 
 
 def trade(
