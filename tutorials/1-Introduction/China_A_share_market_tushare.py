@@ -7,6 +7,15 @@ from IPython import display
 
 display.set_matplotlib_formats("svg")
 
+import logging
+
+logger = logging.getLogger()
+logger.setLevel("DEBUG")
+file_handler = logging.FileHandler("./log.txt", mode='a', encoding="utf-8")
+file_handler.setLevel("DEBUG")
+file_handler.setFormatter(logging.Formatter(fmt="%(lineno)s---%(asctime)s---%(message)s"))
+logger.addHandler(file_handler)
+
 from meta import config
 from meta.data_processor import DataProcessor
 from main import check_and_make_directories
@@ -42,7 +51,7 @@ from meta.config import (
 
 pd.options.display.max_columns = None
 
-print("ALL Modules have been imported!")
+logging.info("ALL Modules have been imported!")
 
 
 # %% md
@@ -125,32 +134,32 @@ p.clean_data()
 # add_technical_indicator
 p.add_technical_indicator(config.INDICATORS)
 p.clean_data()
-print(f"p.dataframe: {p.dataframe}")
+logging.info(f"p.dataframe: {p.dataframe}")
 
 # %% md
 
 ### Split traning dataset
 
 train = p.data_split(p.dataframe, TRAIN_START_DATE, TRAIN_END_DATE)
-print(f"len(train.tic.unique()): {len(train.tic.unique())}")
+logging.info(f"len(train.tic.unique()): {len(train.tic.unique())}")
 
 # %%
 
-print(f"train.tic.unique(): {train.tic.unique()}")
+logging.info(f"train.tic.unique(): {train.tic.unique()}")
 
 # %%
 
-print(f"train.head(): {train.head()}")
+logging.info(f"train.head(): {train.head()}")
 
 # %%
 
-print(f"train.shape: {train.shape}")
+logging.info(f"train.shape: {train.shape}")
 
 # %%
 
 stock_dimension = len(train.tic.unique())
 state_space = stock_dimension * (len(config.INDICATORS) + 2) + 1
-print(f"Stock Dimension: {stock_dimension}, State Space: {state_space}")
+logging.info(f"Stock Dimension: {stock_dimension}, State Space: {state_space}")
 
 # %% md
 
@@ -182,7 +191,7 @@ e_train_gym = StockTradingEnv(df=train, **env_kwargs)
 # %%
 
 env_train, _ = e_train_gym.get_sb_env()
-print(f"print(type(env_train)): {print(type(env_train))}")
+logging.info(f"print(type(env_train)): {logging.info(type(env_train))}")
 
 # %%
 
@@ -251,7 +260,7 @@ df_account_value, df_actions = DRLAgent.DRL_prediction(
 # %%
 
 df_actions.to_csv("action.csv", index=False)
-print(f"df_actions: {df_actions}")
+logging.info(f"df_actions: {df_actions}")
 
 # %% md
 
@@ -298,8 +307,8 @@ perf_stats_all = perf_func(
     transactions=None,
     turnover_denom="AGB",
 )
-print("==============DRL Strategy Stats===========")
-print(f"perf_stats_all: {perf_stats_all}")
+logging.info("==============DRL Strategy Stats===========")
+logging.info(f"perf_stats_all: {perf_stats_all}")
 
 # %%
 
@@ -317,6 +326,6 @@ perf_stats_all = perf_func(
     transactions=None,
     turnover_denom="AGB",
 )
-print("==============Baseline Strategy Stats===========")
+logging.info("==============Baseline Strategy Stats===========")
 
-print(f"perf_stats_all: {perf_stats_all}")
+logging.info(f"perf_stats_all: {perf_stats_all}")

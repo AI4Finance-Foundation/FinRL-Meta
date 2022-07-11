@@ -2,6 +2,15 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
+import logging
+
+logger = logging.getLogger()
+logger.setLevel("DEBUG")
+file_handler = logging.FileHandler("./log.txt", mode='a', encoding="utf-8")
+file_handler.setLevel("DEBUG")
+file_handler.setFormatter(logging.Formatter(fmt="%(lineno)s---%(asctime)s---%(message)s"))
+logger.addHandler(file_handler)
+
 import pandas as pd
 import numpy as np
 from IPython import display
@@ -56,7 +65,7 @@ from meta.config import (
 
 pd.options.display.max_columns = None
 
-print("ALL Modules have been imported!")
+logging.info("ALL Modules have been imported!")
 
 # %% md
 
@@ -123,7 +132,7 @@ p = DataProcessor(
 p.download_data(ticker_list=ticker_list)
 p.clean_data()
 df = p.dataframe
-print(f"p.dataframe: {p.dataframe}")
+logging.info(f"p.dataframe: {p.dataframe}")
 
 
 def add_technical_indicator(df, tech_indicator_list):
@@ -146,12 +155,12 @@ def add_technical_indicator(df, tech_indicator_list):
 
 
 processed_df = add_technical_indicator(df, technical_indicator_list)
-print(f"processed_df: {processed_df.head()}")
+logging.info(f"processed_df: {processed_df.head()}")
 
 # Drop unecessary columns and make time as index
 processed_df.index = pd.to_datetime(processed_df.time)
 processed_df.drop("time", inplace=True, axis=1)
-print(processed_df.tail(20))
+logging.info(processed_df.tail(20))
 
 
 # IMPORTANT: Make sure that pd.Timedelta() is according to the time_interval to get the volatility for that time interval
@@ -174,7 +183,7 @@ def get_vol(prices, span=100):
 
 
 data_ohlcv = processed_df.assign(volatility=get_vol(processed_df.close)).dropna()
-print("data_ohlcv: ", data_ohlcv.head())
+logging.info("data_ohlcv: ", data_ohlcv.head())
 
 ##Adding Path Dependency: Triple-Barrier Method
 ###The labeling schema is defined as follows:
@@ -247,7 +256,7 @@ def get_barriers(
 
 
 barriers = get_barriers()
-print("barriers: ", barriers.head())
+logging.info("barriers: ", barriers.head())
 
 ####Function to get label for the dataset (0, 1, 2)
 # 0: hit the stoploss
@@ -306,7 +315,7 @@ def get_labels():
 
 
 get_labels()
-print("barriers after labeling: ", barriers.head())
+logging.info("barriers after labeling: ", barriers.head())
 # Merge the barriers with the main dataset and drop the last t_final + 1 barriers (as they are too close to the end)
 
 data_ohlcv = data_ohlcv.merge(
@@ -315,9 +324,9 @@ data_ohlcv = data_ohlcv.merge(
     right_on="time",
 )
 data_ohlcv.drop(data_ohlcv.tail(t_final + 1).index, inplace=True)
-print("data_ohlcv after labeling: ", data_ohlcv.head())
+logging.info("data_ohlcv after labeling: ", data_ohlcv.head())
 # Count barrier hits ( 0 = stoploss, 1 = timeout, 2 = profit take)
-print(pd.Series(data_ohlcv["label_barrier"]).value_counts())
+logging.info(pd.Series(data_ohlcv["label_barrier"]).value_counts())
 
 ###Copying the Neural Network function from AI4Finance's ActorPPO agent
 # https://github.com/AI4Finance-Foundation/ElegantRL/blob/master/elegantrl/agents/net.py
@@ -365,7 +374,7 @@ class Net(nn.Module):
 
 
 model_NN1 = Net()
-print(model_NN1)
+logging.info(model_NN1)
 
 
 class ClassifierDataset(Dataset):
@@ -435,7 +444,7 @@ train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size)
 test_loader = DataLoader(dataset=test_dataset, batch_size=1)
 # Check GPU
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-print(device)
+logging.info(device)
 
 # Set optimizer
 criterion = nn.CrossEntropyLoss()
@@ -457,7 +466,7 @@ def train(fold, model, device, trainloader, optimizer, epoch):
         optimizer.step()
 
         if batch_idx % 100 == 0:
-            print(
+            logging.info(
                 "Train Fold/Epoch: {}/{} [{}/{} ({:.0f}%)]\ttrain_loss: {:.6f}".format(
                     fold,
                     epoch,
@@ -500,7 +509,7 @@ def test(fold, model, device, test_loader, correct_train, train_loss):
 
     # Print train accuracy for epoch
     # TODO: still a bug in summed up batch train loss
-    print(
+    logging.info(
         "\nTrain set for fold {}: Average train_loss: {:.4f}, Accuracy: {}/{} ({:.5f}%)".format(
             fold,
             train_loss,
@@ -511,7 +520,7 @@ def test(fold, model, device, test_loader, correct_train, train_loss):
     )
 
     # Print test result for epoch
-    print(
+    logging.info(
         "Test set for fold {}:  Average test_loss:  {:.4f}, Accuracy: {}/{} ({:.5f}%)\n".format(
             fold,
             test_loss,
@@ -559,11 +568,11 @@ with torch.no_grad():
     y_pred_nn1 = y_pred_nn1.cpu().detach().numpy()
 
 # print predction values
-print("labels in prediction:", np.unique(y_pred_nn1), "\n")
+logging.info("labels in prediction:", np.unique(y_pred_nn1), "\n")
 
 # print report
 label_names = ["long", "no bet", "short"]
-print(classification_report(y_test.astype(int), y_pred_nn1, target_names=label_names))
+logging.info(classification_report(y_test.astype(int), y_pred_nn1, target_names=label_names))
 
 
 def perturbation_rank(model, x, y, names):
@@ -608,4 +617,4 @@ rank = perturbation_rank(
     names,
 )
 
-print(display(rank))
+logging.info(display(rank))

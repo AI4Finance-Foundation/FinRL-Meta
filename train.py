@@ -1,3 +1,12 @@
+import logging
+
+logger = logging.getLogger()
+logger.setLevel("DEBUG")
+file_handler = logging.FileHandler("./log.txt", mode='a', encoding="utf-8")
+file_handler.setLevel("DEBUG")
+file_handler.setFormatter(logging.Formatter(fmt="%(lineno)s---%(asctime)s---%(message)s"))
+logger.addHandler(file_handler)
+
 from agents.elegantrl_models import DRLAgent as DRLAgent_erl
 from agents.rllib_models import DRLAgent as DRLAgent_rllib
 from agents.stablebaselines3_models import DRLAgent as DRLAgent_sb3
@@ -88,9 +97,9 @@ def train(
             tb_log_name=model_name,
             total_timesteps=total_timesteps,
         )
-        print("Training finished!")
+        logging.info("Training finished!")
         trained_model.save(cwd)
-        print("Trained model saved in " + str(cwd))
+        logging.info("Trained model saved in " + str(cwd))
 
     else:
         raise ValueError("DRL library input is NOT supported. Please check.")

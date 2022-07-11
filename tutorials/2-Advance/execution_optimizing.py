@@ -1,5 +1,14 @@
 """Source: https://github.com/AI4Finance-Foundation/Liquidation-Analysis-using-Multi-Agent-Reinforcement-Learning-ICML-2019/blob/master/Model_training.ipynb"""
 """Paper: Multi-agent reinforcement learning for liquidation strategy analysis accepted by ICML 2019 AI in Finance: Applications and Infrastructure for Multi-Agent Learning. (https://arxiv.org/abs/1906.11046)"""
+import logging
+
+logger = logging.getLogger()
+logger.setLevel("DEBUG")
+file_handler = logging.FileHandler("./log.txt", mode='a', encoding="utf-8")
+file_handler.setLevel("DEBUG")
+file_handler.setFormatter(logging.Formatter(fmt="%(lineno)s---%(asctime)s---%(message)s"))
+logger.addHandler(file_handler)
+
 from collections import deque
 
 import numpy as np
@@ -83,19 +92,19 @@ for episode in range(episodes):
             shortfall_deque2.append(info.implementation_shortfall2)
             break
 
-    if (episode + 1) % 100 == 0:  # print average shortfall over last 100 episodes
-        print(
+    if (episode + 1) % 100 == 0:  # logging.info average shortfall over last 100 episodes
+        logging.info(
             "\rEpisode [{}/{}]\tAverage Shortfall for Agent1: ${:,.2f}".format(
                 episode + 1, episodes, np.mean(shortfall_deque1)
             )
         )
-        print(
+        logging.info(
             "\rEpisode [{}/{}]\tAverage Shortfall for Agent2: ${:,.2f}".format(
                 episode + 1, episodes, np.mean(shortfall_deque2)
             )
         )
         shortfall_list.append([np.mean(shortfall_deque1), np.mean(shortfall_deque2)])
-print(
+logging.info(
     "\nAverage Implementation Shortfall for Agent1: ${:,.2f} \n".format(
         np.mean(shortfall_hist1)
     )
