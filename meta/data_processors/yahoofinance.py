@@ -54,7 +54,7 @@ class Yahoofinance(_Base):
                 interval=self.time_interval,
             )
             temp_df["tic"] = tic
-            self.dataframe = self.dataframe.append(temp_df)
+            self.dataframe = pd.concat([self.dataframe, temp_df], axis=0, join="outer")
         self.dataframe.reset_index(inplace=True)
         try:
             self.dataframe.columns = [

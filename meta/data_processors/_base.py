@@ -144,8 +144,11 @@ class _Base:
                         temp_indicator["time"] = self.dataframe[
                             self.dataframe.tic == unique_ticker[i]
                         ]["time"].to_list()
-                        indicator_df = indicator_df.append(
-                            temp_indicator, ignore_index=True
+                        indicator_df = pd.concat(
+                            [indicator_df, temp_indicator],
+                            axis=0,
+                            join="outer",
+                            ignore_index=True,
                         )
                     except Exception as e:
                         print(e)
@@ -160,29 +163,29 @@ class _Base:
             for i in self.dataframe.tic.unique():
                 tic_df = self.dataframe[self.dataframe.tic == i]
                 (
-                    tic_df["macd"],
-                    tic_df["macd_signal"],
-                    tic_df["macd_hist"],
+                    tic_df.loc["macd"],
+                    tic_df.loc["macd_signal"],
+                    tic_df.loc["macd_hist"],
                 ) = talib.MACD(
                     tic_df["close"],
                     fastperiod=12,
                     slowperiod=26,
                     signalperiod=9,
                 )
-                tic_df["rsi"] = talib.RSI(tic_df["close"], timeperiod=14)
-                tic_df["cci"] = talib.CCI(
+                tic_df.loc["rsi"] = talib.RSI(tic_df["close"], timeperiod=14)
+                tic_df.loc["cci"] = talib.CCI(
                     tic_df["high"],
                     tic_df["low"],
                     tic_df["close"],
                     timeperiod=14,
                 )
-                tic_df["dx"] = talib.DX(
+                tic_df.loc["dx"] = talib.DX(
                     tic_df["high"],
                     tic_df["low"],
                     tic_df["close"],
                     timeperiod=14,
                 )
-                final_df = final_df.append(tic_df)
+                final_df = pd.concat([final_df, tic_df], axis=0, join="outer")
             self.dataframe = final_df
 
         self.dataframe.sort_values(by=["time", "tic"], inplace=True)
@@ -292,7 +295,7 @@ class _Base:
             print(
                 f"VIX is not applicable for {self.data_source}. Return original DataFrame"
             )
-            return
+            return None
 
         # if self.data_source == 'yahoofinance':
         #     df = data.copy()
@@ -326,14 +329,14 @@ class _Base:
         #     df = df.merge(vix, on="date")
         #     df = df.sort_values(["date", "tic"]).reset_index(drop=True)
 
-        if self.data_source == "yahoofinance":
+        elif self.data_source == "yahoofinance":
             ticker = "^VIX"
         elif self.data_source == "alpaca":
             ticker = "VIXY"
         elif self.data_source == "wrds":
             ticker = "vix"
         else:
-            return
+            pass
         df = self.dataframe.copy()
         self.dataframe = [ticker]
         self.download_data(self.start, self.end, self.time_interval)
