@@ -36,7 +36,7 @@ pytestmark = pytest.mark.parametrize(
 
 
 class TestYahoo:
-    def test_yahoo_download(
+    def test_yahoofinance_download(
         self,
         time_interval: str,
         start_date: str,
@@ -63,7 +63,7 @@ class TestYahoo:
             or dp.dataframe.shape == (expected_df_size - 30, 9)
         )
 
-    def test_yahoo_clean_data(
+    def test_yahoofinance_clean_data(
         self,
         time_interval: str,
         start_date: str,
@@ -80,7 +80,7 @@ class TestYahoo:
         dp.clean_data()
 
     @pytest.mark.parametrize("talib", [0, 1])
-    def test_yahoo_add_tech_indicators(
+    def test_yahoofinance_add_tech_indicators(
         self,
         time_interval: str,
         start_date: str,
@@ -99,7 +99,7 @@ class TestYahoo:
         dp.add_technical_indicator(tech_indicator_list, select_stockstats_talib=talib)
 
     @pytest.mark.parametrize("if_vix", [True, False])
-    def test_yahoo_run(
+    def test_yahoofinance_run(
         self,
         time_interval: str,
         start_date: str,
