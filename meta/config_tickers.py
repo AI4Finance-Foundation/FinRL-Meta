@@ -1,6 +1,6 @@
 SINGLE_TICKER = ["AAPL"]
 
-# Dow 30 constituents in 2021/10
+# Dow 30 constituents on 2021/10
 # check https://wrds-www.wharton.upenn.edu/ for U.S. index constituents
 DOW_30_TICKER = [
     "AXP",
@@ -35,7 +35,7 @@ DOW_30_TICKER = [
     "DOW",
 ]
 
-# Nasdaq 100 constituents at 2019/01
+# Nasdaq 100 constituents on 2019/01
 NAS_100_TICKER = [
     "AMGN",
     "AAPL",
@@ -698,8 +698,7 @@ HSI_50_TICKER = [
     "2313.HK",
 ]
 
-# SSE 50 Index constituents at 2019
-# www.csindex.com.cn, for SSE and CSI adjustments
+# SSE 50 Index constituents in 2019. www.csindex.com.cn, for SSE and CSI adjustments
 SSE_50_TICKER = [
     "600000.XSHG",
     "600036.XSHG",
@@ -1114,7 +1113,7 @@ CAC_40_TICKER = [
     "VIV.PA",
 ]
 
-# DAX 30 constituents at 2021/02
+# DAX 30 constituents on 2021/02
 DAX_30_TICKER = [
     "DHER.DE",
     "RWE.DE",
