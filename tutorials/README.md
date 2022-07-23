@@ -2,10 +2,9 @@
 <img align="center" src=https://github.com/AI4Finance-Foundation/FinRL-Meta/blob/master/figs/FinRL-Meta_Tutorials.png>
 </div>
 
-
 **Mission**: provide more than 100 user-friendly demos in both notebooks and python.
 
-In the python verison, users and developers can debug them locally; however, it is impossible to use notebooks.
+In the python verison, users and developers can debug them locally; however, it is impossible to use jupyter notebooks.
 
 
 **Design Principles in python version**:
