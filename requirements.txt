@@ -17,7 +17,7 @@ matplotlib==3.5.2
 numpy==1.23.1
 pandas==1.4.3
 
-# FinRL-meta
+# pandas
 pandas_market_calendars==3.5
 
 # hooks
