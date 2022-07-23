@@ -12,7 +12,7 @@ except FileNotFoundError as myEx:
 setup(
     name="meta",
     version="0.3.1",
-    author="Xiaoyang Liu, Jingyang Rui, Hongyang Yang",
+    author="Xiaoyang Liu, Ming Zhu, Jingyang Rui, Hongyang Yang",
     author_email="hy2500@columbia.edu",
     url="https://github.com/AI4Finance-Foundation/FinRL-Meta",
     license="MIT",
@@ -28,6 +28,7 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
     ],
