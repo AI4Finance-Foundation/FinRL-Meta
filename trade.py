@@ -1,3 +1,5 @@
+# two modes: "backtesting", and "paper_trading"
+
 from meta.env_stock_trading.env_stock_papertrading import (
     AlpacaPaperTrading,
 )
