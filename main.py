@@ -2,7 +2,6 @@ import os
 from argparse import ArgumentParser
 from typing import List
 
-from meta import config
 from meta.config import ALPACA_API_BASE_URL
 from meta.config import ALPACA_API_KEY
 from meta.config import ALPACA_API_SECRET
