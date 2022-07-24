@@ -27,6 +27,7 @@ Previously called **Neo_FinRL**: **N**ear real-market **E**nvironments f**o**r d
 
 ## News and Tutorials
 
++ [Medium] [Financial Metaverse as a Playground for Financial Machine Learning](https://medium.com/@zx2325/finrl-meta-from-market-environments-to-a-financial-metaverse-5db8490a83df)
 + [DataDrivenInvestor] [FinRL-Meta: A Universe of Near Real-Market En­vironments for Data­-Driven Financial Reinforcement Learning](https://medium.datadriveninvestor.com/finrl-meta-a-universe-of-near-real-market-en-vironments-for-data-driven-financial-reinforcement-e1894e1ebfbd)
 + [深圳特区报] [深港两城深度融合 用“创新”续写“春天的故事”](https://www.sh-stic.com/news_72/515.html) [香港特别行政区联络办公室](http://www.locpg.gov.cn/jsdt/2022-06/06/c_1211654176.htm)
 + [央广网] [2021 IDEA大会于福田圆满落幕：群英荟萃论道AI 多项目发布亮点纷呈](http://tech.cnr.cn/techph/20211123/t20211123_525669092.shtml)
