@@ -6,10 +6,9 @@ import numpy as np
 import pandas as pd
 import pyfolio
 from finrl import config
+from finrl.config import TRAIN_START_DATE
 from finrl.meta.preprocessor.yahoodownloader import YahooDownloader
 from pyfolio import timeseries
-
-from finrl.config import TRAIN_START_DATE
 
 
 def get_daily_return(df, value_col_name="account_value"):
