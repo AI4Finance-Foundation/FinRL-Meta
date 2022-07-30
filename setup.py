@@ -10,7 +10,7 @@ except FileNotFoundError as myEx:
     raise Exception(myEx)
 
 setup(
-    name="meta",
+    name="finrl-meta",
     version="0.3.5",
     author="Xiaoyang Liu, Ming Zhu, Jingyang Rui, Hongyang Yang",
     author_email="hy2500@columbia.edu",
