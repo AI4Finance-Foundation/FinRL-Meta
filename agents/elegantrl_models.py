@@ -87,6 +87,7 @@ class DRLAgent:
         args = Arguments(agent=agent, env=environment)
         args.cwd = cwd
         args.net_dim = net_dimension
+        
         # load agent
         try:
             agent = init_agent(args, gpu_id=0)

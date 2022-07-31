@@ -18,6 +18,7 @@ def train(
     if_vix=True,
     **kwargs
 ):
+
     # process data using unified data processor
     dp = DataProcessor(data_source, start_date, end_date, time_interval, **kwargs)
     price_array, tech_array, turbulence_array = dp.run(
@@ -28,6 +29,7 @@ def train(
         "tech_array": tech_array,
         "turbulence_array": turbulence_array,
     }
+    
     # build environment using processed data
     env_instance = env(config=data_config)
 
