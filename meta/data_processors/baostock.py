@@ -75,8 +75,8 @@ class Baostock(_Base):
             while (rs.error_code == "0") & rs.next():
                 data_list.append(rs.get_row_data())
             df = pd.DataFrame(data_list, columns=rs.fields)
-            df.loc[:, "code"] = pd.DataFrame([ticker] * df.shape[0])
-            self.dataframe = self.dataframe.append(df)
+            df.loc[:, "code"] = [ticker] * df.shape[0]
+            self.dataframe = pd.concat([self.dataframe, df])
         self.dataframe = self.dataframe.sort_values(by=["date", "code"]).reset_index(
             drop=True
         )
@@ -86,8 +86,9 @@ class Baostock(_Base):
         lg = bs.login()
         print("baostock login respond error_code:" + lg.error_code)
         print("baostock login respond  error_msg:" + lg.error_msg)
-        return bs.query_trade_dates(start_date=start, end_date=end)
+        result =  bs.query_trade_dates(start_date=start, end_date=end)
         bs.logout()
+        return result
 
     # "600000.XSHG" -> "sh.600000"
     # "000612.XSHE" -> "sz.000612"

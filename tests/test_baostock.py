@@ -33,9 +33,10 @@ def test_baostock():
     p.clean_data()
     p.add_turbulence()
     p.add_technical_indicator(TECHNICAL_INDICATOR)
-    p.add_vix()
+    # p.add_vix()
 
     price_array, tech_array, turbulence_array = p.run(
         ticker_list, TECHNICAL_INDICATOR, if_vix=False, cache=True
     )
-    pass
+    assert price_array.shape[0] == tech_array.shape[0]
+    assert turbulence_array is None
