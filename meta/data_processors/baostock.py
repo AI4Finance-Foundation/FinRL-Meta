@@ -86,7 +86,7 @@ class Baostock(_Base):
         lg = bs.login()
         print("baostock login respond error_code:" + lg.error_code)
         print("baostock login respond  error_msg:" + lg.error_msg)
-        result =  bs.query_trade_dates(start_date=start, end_date=end)
+        result = bs.query_trade_dates(start_date=start, end_date=end)
         bs.logout()
         return result
 
