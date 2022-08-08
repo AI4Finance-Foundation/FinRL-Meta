@@ -29,7 +29,7 @@ def test(
         "tech_array": tech_array,
         "turbulence_array": turbulence_array,
     }
-    
+
     # build environment using processed data
     env_instance = env(config=data_config)
 
