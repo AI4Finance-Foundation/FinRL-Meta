@@ -16,9 +16,9 @@ import spaces
 
 from finrl import config
 from finrl import config_tickers
-from finrl.finrl_meta.preprocessor.yahoodownloader import YahooDownloader
-from finrl.finrl_meta.preprocessor.preprocessors import FeatureEngineer, data_split
-from finrl.finrl_meta.env_portfolio_allocation.env_portfolio import StockPortfolioEnv
+from finrl.meta.preprocessor.yahoodownloader import YahooDownloader
+from finrl.meta.preprocessor.preprocessors import FeatureEngineer, data_split
+from finrl.meta.env_portfolio_allocation.env_portfolio import StockPortfolioEnv
 from finrl.agents.stablebaselines3.models import DRLAgent
 from finrl.plot import (
     backtest_stats,
@@ -27,8 +27,8 @@ from finrl.plot import (
     get_baseline,
     convert_daily_return_to_pyfolio_ts,
 )
-from finrl.finrl_meta.data_processor import DataProcessor
-from finrl.finrl_meta.data_processors.processor_yahoofinance import (
+from finrl.meta.data_processor import DataProcessor
+from finrl.meta.data_processors.processor_yahoofinance import (
     YahooFinanceProcessor,
 )
 import sys

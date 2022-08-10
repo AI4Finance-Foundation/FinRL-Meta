@@ -1,9 +1,9 @@
 import jqdatasdk as jq
-from neo_finrl.agents.elegantrl.agent import *
-from neo_finrl.agents.elegantrl.run import *
-from neo_finrl.data_processors.joinquant.data_fetch_jq import data_fetch
-from neo_finrl.data_processors.joinquant.env_stock_jq import StockTradingEnv
-from neo_finrl.data_processors.joinquant.preprocess_jq import preprocess
+from meta.agents.elegantrl.agent import *
+from meta.agents.elegantrl.run import *
+from meta.data_processors.joinquant.data_fetch_jq import data_fetch
+from meta.data_processors.joinquant.env_stock_jq import StockTradingEnv
+from meta.data_processors.joinquant.preprocess_jq import preprocess
 
 """data_fetch"""
 # please fill in your own account info

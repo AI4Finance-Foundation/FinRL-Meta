@@ -2,7 +2,7 @@ import sys
 
 import numpy as np
 import torch
-from neo_finrl.agents.elegantrl.run import *
+from meta.agents.elegantrl.run import *
 
 
 def demo_nas100_GPU_Podracer():  # 1.7+ 2.0+
