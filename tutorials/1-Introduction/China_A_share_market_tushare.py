@@ -39,17 +39,16 @@ from meta.config import (
     ALPACA_API_SECRET,
     ALPACA_API_BASE_URL,
 )
+import pyfolio
+from pyfolio import timeseries
 
 pd.options.display.max_columns = None
 
 print("ALL Modules have been imported!")
 
 
-# %% md
 
 ### Create folders
-
-# %%
 
 import os
 
@@ -71,11 +70,7 @@ check_and_make_directories(
 )
 
 
-# %% md
-
 ### Download data, cleaning and feature engineering
-
-# %%
 
 ticker_list = [
     "600000.SH",
@@ -120,43 +115,28 @@ p.download_data(ticker_list=ticker_list)
 p.clean_data()
 
 
-# %%
-
 # add_technical_indicator
 p.add_technical_indicator(config.INDICATORS)
 p.clean_data()
 print(f"p.dataframe: {p.dataframe}")
 
-# %% md
 
 ### Split traning dataset
 
 train = p.data_split(p.dataframe, TRAIN_START_DATE, TRAIN_END_DATE)
 print(f"len(train.tic.unique()): {len(train.tic.unique())}")
 
-# %%
-
 print(f"train.tic.unique(): {train.tic.unique()}")
-
-# %%
 
 print(f"train.head(): {train.head()}")
 
-# %%
-
 print(f"train.shape: {train.shape}")
-
-# %%
 
 stock_dimension = len(train.tic.unique())
 state_space = stock_dimension * (len(config.INDICATORS) + 2) + 1
 print(f"Stock Dimension: {stock_dimension}, State Space: {state_space}")
 
-# %% md
-
 ### Train
-
-# %%
 
 env_kwargs = {
     "stock_dim": stock_dimension,
@@ -175,16 +155,10 @@ env_kwargs = {
 
 e_train_gym = StockTradingEnv(df=train, **env_kwargs)
 
-# %% md
-
 ## DDPG
-
-# %%
 
 env_train, _ = e_train_gym.get_sb_env()
 print(f"print(type(env_train)): {print(type(env_train))}")
-
-# %%
 
 agent = DRLAgent(env=env_train)
 DDPG_PARAMS = {
@@ -198,32 +172,20 @@ model_ddpg = agent.get_model(
     "ddpg", model_kwargs=DDPG_PARAMS, policy_kwargs=POLICY_KWARGS
 )
 
-# %%
-
 trained_ddpg = agent.train_model(
     model=model_ddpg, tb_log_name="ddpg", total_timesteps=10000
 )
 
-# %% md
-
 ## A2C
-
-# %%
 
 agent = DRLAgent(env=env_train)
 model_a2c = agent.get_model("a2c")
-
-# %%
 
 trained_a2c = agent.train_model(
     model=model_a2c, tb_log_name="a2c", total_timesteps=50000
 )
 
-# %% md
-
 ### Trade
-
-# %%
 
 trade = p.data_split(p.dataframe, TRADE_START_DATE, TRADE_END_DATE)
 env_kwargs = {
@@ -242,50 +204,31 @@ env_kwargs = {
 }
 e_trade_gym = StockTradingEnv(df=trade, **env_kwargs)
 
-# %%
-
 df_account_value, df_actions = DRLAgent.DRL_prediction(
     model=trained_ddpg, environment=e_trade_gym
 )
 
-# %%
-
 df_actions.to_csv("action.csv", index=False)
 print(f"df_actions: {df_actions}")
 
-# %% md
-
 ### Backtest
 
-# %%
-
-# %matplotlib inline
+# matplotlib inline
 plotter = ReturnPlotter(df_account_value, trade, TRADE_START_DATE, TRADE_END_DATE)
 # plotter.plot_all()
 
-# %%
-
 plotter.plot()
 
-# %%
-
-# %matplotlib inline
+# matplotlib inline
 # # ticket: SSE 50：000016
 # plotter.plot("000016")
 
-# %% md
-
 #### Use pyfolio
-
-# %%
 
 # CSI 300
 baseline_df = plotter.get_baseline("399300")
 
-# %%
 
-import pyfolio
-from pyfolio import timeseries
 
 daily_return = plotter.get_return(df_account_value)
 daily_return_base = plotter.get_return(baseline_df, value_col_name="close")
@@ -301,10 +244,6 @@ perf_stats_all = perf_func(
 print("==============DRL Strategy Stats===========")
 print(f"perf_stats_all: {perf_stats_all}")
 
-# %%
-
-import pyfolio
-from pyfolio import timeseries
 
 daily_return = plotter.get_return(df_account_value)
 daily_return_base = plotter.get_return(baseline_df, value_col_name="close")
