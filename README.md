@@ -63,7 +63,7 @@ However, the DataOps methodology has not been applied to financial reinforcement
 To deal with financial big data (unstructured), we follow the DataOps paradigm and implement an automatic pipeline in the following figure: task planning, data processing, training-testing-trading, and monitoring agents’ performance. Through this pipeline, we continuously produce DRL benchmarks on dynamic market datasets.
 
 <div align="center">
-<img align="center" src=figs/finrl_meta_dataops.png width="800">
+<img align="center" src=figs/finrl_meta_dataops.png width="80%">
 </div>
 
 
@@ -103,7 +103,7 @@ A demonstration notebook for plug-and-play with ElegantRL, Stable Baselines3 and
 ## "Training-Testing-Trading" Pipeline
 
 <div align="center">
-<img align="center" src=figs/timeline.png width="800">
+<img align="center" src=figs/timeline.png width="80%">
 </div>
 
 We employ a training-testing-trading pipeline. First, a DRL agent is trained in a training dataset and fine-tuned (adjusting hyperparameters) in a testing dataset. Then, backtest the agent (on historical dataset), or depoy in a paper/live trading market.
@@ -118,7 +118,7 @@ Such a unified pipeline also allows fair comparisons among different algorithms.
 For future work, we plan to build a multi-agent-based market simulator that consists of over ten thousands of agents, namely, a FinRL-Metaverse. First, FinRL-Metaverse aims to build a universe of market environments, like the XLand environment ([source](https://deepmind.com/research/publications/2021/open-ended-learning-leads-to-generally-capable-agents)) and planet-scale climate forecast ([source](https://www.nature.com/articles/s41586-021-03854-z)) by DeepMind. To improve the performance for large-scale markets, we will employ GPU-based massive parallel simulation just as Isaac Gym ([source](https://arxiv.org/abs/2108.10470)). Moreover, it will be interesting to explore the deep evolutionary RL framework ([source](https://doaj.org/article/4dd31838732842439cc1301e52613d1c)) to simulate the markets. Our final goal is to provide insights into complex market phenomena and offer guidance for financial regulations through FinRL-Meta.
 
 <div align="center">
-<img align="center" src=figs/finrl_metaverse.png width="800">
+<img align="center" src=figs/finrl_metaverse.png width="80%">
 </div>
 
 
