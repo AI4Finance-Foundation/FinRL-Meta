@@ -47,7 +47,6 @@ pd.options.display.max_columns = None
 print("ALL Modules have been imported!")
 
 
-
 ### Create folders
 
 import os
@@ -227,7 +226,6 @@ plotter.plot()
 
 # CSI 300
 baseline_df = plotter.get_baseline("399300")
-
 
 
 daily_return = plotter.get_return(df_account_value)
