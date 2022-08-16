@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import pyfolio
-from finrl import config
+from finrl_meta import config
 from finrl.config import TRAIN_START_DATE
 from finrl.meta.preprocessor.yahoodownloader import YahooDownloader
 from pyfolio import timeseries
@@ -43,8 +43,8 @@ def backtest_stats(account_value, value_col_name="account_value"):
 
 def backtest_plot(
     account_value,
-    baseline_start=config.START_TRADE_DATE,
-    baseline_end=config.END_DATE,
+    baseline_start=config.TRADE_START_DATE,
+    baseline_end=config.TRADE_END_DATE,
     baseline_ticker="^DJI",
     value_col_name="account_value",
 ):
