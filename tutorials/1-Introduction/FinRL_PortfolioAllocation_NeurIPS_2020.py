@@ -14,10 +14,10 @@ import sys
 
 sys.path.append("../FinRL-Library")
 os.chdir("FinRL-Meta")
-from finrl_meta import config
-from finrl_meta import config_tickers
-from finrl_meta.data_processor import DataProcessor
-from finrl_meta.env_portfolio_allocation.env_portfolio_yahoofinance import (
+from meta import config
+from meta import config_tickers
+from meta.data_processor import DataProcessor
+from meta.env_portfolio_allocation.env_portfolio_yahoofinance import (
     StockPortfolioEnv,
 )
 from agents.stablebaselines3_models import DRLAgent
