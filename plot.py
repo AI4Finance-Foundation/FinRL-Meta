@@ -7,7 +7,7 @@ import pandas as pd
 import pyfolio
 from finrl.config import TRAIN_START_DATE
 from finrl.meta.preprocessor.yahoodownloader import YahooDownloader
-from finrl_meta import config
+from meta import config
 from pyfolio import timeseries
 
 
