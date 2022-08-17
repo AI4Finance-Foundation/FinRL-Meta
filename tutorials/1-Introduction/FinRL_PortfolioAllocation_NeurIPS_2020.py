@@ -10,33 +10,26 @@ import matplotlib
 import matplotlib.pyplot as plt
 
 matplotlib.use("Agg")
-import datetime
-import gym
-import spaces
+import sys
 
-from finrl import config
-from finrl import config_tickers
-from finrl.meta.preprocessor.yahoodownloader import YahooDownloader
-from finrl.meta.preprocessor.preprocessors import FeatureEngineer, data_split
-from finrl.meta.env_portfolio_allocation.env_portfolio import StockPortfolioEnv
-from finrl.agents.stablebaselines3.models import DRLAgent
-from finrl.plot import (
+sys.path.append("../FinRL-Library")
+os.chdir("FinRL-Meta")
+from meta import config
+from meta import config_tickers
+from meta.data_processor import DataProcessor
+from meta.env_portfolio_allocation.env_portfolio_yahoofinance import (
+    StockPortfolioEnv,
+)
+from agents.stablebaselines3_models import DRLAgent
+from plot import (
     backtest_stats,
     backtest_plot,
     get_daily_return,
     get_baseline,
     convert_daily_return_to_pyfolio_ts,
 )
-from finrl.meta.data_processor import DataProcessor
-from finrl.meta.data_processors.processor_yahoofinance import (
-    YahooFinanceProcessor,
-)
-import sys
-
-sys.path.append("../FinRL-Library")
 
 # 1.2. Create Folders
-os.chdir("/FinRL-Meta")
 import main
 
 main.check_and_make_directories(
@@ -48,32 +41,32 @@ main.check_and_make_directories(
     ]
 )
 
-# 2. Download Data
-print(config_tickers.DOW_30_TICKER)
+# 2. Download and Preprocess Data
+print(f"DOW_30_TICKER: {config_tickers.DOW_30_TICKER}")
 
-dp = YahooFinanceProcessor()
-df = dp.download_data(
-    start_date="2008-01-01",
-    end_date="2021-10-31",
-    ticker_list=config_tickers.DOW_30_TICKER,
+dp = DataProcessor(
+    data_source="yahoofinance",
+    start_date="2009-01-01",
+    end_date="2019-01-01",
     time_interval="1D",
 )
 
+dp.run(
+    ticker_list=config_tickers.DOW_30_TICKER,
+    technical_indicator_list=config.INDICATORS,
+    if_vix=False,
+)
+df = dp.dataframe
+
 df.head()
 
-# 3. Preprocess Data
-fe = FeatureEngineer(
-    use_technical_indicator=True, use_turbulence=False, user_defined_feature=False
-)
-
-df = fe.preprocess_data(df)
 print("Shape of DataFrame: ", df.shape)
 
-df.head()
-
 # Add covariance matrix as states
+df.rename(columns={"time": "date"}, inplace=True)
 df = df.sort_values(["date", "tic"], ignore_index=True)
 df.index = df.date.factorize()[0]
+df.drop(columns=["index"], inplace=True)
 
 cov_list = []
 return_list = []
@@ -84,13 +77,12 @@ for i in range(lookback, len(df.index.unique())):
     data_lookback = df.loc[i - lookback : i, :]
     price_lookback = data_lookback.pivot_table(
         index="date", columns="tic", values="close"
-    )
+    ).dropna(axis=1)
     return_lookback = price_lookback.pct_change().dropna()
     return_list.append(return_lookback)
 
     covs = return_lookback.cov().values
     cov_list.append(covs)
-
 
 df_cov = pd.DataFrame(
     {
@@ -106,9 +98,9 @@ print("Shape of DataFrame: ", df.shape)
 df.head()
 
 # 4. Design Environment
-# Training data split: 2009-01-01 to 2020-07-01
-train = data_split(df, "2009-01-01", "2020-07-01")
-# trade = data_split(df, '2020-01-01', config.END_DATE)
+
+# Training data split: 2009-01-01 to 2018-01-01
+train = dp.data_split(df, "2009-01-01", "2018-01-01")
 
 train.head()
 
@@ -131,7 +123,7 @@ env_kwargs = {
 e_train_gym = StockPortfolioEnv(df=train, **env_kwargs)
 
 env_train, _ = e_train_gym.get_sb_env()
-print(type(env_train))
+# print(type(env_train))
 
 # 5. Implement DRL Algorithms
 
@@ -140,15 +132,12 @@ agent = DRLAgent(env=env_train)
 
 # Model 1: A2C
 agent = DRLAgent(env=env_train)
-
 A2C_PARAMS = {"n_steps": 5, "ent_coef": 0.005, "learning_rate": 0.0002}
 model_a2c = agent.get_model(model_name="a2c", model_kwargs=A2C_PARAMS)
-
 trained_a2c = agent.train_model(
     model=model_a2c, tb_log_name="a2c", total_timesteps=50000
 )
-
-trained_a2c.save("/trained_models/trained_a2c.zip")
+trained_a2c.save("/FinRL-Meta/trained_models/trained_a2c.zip")
 
 # Model 2: PPO
 agent = DRLAgent(env=env_train)
@@ -159,25 +148,19 @@ PPO_PARAMS = {
     "batch_size": 128,
 }
 model_ppo = agent.get_model("ppo", model_kwargs=PPO_PARAMS)
-
 trained_ppo = agent.train_model(
     model=model_ppo, tb_log_name="ppo", total_timesteps=80000
 )
-
-trained_ppo.save("/trained_models/trained_ppo.zip")
+trained_ppo.save("/FinRL-Meta/trained_models/trained_ppo.zip")
 
 # Model 3: DDPG
 agent = DRLAgent(env=env_train)
 DDPG_PARAMS = {"batch_size": 128, "buffer_size": 50000, "learning_rate": 0.001}
-
-
 model_ddpg = agent.get_model("ddpg", model_kwargs=DDPG_PARAMS)
-
 trained_ddpg = agent.train_model(
     model=model_ddpg, tb_log_name="ddpg", total_timesteps=50000
 )
-
-trained_ddpg.save("/trained_models/trained_ddpg.zip")
+trained_ddpg.save("/FinRL-Meta/trained_models/trained_ddpg.zip")
 
 # Model 4: SAC
 agent = DRLAgent(env=env_train)
@@ -188,29 +171,23 @@ SAC_PARAMS = {
     "learning_starts": 100,
     "ent_coef": "auto_0.1",
 }
-
 model_sac = agent.get_model("sac", model_kwargs=SAC_PARAMS)
-
 trained_sac = agent.train_model(
     model=model_sac, tb_log_name="sac", total_timesteps=50000
 )
-
-trained_sac.save("/trained_models/trained_sac.zip")
+trained_sac.save("/FinRL-Meta/trained_models/trained_sac.zip")
 
 # Model 5: TD3
 agent = DRLAgent(env=env_train)
 TD3_PARAMS = {"batch_size": 100, "buffer_size": 1000000, "learning_rate": 0.001}
-
 model_td3 = agent.get_model("td3", model_kwargs=TD3_PARAMS)
-
 trained_td3 = agent.train_model(
     model=model_td3, tb_log_name="td3", total_timesteps=30000
 )
-
-trained_td3.save("/trained_models/trained_td3.zip")
+trained_td3.save("/FinRL-Meta/trained_models/trained_td3.zip")
 
 # Trading
-trade = data_split(df, "2020-07-01", "2021-10-31")
+trade = dp.data_split(df, "2018-01-01", "2019-01-01")
 e_trade_gym = StockPortfolioEnv(df=trade, **env_kwargs)
 
 print("Shape of Trade DataFrame: ", trade.shape)
@@ -221,11 +198,11 @@ df_daily_return, df_actions = DRLAgent.DRL_prediction(
 
 df_daily_return.head()
 
-df_daily_return.to_csv("/results/df_daily_return.csv")
+df_daily_return.to_csv("/FinRL-Meta/results/df_daily_return.csv")
 
 df_actions.head()
 
-df_actions.to_csv("/results/df_actions.csv")
+df_actions.to_csv("/FinRL-Meta/results/df_actions.csv")
 
 # 6. Backtest Our Strategy
 
@@ -327,7 +304,6 @@ min_var_cumpod = (portfolio.account_value.pct_change() + 1).cumprod() - 1
 dji_cumpod = (baseline_returns + 1).cumprod() - 1
 
 # Plotly: DRL, Min-Variance, DJIA
-from datetime import datetime as dt
 import matplotlib.pyplot as plt
 import plotly
 import plotly.graph_objs as go
