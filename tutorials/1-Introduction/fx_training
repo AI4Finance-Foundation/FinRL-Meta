@@ -22,9 +22,9 @@ from meta.env_fx_trading.env_fx import tgym
 config.USE_TIME_ZONE_SELFDEFINED = 1
 config.TIME_ZONE_SELFDEFINED = 'US/Eastern'
 
-dp = DataProcessor(data_source="yahoofinance", 
-                   start_date = '2017-01-01', 
-                   end_date = '2018-01-01', 
+dp = DataProcessor(data_source="yahoofinance",
+                   start_date = '2017-01-01',
+                   end_date = '2018-01-01',
                    time_interval='1D')
 
 dp.run(ticker_list = ['GBPUSD=X'], technical_indicator_list = config.INDICATORS, if_vix=False)
@@ -62,8 +62,8 @@ def train(env, agent, df, if_vix = True,**kwargs):
         # env_train = [x.get_sb_env for x in env_instance ]
         vector_env = [lambda:env(df)]
         env_train = SubprocVecEnv(vector_env)
-        model = PPO("MlpPolicy", env_train, learning_rate=learning_rate, 
-                    n_steps=2048, batch_size=batch_size, ent_coef=0.0, 
+        model = PPO("MlpPolicy", env_train, learning_rate=learning_rate,
+                    n_steps=2048, batch_size=batch_size, ent_coef=0.0,
                     gamma=gamma, seed=seed)
         start_time = time.time()
         s = datetime.datetime.now()
@@ -81,5 +81,3 @@ def train(env, agent, df, if_vix = True,**kwargs):
 df.rename(columns={"open": "Open", "high": "High", "low": "Low", "close": "Close"}, inplace=True)
 
 train(env=tgym,agent="ppo",df=df)
-
-
