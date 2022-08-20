@@ -31,7 +31,7 @@ INDICATORS = ['macd', 'rsi', 'cci', 'dx'] #self-defined technical indicator list
 net_dimension = 2**9
 
 ERL_PARAMS = {"learning_rate": 2**-15,"batch_size": 2**11,
-                "gamma": 0.99, "seed":312,"net_dimension": 2**9, 
+                "gamma": 0.99, "seed":312,"net_dimension": 2**9,
                 "target_step": 5000, "eval_gap": 30, "eval_times": 1}
 
 # 3. Create Multiple Cryptocurrencies Trading Env
@@ -41,15 +41,15 @@ env = CryptoEnv
 # 4. Training
 start_time = time.time()
 
-train(start_date=TRAIN_START_DATE, 
+train(start_date=TRAIN_START_DATE,
       end_date=TRAIN_END_DATE,
-      ticker_list=TICKER_LIST, 
+      ticker_list=TICKER_LIST,
       data_source='binance',
-      time_interval = time_interval, 
+      time_interval = time_interval,
       technical_indicator_list=INDICATORS,
-      drl_lib='elegantrl', 
-      env=env, 
-      model_name='ppo', 
+      drl_lib='elegantrl',
+      env=env,
+      model_name='ppo',
       current_working_dir='./test_ppo',
       erl_params=ERL_PARAMS,
       break_step=5e4,
@@ -61,17 +61,17 @@ duration_train = round((time.time() - start_time), 2)
 # 5. Testing
 start_time = time.time()
 
-account_value_erl = test(start_date = TEST_START_DATE, 
+account_value_erl = test(start_date = TEST_START_DATE,
                         end_date = TEST_END_DATE,
-                        ticker_list = TICKER_LIST, 
+                        ticker_list = TICKER_LIST,
                         data_source = 'binance',
-                        time_interval = time_interval, 
+                        time_interval = time_interval,
                         technical_indicator_list= INDICATORS,
-                        drl_lib='elegantrl', 
-                        env=env, 
-                        model_name='ppo', 
-                        current_working_dir='./test_ppo', 
-                        net_dimension = net_dimension, 
+                        drl_lib='elegantrl',
+                        env=env,
+                        model_name='ppo',
+                        current_working_dir='./test_ppo',
+                        net_dimension = net_dimension,
                         if_vix=False
                         )
 
@@ -101,7 +101,7 @@ for i in range(0, price_array.shape[0]):
 equal_weight_values = np.array(equal_weight_values)
 equal_returns = equal_weight_values/equal_weight_values[0]
 
-#plot 
+#plot
 plt.figure(dpi=200)
 plt.grid()
 plt.grid(which='minor', axis='y')
@@ -128,5 +128,3 @@ print('TEST_START_DATE: ', TEST_START_DATE, '   TEST_END_DATE: ', TEST_END_DATE)
 print('Time_Interval: ', time_interval)
 print('ERL_PARAMS: ', ERL_PARAMS)
 print('Episode_Total_Return: ', account_value_erl[-1]/initial_capital)
-
-
