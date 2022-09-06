@@ -116,11 +116,8 @@ class DRLAgent:
     def DRL_prediction(
         model_name,
         env,
-        price_array,
-        tech_array,
-        turbulence_array,
-        agent_path="./test_ppo/checkpoint_000100/checkpoint-100",
-    ):
+        agent_path="./test_ppo/checkpoint_000100/checkpoint-100",):
+        
         if model_name not in MODELS:
             raise NotImplementedError("NotImplementedError")
 
@@ -132,19 +129,8 @@ class DRLAgent:
             model_config = MODELS[model_name].DEFAULT_CONFIG.copy()
         model_config["env"] = env
         model_config["log_level"] = "WARN"
-        model_config["env_config"] = {
-            "price_array": price_array,
-            "tech_array": tech_array,
-            "turbulence_array": turbulence_array,
-            "if_train": False,
-        }
-        env_config = {
-            "price_array": price_array,
-            "tech_array": tech_array,
-            "turbulence_array": turbulence_array,
-            "if_train": False,
-        }
-        env_instance = env(config=env_config)
+
+        env_instance = env
 
         # ray.init() # Other Ray APIs will not work until `ray.init()` is called.
         if model_name == "ppo":
