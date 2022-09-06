@@ -6,7 +6,7 @@ from agents.stablebaselines3_models import DRLAgent as DRLAgent_sb3
 
 def test(drl_lib, env, model_name, **kwargs):
     # load elegantrl needs state dim, action dim and net dim
-    net_dimension = kwargs.get("net_dimension", 2 ** 7)
+    net_dimension = kwargs.get("net_dimension", 2**7)
     cwd = kwargs.get("cwd", "./" + str(model_name))
 
     if drl_lib == "elegantrl":
@@ -35,6 +35,6 @@ def test(drl_lib, env, model_name, **kwargs):
         )
 
         return episode_total_assets
-    
+
     else:
         raise ValueError("DRL library input is NOT supported. Please check.")
