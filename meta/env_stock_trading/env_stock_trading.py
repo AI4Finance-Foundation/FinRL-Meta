@@ -62,7 +62,7 @@ class StockTradingEnv(gym.Env):
         # cash + (turbulence, turbulence_bool) + (price, stock) * stock_dim + tech_dim
         self.stocks_cd = None
         self.action_dim = stock_dim
-        self.max_step = self.price_ary.shape[0] - 1
+        self.max_step = self.price_array.shape[0] - 1
         self.if_train = if_train
         self.if_discrete = False
         self.target_return = 10.0
