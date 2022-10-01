@@ -542,8 +542,11 @@ def calc_time_zone(
         raise ValueError("Time zone is wrong.")
     return time_zone
 
+
 def check_date(d: str) -> bool:
-    assert len(d) == 10, 'Please check the length of date and use the correct date like 2020-01-01.'
+    assert (
+        len(d) == 10
+    ), "Please check the length of date and use the correct date like 2020-01-01."
     indices = [0, 1, 2, 3, 5, 6, 8, 9]
     correct = True
     for i in indices:
@@ -551,7 +554,5 @@ def check_date(d: str) -> bool:
             correct = False
             break
     if not correct:
-        raise ValueError('Please use the correct date like 2020-01-01.')
+        raise ValueError("Please use the correct date like 2020-01-01.")
     return correct
-
-

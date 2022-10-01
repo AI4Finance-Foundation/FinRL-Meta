@@ -9,6 +9,7 @@ from typing import List
 
 import pandas as pd
 import requests
+from _base import check_date
 
 from meta.config import BINANCE_BASE_URL
 from meta.config import TIME_ZONE_BERLIN
@@ -19,7 +20,7 @@ from meta.config import TIME_ZONE_SHANGHAI
 from meta.config import TIME_ZONE_USEASTERN
 from meta.config import USE_TIME_ZONE_SELFDEFINED
 from meta.data_processors._base import _Base
-from _base import check_date
+
 
 class Binance(_Base):
     def __init__(
@@ -30,9 +31,9 @@ class Binance(_Base):
         time_interval: str,
         **kwargs,
     ):
-        if time_interval == '1D':
-            raise ValueError('Please use the time_interval 1d instead of 1D')
-        if time_interval == '1d':
+        if time_interval == "1D":
+            raise ValueError("Please use the time_interval 1d instead of 1D")
+        if time_interval == "1d":
             check_date(start_date)
             check_date(end_date)
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
