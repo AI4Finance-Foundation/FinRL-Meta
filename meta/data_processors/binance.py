@@ -30,6 +30,9 @@ class Binance(_Base):
         time_interval: str,
         **kwargs,
     ):
+        if time_interval == '1D':
+            raise ValueError('Please use the time_interval 1d instead of 1D')
+
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
         self.url = "https://api.binance.com/api/v3/klines"
         self.time_diff = None
