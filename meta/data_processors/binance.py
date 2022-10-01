@@ -9,6 +9,7 @@ from typing import List
 
 import pandas as pd
 import requests
+from _base import check_date
 
 from meta.config import BINANCE_BASE_URL
 from meta.config import TIME_ZONE_BERLIN
@@ -30,6 +31,11 @@ class Binance(_Base):
         time_interval: str,
         **kwargs,
     ):
+        if time_interval == "1D":
+            raise ValueError("Please use the time_interval 1d instead of 1D")
+        if time_interval == "1d":
+            check_date(start_date)
+            check_date(end_date)
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
         self.url = "https://api.binance.com/api/v3/klines"
         self.time_diff = None
