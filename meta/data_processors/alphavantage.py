@@ -45,9 +45,9 @@ class Alphavantage(_Base):
 
     # ["1d"]
     def download_data(self, ticker_list: List[str]):
-        self.time_zone = calc_time_zone(
-            ticker_list, TIME_ZONE_SELFDEFINED, USE_TIME_ZONE_SELFDEFINED
-        )
+        # self.time_zone = calc_time_zone(
+        #     ticker_list, TIME_ZONE_SELFDEFINED, USE_TIME_ZONE_SELFDEFINED
+        # )
         self.dataframe = pd.DataFrame()
         for ticker in ticker_list:
             url = 'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=' + ticker + '&apikey=demo'
