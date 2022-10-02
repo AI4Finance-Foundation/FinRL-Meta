@@ -19,7 +19,7 @@ class Evaluator:  # [ElegantRL.2021.10.13]
         target_return,
         if_overwrite,
     ):
-        self.recorder = list()  # total_step, r_avg, r_std, obj_c, ...
+        self.recorder = []  # total_step, r_avg, r_std, obj_c, ...
         self.recorder_path = f"{cwd}/recorder.npy"
 
         self.cwd = cwd
