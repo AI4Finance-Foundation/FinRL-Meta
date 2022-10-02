@@ -23,54 +23,67 @@ class DataProcessor:
 
         if self.data_source == "alpaca":
             from meta.data_processors.alpaca import Alpaca
+
             processor_dict = {self.data_source: Alpaca}
 
         elif self.data_source == "alphavantage":
             from meta.data_processors.alphavantage import Alphavantage
+
             processor_dict = {self.data_source: Alphavantage}
 
         elif self.data_source == "baostock":
             from meta.data_processors.baostock import Baostock
+
             processor_dict = {self.data_source: Baostock}
 
         elif self.data_source == "binance":
             from meta.data_processors.binance import Binance
+
             processor_dict = {self.data_source: Binance}
 
         elif self.data_source == "ccxt":
             from meta.data_processors.ccxt import Ccxt
+
             processor_dict = {self.data_source: Ccxt}
 
         elif self.data_source == "iexcloud":
             from meta.data_processors.iexcloud import Iexcloud
+
             processor_dict = {self.data_source: Iexcloud}
 
         elif self.data_source == "joinquant":
             from meta.data_processors.joinquant import Joinquant
+
             processor_dict = {self.data_source: Joinquant}
 
         elif self.data_source == "quandl":
             from meta.data_processors.quandl import Quandl
+
             processor_dict = {self.data_source: Quandl}
 
         elif self.data_source == "quantconnect":
             from meta.data_processors.quantconnect import Quantconnect
+
             processor_dict = {self.data_source: Quantconnect}
 
         elif self.data_source == "ricequant":
             from meta.data_processors.ricequant import Ricequant
+
             processor_dict = {self.data_source: Ricequant}
 
         elif self.data_source == "tushare":
             from meta.data_processors.tushare import Tushare
+
             processor_dict = {self.data_source: Tushare}
 
         elif self.data_source == "wrds":
             from meta.data_processors.wrds import Wrds
+
             processor_dict = {self.data_source: Wrds}
 
         elif self.data_source == "yahoofinance":
             from meta.data_processors.yahoofinance import Yahoofinance
+
             processor_dict = {self.data_source: Yahoofinance}
 
         else:

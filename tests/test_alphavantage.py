@@ -2,6 +2,7 @@ import pytest
 
 from meta.data_processor import DataProcessor
 
+
 def test_alphavantage():
     TRADE_START_DATE = "2020-09-01"
     TRADE_END_DATE = "2021-09-11"
