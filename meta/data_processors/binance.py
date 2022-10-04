@@ -9,9 +9,6 @@ from typing import List
 
 import pandas as pd
 import requests
-from meta.data_processors._base import _Base
-# from _base import check_date
-from meta.data_processors._base import check_date
 
 from meta.config import BINANCE_BASE_URL
 from meta.config import TIME_ZONE_BERLIN
@@ -21,7 +18,10 @@ from meta.config import TIME_ZONE_SELFDEFINED
 from meta.config import TIME_ZONE_SHANGHAI
 from meta.config import TIME_ZONE_USEASTERN
 from meta.config import USE_TIME_ZONE_SELFDEFINED
+from meta.data_processors._base import _Base
+from meta.data_processors._base import check_date
 
+# from _base import check_date
 
 
 class Binance(_Base):
