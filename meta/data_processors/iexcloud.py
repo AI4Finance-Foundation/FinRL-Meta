@@ -7,7 +7,7 @@ import pandas_market_calendars as mcal
 import pytz
 import requests
 # from _base import _Base
-from meta.data_processors._base
+from meta.data_processors._base import _Base
 
 class Iexcloud(_Base):
     @classmethod
