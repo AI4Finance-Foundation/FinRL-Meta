@@ -294,9 +294,11 @@ class ReturnPlotter:
         if baseline_ticket:
             # 使用指定ticket作为baseline
             baseline_df = self.get_baseline(baseline_ticket)
-            baseline_date_list = baseline_df.date.dt.strftime('%Y-%m-%d').tolist()
+            baseline_date_list = baseline_df.date.dt.strftime("%Y-%m-%d").tolist()
             df_date_list = self.df_account_value.date.tolist()
-            df_account_value = self.df_account_value[self.df_account_value.date.isin(baseline_date_list)]
+            df_account_value = self.df_account_value[
+                self.df_account_value.date.isin(baseline_date_list)
+            ]
             baseline_df = baseline_df[baseline_df.date.isin(df_date_list)]
             baseline = baseline_df.close.tolist()
             baseline_label = tic2label.get(baseline_ticket, baseline_ticket)
@@ -330,7 +332,7 @@ class ReturnPlotter:
 
         plt.legend()
         plt.show()
-        plt.savefig(f'plot_{baseline_ticket}.png')
+        plt.savefig(f"plot_{baseline_ticket}.png")
 
     def plot_all(self):
         baseline_label = "Equal-weight portfolio"
@@ -341,24 +343,26 @@ class ReturnPlotter:
         df_date_list = self.df_account_value.date.tolist()
 
         # 399300 date list
-        csi300_df = self.get_baseline('399300')
-        csi300_date_list = csi300_df.date.dt.strftime('%Y-%m-%d').tolist()
+        csi300_df = self.get_baseline("399300")
+        csi300_date_list = csi300_df.date.dt.strftime("%Y-%m-%d").tolist()
 
         # 000016 date list
-        sh50_df = self.get_baseline('000016')
-        sh50_date_list = sh50_df.date.dt.strftime('%Y-%m-%d').tolist()
+        sh50_df = self.get_baseline("000016")
+        sh50_date_list = sh50_df.date.dt.strftime("%Y-%m-%d").tolist()
 
         # find intersection
-        all_date = sorted(list(set(df_date_list) & set(csi300_date_list) & set(sh50_date_list)))
+        all_date = sorted(
+            list(set(df_date_list) & set(csi300_date_list) & set(sh50_date_list))
+        )
 
         # filter data
         csi300_df = csi300_df[csi300_df.date.isin(all_date)]
         baseline_300 = csi300_df.close.tolist()
-        baseline_label_300 = tic2label['399300']
+        baseline_label_300 = tic2label["399300"]
 
         sh50_df = sh50_df[sh50_df.date.isin(all_date)]
         baseline_50 = sh50_df.close.tolist()
-        baseline_label_50 = tic2label['000016']
+        baseline_label_50 = tic2label["000016"]
 
         # 均等权重
         baseline_equal_weight = []
@@ -367,7 +371,9 @@ class ReturnPlotter:
             avg_close = sum(day_close) / len(day_close)
             baseline_equal_weight.append(avg_close)
 
-        df_account_value = self.df_account_value[self.df_account_value.date.isin(all_date)]
+        df_account_value = self.df_account_value[
+            self.df_account_value.date.isin(all_date)
+        ]
         ours = df_account_value.account_value.tolist()
 
         ours = self.pct(ours)
@@ -399,7 +405,7 @@ class ReturnPlotter:
         plt.xticks([i * days_per_tick for i in range(len(ticks))], ticks, fontsize=7)
         plt.legend()
         plt.show()
-        plt.savefig('./plot_all.png')
+        plt.savefig("./plot_all.png")
 
     def pct(self, l):
         """Get percentage"""
