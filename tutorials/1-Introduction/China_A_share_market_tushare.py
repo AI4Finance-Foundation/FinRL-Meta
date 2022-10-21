@@ -88,11 +88,11 @@ ticker_list = [
     "600547.SH",
     "600570.SH",
 ]
-
+# At Oct.22 2022, trade date available span is [2020-04-22, 2022-10-21]
 TRAIN_START_DATE = "2015-01-01"
-TRAIN_END_DATE = "2019-08-01"
-TRADE_START_DATE = "2019-08-01"
-TRADE_END_DATE = "2020-01-03"
+TRAIN_END_DATE = "2020-07-01"
+TRADE_START_DATE = "2020-07-01"
+TRADE_END_DATE = "2022-10-01"
 
 
 TIME_INTERVAL = "1d"
@@ -214,13 +214,13 @@ print(f"df_actions: {df_actions}")
 
 # matplotlib inline
 plotter = ReturnPlotter(df_account_value, trade, TRADE_START_DATE, TRADE_END_DATE)
-# plotter.plot_all()
+plotter.plot_all()
 
 plotter.plot()
 
 # matplotlib inline
 # # ticket: SSE 50：000016
-# plotter.plot("000016")
+plotter.plot("000016")
 
 #### Use pyfolio
 
