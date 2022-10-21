@@ -294,11 +294,13 @@ class ReturnPlotter:
         if baseline_ticket:
             # 使用指定ticket作为baseline
             baseline_df = self.get_baseline(baseline_ticket)
-            baseline_df = baseline_df[
-                baseline_df.dt != "2020-06-26"
-            ]  # ours don't have date=="2020-06-26"
+            baseline_date_list = baseline_df.date.dt.strftime('%Y-%m-%d').tolist()
+            df_date_list = self.df_account_value.date.tolist()
+            df_account_value = self.df_account_value[self.df_account_value.date.isin(baseline_date_list)]
+            baseline_df = baseline_df[baseline_df.date.isin(df_date_list)]
             baseline = baseline_df.close.tolist()
             baseline_label = tic2label.get(baseline_ticket, baseline_ticket)
+            ours = df_account_value.account_value.tolist()
         else:
             # 均等权重
             all_date = self.trade.date.unique().tolist()
@@ -307,8 +309,8 @@ class ReturnPlotter:
                 day_close = self.trade[self.trade["date"] == day].close.tolist()
                 avg_close = sum(day_close) / len(day_close)
                 baseline.append(avg_close)
+            ours = self.df_account_value.account_value.tolist()
 
-        ours = self.df_account_value.account_value.tolist()
         ours = self.pct(ours)
         baseline = self.pct(baseline)
 
