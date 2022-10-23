@@ -213,13 +213,17 @@ print(f"df_actions: {df_actions}")
 ### Backtest
 
 # matplotlib inline
+from matplotlib import pyplot as plt
+plt.clf()
 plotter = ReturnPlotter(df_account_value, trade, TRADE_START_DATE, TRADE_END_DATE)
 plotter.plot_all()
 
+plt.clf()
 plotter.plot()
 
 # matplotlib inline
 # # ticket: SSE 50：000016
+plt.clf()
 plotter.plot("000016")
 
 #### Use pyfolio
