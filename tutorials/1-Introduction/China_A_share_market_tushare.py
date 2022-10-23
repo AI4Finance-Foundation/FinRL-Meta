@@ -214,6 +214,7 @@ print(f"df_actions: {df_actions}")
 
 # matplotlib inline
 from matplotlib import pyplot as plt
+
 plt.clf()
 plotter = ReturnPlotter(df_account_value, trade, TRADE_START_DATE, TRADE_END_DATE)
 plotter.plot_all()
