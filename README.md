@@ -6,7 +6,7 @@
 [![Python 3.6](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/downloads/release/python-360/)
 [![PyPI](https://img.shields.io/pypi/v/finrl_meta.svg)](https://pypi.org/project/finrl_meta/)
 
-FinRL-Meta ([website](https://finrl.readthedocs.io/en/latest/finrl_meta/background.html)) builds a universe of market environments for data-driven financial reinforcement learning. We aim to server the users in our community to help them to build environments.
+FinRL-Meta ([docs website](https://finrl.readthedocs.io/en/latest/finrl_meta/background.html)) builds a universe of market environments for data-driven financial reinforcement learning. We aim to help the users in our community to easily build environments.
 
 
 1. FinRL-Meta provides hundreds of market environments.
