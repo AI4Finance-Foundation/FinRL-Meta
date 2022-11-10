@@ -123,6 +123,19 @@ For future work, we plan to build a multi-agent-based market simulator that cons
 
 
 ## Citing FinRL-Meta
+FinRL-Meta: Market Environments and Benchmarks for Data-Driven Financial Reinforcement Learning
+https://arxiv.org/abs/2211.03107
+```
+@article{finrl_meta_2022,
+    author = {Liu, Xiao-Yang and Xia, Ziyi and Rui, Jingyang and Gao, Jiechao and Yang, Hongyang and Zhu, Ming and Wang, Christina Dan and Wang, Zhaoran and Guo, Jian},
+    title = {{FinRL-Meta}: Market Environments and Benchmarks for Data-Driven Financial Reinforcement Learning},
+    journal = {NeurIPS},
+    year = {2022}
+}
+```
+
+FinRL-Meta: Data-Driven Deep ReinforcementLearning in Quantitative Finance
+https://arxiv.org/abs/2112.06753
 ```
 @article{finrl_meta_2021,
     author = {Liu, Xiao-Yang and Rui, Jingyang and Gao, Jiechao and Yang, Liuqing and Yang, Hongyang and Wang, Zhaoran and Wang, Christina Dan and Guo Jian},
@@ -130,16 +143,9 @@ For future work, we plan to build a multi-agent-based market simulator that cons
     journal = {Data-Centric AI Workshop, NeurIPS},
     year    = {2021}
 }
-
-
-@article{finrl_meta_2022,
-    author = {Liu, Xiao-Yang and Xia, Ziyi and Rui, Jingyang and Gao, Jiechao and Yang, Hongyang and Zhu, Ming and Wang, Christina Dan and Wang, Zhaoran and Guo, Jian},
-    title = {{FinRL-Meta}: Market Environments and Benchmarks for Data-Driven Financial Reinforcement Learning},
-    journal = {NeurIPS},
-    year = {2022}
-}
-
 ```
+
+
 
 ## Collaborators
 
