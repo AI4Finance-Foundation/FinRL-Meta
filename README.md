@@ -135,7 +135,7 @@ For future work, we plan to build a multi-agent-based market simulator that cons
 @article{finrl_meta_2022,
     author = {Liu, Xiao-Yang and Xia, Ziyi and Rui, Jingyang and Gao, Jiechao and Yang, Hongyang and Zhu, Ming and Wang, Christina Dan and Wang, Zhaoran and Guo, Jian},
     title = {{FinRL-Meta}: Market Environments and Benchmarks for Data-Driven Financial Reinforcement Learning},
-    journal = {Dataset and Benchmark, NeurIPS},
+    journal = {NeurIPS},
     year = {2022}
 }
 
