@@ -2,6 +2,9 @@
 <img align="center" src=https://github.com/AI4Finance-Foundation/FinRL-Meta/blob/master/figs/FinRL-Meta_Tutorials.png>
 </div>
 
+**NOTICE**
+We only reserve several stable tutorials in this folder. For more tutorials, please refer to this repo https://github.com/AI4Finance-Foundation/FinRL-Tutorials.
+
 **Mission**: provide more than 100 user-friendly demos in both notebooks and python.
 
 In the python verison, users and developers can debug them locally; however, it is impossible to use jupyter notebooks.
