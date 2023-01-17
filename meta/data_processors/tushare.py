@@ -1,6 +1,7 @@
 import copy
 import time
 import warnings
+
 warnings.filterwarnings("ignore")
 from typing import List
 
@@ -13,6 +14,7 @@ import talib
 from meta.data_processors._base import _Base
 
 import tushare as ts
+
 
 class Tushare(_Base):
     """
@@ -156,7 +158,10 @@ class Tushare(_Base):
         self.dataframe = df3
 
     def add_technical_indicator(
-        self, tech_indicator_list: List[str], select_stockstats_talib: int = 0,drop_na_timestpe: int = 0,
+        self,
+        tech_indicator_list: List[str],
+        select_stockstats_talib: int = 0,
+        drop_na_timestpe: int = 0,
     ):
         """
         calculate technical indicators
@@ -237,7 +242,9 @@ class Tushare(_Base):
 
         self.dataframe.sort_values(by=["time", "tic"], inplace=True)
         if drop_na_timestpe:
-            time_to_drop = self.dataframe[self.dataframe.isna().any(axis=1)].time.unique()
+            time_to_drop = self.dataframe[
+                self.dataframe.isna().any(axis=1)
+            ].time.unique()
             self.dataframe = self.dataframe[~self.dataframe.time.isin(time_to_drop)]
         self.dataframe.rename(columns={"time": "date"}, inplace=True)
         print("Succesfully add technical indicators")
@@ -287,8 +294,6 @@ class Tushare(_Base):
         elif alpha == "XSHE":
             nonstandard_ticker = n + ".SZ"
         return nonstandard_ticker
-
-
 
 
 class ReturnPlotter:

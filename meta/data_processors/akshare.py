@@ -1,6 +1,7 @@
 import copy
 import time
 import warnings
+
 warnings.filterwarnings("ignore")
 from typing import List
 
@@ -11,10 +12,10 @@ import stockstats
 import talib
 from meta.data_processors._base import _Base
 
-import akshare as ak # pip install akshare
+import akshare as ak  # pip install akshare
+
 
 class Akshare(_Base):
-
     def __init__(
         self,
         data_source: str,
@@ -22,7 +23,7 @@ class Akshare(_Base):
         end_date: str,
         time_interval: str,
         **kwargs,
-    ):  
+    ):
         start_date = self.transfer_date(start_date)
         end_date = self.transfer_date(end_date)
 
@@ -32,22 +33,22 @@ class Akshare(_Base):
             self.adj = kwargs["adj"]
             print(f"Using {self.adj} method.")
         else:
-            self.adj = ''
-            
+            self.adj = ""
+
         if "period" in kwargs.keys():
             self.period = kwargs["period"]
         else:
-            self.period = 'daily'
-        
+            self.period = "daily"
+
     def get_data(self, id) -> pd.DataFrame:
 
         return ak.stock_zh_a_hist(
-            symbol = id, 
-            period = self.time_interval,
-            start_date = self.start_date,
-            end_date = self.end_date,
-            adjust = self.adj,
-            )
+            symbol=id,
+            period=self.time_interval,
+            start_date=self.start_date,
+            end_date=self.end_date,
+            adjust=self.adj,
+        )
 
     def download_data(self, ticker_list: List[str]):
         """
@@ -55,7 +56,11 @@ class Akshare(_Base):
             7 columns: A tick symbol, date, open, high, low, close and volume
             for the specified stock ticker
         """
-        assert self.time_interval in ["daily","weekly",'monthly'], "Not supported currently"
+        assert self.time_interval in [
+            "daily",
+            "weekly",
+            "monthly",
+        ], "Not supported currently"
 
         self.ticker_list = ticker_list
 
@@ -65,7 +70,7 @@ class Akshare(_Base):
             df_temp = self.get_data(nonstandard_id)
             df_temp["tic"] = i
             # df_temp = self.get_data(i)
-            self.dataframe = pd.concat([self.dataframe,df_temp])
+            self.dataframe = pd.concat([self.dataframe, df_temp])
             # self.dataframe = self.dataframe.append(df_temp)
             # print("{} ok".format(i))
             time.sleep(0.25)
@@ -92,7 +97,9 @@ class Akshare(_Base):
             ["tic", "date", "open", "high", "low", "close", "volume"]
         ]
         # self.dataframe.loc[:, 'tic'] = pd.DataFrame((self.dataframe['tic'].tolist()))
-        self.dataframe["date"] = pd.to_datetime(self.dataframe["date"], format="%Y-%m-%d")
+        self.dataframe["date"] = pd.to_datetime(
+            self.dataframe["date"], format="%Y-%m-%d"
+        )
         self.dataframe["day"] = self.dataframe["date"].dt.dayofweek
         self.dataframe["date"] = self.dataframe.date.apply(
             lambda x: x.strftime("%Y-%m-%d")
@@ -154,7 +161,10 @@ class Akshare(_Base):
         self.dataframe = df3
 
     def add_technical_indicator(
-        self, tech_indicator_list: List[str], select_stockstats_talib: int = 0,drop_na_timestpe: int = 0,
+        self,
+        tech_indicator_list: List[str],
+        select_stockstats_talib: int = 0,
+        drop_na_timestpe: int = 0,
     ):
         """
         calculate technical indicators
@@ -235,7 +245,9 @@ class Akshare(_Base):
 
         self.dataframe.sort_values(by=["time", "tic"], inplace=True)
         if drop_na_timestpe:
-            time_to_drop = self.dataframe[self.dataframe.isna().any(axis=1)].time.unique()
+            time_to_drop = self.dataframe[
+                self.dataframe.isna().any(axis=1)
+            ].time.unique()
             self.dataframe = self.dataframe[~self.dataframe.time.isin(time_to_drop)]
         self.dataframe.rename(columns={"time": "date"}, inplace=True)
         print("Succesfully add technical indicators")
@@ -284,7 +296,7 @@ class Akshare(_Base):
             n, alpha = ticker.split(".")
             # assert alpha in ["XSHG", "XSHE"], "Wrong alpha"
         return n
-    
+
     def transfer_date(self, date: str) -> str:
         if "-" in date:
             date = "".join(date.split("-"))
