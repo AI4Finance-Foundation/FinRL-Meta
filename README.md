@@ -70,6 +70,7 @@ To deal with financial big data (unstructured), we follow the DataOps paradigm a
 Supported Data Sources:
 |Data Source |Type |Range and Frequency |Request Limits|Raw Data|Preprocessed Data|
 |  ----  |  ----  |  ----  |  ----  |  ----  |  ----  |
+|[Akshare](https://github.com/akfamily/akshare) |CN Securities, A share |2017-now, 1 day |NA|OHLCV|Prices&Indicators|
 |[Alpaca](https://alpaca.markets/docs/introduction/)| US Stocks, ETFs| 2015-now, 1min| Account-specific| OHLCV| Prices&Indicators|
 |[Baostock](http://baostock.com/baostock/index.php/Python_API%E6%96%87%E6%A1%A3)| CN Securities| 1990-12-19-now, 5min| Account-specific| OHLCV| Prices&Indicators|
 |[Binance](https://binance-docs.github.io/apidocs/spot/en/#public-api-definitions)| Cryptocurrency| API-specific, 1s, 1min| API-specific| Tick-level daily aggegrated trades, OHLCV| Prices&Indicators|
