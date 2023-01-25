@@ -112,7 +112,7 @@ def plot_price_model(seed=0, num_days=1000):
     # Create a simulation environment
     env = sca.MarketEnvironment()
 
-    # Reset the enviroment with the given seed
+    # Reset the environment with the given seed
     env.reset(seed)
 
     # Create an array to hold the daily stock price for the given number of days
@@ -144,7 +144,7 @@ def get_optimal_vals(lq_time=60, nm_trades=60, tr_risk=1e-6, title=""):
     # Create a simulation environment
     env = sca.MarketEnvironment()
 
-    # Reset the enviroment with the given parameters
+    # Reset the environment with the given parameters
     env.reset(liquid_time=lq_time, num_trades=nm_trades, lamb=tr_risk)
 
     # Set the title for the AC Optimal Strategy table
@@ -260,7 +260,7 @@ def plot_efficient_frontier(tr_risk=1e-6):
     # Create a simulation environment
     env = sca.MarketEnvironment()
 
-    # Reset the enviroment with the given trader's risk aversion
+    # Reset the environment with the given trader's risk aversion
     env.reset(lamb=tr_risk)
 
     # Get the expected shortfall and corresponding variance for the given trader's risk aversion
@@ -494,7 +494,7 @@ def get_av_std(lq_time=60, nm_trades=60, tr_risk=1e-6, trs=100):
     # Create simulation environment
     env = sca.MarketEnvironment()
 
-    # Reset the enviroment
+    # Reset the environment
     env.reset(liquid_time=lq_time, num_trades=nm_trades, lamb=tr_risk)
 
     # Get the trading list
@@ -512,7 +512,7 @@ def get_av_std(lq_time=60, nm_trades=60, tr_risk=1e-6, trs=100):
         if (episode + 1) % 100 == 0:
             print(f"Episode [{episode + 1}/{trs}]", end="\r", flush=True)
 
-        # Reset the enviroment
+        # Reset the environment
         env.reset(
             seed=episode,
             liquid_time=lq_time,
