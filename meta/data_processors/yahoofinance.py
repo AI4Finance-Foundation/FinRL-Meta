@@ -1,4 +1,3 @@
-"""Reference: https://github.com/AI4Finance-LLC/FinRL"""
 from typing import List
 
 import numpy as np
