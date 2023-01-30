@@ -1,4 +1,5 @@
 import copy
+import os
 import time
 import warnings
 
@@ -56,7 +57,7 @@ class Tushare(_Base):
             adj=self.adj,
         )
 
-    def download_data(self, ticker_list: List[str]):
+    def download_data(self, ticker_list: List[str], save_path="./data/dataset.csv"):
         """
         `pd.DataFrame`
             7 columns: A tick symbol, date, open, high, low, close and volume
@@ -106,7 +107,11 @@ class Tushare(_Base):
         self.dataframe.sort_values(by=["date", "tic"], inplace=True)
         self.dataframe.reset_index(drop=True, inplace=True)
 
-        print("Shape of DataFrame: ", self.dataframe.shape)
+        self.save_data(save_path)
+
+        print(
+            f"Download complete! Dataset saved to {save_path}. \nShape of DataFrame: {self.dataframe.shape}"
+        )
 
     def clean_data(self):
         dfc = copy.deepcopy(self.dataframe)
@@ -249,30 +254,6 @@ class Tushare(_Base):
         self.dataframe.rename(columns={"time": "date"}, inplace=True)
         print("Succesfully add technical indicators")
 
-    # def get_trading_days(self, start: str, end: str) -> List[str]:
-    #     print('not supported currently!')
-    #     return ['not supported currently!']
-
-    # def add_turbulence(self, data: pd.DataFrame) \
-    #         -> pd.DataFrame:
-    #     print('not supported currently!')
-    #     return pd.DataFrame(['not supported currently!'])
-
-    # def calculate_turbulence(self, data: pd.DataFrame, time_period: int = 252) \
-    #         -> pd.DataFrame:
-    #     print('not supported currently!')
-    #     return pd.DataFrame(['not supported currently!'])
-
-    # def add_vix(self, data: pd.DataFrame) \
-    #         -> pd.DataFrame:
-    #     print('not supported currently!')
-    #     return pd.DataFrame(['not supported currently!'])
-
-    # def df_to_array(self, df: pd.DataFrame, tech_indicator_list: List[str], if_vix: bool) \
-    #         -> List[np.array]:
-    #     print('not supported currently!')
-    #     return pd.DataFrame(['not supported currently!'])
-
     def data_split(self, df, start, end, target_date_col="date"):
         """
         split the dataset into training or testing using date
@@ -284,9 +265,9 @@ class Tushare(_Base):
         data.index = data[target_date_col].factorize()[0]
         return data
 
-    # "600000.XSHG" -> "600000.SH"
-    # "000612.XSHE" -> "000612.SZ"
     def transfer_standard_ticker_to_nonstandard(self, ticker: str) -> str:
+        # "600000.XSHG" -> "600000.SH"
+        # "000612.XSHE" -> "000612.SZ"
         n, alpha = ticker.split(".")
         assert alpha in ["XSHG", "XSHE"], "Wrong alpha"
         if alpha == "XSHG":
@@ -294,6 +275,28 @@ class Tushare(_Base):
         elif alpha == "XSHE":
             nonstandard_ticker = n + ".SZ"
         return nonstandard_ticker
+
+    def save_data(self, path):
+        if ".csv" in path:
+            path = path.split("/")
+            filename = path[-1]
+            path = "/".join(path[:-1] + [""])
+        else:
+            if path[-1] == "/":
+                filename = "dataset.csv"
+            else:
+                filename = "/dataset.csv"
+
+        os.makedirs(path, exist_ok=True)
+        self.dataframe.to_csv(path + filename, index=False)
+
+    def load_data(self, path):
+        assert ".csv" in path  # only support csv format now
+        self.dataframe = pd.read_csv(path)
+        columns = self.dataframe.columns
+        assert (
+            "tic" in columns and "date" in columns and "close" in columns
+        )  # input file must have "tic","date" and "close" columns
 
 
 class ReturnPlotter:
