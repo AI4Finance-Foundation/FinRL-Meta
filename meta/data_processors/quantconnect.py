@@ -21,7 +21,7 @@ class Quantconnect(_Base):
         start_date: str,
         end_date: str,
         time_interval: str,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
 
@@ -33,7 +33,9 @@ class Quantconnect(_Base):
     #     history = qb.History(qb.Securities.Keys, start_time, end_time, resolution)
     #     return history
 
-    def download_data(self, ticker_list: List[str], save_path: str = "./data/dataset.csv"):
+    def download_data(
+        self, ticker_list: List[str], save_path: str = "./data/dataset.csv"
+    ):
         # self.time_zone = calc_time_zone(ticker_list, TIME_ZONE_SELFDEFINED, USE_TIME_ZONE_SELFDEFINED)
 
         # start_date = pd.Timestamp(start_date, tz=self.time_zone)
@@ -51,7 +53,9 @@ class Quantconnect(_Base):
 
         self.save_data(save_path)
 
-        print(f"Download complete! Dataset saved to {save_path}. \nShape of DataFrame: {self.dataframe.shape}") 
+        print(
+            f"Download complete! Dataset saved to {save_path}. \nShape of DataFrame: {self.dataframe.shape}"
+        )
 
     # def preprocess(df, stock_list):
     #     df = df[['open','high','low','close','volume']]

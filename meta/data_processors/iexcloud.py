@@ -36,7 +36,9 @@ class Iexcloud(_Base):
         self.base_url = self._get_base_url(mode=kwargs["mode"])
         self.token = kwargs["token"] or os.environ.get("IEX_TOKEN")
 
-    def download_data(self, ticker_list: List[str], save_path: str = "./data/dataset.csv"):
+    def download_data(
+        self, ticker_list: List[str], save_path: str = "./data/dataset.csv"
+    ):
         """Returns end of day historical data for up to 15 years.
 
         Args:
@@ -111,8 +113,9 @@ class Iexcloud(_Base):
 
         self.save_data(save_path)
 
-        print(f"Download complete! Dataset saved to {save_path}. \nShape of DataFrame: {self.dataframe.shape}") 
-
+        print(
+            f"Download complete! Dataset saved to {save_path}. \nShape of DataFrame: {self.dataframe.shape}"
+        )
 
     def get_trading_days(self, start: str, end: str) -> List[str]:
         """Retrieves every trading day between two dates.

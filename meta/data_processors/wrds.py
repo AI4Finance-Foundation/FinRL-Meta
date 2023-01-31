@@ -32,14 +32,18 @@ class Wrds(_Base):
         start_date: str,
         end_date: str,
         time_interval: str,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
         if "if_offline" in kwargs.keys() and not kwargs["if_offline"]:
             self.db = wrds.Connection()
 
     def download_data(
-        self, ticker_list: List[str], if_save_tempfile=False, filter_shares=0, save_path: str = "./data/dataset.csv"
+        self,
+        ticker_list: List[str],
+        if_save_tempfile=False,
+        filter_shares=0,
+        save_path: str = "./data/dataset.csv",
     ):
 
         dates = self.get_trading_days(self.start_date, self.end_date)
@@ -74,7 +78,9 @@ class Wrds(_Base):
 
         self.save_data(save_path)
 
-        print(f"Download complete! Dataset saved to {save_path}. \nShape of DataFrame: {self.dataframe.shape}") 
+        print(
+            f"Download complete! Dataset saved to {save_path}. \nShape of DataFrame: {self.dataframe.shape}"
+        )
 
     def preprocess_to_ohlcv(self, df, time_interval="60S"):
         df = df[["date", "time_m", "sym_root", "size", "price"]]
