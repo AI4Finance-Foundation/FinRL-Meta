@@ -518,6 +518,29 @@ class _Base:
     def transfer_standard_ticker_to_nonstandard(self, ticker: str) -> str:
         return ticker
 
+    def save_data(self, path):
+        if ".csv" in path:
+            path = path.split("/")
+            filename = path[-1]
+            path = "/".join(path[:-1] + [""])
+        else:
+            if path[-1] == "/":
+                filename = "dataset.csv"
+            else:
+                filename = "/dataset.csv"
+
+        os.makedirs(path, exist_ok=True)
+        self.dataframe.to_csv(path + filename, index=False)
+
+    def load_data(self, path):
+        assert ".csv" in path  # only support csv format now
+        self.dataframe = pd.read_csv(path)
+        columns = self.dataframe.columns
+        print(f"{path} loaded")
+        # # check loaded file
+        # assert "date" in columns or "time" in columns
+        # assert "close" in columns
+
 
 def calc_time_zone(
     ticker_list: List[str],

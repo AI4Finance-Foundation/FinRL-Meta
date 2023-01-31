@@ -57,7 +57,9 @@ class Tushare(_Base):
             adj=self.adj,
         )
 
-    def download_data(self, ticker_list: List[str], save_path="./data/dataset.csv"):
+    def download_data(
+        self, ticker_list: List[str], save_path: str = "./data/dataset.csv"
+    ):
         """
         `pd.DataFrame`
             7 columns: A tick symbol, date, open, high, low, close and volume
@@ -157,6 +159,11 @@ class Tushare(_Base):
 
         # reshape dataframe
         df3 = df3.sort_values(by=["date", "tic"]).reset_index(drop=True)
+
+        if "date" in self.dataframe.columns.values.tolist():
+            self.dataframe.rename(columns={"date": "time"}, inplace=True)
+        if "datetime" in self.dataframe.columns.values.tolist():
+            self.dataframe.rename(columns={"datetime": "time"}, inplace=True)
 
         print("Shape of DataFrame: ", df3.shape)
 
