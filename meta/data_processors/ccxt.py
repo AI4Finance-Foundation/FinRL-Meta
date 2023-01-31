@@ -23,7 +23,7 @@ class Ccxt(_Base):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
         self.binance = ccxt.binance()
 
-    def download_data(self, ticker_list: List[str]):
+    def download_data(self, ticker_list: List[str], save_path: str = "./data/dataset.csv"):
 
         crypto_column = pd.MultiIndex.from_product(
             [ticker_list, ["open", "high", "low", "close", "volume"]]
@@ -54,6 +54,10 @@ class Ccxt(_Base):
             dataset[temp_col] = df[["open", "high", "low", "close", "volume"]].values
         print("Actual end time: " + str(df["time"].values[-1]))
         self.dataframe = dataset
+
+        self.save_data(save_path)
+
+        print(f"Download complete! Dataset saved to {save_path}. \nShape of DataFrame: {self.dataframe.shape}") 
 
     # def add_technical_indicators(self, df, pair_list, tech_indicator_list = [
     #     'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30',

@@ -1,3 +1,4 @@
+import os
 import copy
 import time
 import warnings
@@ -50,7 +51,7 @@ class Akshare(_Base):
             adjust=self.adj,
         )
 
-    def download_data(self, ticker_list: List[str]):
+    def download_data(self, ticker_list: List[str], save_path: str = "./data/dataset.csv"):
         """
         `pd.DataFrame`
             7 columns: A tick symbol, date, open, high, low, close and volume
@@ -109,7 +110,9 @@ class Akshare(_Base):
         self.dataframe.sort_values(by=["date", "tic"], inplace=True)
         self.dataframe.reset_index(drop=True, inplace=True)
 
-        print("Shape of DataFrame: ", self.dataframe.shape)
+        self.save_data(save_path)
+
+        print(f"Download complete! Dataset saved to {save_path}. \nShape of DataFrame: {self.dataframe.shape}") 
 
     def clean_data(self):
         dfc = copy.deepcopy(self.dataframe)
@@ -155,6 +158,11 @@ class Akshare(_Base):
 
         # reshape dataframe
         df3 = df3.sort_values(by=["date", "tic"]).reset_index(drop=True)
+
+        if "date" in self.dataframe.columns.values.tolist():
+            self.dataframe.rename(columns={"date": "time"}, inplace=True)
+        if "datetime" in self.dataframe.columns.values.tolist():
+            self.dataframe.rename(columns={"datetime": "time"}, inplace=True)
 
         print("Shape of DataFrame: ", df3.shape)
 
@@ -251,30 +259,6 @@ class Akshare(_Base):
             self.dataframe = self.dataframe[~self.dataframe.time.isin(time_to_drop)]
         self.dataframe.rename(columns={"time": "date"}, inplace=True)
         print("Succesfully add technical indicators")
-
-    # def get_trading_days(self, start: str, end: str) -> List[str]:
-    #     print('not supported currently!')
-    #     return ['not supported currently!']
-
-    # def add_turbulence(self, data: pd.DataFrame) \
-    #         -> pd.DataFrame:
-    #     print('not supported currently!')
-    #     return pd.DataFrame(['not supported currently!'])
-
-    # def calculate_turbulence(self, data: pd.DataFrame, time_period: int = 252) \
-    #         -> pd.DataFrame:
-    #     print('not supported currently!')
-    #     return pd.DataFrame(['not supported currently!'])
-
-    # def add_vix(self, data: pd.DataFrame) \
-    #         -> pd.DataFrame:
-    #     print('not supported currently!')
-    #     return pd.DataFrame(['not supported currently!'])
-
-    # def df_to_array(self, df: pd.DataFrame, tech_indicator_list: List[str], if_vix: bool) \
-    #         -> List[np.array]:
-    #     print('not supported currently!')
-    #     return pd.DataFrame(['not supported currently!'])
 
     def data_split(self, df, start, end, target_date_col="date"):
         """

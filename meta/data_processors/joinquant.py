@@ -22,7 +22,7 @@ class Joinquant(_Base):
         if "username" in kwargs.keys() and "password" in kwargs.keys():
             jq.auth(kwargs["username"], kwargs["password"])
 
-    def download_data(self, ticker_list: List[str]):
+    def download_data(self, ticker_list: List[str], save_path: str = "./data/dataset.csv"):
         # joinquant supports: '1m', '5m', '15m', '30m', '60m', '120m', '1d', '1w', '1M'。'1w' denotes one week，‘1M' denotes one month。
         count = len(self.get_trading_days(self.start_date, self.end_date))
         df = jq.get_bars(
@@ -34,6 +34,10 @@ class Joinquant(_Base):
         )
         df = df.reset_index().rename(columns={"level_0": "tic"})
         self.dataframe = df
+
+        self.save_data(save_path)
+
+        print(f"Download complete! Dataset saved to {save_path}. \nShape of DataFrame: {self.dataframe.shape}") 
 
     def preprocess(df, stock_list):
         n = len(stock_list)

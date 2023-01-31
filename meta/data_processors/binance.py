@@ -43,7 +43,7 @@ class Binance(_Base):
         self.time_diff = None
 
     # main functions
-    def download_data(self, ticker_list: List[str]):
+    def download_data(self, ticker_list: List[str], save_path: str = "./data/dataset.csv"):
         startTime = dt.datetime.strptime(self.start_date, "%Y-%m-%d")
         endTime = dt.datetime.strptime(self.end_date, "%Y-%m-%d")
 
@@ -65,6 +65,10 @@ class Binance(_Base):
                 df["tic"] = i
                 final_df = pd.concat([final_df, df], axis=0, join="outer")
         self.dataframe = final_df
+
+        self.save_data(save_path)
+
+        print(f"Download complete! Dataset saved to {save_path}. \nShape of DataFrame: {self.dataframe.shape}")
 
     # def clean_data(self, df):
     #     df = df.dropna()

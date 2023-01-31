@@ -46,7 +46,7 @@ class Alphavantage(_Base):
         assert time_interval == "1d", "please set the time_interval 1d"
 
     # ["1d"]
-    def download_data(self, ticker_list: List[str]):
+    def download_data(self, ticker_list: List[str], save_path: str = "./data/dataset.csv"):
         # self.time_zone = calc_time_zone(
         #     ticker_list, TIME_ZONE_SELFDEFINED, USE_TIME_ZONE_SELFDEFINED
         # )
@@ -82,3 +82,7 @@ class Alphavantage(_Base):
         self.dataframe = self.dataframe.sort_values(by=["date", "tic"]).reset_index(
             drop=True
         )
+
+        self.save_data(save_path)
+
+        print(f"Download complete! Dataset saved to {save_path}. \nShape of DataFrame: {self.dataframe.shape}")
