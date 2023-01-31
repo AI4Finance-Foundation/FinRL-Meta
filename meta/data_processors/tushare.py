@@ -57,11 +57,7 @@ class Tushare(_Base):
             adj=self.adj,
         )
 
-<<<<<<< HEAD
     def download_data(self, ticker_list: List[str], save_path: str = "./data/dataset.csv"):
-=======
-    def download_data(self, ticker_list: List[str], save_path="./data/dataset.csv"):
->>>>>>> fd8ecb59145c86ac51ca897016df814068202b35
         """
         `pd.DataFrame`
             7 columns: A tick symbol, date, open, high, low, close and volume
