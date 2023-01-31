@@ -41,13 +41,15 @@ class Baostock(_Base):
         start_date: str,
         end_date: str,
         time_interval: str,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
 
     # 日k线、周k线、月k线，以及5分钟、15分钟、30分钟和60分钟k线数据
     # ["5m", "15m", "30m", "60m", "1d", "1w", "1M"]
-    def download_data(self, ticker_list: List[str], save_path: str = "./data/dataset.csv"):
+    def download_data(
+        self, ticker_list: List[str], save_path: str = "./data/dataset.csv"
+    ):
         lg = bs.login()
         print("baostock login respond error_code:" + lg.error_code)
         print("baostock login respond  error_msg:" + lg.error_msg)
@@ -84,7 +86,9 @@ class Baostock(_Base):
 
         self.save_data(save_path)
 
-        print(f"Download complete! Dataset saved to {save_path}. \nShape of DataFrame: {self.dataframe.shape}") 
+        print(
+            f"Download complete! Dataset saved to {save_path}. \nShape of DataFrame: {self.dataframe.shape}"
+        )
 
     def get_trading_days(self, start, end):
         lg = bs.login()

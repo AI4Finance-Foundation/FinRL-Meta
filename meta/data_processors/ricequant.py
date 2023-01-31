@@ -12,7 +12,7 @@ class Ricequant(_Base):
         start_date: str,
         end_date: str,
         time_interval: str,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
         if kwargs["username"] is None or kwargs["password"] is None:
@@ -22,7 +22,9 @@ class Ricequant(_Base):
                 kwargs["username"], kwargs["password"]
             )  # init with username and password
 
-    def download_data(self, ticker_list: List[str], save_path: str = "./data/dataset.csv"):
+    def download_data(
+        self, ticker_list: List[str], save_path: str = "./data/dataset.csv"
+    ):
         # download data by calling RiceQuant API
         dataframe = ricequant.get_price(
             ticker_list,
@@ -34,7 +36,9 @@ class Ricequant(_Base):
 
         self.save_data(save_path)
 
-        print(f"Download complete! Dataset saved to {save_path}. \nShape of DataFrame: {self.dataframe.shape}") 
+        print(
+            f"Download complete! Dataset saved to {save_path}. \nShape of DataFrame: {self.dataframe.shape}"
+        )
 
     # def clean_data(self, df) -> pd.DataFrame:
     #     ''' RiceQuant data is already cleaned, we only need to transform data format here.

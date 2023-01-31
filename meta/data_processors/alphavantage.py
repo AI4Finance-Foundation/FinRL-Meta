@@ -39,14 +39,16 @@ class Alphavantage(_Base):
         start_date: str,
         end_date: str,
         time_interval: str,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
 
         assert time_interval == "1d", "please set the time_interval 1d"
 
     # ["1d"]
-    def download_data(self, ticker_list: List[str], save_path: str = "./data/dataset.csv"):
+    def download_data(
+        self, ticker_list: List[str], save_path: str = "./data/dataset.csv"
+    ):
         # self.time_zone = calc_time_zone(
         #     ticker_list, TIME_ZONE_SELFDEFINED, USE_TIME_ZONE_SELFDEFINED
         # )
@@ -85,4 +87,6 @@ class Alphavantage(_Base):
 
         self.save_data(save_path)
 
-        print(f"Download complete! Dataset saved to {save_path}. \nShape of DataFrame: {self.dataframe.shape}")
+        print(
+            f"Download complete! Dataset saved to {save_path}. \nShape of DataFrame: {self.dataframe.shape}"
+        )

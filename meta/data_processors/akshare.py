@@ -1,5 +1,5 @@
-import os
 import copy
+import os
 import time
 import warnings
 
@@ -51,7 +51,9 @@ class Akshare(_Base):
             adjust=self.adj,
         )
 
-    def download_data(self, ticker_list: List[str], save_path: str = "./data/dataset.csv"):
+    def download_data(
+        self, ticker_list: List[str], save_path: str = "./data/dataset.csv"
+    ):
         """
         `pd.DataFrame`
             7 columns: A tick symbol, date, open, high, low, close and volume
@@ -112,7 +114,9 @@ class Akshare(_Base):
 
         self.save_data(save_path)
 
-        print(f"Download complete! Dataset saved to {save_path}. \nShape of DataFrame: {self.dataframe.shape}") 
+        print(
+            f"Download complete! Dataset saved to {save_path}. \nShape of DataFrame: {self.dataframe.shape}"
+        )
 
     def clean_data(self):
         dfc = copy.deepcopy(self.dataframe)
