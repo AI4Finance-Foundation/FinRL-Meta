@@ -1,5 +1,5 @@
-import os
 import copy
+import os
 import time
 import warnings
 
@@ -57,7 +57,11 @@ class Tushare(_Base):
             adj=self.adj,
         )
 
+<<<<<<< HEAD
     def download_data(self, ticker_list: List[str], save_path: str = "./data/dataset.csv"):
+=======
+    def download_data(self, ticker_list: List[str], save_path="./data/dataset.csv"):
+>>>>>>> fd8ecb59145c86ac51ca897016df814068202b35
         """
         `pd.DataFrame`
             7 columns: A tick symbol, date, open, high, low, close and volume
@@ -109,7 +113,9 @@ class Tushare(_Base):
 
         self.save_data(save_path)
 
-        print(f"Download complete! Dataset saved to {save_path}. \nShape of DataFrame: {self.dataframe.shape}")  
+        print(
+            f"Download complete! Dataset saved to {save_path}. \nShape of DataFrame: {self.dataframe.shape}"
+        )
 
     def clean_data(self):
         dfc = copy.deepcopy(self.dataframe)
@@ -279,26 +285,28 @@ class Tushare(_Base):
             nonstandard_ticker = n + ".SZ"
         return nonstandard_ticker
 
-    def save_data(self,path):
+    def save_data(self, path):
         if ".csv" in path:
             path = path.split("/")
             filename = path[-1]
-            path = "/".join(path[:-1]+[""])
+            path = "/".join(path[:-1] + [""])
         else:
             if path[-1] == "/":
                 filename = "dataset.csv"
             else:
                 filename = "/dataset.csv"
-            
-        os.makedirs(path,exist_ok=True)
-        self.dataframe.to_csv(path+filename,index = False)
-    
-    def load_data(self,path):
+
+        os.makedirs(path, exist_ok=True)
+        self.dataframe.to_csv(path + filename, index=False)
+
+    def load_data(self, path):
         assert ".csv" in path  # only support csv format now
         self.dataframe = pd.read_csv(path)
         columns = self.dataframe.columns
-        assert "tic" in columns and "date" in columns and "close" in columns # input file must have "tic","date" and "close" columns
-        
+        assert (
+            "tic" in columns and "date" in columns and "close" in columns
+        )  # input file must have "tic","date" and "close" columns
+
 
 class ReturnPlotter:
     """
