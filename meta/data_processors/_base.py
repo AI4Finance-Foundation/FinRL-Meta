@@ -155,7 +155,10 @@ class _Base:
     # select_stockstats_talib: 0 (stockstats, default), or 1 (use talib). Users can choose the method.
     # drop_na_timestep: 0 (not dropping timesteps that contain nan), or 1 (dropping timesteps that contain nan, default). Users can choose the method.
     def add_technical_indicator(
-        self, tech_indicator_list: List[str], select_stockstats_talib: int = 0, drop_na_timesteps: int = 1,
+        self,
+        tech_indicator_list: List[str],
+        select_stockstats_talib: int = 0,
+        drop_na_timesteps: int = 1,
     ):
         """
         calculate technical indicators
@@ -236,7 +239,9 @@ class _Base:
 
         self.dataframe.sort_values(by=["time", "tic"], inplace=True)
         if drop_na_timesteps:
-            time_to_drop = self.dataframe[self.dataframe.isna().any(axis=1)].time.unique()
+            time_to_drop = self.dataframe[
+                self.dataframe.isna().any(axis=1)
+            ].time.unique()
             self.dataframe = self.dataframe[~self.dataframe.time.isin(time_to_drop)]
         print("Succesfully add technical indicators")
 
