@@ -34,6 +34,7 @@ from meta.config_tickers import TECDAX_TICKER
 
 
 class _Base:
+
     def __init__(
         self,
         data_source: str,
@@ -68,7 +69,8 @@ class _Base:
         if self.data_source == "ricequant":
             """RiceQuant data is already cleaned, we only need to transform data format here.
             No need for filling NaN data"""
-            self.dataframe.rename(columns={"order_book_id": "tic"}, inplace=True)
+            self.dataframe.rename(columns={"order_book_id": "tic"},
+                                  inplace=True)
             # raw df uses multi-index (tic,time), reset it to single index (time)
             self.dataframe.reset_index(level=[0, 1], inplace=True)
             # check if there is NaN values
@@ -81,18 +83,16 @@ class _Base:
         if "adjusted_close" not in self.dataframe.columns.values.tolist():
             self.dataframe["adjusted_close"] = self.dataframe["close"]
         self.dataframe.sort_values(by=["time", "tic"], inplace=True)
-        self.dataframe = self.dataframe[
-            [
-                "tic",
-                "time",
-                "open",
-                "high",
-                "low",
-                "close",
-                "adjusted_close",
-                "volume",
-            ]
-        ]
+        self.dataframe = self.dataframe[[
+            "tic",
+            "time",
+            "open",
+            "high",
+            "low",
+            "close",
+            "adjusted_close",
+            "volume",
+        ]]
 
     def fillna(self):
         df = self.dataframe
@@ -102,7 +102,10 @@ class _Base:
 
         dfcode.tic = df.tic.unique()
         dfdate.time = df.time.unique()
-        dfdate.sort_values(by="time", ascending=False, ignore_index=True, inplace=True)
+        dfdate.sort_values(by="time",
+                           ascending=False,
+                           ignore_index=True,
+                           inplace=True)
 
         # the old pandas may not support pd.merge(how="cross")
         try:
@@ -119,15 +122,15 @@ class _Base:
                                 "time": dfdate.iat[j, 0],
                             },
                             index=[(i + 1) * (j + 1) - 1],
-                        )
-                    )
+                        ))
 
         df = pd.merge(df1, df, how="left", on=["tic", "time"])
 
         # back fill missing data then front fill
         df_new = pd.DataFrame(columns=df.columns)
         for i in df.tic.unique():
-            df_tmp = df[df.tic == i].fillna(method="bfill").fillna(method="ffill")
+            df_tmp = df[df.tic == i].fillna(method="bfill").fillna(
+                method="ffill")
             df_new = pd.concat([df_new, df_tmp], ignore_index=True)
 
         df_new = df_new.fillna(0)
@@ -141,11 +144,11 @@ class _Base:
 
     def get_trading_days(self, start: str, end: str) -> List[str]:
         if self.data_source in [
-            "binance",
-            "ccxt",
-            "quantconnect",
-            "ricequant",
-            "tushare",
+                "binance",
+                "ccxt",
+                "quantconnect",
+                "ricequant",
+                "tushare",
         ]:
             print(
                 f"Calculate get_trading_days not supported for {self.data_source} yet."
@@ -187,12 +190,13 @@ class _Base:
                 indicator_df = pd.DataFrame()
                 for i in range(len(unique_ticker)):
                     try:
-                        temp_indicator = stock[stock.tic == unique_ticker[i]][indicator]
+                        temp_indicator = stock[stock.tic ==
+                                               unique_ticker[i]][indicator]
                         temp_indicator = pd.DataFrame(temp_indicator)
                         temp_indicator["tic"] = unique_ticker[i]
                         temp_indicator["time"] = self.dataframe[
-                            self.dataframe.tic == unique_ticker[i]
-                        ]["time"].to_list()
+                            self.dataframe.tic ==
+                            unique_ticker[i]]["time"].to_list()
                         indicator_df = pd.concat(
                             [indicator_df, temp_indicator],
                             axis=0,
@@ -239,10 +243,10 @@ class _Base:
 
         self.dataframe.sort_values(by=["time", "tic"], inplace=True)
         if drop_na_timesteps:
-            time_to_drop = self.dataframe[
-                self.dataframe.isna().any(axis=1)
-            ].time.unique()
-            self.dataframe = self.dataframe[~self.dataframe.time.isin(time_to_drop)]
+            time_to_drop = self.dataframe[self.dataframe.isna().any(
+                axis=1)].time.unique()
+            self.dataframe = self.dataframe[~self.dataframe.time.
+                                            isin(time_to_drop)]
         print("Succesfully add technical indicators")
 
     def add_turbulence(self):
@@ -257,34 +261,34 @@ class _Base:
         # df = df.sort_values(["time", "tic"]).reset_index(drop=True)
         # return df
         if self.data_source in [
-            "binance",
-            "ccxt",
-            "iexcloud",
-            "joinquant",
-            "quantconnect",
+                "binance",
+                "ccxt",
+                "iexcloud",
+                "joinquant",
+                "quantconnect",
         ]:
             print(
                 f"Turbulence not supported for {self.data_source} yet. Return original DataFrame."
             )
         if self.data_source in [
-            "alpaca",
-            "ricequant",
-            "tushare",
-            "wrds",
-            "yahoofinance",
+                "alpaca",
+                "ricequant",
+                "tushare",
+                "wrds",
+                "yahoofinance",
         ]:
             turbulence_index = self.calculate_turbulence()
             self.dataframe = self.dataframe.merge(turbulence_index, on="time")
-            self.dataframe.sort_values(["time", "tic"], inplace=True).reset_index(
-                drop=True, inplace=True
-            )
+            self.dataframe.sort_values(["time", "tic"],
+                                       inplace=True).reset_index(drop=True,
+                                                                 inplace=True)
 
     def calculate_turbulence(self, time_period: int = 252) -> pd.DataFrame:
         """calculate turbulence index based on dow 30"""
         # can add other market assets
-        df_price_pivot = self.dataframe.pivot(
-            index="time", columns="tic", values="close"
-        )
+        df_price_pivot = self.dataframe.pivot(index="time",
+                                              columns="tic",
+                                              values="close")
         # use returns to calculate turbulence
         df_price_pivot = df_price_pivot.pct_change()
 
@@ -295,27 +299,24 @@ class _Base:
         # turbulence_index = [0]
         count = 0
         for i in range(start, len(unique_date)):
-            current_price = df_price_pivot[df_price_pivot.index == unique_date[i]]
+            current_price = df_price_pivot[df_price_pivot.index ==
+                                           unique_date[i]]
             # use one year rolling window to calcualte covariance
             hist_price = df_price_pivot[
                 (df_price_pivot.index < unique_date[i])
-                & (df_price_pivot.index >= unique_date[i - time_period])
-            ]
+                & (df_price_pivot.index >= unique_date[i - time_period])]
             # Drop tickers which has number missing values more than the "oldest" ticker
-            filtered_hist_price = hist_price.iloc[
-                hist_price.isna().sum().min() :
-            ].dropna(axis=1)
+            filtered_hist_price = hist_price.iloc[hist_price.isna().sum().min(
+            ):].dropna(axis=1)
 
             cov_temp = filtered_hist_price.cov()
             current_temp = current_price[list(filtered_hist_price)] - np.mean(
-                filtered_hist_price, axis=0
-            )
+                filtered_hist_price, axis=0)
             # cov_temp = hist_price.cov()
             # current_temp=(current_price - np.mean(hist_price,axis=0))
 
             temp = current_temp.values.dot(np.linalg.pinv(cov_temp)).dot(
-                current_temp.values.T
-            )
+                current_temp.values.T)
             if temp > 0:
                 count += 1
                 # avoid large outlier because of the calculation just begins: else turbulence_temp = 0
@@ -324,9 +325,10 @@ class _Base:
                 turbulence_temp = 0
             turbulence_index.append(turbulence_temp)
 
-        turbulence_index = pd.DataFrame(
-            {"time": df_price_pivot.index, "turbulence": turbulence_index}
-        )
+        turbulence_index = pd.DataFrame({
+            "time": df_price_pivot.index,
+            "turbulence": turbulence_index
+        })
         return turbulence_index
 
     def add_vix(self):
@@ -336,13 +338,13 @@ class _Base:
         :return: (df) pandas dataframe
         """
         if self.data_source in [
-            "binance",
-            "ccxt",
-            "iexcloud",
-            "joinquant",
-            "quantconnect",
-            "ricequant",
-            "tushare",
+                "binance",
+                "ccxt",
+                "iexcloud",
+                "joinquant",
+                "quantconnect",
+                "ricequant",
+                "tushare",
         ]:
             print(
                 f"VIX is not applicable for {self.data_source}. Return original DataFrame"
@@ -403,37 +405,29 @@ class _Base:
 
     def df_to_array(self, tech_indicator_list: List[str], if_vix: bool):
         unique_ticker = self.dataframe.tic.unique()
-        price_array = np.column_stack(
-            [self.dataframe[self.dataframe.tic == tic].close for tic in unique_ticker]
-        )
+        price_array = np.column_stack([
+            self.dataframe[self.dataframe.tic == tic].close
+            for tic in unique_ticker
+        ])
         common_tech_indicator_list = [
-            i
-            for i in tech_indicator_list
+            i for i in tech_indicator_list
             if i in self.dataframe.columns.values.tolist()
         ]
-        tech_array = np.hstack(
-            [
-                self.dataframe.loc[
-                    (self.dataframe.tic == tic), common_tech_indicator_list
-                ]
-                for tic in unique_ticker
-            ]
-        )
+        tech_array = np.hstack([
+            self.dataframe.loc[(self.dataframe.tic == tic),
+                               common_tech_indicator_list]
+            for tic in unique_ticker
+        ])
         if if_vix:
-            risk_array = np.column_stack(
-                [self.dataframe[self.dataframe.tic == tic].vix for tic in unique_ticker]
-            )
+            risk_array = np.column_stack([
+                self.dataframe[self.dataframe.tic == tic].vix
+                for tic in unique_ticker
+            ])
         else:
-            risk_array = (
-                np.column_stack(
-                    [
-                        self.dataframe[self.dataframe.tic == tic].turbulence
-                        for tic in unique_ticker
-                    ]
-                )
-                if "turbulence" in self.dataframe.columns
-                else None
-            )
+            risk_array = (np.column_stack([
+                self.dataframe[self.dataframe.tic == tic].turbulence
+                for tic in unique_ticker
+            ]) if "turbulence" in self.dataframe.columns else None)
         print("Successfully transformed into array")
         return price_array, tech_array, risk_array
 
@@ -448,13 +442,9 @@ class _Base:
             time_intervals = ["5m", "15m", "30m", "60m", "1d", "1w", "1M"]
             assert self.time_interval in time_intervals, (
                 "This time interval is not supported. Supported time intervals: "
-                + ",".join(time_intervals)
-            )
-            if (
-                "d" in self.time_interval
-                or "w" in self.time_interval
-                or "M" in self.time_interval
-            ):
+                + ",".join(time_intervals))
+            if ("d" in self.time_interval or "w" in self.time_interval
+                    or "M" in self.time_interval):
                 return self.time_interval[-1:].lower()
             elif "m" in self.time_interval:
                 return self.time_interval[:-1]
@@ -479,8 +469,7 @@ class _Base:
             ]
             assert self.time_interval in time_intervals, (
                 "This time interval is not supported. Supported time intervals: "
-                + ",".join(time_intervals)
-            )
+                + ",".join(time_intervals))
             return self.time_interval
         elif self.data_source == "ccxt":
             pass
@@ -488,8 +477,7 @@ class _Base:
             time_intervals = ["1d"]
             assert self.time_interval in time_intervals, (
                 "This time interval is not supported. Supported time intervals: "
-                + ",".join(time_intervals)
-            )
+                + ",".join(time_intervals))
             return self.time_interval.upper()
         elif self.data_source == "joinquant":
             # '1m', '5m', '15m', '30m', '60m', '120m', '1d', '1w', '1M'
@@ -506,8 +494,7 @@ class _Base:
             ]
             assert self.time_interval in time_intervals, (
                 "This time interval is not supported. Supported time intervals: "
-                + ",".join(time_intervals)
-            )
+                + ",".join(time_intervals))
             return self.time_interval
         elif self.data_source == "quantconnect":
             pass
@@ -516,8 +503,7 @@ class _Base:
             time_intervals = ["d", "w", "M", "q", "y"]
             assert self.time_interval[-1] in time_intervals, (
                 "This time interval is not supported. Supported time intervals: "
-                + ",".join(time_intervals)
-            )
+                + ",".join(time_intervals))
             if "M" in self.time_interval:
                 return self.time_interval.lower()
             else:
@@ -528,8 +514,7 @@ class _Base:
             time_intervals = ["1d"]
             assert self.time_interval in time_intervals, (
                 "This time interval is not supported. Supported time intervals: "
-                + ",".join(time_intervals)
-            )
+                + ",".join(time_intervals))
             return self.time_interval
         elif self.data_source == "wrds":
             pass
@@ -552,8 +537,7 @@ class _Base:
             ]
             assert self.time_interval in time_intervals, (
                 "This time interval is not supported. Supported time intervals: "
-                + ",".join(time_intervals)
-            )
+                + ",".join(time_intervals))
             if "w" in self.time_interval:
                 return self.time_interval + "k"
             elif "M" in self.time_interval:
