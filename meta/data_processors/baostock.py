@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import pytz
 import yfinance as yf
+
 """Reference: https://github.com/AI4Finance-LLC/FinRL"""
 
 try:
@@ -34,7 +35,6 @@ from meta.config import (
 
 
 class Baostock(_Base):
-
     def __init__(
         self,
         data_source: str,
@@ -43,24 +43,23 @@ class Baostock(_Base):
         time_interval: str,
         **kwargs,
     ):
-        super().__init__(data_source, start_date, end_date, time_interval,
-                         **kwargs)
+        super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
 
     # 日k线、周k线、月k线，以及5分钟、15分钟、30分钟和60分钟k线数据
     # ["5m", "15m", "30m", "60m", "1d", "1w", "1M"]
-    def download_data(self,
-                      ticker_list: List[str],
-                      save_path: str = "./data/dataset.csv"):
+    def download_data(
+        self, ticker_list: List[str], save_path: str = "./data/dataset.csv"
+    ):
         lg = bs.login()
         print("baostock login respond error_code:" + lg.error_code)
         print("baostock login respond  error_msg:" + lg.error_msg)
 
-        self.time_zone = calc_time_zone(ticker_list, TIME_ZONE_SELFDEFINED,
-                                        USE_TIME_ZONE_SELFDEFINED)
+        self.time_zone = calc_time_zone(
+            ticker_list, TIME_ZONE_SELFDEFINED, USE_TIME_ZONE_SELFDEFINED
+        )
         self.dataframe = pd.DataFrame()
         for ticker in ticker_list:
-            nonstandrad_ticker = self.transfer_standard_ticker_to_nonstandard(
-                ticker)
+            nonstandrad_ticker = self.transfer_standard_ticker_to_nonstandard(ticker)
             # All supported: "date,code,open,high,low,close,preclose,volume,amount,adjustflag,turn,tradestatus,pctChg,isST"
             rs = bs.query_history_k_data_plus(
                 nonstandrad_ticker,
@@ -80,8 +79,9 @@ class Baostock(_Base):
             df = pd.DataFrame(data_list, columns=rs.fields)
             df.loc[:, "code"] = [ticker] * df.shape[0]
             self.dataframe = pd.concat([self.dataframe, df])
-        self.dataframe = self.dataframe.sort_values(
-            by=["date", "code"]).reset_index(drop=True)
+        self.dataframe = self.dataframe.sort_values(by=["date", "code"]).reset_index(
+            drop=True
+        )
         bs.logout()
 
         self.dataframe.open = self.dataframe.open.astype(float)

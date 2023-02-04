@@ -17,7 +17,6 @@ import akshare as ak  # pip install akshare
 
 
 class Akshare(_Base):
-
     def __init__(
         self,
         data_source: str,
@@ -29,8 +28,7 @@ class Akshare(_Base):
         start_date = self.transfer_date(start_date)
         end_date = self.transfer_date(end_date)
 
-        super().__init__(data_source, start_date, end_date, time_interval,
-                         **kwargs)
+        super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
 
         if "adj" in kwargs.keys():
             self.adj = kwargs["adj"]
@@ -53,9 +51,9 @@ class Akshare(_Base):
             adjust=self.adj,
         )
 
-    def download_data(self,
-                      ticker_list: List[str],
-                      save_path: str = "./data/dataset.csv"):
+    def download_data(
+        self, ticker_list: List[str], save_path: str = "./data/dataset.csv"
+    ):
         """
         `pd.DataFrame`
             7 columns: A tick symbol, time, open, high, low, close and volume
@@ -98,15 +96,17 @@ class Akshare(_Base):
         self.dataframe.sort_values(by=["time", "tic"], inplace=True)
         self.dataframe.reset_index(drop=True, inplace=True)
 
-        self.dataframe = self.dataframe[[
-            "tic", "time", "open", "high", "low", "close", "volume"
-        ]]
+        self.dataframe = self.dataframe[
+            ["tic", "time", "open", "high", "low", "close", "volume"]
+        ]
         # self.dataframe.loc[:, 'tic'] = pd.DataFrame((self.dataframe['tic'].tolist()))
-        self.dataframe["time"] = pd.to_datetime(self.dataframe["time"],
-                                                format="%Y-%m-%d")
+        self.dataframe["time"] = pd.to_datetime(
+            self.dataframe["time"], format="%Y-%m-%d"
+        )
         self.dataframe["day"] = self.dataframe["time"].dt.dayofweek
         self.dataframe["time"] = self.dataframe.time.apply(
-            lambda x: x.strftime("%Y-%m-%d"))
+            lambda x: x.strftime("%Y-%m-%d")
+        )
 
         self.dataframe.dropna(inplace=True)
         self.dataframe.sort_values(by=["time", "tic"], inplace=True)

@@ -37,8 +37,7 @@ class Tushare(_Base):
         time_interval: str,
         **kwargs,
     ):
-        super().__init__(data_source, start_date, end_date, time_interval,
-                         **kwargs)
+        super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
         assert "token" in kwargs.keys(), "Please input token!"
         self.token = kwargs["token"]
         if "adj" in kwargs.keys():
@@ -58,9 +57,9 @@ class Tushare(_Base):
             adj=self.adj,
         )
 
-    def download_data(self,
-                      ticker_list: List[str],
-                      save_path: str = "./data/dataset.csv"):
+    def download_data(
+        self, ticker_list: List[str], save_path: str = "./data/dataset.csv"
+    ):
         """
         `pd.DataFrame`
             7 columns: A tick symbol, time, open, high, low, close and volume
@@ -96,15 +95,15 @@ class Tushare(_Base):
         self.dataframe.sort_values(by=["time", "tic"], inplace=True)
         self.dataframe.reset_index(drop=True, inplace=True)
 
-        self.dataframe = self.dataframe[[
-            "tic", "time", "open", "high", "low", "close", "volume"
-        ]]
+        self.dataframe = self.dataframe[
+            ["tic", "time", "open", "high", "low", "close", "volume"]
+        ]
         # self.dataframe.loc[:, 'tic'] = pd.DataFrame((self.dataframe['tic'].tolist()))
-        self.dataframe["time"] = pd.to_datetime(self.dataframe["time"],
-                                                format="%Y%m%d")
+        self.dataframe["time"] = pd.to_datetime(self.dataframe["time"], format="%Y%m%d")
         self.dataframe["day"] = self.dataframe["time"].dt.dayofweek
         self.dataframe["time"] = self.dataframe.time.apply(
-            lambda x: x.strftime("%Y-%m-%d"))
+            lambda x: x.strftime("%Y-%m-%d")
+        )
 
         self.dataframe.dropna(inplace=True)
         self.dataframe.sort_values(by=["time", "tic"], inplace=True)
@@ -156,8 +155,9 @@ class Tushare(_Base):
         assert ".csv" in path  # only support csv format now
         self.dataframe = pd.read_csv(path)
         columns = self.dataframe.columns
-        assert ("tic" in columns and "time" in columns and "close" in columns
-                )  # input file must have "tic","time" and "close" columns
+        assert (
+            "tic" in columns and "time" in columns and "close" in columns
+        )  # input file must have "tic","time" and "close" columns
 
 
 class ReturnPlotter:
@@ -191,11 +191,11 @@ class ReturnPlotter:
         if baseline_ticket:
             # 使用指定ticket作为baseline
             baseline_df = self.get_baseline(baseline_ticket)
-            baseline_date_list = baseline_df.time.dt.strftime(
-                "%Y-%m-%d").tolist()
+            baseline_date_list = baseline_df.time.dt.strftime("%Y-%m-%d").tolist()
             df_date_list = self.df_account_value.time.tolist()
             df_account_value = self.df_account_value[
-                self.df_account_value.time.isin(baseline_date_list)]
+                self.df_account_value.time.isin(baseline_date_list)
+            ]
             baseline_df = baseline_df[baseline_df.time.isin(df_date_list)]
             baseline = baseline_df.close.tolist()
             baseline_label = tic2label.get(baseline_ticket, baseline_ticket)
@@ -205,8 +205,7 @@ class ReturnPlotter:
             all_date = self.trade.time.unique().tolist()
             baseline = []
             for day in all_date:
-                day_close = self.trade[self.trade["time"] ==
-                                       day].close.tolist()
+                day_close = self.trade[self.trade["time"] == day].close.tolist()
                 avg_close = sum(day_close) / len(day_close)
                 baseline.append(avg_close)
             ours = self.df_account_value.account_value.tolist()
@@ -219,15 +218,11 @@ class ReturnPlotter:
         )
         time = list(range(len(ours)))
         datetimes = self.df_account_value.time.tolist()
-        ticks = [
-            tick for t, tick in zip(time, datetimes) if t % days_per_tick == 0
-        ]
+        ticks = [tick for t, tick in zip(time, datetimes) if t % days_per_tick == 0]
         plt.title("Cumulative Returns")
         plt.plot(time, ours, label="DDPG Agent", color="green")
         plt.plot(time, baseline, label=baseline_label, color="grey")
-        plt.xticks([i * days_per_tick for i in range(len(ticks))],
-                   ticks,
-                   fontsize=7)
+        plt.xticks([i * days_per_tick for i in range(len(ticks))], ticks, fontsize=7)
 
         plt.xlabel("Date")
         plt.ylabel("Cumulative Return")
@@ -254,9 +249,8 @@ class ReturnPlotter:
 
         # find intersection
         all_date = sorted(
-            list(
-                set(df_date_list) & set(csi300_date_list)
-                & set(sh50_date_list)))
+            list(set(df_date_list) & set(csi300_date_list) & set(sh50_date_list))
+        )
 
         # filter data
         csi300_df = csi300_df[csi300_df.time.isin(all_date)]
@@ -275,7 +269,8 @@ class ReturnPlotter:
             baseline_equal_weight.append(avg_close)
 
         df_account_value = self.df_account_value[
-            self.df_account_value.time.isin(all_date)]
+            self.df_account_value.time.isin(all_date)
+        ]
         ours = df_account_value.account_value.tolist()
 
         ours = self.pct(ours)
@@ -288,9 +283,7 @@ class ReturnPlotter:
         )
         time = list(range(len(ours)))
         datetimes = self.df_account_value.time.tolist()
-        ticks = [
-            tick for t, tick in zip(time, datetimes) if t % days_per_tick == 0
-        ]
+        ticks = [tick for t, tick in zip(time, datetimes) if t % days_per_tick == 0]
         plt.title("Cumulative Returns")
         plt.plot(time, ours, label="DDPG Agent", color="darkorange")
         plt.plot(
@@ -299,18 +292,14 @@ class ReturnPlotter:
             label=baseline_label,
             color="cornflowerblue",
         )  # equal weight
-        plt.plot(time,
-                 baseline_300,
-                 label=baseline_label_300,
-                 color="lightgreen")  # 399300
-        plt.plot(time, baseline_50, label=baseline_label_50,
-                 color="silver")  # 000016
+        plt.plot(
+            time, baseline_300, label=baseline_label_300, color="lightgreen"
+        )  # 399300
+        plt.plot(time, baseline_50, label=baseline_label_50, color="silver")  # 000016
         plt.xlabel("Date")
         plt.ylabel("Cumulative Return")
 
-        plt.xticks([i * days_per_tick for i in range(len(ticks))],
-                   ticks,
-                   fontsize=7)
+        plt.xticks([i * days_per_tick for i in range(len(ticks))], ticks, fontsize=7)
         plt.legend()
         plt.show()
         plt.savefig("./plot_all.png")
