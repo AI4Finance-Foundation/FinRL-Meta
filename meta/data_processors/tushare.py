@@ -62,7 +62,7 @@ class Tushare(_Base):
     ):
         """
         `pd.DataFrame`
-            7 columns: A tick symbol, date, open, high, low, close and volume
+            7 columns: A tick symbol, time, open, high, low, close and volume
             for the specified stock ticker
         """
         assert self.time_interval == "1d", "Not supported currently"
@@ -81,7 +81,7 @@ class Tushare(_Base):
 
         self.dataframe.columns = [
             "tic",
-            "date",
+            "time",
             "open",
             "high",
             "low",
@@ -92,21 +92,21 @@ class Tushare(_Base):
             "volume",
             "amount",
         ]
-        self.dataframe.sort_values(by=["date", "tic"], inplace=True)
+        self.dataframe.sort_values(by=["time", "tic"], inplace=True)
         self.dataframe.reset_index(drop=True, inplace=True)
 
         self.dataframe = self.dataframe[
-            ["tic", "date", "open", "high", "low", "close", "volume"]
+            ["tic", "time", "open", "high", "low", "close", "volume"]
         ]
         # self.dataframe.loc[:, 'tic'] = pd.DataFrame((self.dataframe['tic'].tolist()))
-        self.dataframe["date"] = pd.to_datetime(self.dataframe["date"], format="%Y%m%d")
-        self.dataframe["day"] = self.dataframe["date"].dt.dayofweek
-        self.dataframe["date"] = self.dataframe.date.apply(
+        self.dataframe["time"] = pd.to_datetime(self.dataframe["time"], format="%Y%m%d")
+        self.dataframe["day"] = self.dataframe["time"].dt.dayofweek
+        self.dataframe["time"] = self.dataframe.time.apply(
             lambda x: x.strftime("%Y-%m-%d")
         )
 
         self.dataframe.dropna(inplace=True)
-        self.dataframe.sort_values(by=["date", "tic"], inplace=True)
+        self.dataframe.sort_values(by=["time", "tic"], inplace=True)
         self.dataframe.reset_index(drop=True, inplace=True)
 
         self.save_data(save_path)
@@ -115,155 +115,9 @@ class Tushare(_Base):
             f"Download complete! Dataset saved to {save_path}. \nShape of DataFrame: {self.dataframe.shape}"
         )
 
-    def clean_data(self):
-        dfc = copy.deepcopy(self.dataframe)
-
-        dfcode = pd.DataFrame(columns=["tic"])
-        dfdate = pd.DataFrame(columns=["date"])
-
-        dfcode.tic = dfc.tic.unique()
-
-        if "time" in dfc.columns.values.tolist():
-            dfc = dfc.rename(columns={"time": "date"})
-
-        dfdate.date = dfc.date.unique()
-        dfdate.sort_values(by="date", ascending=False, ignore_index=True, inplace=True)
-
-        # the old pandas may not support pd.merge(how="cross")
-        try:
-            df1 = pd.merge(dfcode, dfdate, how="cross")
-        except:
-            print("Please wait for a few seconds...")
-            df1 = pd.DataFrame(columns=["tic", "date"])
-            for i in range(dfcode.shape[0]):
-                for j in range(dfdate.shape[0]):
-                    df1 = df1.append(
-                        pd.DataFrame(
-                            data={
-                                "tic": dfcode.iat[i, 0],
-                                "date": dfdate.iat[j, 0],
-                            },
-                            index=[(i + 1) * (j + 1) - 1],
-                        )
-                    )
-
-        df2 = pd.merge(df1, dfc, how="left", on=["tic", "date"])
-
-        # back fill missing data then front fill
-        df3 = pd.DataFrame(columns=df2.columns)
-        for i in self.ticker_list:
-            df4 = df2[df2.tic == i].fillna(method="bfill").fillna(method="ffill")
-            df3 = pd.concat([df3, df4], ignore_index=True)
-
-        df3 = df3.fillna(0)
-
-        # reshape dataframe
-        df3 = df3.sort_values(by=["date", "tic"]).reset_index(drop=True)
-
-        if "date" in self.dataframe.columns.values.tolist():
-            self.dataframe.rename(columns={"date": "time"}, inplace=True)
-        if "datetime" in self.dataframe.columns.values.tolist():
-            self.dataframe.rename(columns={"datetime": "time"}, inplace=True)
-
-        print("Shape of DataFrame: ", df3.shape)
-
-        self.dataframe = df3
-
-    def add_technical_indicator(
-        self,
-        tech_indicator_list: List[str],
-        select_stockstats_talib: int = 0,
-        drop_na_timestpe: int = 0,
-    ):
+    def data_split(self, df, start, end, target_date_col="time"):
         """
-        calculate technical indicators
-        use stockstats/talib package to add technical inidactors
-        :param data: (df) pandas dataframe
-        :return: (df) pandas dataframe
-        """
-        if "date" in self.dataframe.columns.values.tolist():
-            self.dataframe.rename(columns={"date": "time"}, inplace=True)
-
-        if self.data_source == "ccxt":
-            self.dataframe.rename(columns={"index": "time"}, inplace=True)
-
-        self.dataframe.reset_index(drop=False, inplace=True)
-        if "level_1" in self.dataframe.columns:
-            self.dataframe.drop(columns=["level_1"], inplace=True)
-        if "level_0" in self.dataframe.columns and "tic" not in self.dataframe.columns:
-            self.dataframe.rename(columns={"level_0": "tic"}, inplace=True)
-        assert select_stockstats_talib in {0, 1}
-        print("tech_indicator_list: ", tech_indicator_list)
-        if select_stockstats_talib == 0:  # use stockstats
-            stock = stockstats.StockDataFrame.retype(self.dataframe)
-            unique_ticker = stock.tic.unique()
-            for indicator in tech_indicator_list:
-                print("indicator: ", indicator)
-                indicator_df = pd.DataFrame()
-                for i in range(len(unique_ticker)):
-                    try:
-                        temp_indicator = stock[stock.tic == unique_ticker[i]][indicator]
-                        temp_indicator = pd.DataFrame(temp_indicator)
-                        temp_indicator["tic"] = unique_ticker[i]
-                        temp_indicator["time"] = self.dataframe[
-                            self.dataframe.tic == unique_ticker[i]
-                        ]["time"].to_list()
-                        indicator_df = pd.concat(
-                            [indicator_df, temp_indicator],
-                            axis=0,
-                            join="outer",
-                            ignore_index=True,
-                        )
-                    except Exception as e:
-                        print(e)
-                if not indicator_df.empty:
-                    self.dataframe = self.dataframe.merge(
-                        indicator_df[["tic", "time", indicator]],
-                        on=["tic", "time"],
-                        how="left",
-                    )
-        else:  # use talib
-            final_df = pd.DataFrame()
-            for i in self.dataframe.tic.unique():
-                tic_df = self.dataframe[self.dataframe.tic == i]
-                (
-                    tic_df.loc["macd"],
-                    tic_df.loc["macd_signal"],
-                    tic_df.loc["macd_hist"],
-                ) = talib.MACD(
-                    tic_df["close"],
-                    fastperiod=12,
-                    slowperiod=26,
-                    signalperiod=9,
-                )
-                tic_df.loc["rsi"] = talib.RSI(tic_df["close"], timeperiod=14)
-                tic_df.loc["cci"] = talib.CCI(
-                    tic_df["high"],
-                    tic_df["low"],
-                    tic_df["close"],
-                    timeperiod=14,
-                )
-                tic_df.loc["dx"] = talib.DX(
-                    tic_df["high"],
-                    tic_df["low"],
-                    tic_df["close"],
-                    timeperiod=14,
-                )
-                final_df = pd.concat([final_df, tic_df], axis=0, join="outer")
-            self.dataframe = final_df
-
-        self.dataframe.sort_values(by=["time", "tic"], inplace=True)
-        if drop_na_timestpe:
-            time_to_drop = self.dataframe[
-                self.dataframe.isna().any(axis=1)
-            ].time.unique()
-            self.dataframe = self.dataframe[~self.dataframe.time.isin(time_to_drop)]
-        self.dataframe.rename(columns={"time": "date"}, inplace=True)
-        print("Succesfully add technical indicators")
-
-    def data_split(self, df, start, end, target_date_col="date"):
-        """
-        split the dataset into training or testing using date
+        split the dataset into training or testing using time
         :param data: (df) pandas dataframe, start, end
         :return: (df) pandas dataframe
         """
@@ -302,8 +156,8 @@ class Tushare(_Base):
         self.dataframe = pd.read_csv(path)
         columns = self.dataframe.columns
         assert (
-            "tic" in columns and "date" in columns and "close" in columns
-        )  # input file must have "tic","date" and "close" columns
+            "tic" in columns and "time" in columns and "close" in columns
+        )  # input file must have "tic","time" and "close" columns
 
 
 class ReturnPlotter:
@@ -323,7 +177,7 @@ class ReturnPlotter:
         df.loc[:, "dt"] = df.index
         df.index = range(len(df))
         df.sort_values(axis=0, by="dt", ascending=True, inplace=True)
-        df["date"] = pd.to_datetime(df["dt"], format="%Y-%m-%d")
+        df["time"] = pd.to_datetime(df["dt"], format="%Y-%m-%d")
         return df
 
     def plot(self, baseline_ticket=None):
@@ -337,21 +191,21 @@ class ReturnPlotter:
         if baseline_ticket:
             # 使用指定ticket作为baseline
             baseline_df = self.get_baseline(baseline_ticket)
-            baseline_date_list = baseline_df.date.dt.strftime("%Y-%m-%d").tolist()
-            df_date_list = self.df_account_value.date.tolist()
+            baseline_date_list = baseline_df.time.dt.strftime("%Y-%m-%d").tolist()
+            df_date_list = self.df_account_value.time.tolist()
             df_account_value = self.df_account_value[
-                self.df_account_value.date.isin(baseline_date_list)
+                self.df_account_value.time.isin(baseline_date_list)
             ]
-            baseline_df = baseline_df[baseline_df.date.isin(df_date_list)]
+            baseline_df = baseline_df[baseline_df.time.isin(df_date_list)]
             baseline = baseline_df.close.tolist()
             baseline_label = tic2label.get(baseline_ticket, baseline_ticket)
             ours = df_account_value.account_value.tolist()
         else:
             # 均等权重
-            all_date = self.trade.date.unique().tolist()
+            all_date = self.trade.time.unique().tolist()
             baseline = []
             for day in all_date:
-                day_close = self.trade[self.trade["date"] == day].close.tolist()
+                day_close = self.trade[self.trade["time"] == day].close.tolist()
                 avg_close = sum(day_close) / len(day_close)
                 baseline.append(avg_close)
             ours = self.df_account_value.account_value.tolist()
@@ -363,7 +217,7 @@ class ReturnPlotter:
             60  # you should scale this variable accroding to the total trading days
         )
         time = list(range(len(ours)))
-        datetimes = self.df_account_value.date.tolist()
+        datetimes = self.df_account_value.time.tolist()
         ticks = [tick for t, tick in zip(time, datetimes) if t % days_per_tick == 0]
         plt.title("Cumulative Returns")
         plt.plot(time, ours, label="DDPG Agent", color="green")
@@ -381,17 +235,17 @@ class ReturnPlotter:
         baseline_label = "Equal-weight portfolio"
         tic2label = {"399300": "CSI 300 Index", "000016": "SSE 50 Index"}
 
-        # date lists
-        # algorithm date list
-        df_date_list = self.df_account_value.date.tolist()
+        # time lists
+        # algorithm time list
+        df_date_list = self.df_account_value.time.tolist()
 
-        # 399300 date list
+        # 399300 time list
         csi300_df = self.get_baseline("399300")
-        csi300_date_list = csi300_df.date.dt.strftime("%Y-%m-%d").tolist()
+        csi300_date_list = csi300_df.time.dt.strftime("%Y-%m-%d").tolist()
 
-        # 000016 date list
+        # 000016 time list
         sh50_df = self.get_baseline("000016")
-        sh50_date_list = sh50_df.date.dt.strftime("%Y-%m-%d").tolist()
+        sh50_date_list = sh50_df.time.dt.strftime("%Y-%m-%d").tolist()
 
         # find intersection
         all_date = sorted(
@@ -399,23 +253,23 @@ class ReturnPlotter:
         )
 
         # filter data
-        csi300_df = csi300_df[csi300_df.date.isin(all_date)]
+        csi300_df = csi300_df[csi300_df.time.isin(all_date)]
         baseline_300 = csi300_df.close.tolist()
         baseline_label_300 = tic2label["399300"]
 
-        sh50_df = sh50_df[sh50_df.date.isin(all_date)]
+        sh50_df = sh50_df[sh50_df.time.isin(all_date)]
         baseline_50 = sh50_df.close.tolist()
         baseline_label_50 = tic2label["000016"]
 
         # 均等权重
         baseline_equal_weight = []
         for day in all_date:
-            day_close = self.trade[self.trade["date"] == day].close.tolist()
+            day_close = self.trade[self.trade["time"] == day].close.tolist()
             avg_close = sum(day_close) / len(day_close)
             baseline_equal_weight.append(avg_close)
 
         df_account_value = self.df_account_value[
-            self.df_account_value.date.isin(all_date)
+            self.df_account_value.time.isin(all_date)
         ]
         ours = df_account_value.account_value.tolist()
 
@@ -428,7 +282,7 @@ class ReturnPlotter:
             60  # you should scale this variable accroding to the total trading days
         )
         time = list(range(len(ours)))
-        datetimes = self.df_account_value.date.tolist()
+        datetimes = self.df_account_value.time.tolist()
         ticks = [tick for t, tick in zip(time, datetimes) if t % days_per_tick == 0]
         plt.title("Cumulative Returns")
         plt.plot(time, ours, label="DDPG Agent", color="darkorange")
@@ -458,7 +312,7 @@ class ReturnPlotter:
     def get_return(self, df, value_col_name="account_value"):
         df = copy.deepcopy(df)
         df["daily_return"] = df[value_col_name].pct_change(1)
-        df["date"] = pd.to_datetime(df["date"], format="%Y-%m-%d")
-        df.set_index("date", inplace=True, drop=True)
+        df["time"] = pd.to_datetime(df["time"], format="%Y-%m-%d")
+        df.set_index("time", inplace=True, drop=True)
         df.index = df.index.tz_localize("UTC")
         return pd.Series(df["daily_return"], index=df.index)

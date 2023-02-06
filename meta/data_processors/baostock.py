@@ -84,6 +84,10 @@ class Baostock(_Base):
         )
         bs.logout()
 
+        self.dataframe.open = self.dataframe.open.astype(float)
+        self.dataframe.high = self.dataframe.high.astype(float)
+        self.dataframe.low = self.dataframe.low.astype(float)
+        self.dataframe.close = self.dataframe.close.astype(float)
         self.save_data(save_path)
 
         print(
