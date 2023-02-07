@@ -11,7 +11,7 @@ except FileNotFoundError as myEx:
 
 setup(
     name="finrl-meta",
-    version="0.3.5",
+    version="0.3.6",
     author="Xiao-Yang Liu, Ming Zhu, Jingyang Rui, Hongyang Yang",
     author_email="hy2500@columbia.edu",
     url="https://github.com/AI4Finance-Foundation/FinRL-Meta",
