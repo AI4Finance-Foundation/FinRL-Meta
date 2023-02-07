@@ -461,7 +461,6 @@ def implement_trade_list(seed=0, lq_time=60, nm_trades=60, tr_risk=1e-6):
 
     # Implement the trading list in our similation environment
     for trade in trade_list:
-
         # Convert the number of shares to sell in each trade into an action
         action = trade / env.shares_remaining
 
@@ -507,7 +506,6 @@ def get_av_std(lq_time=60, nm_trades=60, tr_risk=1e-6, trs=100):
     shortfall_hist = np.array([])
 
     for episode in range(trs):
-
         # Print current episode every 100 episodes
         if (episode + 1) % 100 == 0:
             print(f"Episode [{episode + 1}/{trs}]", end="\r", flush=True)

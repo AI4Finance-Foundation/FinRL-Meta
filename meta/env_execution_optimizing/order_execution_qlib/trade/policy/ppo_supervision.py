@@ -113,7 +113,14 @@ class PPO_sup(PGPolicy):
         self, batch: Batch, batch_size: int, repeat: int, **kwargs
     ) -> Dict[str, List[float]]:
         self._batch = batch_size
-        (losses, clip_losses, vf_losses, ent_losses, kl_losses, supervision_losses,) = (
+        (
+            losses,
+            clip_losses,
+            vf_losses,
+            ent_losses,
+            kl_losses,
+            supervision_losses,
+        ) = (
             [],
             [],
             [],

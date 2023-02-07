@@ -28,7 +28,6 @@ class DayData:
 
 
 def extractPID(code):
-
     for idx in range(0, len(code)):
         c = code[idx]
         if "0" <= c and c <= "9":
@@ -339,7 +338,6 @@ class WtCacheMonExchg(WtCacheMon):
         trcount = len(lis)
         # 遍历行
         for tr in range(1, trcount):
-
             tdlis = doc(lis[tr])("td")
             # 商品名称
             pzname = doc(tdlis[0]).text()

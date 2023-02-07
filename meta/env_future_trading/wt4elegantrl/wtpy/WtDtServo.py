@@ -63,7 +63,6 @@ def httpPost(url, datas: dict, encoding="utf-8") -> dict:
 
 @singleton
 class WtDtServo:
-
     # 构造函数，传入动态库名
     def __init__(self):
         self.__config__ = None

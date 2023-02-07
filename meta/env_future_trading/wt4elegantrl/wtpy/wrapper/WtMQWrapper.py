@@ -23,6 +23,7 @@ from .PlatformHelper import PlatformHelper as ph
 CB_ON_MSG = CFUNCTYPE(c_void_p, c_uint32, c_char_p, c_char_p, c_uint32)
 CB_ON_LOG = CFUNCTYPE(c_void_p, c_uint32, c_char_p, c_bool)
 
+
 # Python对接C接口的库
 @singleton
 class WtMQWrapper:

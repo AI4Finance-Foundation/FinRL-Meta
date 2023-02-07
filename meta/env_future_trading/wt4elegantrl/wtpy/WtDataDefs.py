@@ -23,7 +23,6 @@ class WtKlineData:
             self.volumes = None
 
     def append_bar(self, newBar: dict):
-
         pos = self.size
         if pos == self.capacity:
             self.bartimes[:-1] = self.bartimes[1:]

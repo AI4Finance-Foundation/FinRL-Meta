@@ -21,7 +21,6 @@ from qlib.workflow.record_temp import PortAnaRecord
 from qlib.workflow.record_temp import SignalRecord
 
 if __name__ == "__main__":
-
     # use default data
     provider_uri = "~/.qlib/qlib_data/cn_data"  # target_dir
     if not exists_qlib_data(provider_uri):

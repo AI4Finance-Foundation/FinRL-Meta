@@ -70,7 +70,6 @@ class TradingChart:
         return _wlines, _wcolors, _llines, _lcolors, rewards
 
     def plot(self):
-
         for s in self.symbols:
             (
                 _wlines,

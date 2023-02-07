@@ -22,7 +22,6 @@ def trade(
     if_vix=True,
     **kwargs
 ):
-
     if trade_mode == "backtesting":
         # use test function for backtesting mode
         test(

@@ -39,7 +39,6 @@ class StockTradingEnv(gym.Env):
         initial_buy=False,  # Use half of initial amount to buy
         hundred_each_trade=True,
     ):  # The number of shares per lot must be an integer multiple of 100
-
         self.day = day
         self.df = df
         self.stock_dim = stock_dim
@@ -268,7 +267,6 @@ class StockTradingEnv(gym.Env):
             return self.state, self.reward, self.terminal, {}
 
         else:
-
             actions = actions * self.hmax  # actions initially is scaled between 0 to 1
             actions = actions.astype(
                 int

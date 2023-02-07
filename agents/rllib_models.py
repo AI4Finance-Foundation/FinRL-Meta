@@ -118,7 +118,6 @@ class DRLAgent:
         env,
         agent_path="./test_ppo/checkpoint_000100/checkpoint-100",
     ):
-
         if model_name not in MODELS:
             raise NotImplementedError("NotImplementedError")
 
