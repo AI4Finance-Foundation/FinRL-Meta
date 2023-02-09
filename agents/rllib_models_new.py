@@ -17,8 +17,8 @@ from ray.tune.registry import register_env
 class Rllib_model:
     def __init__(self, trainer):
         self.trainer = trainer
-    
-    def __call__(self,state):
+
+    def __call__(self, state):
         return self.trainer.compute_single_action(state)
 
 
@@ -51,8 +51,8 @@ class DRLAgent:
         self,
         model_name,
         env_config,
-        model_config = None,
-        framework = "torch",
+        model_config=None,
+        framework="torch",
     ):
         if model_name not in MODELS:
             raise NotImplementedError("NotImplementedError")
@@ -66,12 +66,12 @@ class DRLAgent:
                 model_config = model.TD3_DEFAULT_CONFIG.copy()
             else:
                 model_config = model.DEFAULT_CONFIG.copy()
-        
+
         register_env("finrl_env", self.env)
         model_config["env"] = "finrl_env"
         model_config["env_config"] = env_config
         model_config["log_level"] = "WARN"
-        model_config["framework"]=framework
+        model_config["framework"] = framework
 
         return model, model_config
 
@@ -81,11 +81,9 @@ class DRLAgent:
         model_name,
         model_config,
         total_episodes=100,
-        
     ):
         if model_name not in MODELS:
             raise NotImplementedError("NotImplementedError")
-        
 
         if model_name == "ppo":
             trainer = model.PPOTrainer(env=self.env, config=model_config)
@@ -97,7 +95,7 @@ class DRLAgent:
             trainer = model.TD3Trainer(env=self.env, config=model_config)
         elif model_name == "sac":
             trainer = model.SACTrainer(env=self.env, config=model_config)
-        
+
         cwd = "./test_" + str(model_name)
         for _ in range(total_episodes):
             trainer.train()
@@ -114,9 +112,9 @@ class DRLAgent:
         env,
         env_config,
         agent_path="./test_ppo/checkpoint_000100/checkpoint-100",
-        init_ray = True,
-        model_config = None,
-        framework = "torch",
+        init_ray=True,
+        model_config=None,
+        framework="torch",
     ):
         if init_ray:
             ray.init(
@@ -133,12 +131,12 @@ class DRLAgent:
                 model_config = MODELS[model_name].TD3_DEFAULT_CONFIG.copy()
             else:
                 model_config = MODELS[model_name].DEFAULT_CONFIG.copy()
-        
+
         register_env("finrl_env", env)
         model_config["env"] = "finrl_env"
         model_config["env_config"] = env_config
         model_config["log_level"] = "WARN"
-        model_config["framework"]= framework
+        model_config["framework"] = framework
 
         # ray.init() # Other Ray APIs will not work until `ray.init()` is called.
         if model_name == "ppo":
@@ -157,8 +155,7 @@ class DRLAgent:
             print("Restoring from checkpoint path", agent_path)
         except BaseException:
             raise ValueError("Fail to load agent!")
-        
-        agent = Rllib_model(trainer)
-        
-        return agent
 
+        agent = Rllib_model(trainer)
+
+        return agent
