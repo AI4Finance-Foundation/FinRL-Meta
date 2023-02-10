@@ -47,6 +47,7 @@ if not exists_qlib_data(provider_uri):
     GetData().qlib_data(target_dir=provider_uri, region=REG_CN)
 qlib.init(provider_uri=provider_uri, region=REG_CN, exp_manager=exp_manager)
 
+
 # decorator to check the arguments
 def only_allow_defined_args(function_to_decorate):
     @functools.wraps(function_to_decorate)

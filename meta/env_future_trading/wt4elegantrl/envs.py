@@ -32,7 +32,6 @@ class WtEnv(Env):
         id: int = getpid(),
         mode=1,
     ):
-
         self.reward_range
 
         if mode == 3:  # 调试模式

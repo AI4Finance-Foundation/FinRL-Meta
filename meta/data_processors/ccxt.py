@@ -26,7 +26,6 @@ class Ccxt(_Base):
     def download_data(
         self, ticker_list: List[str], save_path: str = "./data/dataset.csv"
     ):
-
         crypto_column = pd.MultiIndex.from_product(
             [ticker_list, ["open", "high", "low", "close", "volume"]]
         )

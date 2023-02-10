@@ -17,7 +17,6 @@ from .PlatformHelper import PlatformHelper as ph
 
 @singleton
 class WtExecApi:
-
     # api可以作为公共变量
     api = None
     ver = "Unknown"

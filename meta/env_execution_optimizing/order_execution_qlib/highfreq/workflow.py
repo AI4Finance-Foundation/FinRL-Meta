@@ -32,7 +32,6 @@ from qlib.utils import init_instance_by_config
 
 
 class HighfreqWorkflow(object):
-
     SPEC_CONF = {
         "custom_ops": [DayLast, FFillNan, BFillNan, Date, Select, IsNull, Cut],
         "expression_cache": None,
