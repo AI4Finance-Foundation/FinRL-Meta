@@ -42,7 +42,6 @@ class Akshare(_Base):
             self.period = "daily"
 
     def get_data(self, id) -> pd.DataFrame:
-
         return ak.stock_zh_a_hist(
             symbol=id,
             period=self.time_interval,

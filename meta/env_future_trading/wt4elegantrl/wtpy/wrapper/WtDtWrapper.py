@@ -23,6 +23,7 @@ from wtpy.WtUtilDefs import singleton
 
 from .PlatformHelper import PlatformHelper as ph
 
+
 # Python对接C接口的库
 @singleton
 class WtDtWrapper:

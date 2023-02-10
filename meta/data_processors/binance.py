@@ -197,7 +197,6 @@ class Binance(_Base):
         final_df = pd.DataFrame()
         last_datetime = self.start_time
         while True:
-
             new_df = self.get_binance_bars(last_datetime, symbol)
             if new_df is None:
                 break

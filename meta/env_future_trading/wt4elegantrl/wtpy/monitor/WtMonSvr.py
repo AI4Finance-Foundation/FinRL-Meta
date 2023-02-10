@@ -70,7 +70,6 @@ def check_auth():
     usrInfo = session.get("userinfo")
     # session里没有用户信息
     if usrInfo is None:
-
         return False, {"result": -999, "message": "请先登录"}
 
     # session里有用户信息，则要读取
@@ -282,7 +281,6 @@ class WtMonSvr(WatcherSink):
         self.__dt_servo__ = dtServo
 
     def init_bt_apis(self, app: Flask):
-
         # 拉取K线数据
         @app.route("/bt/qrybars", methods=["POST"])
         def qry_bt_bars():
@@ -761,7 +759,6 @@ class WtMonSvr(WatcherSink):
 
         @app.route("/mgr/login", methods=["POST"])
         def cmd_login():
-
             bSucc, json_data = parse_data()
             if not bSucc:
                 return pack_rsp(json_data)

@@ -583,7 +583,6 @@ def performance_summary(input_data, input_data1, capital=500000, rf=0.00, period
 
 
 def do_trading_analyze(df_closes, df_funds):
-
     df_wins = df_closes[df_closes["profit"] > 0]
     df_loses = df_closes[df_closes["profit"] <= 0]
 

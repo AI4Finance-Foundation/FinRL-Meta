@@ -45,7 +45,6 @@ class Wrds(_Base):
         filter_shares=0,
         save_path: str = "./data/dataset.csv",
     ):
-
         dates = self.get_trading_days(self.start_date, self.end_date)
         print("Trading days: ")
         print(dates)

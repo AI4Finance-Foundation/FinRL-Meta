@@ -15,7 +15,6 @@ from meta.data_processors._base import _Base
 class Iexcloud(_Base):
     @classmethod
     def _get_base_url(self, mode: str) -> str:
-
         as1 = "mode must be sandbox or production."
         assert mode in {"sandbox", "production"}, as1
 

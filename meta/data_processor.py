@@ -154,7 +154,6 @@ class DataProcessor:
         cache: bool = False,
         select_stockstats_talib: int = 0,
     ):
-
         if self.time_interval == "1s" and self.data_source != "binance":
             raise ValueError(
                 "Currently 1s interval data is only supported with 'binance' as data source"

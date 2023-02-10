@@ -47,7 +47,6 @@ class MarketEnvironment:
         lambd1=LLAMBDA1,
         lambd2=LLAMBDA2,
     ):
-
         # Set the random seed
         random.seed(randomSeed)
 
@@ -110,7 +109,6 @@ class MarketEnvironment:
         lamb1=LLAMBDA1,
         lamb2=LLAMBDA2,
     ):
-
         # Initialize the environment with the given parameters
         self.__init__(
             randomSeed=seed,
@@ -132,7 +130,6 @@ class MarketEnvironment:
         return self.initial_state
 
     def start_transactions(self):
-
         # Set transactions on
         self.transacting1 = True
         self.transacting2 = True
@@ -162,7 +159,6 @@ class MarketEnvironment:
         )
 
     def step(self, action1, action2):
-
         # Create a class that will be used to keep track of information about the transaction
         class Info(object):
             pass
@@ -225,7 +221,6 @@ class MarketEnvironment:
         # If we are transacting, the stock price is affected by the number of shares we sell. The price evolves
         # according to the Almgren and Chriss price dynamics model.
         if self.transacting1:
-
             # If action is an ndarray then extract the number from the array
             if isinstance(action1, np.ndarray):
                 action1 = action1.item()
@@ -239,7 +234,6 @@ class MarketEnvironment:
             sharesToSellNow1 = 0
         #             sharesToSellNow = min(self.shares_remaining * action, self.shares_remaining)
         if self.transacting2:
-
             # If action is an ndarray then extract the number from the array
             if isinstance(action2, np.ndarray):
                 action2 = action2.item()
@@ -253,7 +247,6 @@ class MarketEnvironment:
             sharesToSellNow2 = 0
 
         if self.transacting1 or self.transacting2:
-
             # Since we are not selling fractions of shares, round up the total number of shares to sell to the nearest integer.
             info.share_to_sell_now1 = np.around(sharesToSellNow1)
             info.share_to_sell_now2 = np.around(sharesToSellNow2)

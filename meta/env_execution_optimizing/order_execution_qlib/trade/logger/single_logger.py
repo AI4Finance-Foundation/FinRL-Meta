@@ -127,7 +127,6 @@ class DFLogger(object):
         self.child.start()
 
     def set_step(self, step):
-
         self.log_dir = f"{self.raw_log_dir}{step}/"
         self.reset()
 

@@ -77,7 +77,6 @@ def get_baseline(ticker, start, end):
 
 
 def trx_plot(df_trade, df_actions, ticker_list):
-
     df_trx = pd.DataFrame(np.array(df_actions["transactions"].to_list()))
     df_trx.columns = ticker_list
     df_trx.index = df_actions["date"]

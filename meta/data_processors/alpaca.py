@@ -340,7 +340,6 @@ class Alpaca(_Base):
     def fetch_latest_data(
         self, ticker_list, time_interval, tech_indicator_list, limit=100
     ) -> pd.DataFrame:
-
         data_df = pd.DataFrame()
         for tic in ticker_list:
             barset = self.api.get_barset([tic], time_interval, limit=limit).df[tic]

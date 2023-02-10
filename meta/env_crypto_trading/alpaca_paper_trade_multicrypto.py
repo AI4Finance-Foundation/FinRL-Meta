@@ -154,7 +154,6 @@ class AlpacaPaperTradingMultiCrypto:
             time.sleep(self.time_interval)
 
     def trade(self):
-
         # Get state
         state = self.get_state()
 

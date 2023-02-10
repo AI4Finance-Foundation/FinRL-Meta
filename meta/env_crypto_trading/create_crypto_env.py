@@ -27,7 +27,6 @@ def create_train_env(
     if_vix,
     **kwargs
 ):
-
     dp = DataProcessor(
         data_source, train_start_date, train_end_date, time_interval, **kwargs
     )
@@ -65,7 +64,6 @@ def create_test_env(
     if_vix,
     **kwargs
 ):
-
     dp = DataProcessor(
         data_source, test_start_date, test_end_date, time_interval, **kwargs
     )
