@@ -135,7 +135,7 @@ class DataProcessor:
 
         return price_array, tech_array, turbulence_array
 
-    def data_split(self, df, start, end, target_date_col="date"):
+    def data_split(self, df, start, end, target_date_col="time"):
         """
         split the dataset into training or testing using date
         :param data: (df) pandas dataframe, start, end
@@ -145,6 +145,11 @@ class DataProcessor:
         data = data.sort_values([target_date_col, "tic"], ignore_index=True)
         data.index = data[target_date_col].factorize()[0]
         return data
+
+    def fillna(self):
+        self.processor.dataframe = self.dataframe
+        self.processor.fillna()
+        self.dataframe = self.processor.dataframe
 
     def run(
         self,
