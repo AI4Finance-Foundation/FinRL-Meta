@@ -20,14 +20,6 @@ class Rllib_model:
         return self.trainer.compute_single_action(state)
 
 
-class Rllib_model:
-    def __init__(self, trainer):
-        self.trainer = trainer
-
-    def __call__(self, state):
-        return self.trainer.compute_single_action(state)
-
-
 class DRLAgent:
     """Implementations for DRL algorithms
 
