@@ -12,6 +12,7 @@ from ray.tune.registry import register_env
 
 # MODEL_KWARGS = {x: config.__dict__[f"{x.upper()}_PARAMS"] for x in MODELS.keys()}
 
+
 class Rllib_model:
     def __init__(self, trainer):
         self.trainer = trainer
