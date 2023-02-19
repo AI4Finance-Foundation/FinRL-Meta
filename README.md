@@ -11,7 +11,7 @@ FinRL-Meta ([docs website](https://finrl.readthedocs.io/en/latest/finrl_meta/bac
 
 1. FinRL-Meta provides hundreds of market environments.
 2. FinRL-Meta reproduces existing papers as benchmarks.
-3. FinRL-Meta provides tens of demos/tutorials, organized in a curriculum.
+3. FinRL-Meta provides dozens of demos/tutorials, organized in a curriculum.
 
 
 Previously called **Neo_FinRL**: **N**ear real-market **E**nvironments f**o**r data-driven **Fin**ancial **R**einforcement **L**earning.
