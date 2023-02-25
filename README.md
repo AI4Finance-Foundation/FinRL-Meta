@@ -157,3 +157,17 @@ For future work, we plan to build a multi-agent-based market simulator that cons
 
 
 **Disclaimer: Nothing herein is financial advice, and NOT a recommendation to trade real money. Please use common sense and always first consult a professional before trading or investing.**
+
+
+## Aaron's installation cheatsheet
+"""
+conda create -n finrl --no-default-packages
+conda activate finrl
+mamba install -y python==3.8 swig
+mamba install -y ta-lib -c conda-forge
+mamba install -y pytorch -c pytorch
+mamba install tensorboard
+pip install -e .
+"""
+
+The last line allows you to edit the python files without having to redo the pip install
