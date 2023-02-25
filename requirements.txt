@@ -39,3 +39,6 @@ vectorbt[full]
 wheel==0.37.1
 wrds
 yfinance
+
+# for markowitz portfolio optimization
+cvxpy
