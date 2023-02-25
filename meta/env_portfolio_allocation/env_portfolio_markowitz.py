@@ -13,7 +13,11 @@ from stable_baselines3.common.vec_env import DummyVecEnv
 
 
 class StockPortfolioEnv(gym.Env):
-    """A single stock trading environment for OpenAI gym
+    """A single stock trading environment for markowitz portfolio optimization
+    ideally this would be combined with the standard environment, but for now we
+    will keep it separate, mainly because the state space is slightly different
+    using covariance matrix and expected returns instead of indicator data
+    
 
     Attributes
     ----------
