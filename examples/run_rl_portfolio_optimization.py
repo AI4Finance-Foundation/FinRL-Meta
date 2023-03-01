@@ -106,9 +106,7 @@ def main(
                       "ent_coef": 0.005, "learning_rate": 0.0004}
         model_a2c = agent.get_model(model_name="a2c", model_kwargs=A2C_PARAMS)
         trained_a2c = agent.train_model(
-            model=model_a2c,
-            tb_log_name='a2c',
-            total_timesteps=40000
+            model=model_a2c, tb_log_name="a2c", total_timesteps=40000
         )
         # save trained_a2c model
         trained_a2c.save("saved_models/a2c_model.pt")
