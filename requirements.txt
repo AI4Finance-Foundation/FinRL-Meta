@@ -2,6 +2,9 @@
 
 alpaca_trade_api>=2.1.0
 ccxt
+
+# for markowitz portfolio optimization
+cvxpy
 elegantrl
 
 # market data & paper trading API
@@ -39,6 +42,3 @@ vectorbt[full]
 wheel==0.37.1
 wrds
 yfinance
-
-# for markowitz portfolio optimization
-cvxpy

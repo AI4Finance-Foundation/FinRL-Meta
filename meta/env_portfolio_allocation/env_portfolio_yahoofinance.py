@@ -138,12 +138,11 @@ class StockPortfolioEnv(gym.Env):
         self.terminal = self.time_index >= len(self.sorted_times) - 1
 
         if self.terminal:
-            df = pd.DataFrame({
-                "date":self.date_memory,
-                "daily_return":self.portfolio_return_memory
-                })
+            df = pd.DataFrame(
+                {"date": self.date_memory, "daily_return": self.portfolio_return_memory}
+            )
             df.set_index("date", inplace=True)
-            plt.plot((1+df.daily_return).cumprod()*self.initial_amount, "r")
+            plt.plot((1 + df.daily_return).cumprod() * self.initial_amount, "r")
             plt.savefig(self.results_file / "cumulative_reward.png")
             plt.close()
 
@@ -193,7 +192,7 @@ class StockPortfolioEnv(gym.Env):
             #     np.array(self.covs),
             #     [self.data[tech].values.tolist() for tech in self.tech_indicator_list],
             #     axis=0,
-            # ) 
+            # )
             # print(self.state)
             # calcualte portfolio return
             # individual stocks' return * weight
@@ -227,7 +226,7 @@ class StockPortfolioEnv(gym.Env):
         #     np.array(self.covs),
         #     [self.data[tech].values.tolist() for tech in self.tech_indicator_list],
         #     axis=0,
-        # ) 
+        # )
         self.portfolio_value = self.initial_amount
         # self.cost = 0
         # self.trades = 0
