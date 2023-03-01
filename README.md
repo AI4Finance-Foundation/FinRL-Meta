@@ -157,4 +157,3 @@ For future work, we plan to build a multi-agent-based market simulator that cons
 
 
 **Disclaimer: Nothing herein is financial advice, and NOT a recommendation to trade real money. Please use common sense and always first consult a professional before trading or investing.**
-
