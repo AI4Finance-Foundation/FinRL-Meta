@@ -1,24 +1,21 @@
 # Requirements
 
 alpaca_trade_api>=2.1.0
-ccxt
-
-# for markowitz portfolio optimization
-cvxpy
+ccxt==1.90.41
 elegantrl
 
 # market data & paper trading API
-exchange_calendars
+exchange_calendars==4.1.1
 gputil==1.4.0
-gym
+gym==0.24.1
 jqdatasdk==1.8.10
 lz4==4.0.1
 
 # plot
 matplotlib==3.5.2
 # data handling
-numpy
-pandas
+numpy==1.23.1
+pandas==1.4.3
 
 # pandas
 pandas_market_calendars==3.5
@@ -27,18 +24,18 @@ pandas_market_calendars==3.5
 pre-commit==2.19.0
 
 # testing requirements
-pytest
-ray[default]
+pytest==7.1.2
+ray[default]==1.13.0
 
 # Model Building Requirements
-scikit-learn
+scikit-learn==1.1.1
 
 # packaging
-setuptools
-# stable-baselines3[extra]
-stockstats
+setuptools==63.1.0
+stable-baselines3[extra]==1.5.0
+stockstats==0.4.1
 tensorboardX==2.5.1
-vectorbt[full]
+vectorbt[full]==0.23.3
 wheel==0.37.1
-wrds
-yfinance
+wrds==3.1.1
+yfinance==0.1.72
