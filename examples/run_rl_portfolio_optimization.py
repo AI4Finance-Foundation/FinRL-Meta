@@ -1,12 +1,13 @@
 import os
 
 import pandas as pd
-from agents.stablebaselines3_models import DRLAgent
-from meta import config, config_tickers
-from meta.data_processor import DataProcessor
-from meta.env_portfolio_allocation.env_portfolio_yahoofinance import \
-    StockPortfolioEnv
 from stable_baselines3 import A2C
+
+from agents.stablebaselines3_models import DRLAgent
+from meta import config
+from meta import config_tickers
+from meta.data_processor import DataProcessor
+from meta.env_portfolio_allocation.env_portfolio_yahoofinance import StockPortfolioEnv
 
 
 def data_split(df, start, end, target_date_col="time"):
@@ -65,7 +66,7 @@ def main(
     # look back is one year
     lookback = 252
     for i in range(lookback, len(df.index.unique())):
-        data_lookback = df.loc[i - lookback: i, :]
+        data_lookback = df.loc[i - lookback : i, :]
         price_lookback = data_lookback.pivot_table(
             index="time", columns="tic", values="close"
         )
@@ -74,13 +75,11 @@ def main(
         cov_list.append(covs)
     # df["mean_pct_change_lookback"] = df.rolling(lookback)["pct_change"].mean()
     # df["ewm_returns"] = df["pct_change"].ewm(span=50).mean()
-    df_cov = pd.DataFrame(
-        {"time": df.time.unique()[lookback:], "cov_list": cov_list})
+    df_cov = pd.DataFrame({"time": df.time.unique()[lookback:], "cov_list": cov_list})
     df = df.merge(df_cov, on="time")
     df = df.sort_values(["time", "tic"]).reset_index(drop=True)
 
-    train_df = data_split(df, start=config.TRAIN_START_DATE,
-                          end=config.TRAIN_END_DATE)
+    train_df = data_split(df, start=config.TRAIN_START_DATE, end=config.TRAIN_END_DATE)
     stock_dimension = len(train_df.tic.unique())
     state_space = stock_dimension
     print(f"Stock Dimension: {stock_dimension}, State Space: {state_space}")
@@ -102,8 +101,7 @@ def main(
         e_train_gym = StockPortfolioEnv(df=train_df, **env_kwargs)
         agent = DRLAgent(env=e_train_gym)
 
-        A2C_PARAMS = {"n_steps": 10,
-                      "ent_coef": 0.005, "learning_rate": 0.0004}
+        A2C_PARAMS = {"n_steps": 10, "ent_coef": 0.005, "learning_rate": 0.0004}
         model_a2c = agent.get_model(model_name="a2c", model_kwargs=A2C_PARAMS)
         trained_a2c = agent.train_model(
             model=model_a2c, tb_log_name="a2c", total_timesteps=40000
@@ -112,8 +110,7 @@ def main(
         trained_a2c.save("saved_models/a2c_model.pt")
 
     # evaluate on test data
-    test_df = data_split(df, start=config.TEST_START_DATE,
-                         end=config.TEST_END_DATE)
+    test_df = data_split(df, start=config.TEST_START_DATE, end=config.TEST_END_DATE)
     e_test_gym = StockPortfolioEnv(df=test_df, **env_kwargs)
 
     df_daily_return, df_actions = DRLAgent.DRL_prediction(

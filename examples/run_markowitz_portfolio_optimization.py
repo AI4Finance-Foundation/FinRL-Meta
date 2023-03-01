@@ -3,10 +3,11 @@ from collections import defaultdict
 import cvxpy as cp
 import numpy as np
 import pandas as pd
-from meta import config, config_tickers
+
+from meta import config
+from meta import config_tickers
 from meta.data_processor import DataProcessor
-from meta.env_portfolio_allocation.env_portfolio_yahoofinance import \
-    StockPortfolioEnv
+from meta.env_portfolio_allocation.env_portfolio_yahoofinance import StockPortfolioEnv
 
 
 def data_split(df, start, end, target_date_col="time"):
@@ -95,8 +96,7 @@ class MarkowitzAgent:
         portfolio_return = mean_returns @ weights
         portfolio_risk = cp.quad_form(weights, cov)
         # define objective
-        objective = cp.Maximize(
-            portfolio_return - self.risk_aversion * portfolio_risk)
+        objective = cp.Maximize(portfolio_return - self.risk_aversion * portfolio_risk)
         # define problem
         problem = cp.Problem(objective, constraints)
         # solve problem
@@ -182,7 +182,7 @@ def main(
     # look back is one year
     lookback = 252
     for i in range(lookback, len(df.index.unique())):
-        data_lookback = df.loc[i - lookback: i, :]
+        data_lookback = df.loc[i - lookback : i, :]
         price_lookback = data_lookback.pivot_table(
             index="time", columns="tic", values="close"
         )
@@ -191,14 +191,12 @@ def main(
         cov_list.append(covs)
     df["mean_pct_change_lookback"] = df.rolling(lookback)["pct_change"].mean()
     df["ewm_returns"] = df["pct_change"].ewm(span=50).mean()
-    df_cov = pd.DataFrame(
-        {"time": df.time.unique()[lookback:], "cov_list": cov_list})
+    df_cov = pd.DataFrame({"time": df.time.unique()[lookback:], "cov_list": cov_list})
     df = df.merge(df_cov, on="time")
     df = df.sort_values(["time", "tic"]).reset_index(drop=True)
 
     # trade_df = df
-    test_df = data_split(df, start=config.TEST_START_DATE,
-                         end=config.TEST_END_DATE)
+    test_df = data_split(df, start=config.TEST_START_DATE, end=config.TEST_END_DATE)
 
     stock_dimension = len(test_df.tic.unique())
     state_space = stock_dimension
