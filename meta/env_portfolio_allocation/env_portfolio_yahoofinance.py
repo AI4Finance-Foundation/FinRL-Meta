@@ -114,13 +114,14 @@ class StockPortfolioEnv(gym.Env):
 
         # load data from a pandas dataframe
         day = self.sorted_times[self.time_index]
-        self.data = self.df[self.df["time"] == day]
-        self.covs = self.data["cov_list"].values[0]
-        self.state = np.append(
-            np.array(self.covs),
-            [self.data[tech].values.tolist() for tech in self.tech_indicator_list],
-            axis=0,
-        )
+        # self.data = self.df[self.df["time"] == day]
+        # self.covs = self.data["cov_list"].values[0]
+        # self.state = np.append(
+        #     np.array(self.covs),
+        #     [self.data[tech].values.tolist() for tech in self.tech_indicator_list],
+        #     axis=0,
+        # )
+        self.state, self.info = self.get_state_and_info_from_day(day)
         self.terminal = False
         self.turbulence_threshold = turbulence_threshold
         # initalize state: inital portfolio return + individual stock return + individual weights
@@ -164,7 +165,7 @@ class StockPortfolioEnv(gym.Env):
                 )
                 print("Sharpe: ", sharpe)
             print("=================================")
-            return self.state, self.reward, self.terminal, False, {}
+            return self.state, self.reward, self.terminal, False, self.info
 
         else:
             # print("Model actions: ",actions)
@@ -185,13 +186,14 @@ class StockPortfolioEnv(gym.Env):
             # load next state
             self.time_index += 1
             day = self.sorted_times[self.time_index]
-            self.data = self.df[self.df["time"] == day]
-            self.covs = self.data["cov_list"].values[0]
-            self.state = np.append(
-                np.array(self.covs),
-                [self.data[tech].values.tolist() for tech in self.tech_indicator_list],
-                axis=0,
-            ) 
+            self.state, self.info = self.get_state_and_info_from_day(day)
+            # self.data = self.df[self.df["time"] == day]
+            # self.covs = self.data["cov_list"].values[0]
+            # self.state = np.append(
+            #     np.array(self.covs),
+            #     [self.data[tech].values.tolist() for tech in self.tech_indicator_list],
+            #     axis=0,
+            # ) 
             # print(self.state)
             # calcualte portfolio return
             # individual stocks' return * weight
@@ -212,19 +214,20 @@ class StockPortfolioEnv(gym.Env):
             # print("Step reward: ", self.reward)
             # self.reward = self.reward*self.reward_scaling
 
-        return self.state, self.reward, self.terminal, False, {}
+        return self.state, self.reward, self.terminal, False, self.info
 
     def reset(self):
         self.time_index = 0
         self.asset_memory = [self.initial_amount]
         day = self.sorted_times[self.time_index]
-        self.data = self.df[self.df["time"] == day]
-        self.covs = self.data["cov_list"].values[0]
-        self.state = np.append(
-            np.array(self.covs),
-            [self.data[tech].values.tolist() for tech in self.tech_indicator_list],
-            axis=0,
-        ) 
+        self.state, self.info = self.get_state_and_info_from_day(day)
+        # self.data = self.df[self.df["time"] == day]
+        # self.covs = self.data["cov_list"].values[0]
+        # self.state = np.append(
+        #     np.array(self.covs),
+        #     [self.data[tech].values.tolist() for tech in self.tech_indicator_list],
+        #     axis=0,
+        # ) 
         self.portfolio_value = self.initial_amount
         # self.cost = 0
         # self.trades = 0
@@ -232,7 +235,20 @@ class StockPortfolioEnv(gym.Env):
         self.portfolio_return_memory = [0]
         self.actions_memory = [[1 / self.stock_dim] * self.stock_dim]
         self.date_memory = [day]
-        return self.state, {}
+        return self.state, self.info
+
+    def get_state_and_info_from_day(self, day):
+        self.data = self.df[self.df["time"] == day]
+        covs = self.data["cov_list"].values[0]
+        state = np.append(
+            np.array(covs),
+            [self.data[tech].values.tolist() for tech in self.tech_indicator_list],
+            axis=0,
+        )
+        info = {
+            "data": self.df[self.df.time <= day],
+        }
+        return state, info
 
     def render(self, mode="human"):
         return self.state
