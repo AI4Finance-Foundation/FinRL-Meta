@@ -71,6 +71,7 @@ class Yahoofinance(_Base):
         except NotImplementedError:
             print("the features are not supported currently")
         self.dataframe["day"] = self.dataframe["date"].dt.dayofweek
+        print(self.dataframe)
         self.dataframe["date"] = self.dataframe.date.apply(
             lambda x: x.strftime("%Y-%m-%d")
         )

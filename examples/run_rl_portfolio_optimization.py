@@ -1,11 +1,11 @@
-import pandas as pd
 import os
 
-from meta import config, config_tickers
-# from meta.env_portfolio_allocation.env_portfolio_yahoofinance import StockPortfolioEnv
-from meta.env_portfolio_allocation.env_portfolio_yahoofinance import StockPortfolioEnv
-from meta.data_processor import DataProcessor
+import pandas as pd
 from agents.stablebaselines3_models import DRLAgent
+from meta import config, config_tickers
+from meta.data_processor import DataProcessor
+from meta.env_portfolio_allocation.env_portfolio_yahoofinance import \
+    StockPortfolioEnv
 from stable_baselines3 import A2C
 
 
@@ -108,7 +108,7 @@ def main(
             model=model_a2c,
             tb_log_name='a2c',
             total_timesteps=40000
-            )
+        )
         # save trained_a2c model
         trained_a2c.save("saved_models/a2c_model.pt")
 
