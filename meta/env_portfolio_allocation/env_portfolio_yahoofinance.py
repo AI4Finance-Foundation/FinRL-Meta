@@ -9,6 +9,7 @@ from gym.utils import seeding
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from stable_baselines3.common.vec_env import DummyVecEnv
+from pathlib import Path
 
 
 class StockPortfolioEnv(gym.Env):
@@ -75,11 +76,12 @@ class StockPortfolioEnv(gym.Env):
         tech_indicator_list,
         turbulence_threshold=None,
         lookback=252,
-        day=0,
+        time_index=0,
+        cwd="./",
     ):
         # super(StockEnv, self).__init__()
         # money = 10 , scope = 1
-        self.day = day
+        self.time_index = time_index
         self.lookback = lookback
         self.df = df
         self.stock_dim = stock_dim
@@ -90,6 +92,12 @@ class StockPortfolioEnv(gym.Env):
         self.state_space = state_space
         self.action_space = action_space
         self.tech_indicator_list = tech_indicator_list
+        self.cwd = Path(cwd)
+        self.results_file = self.cwd / "results" / "rl"
+        self.results_file.mkdir(parents=True, exist_ok=True)
+
+        self.df.time = pd.to_datetime(self.df.time)
+        self.sorted_times = sorted(set(self.df.time))
 
         # action_space normalization and shape is self.stock_dim
         self.action_space = spaces.Box(low=0, high=1, shape=(self.action_space,))
@@ -105,13 +113,15 @@ class StockPortfolioEnv(gym.Env):
         )
 
         # load data from a pandas dataframe
-        self.data = self.df.loc[self.day, :]
-        self.covs = self.data["cov_list"].values[0]
-        self.state = np.append(
-            np.array(self.covs),
-            [self.data[tech].values.tolist() for tech in self.tech_indicator_list],
-            axis=0,
-        )
+        day = self.sorted_times[self.time_index]
+        # self.data = self.df[self.df["time"] == day]
+        # self.covs = self.data["cov_list"].values[0]
+        # self.state = np.append(
+        #     np.array(self.covs),
+        #     [self.data[tech].values.tolist() for tech in self.tech_indicator_list],
+        #     axis=0,
+        # )
+        self.state, self.info = self.get_state_and_info_from_day(day)
         self.terminal = False
         self.turbulence_threshold = turbulence_threshold
         # initalize state: inital portfolio return + individual stock return + individual weights
@@ -122,22 +132,22 @@ class StockPortfolioEnv(gym.Env):
         # memorize portfolio return each step
         self.portfolio_return_memory = [0]
         self.actions_memory = [[1 / self.stock_dim] * self.stock_dim]
-        self.date_memory = [self.data.date.unique()[0]]
+        self.date_memory = [day]
 
     def step(self, actions):
-        # print(self.day)
-        self.terminal = self.day >= len(self.df.index.unique()) - 1
-        # print(actions)
+        self.terminal = self.time_index >= len(self.sorted_times) - 1
 
         if self.terminal:
-            df = pd.DataFrame(self.portfolio_return_memory)
-            df.columns = ["daily_return"]
-            plt.plot(df.daily_return.cumsum(), "r")
-            plt.savefig("results/cumulative_reward.png")
+            df = pd.DataFrame(
+                {"date": self.date_memory, "daily_return": self.portfolio_return_memory}
+            )
+            df.set_index("date", inplace=True)
+            plt.plot((1 + df.daily_return).cumprod() * self.initial_amount, "r")
+            plt.savefig(self.results_file / "cumulative_reward.png")
             plt.close()
 
             plt.plot(self.portfolio_return_memory, "r")
-            plt.savefig("results/rewards.png")
+            plt.savefig(self.results_file / "rewards.png")
             plt.close()
 
             print("=================================")
@@ -154,8 +164,7 @@ class StockPortfolioEnv(gym.Env):
                 )
                 print("Sharpe: ", sharpe)
             print("=================================")
-
-            return self.state, self.reward, self.terminal, {}
+            return self.state, self.reward, self.terminal, False, self.info
 
         else:
             # print("Model actions: ",actions)
@@ -165,20 +174,25 @@ class StockPortfolioEnv(gym.Env):
             #  norm_actions = (np.array(actions) - np.array(actions).min()) / (np.array(actions) - np.array(actions).min()).sum()
             # else:
             #  norm_actions = actions
-            weights = self.softmax_normalization(actions)
+            if np.sum(actions) == 1 and np.min(actions) >= 0:
+                weights = actions
+            else:
+                weights = self.softmax_normalization(actions)
             # print("Normalized actions: ", weights)
             self.actions_memory.append(weights)
             last_day_memory = self.data
 
             # load next state
-            self.day += 1
-            self.data = self.df.loc[self.day, :]
-            self.covs = self.data["cov_list"].values[0]
-            self.state = np.append(
-                np.array(self.covs),
-                [self.data[tech].values.tolist() for tech in self.tech_indicator_list],
-                axis=0,
-            )
+            self.time_index += 1
+            day = self.sorted_times[self.time_index]
+            self.state, self.info = self.get_state_and_info_from_day(day)
+            # self.data = self.df[self.df["time"] == day]
+            # self.covs = self.data["cov_list"].values[0]
+            # self.state = np.append(
+            #     np.array(self.covs),
+            #     [self.data[tech].values.tolist() for tech in self.tech_indicator_list],
+            #     axis=0,
+            # )
             # print(self.state)
             # calcualte portfolio return
             # individual stocks' return * weight
@@ -191,7 +205,7 @@ class StockPortfolioEnv(gym.Env):
 
             # save into memory
             self.portfolio_return_memory.append(portfolio_return)
-            self.date_memory.append(self.data.date.unique()[0])
+            self.date_memory.append(day)
             self.asset_memory.append(new_portfolio_value)
 
             # the reward is the new portfolio value or end portfolo value
@@ -199,27 +213,41 @@ class StockPortfolioEnv(gym.Env):
             # print("Step reward: ", self.reward)
             # self.reward = self.reward*self.reward_scaling
 
-        return self.state, self.reward, self.terminal, {}
+        return self.state, self.reward, self.terminal, False, self.info
 
     def reset(self):
+        self.time_index = 0
         self.asset_memory = [self.initial_amount]
-        self.day = 0
-        self.data = self.df.loc[self.day, :]
-        # load states
-        self.covs = self.data["cov_list"].values[0]
-        self.state = np.append(
-            np.array(self.covs),
-            [self.data[tech].values.tolist() for tech in self.tech_indicator_list],
-            axis=0,
-        )
+        day = self.sorted_times[self.time_index]
+        self.state, self.info = self.get_state_and_info_from_day(day)
+        # self.data = self.df[self.df["time"] == day]
+        # self.covs = self.data["cov_list"].values[0]
+        # self.state = np.append(
+        #     np.array(self.covs),
+        #     [self.data[tech].values.tolist() for tech in self.tech_indicator_list],
+        #     axis=0,
+        # )
         self.portfolio_value = self.initial_amount
         # self.cost = 0
         # self.trades = 0
         self.terminal = False
         self.portfolio_return_memory = [0]
         self.actions_memory = [[1 / self.stock_dim] * self.stock_dim]
-        self.date_memory = [self.data.date.unique()[0]]
-        return self.state
+        self.date_memory = [day]
+        return self.state, self.info
+
+    def get_state_and_info_from_day(self, day):
+        self.data = self.df[self.df["time"] == day]
+        covs = self.data["cov_list"].values[0]
+        state = np.append(
+            np.array(covs),
+            [self.data[tech].values.tolist() for tech in self.tech_indicator_list],
+            axis=0,
+        )
+        info = {
+            "data": self.df[self.df.time <= day],
+        }
+        return state, info
 
     def render(self, mode="human"):
         return self.state

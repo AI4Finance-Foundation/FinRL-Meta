@@ -275,9 +275,8 @@ class _Base:
         ]:
             turbulence_index = self.calculate_turbulence()
             self.dataframe = self.dataframe.merge(turbulence_index, on="time")
-            self.dataframe.sort_values(["time", "tic"], inplace=True).reset_index(
-                drop=True, inplace=True
-            )
+            self.dataframe.sort_values(["time", "tic"], inplace=True)
+            self.dataframe.reset_index(drop=True, inplace=True)
 
     def calculate_turbulence(self, time_period: int = 252) -> pd.DataFrame:
         """calculate turbulence index based on dow 30"""
@@ -391,11 +390,13 @@ class _Base:
             pass
         df = self.dataframe.copy()
         self.dataframe = [ticker]
-        self.download_data(self.start, self.end, self.time_interval)
+        # self.download_data(self.start_date, self.end_date, self.time_interval)
+        self.download_data([ticker], save_path="./data/vix.csv")
         self.clean_data()
-        # vix = cleaned_vix[["time", "close"]]
-        # vix = vix.rename(columns={"close": "VIXY"})
-        cleaned_vix = self.dataframe.rename(columns={ticker: "vix"})
+        cleaned_vix = self.dataframe
+        # .rename(columns={ticker: "vix"})
+        vix = cleaned_vix[["time", "close"]]
+        cleaned_vix = vix.rename(columns={"close": "vix"})
 
         df = df.merge(cleaned_vix, on="time")
         df = df.sort_values(["time", "tic"]).reset_index(drop=True)
@@ -614,7 +615,10 @@ def calc_time_zone(
     elif ticker_list == LQ45_TICKER:
         time_zone = TIME_ZONE_JAKARTA
     else:
-        raise ValueError("Time zone is wrong.")
+        # hack needed to have this working with vix indicator
+        # fix: unable to set time_zone_selfdefined from top-level dataprocessor class
+        time_zone = TIME_ZONE_USEASTERN
+        # raise ValueError("Time zone is wrong.")
     return time_zone
 
 
