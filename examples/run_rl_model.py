@@ -1,11 +1,6 @@
 import os
 
 import pandas as pd
-from agents.stablebaselines3_models import DRLAgent
-from meta import config, config_tickers
-from meta.data_processor import DataProcessor
-from meta.env_portfolio_allocation.env_portfolio_yahoofinance import \
-    StockPortfolioEnv
 from stable_baselines3 import A2C
 
 from agents.stablebaselines3_models import DRLAgent
@@ -14,6 +9,7 @@ from meta import config_tickers
 from meta.data_processor import DataProcessor
 from meta.env_portfolio_allocation.env_portfolio_yahoofinance import StockPortfolioEnv
 
+# from meta.env_portfolio_allocation.env_portfolio_yahoofinance import StockPortfolioEnv
 
 
 def data_split(df, start, end, target_date_col="time"):
@@ -110,9 +106,7 @@ def main(
         A2C_PARAMS = {"n_steps": 10, "ent_coef": 0.005, "learning_rate": 0.0004}
         model_a2c = agent.get_model(model_name="a2c", model_kwargs=A2C_PARAMS)
         trained_a2c = agent.train_model(
-            model=model_a2c,
-            tb_log_name='a2c',
-            total_timesteps=40000
+            model=model_a2c, tb_log_name="a2c", total_timesteps=40000
         )
         # save trained_a2c model
         trained_a2c.save("saved_models/a2c_model.pt")
@@ -129,6 +123,6 @@ def main(
 
 if __name__ == "__main__":
     """
-    python FinRL-Meta/examples/run_rl_portfolio_optimization.py
+    python -m scripts.run_rl_model
     """
     main()
