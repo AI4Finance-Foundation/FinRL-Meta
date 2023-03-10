@@ -66,41 +66,38 @@ class PortfolioAllocationEnv(gym.Env):
     def __init__(
         self,
         df,
-        stock_dim,
-        hmax,
         initial_amount,
         transaction_cost_pct,
-        reward_scaling,
-        state_space,
-        action_space,
-        tech_indicator_list,
-        turbulence_threshold=None,
+        action_space=None,
+        reward_scaling=1,
         features=["close", "high", "low"],
         time_column="date",
         tic_column="tic",
-        time_window=0,
-        time_index=0,
+        time_window=1,
         cwd="./",
     ):
         # super(StockEnv, self).__init__()
         # money = 10 , scope = 1
-        self.time_index = time_index
         self.time_window = time_window
+        self.time_index = time_window - 1
         self.time_column = time_column
         self.tic_column = tic_column
         self.df = df
-        self.stock_dim = stock_dim
-        self.hmax = hmax
         self.initial_amount = initial_amount
         self.transaction_cost_pct = transaction_cost_pct
         self.reward_scaling = reward_scaling
-        self.features=features
-        self.state_space = state_space
+        self.features = features
         self.action_space = action_space
-        self.tech_indicator_list = tech_indicator_list
         self.cwd = Path(cwd)
+
+        # results file
         self.results_file = self.cwd / "results" / "rl"
         self.results_file.mkdir(parents=True, exist_ok=True)
+
+        # dims and spaces
+        self.tic_list = self.df[self.tic_column].unique()
+        self.stock_dim = len(self.tic_list)
+        self.action_space = 1 + self.stock_dim if action_space is None else action_space
 
         self.df[time_column] = pd.to_datetime(self.df[time_column])
         self.sorted_times = sorted(set(self.df[time_column]))
@@ -113,8 +110,9 @@ class PortfolioAllocationEnv(gym.Env):
             low=-np.inf,
             high=np.inf,
             shape=(
-                self.state_space + len(self.tech_indicator_list),
-                self.state_space,
+                len(self.features),
+                self.time_window,
+                self.stock_dim
             ),
         )
 
@@ -127,10 +125,7 @@ class PortfolioAllocationEnv(gym.Env):
         #     [self.data[tech].values.tolist() for tech in self.tech_indicator_list],
         #     axis=0,
         # )
-        # THE LINE BELOW SHOULDN'T RUN
-        # self.state, self.info = self.get_state_and_info_from_day(day)
         self.terminal = False
-        self.turbulence_threshold = turbulence_threshold
         # initalize state: inital portfolio return + individual stock return + individual weights
         self.portfolio_value = self.initial_amount
 
@@ -217,13 +212,13 @@ class PortfolioAllocationEnv(gym.Env):
             # the reward is the new portfolio value or end portfolo value
             self.reward = new_portfolio_value
             # print("Step reward: ", self.reward)
-            # self.reward = self.reward*self.reward_scaling
+            self.reward = self.reward * self.reward_scaling
 
         return self.state, self.reward, self.terminal, False, self.info
 
     def reset(self):
         # time_index must start a little bit in the future to implement lookback
-        self.time_index = self.time_window
+        self.time_index = self.time_window - 1
         self.asset_memory = [self.initial_amount]
         self.state, self.info = self.get_state_and_info_from_time_index(self.time_index)
         # self.data = self.df[self.df["time"] == day]
@@ -243,28 +238,28 @@ class PortfolioAllocationEnv(gym.Env):
         return self.state, self.info
 
     def get_state_and_info_from_time_index(self, time_index):
-        end_time = self.sorted_times[self.time_index]
-        start_time = self.sorted_times[self.time_index - self.time_window]
+        end_time = self.sorted_times[time_index]
+        start_time = self.sorted_times[time_index - (self.time_window - 1)]
         self.data = self.df[
             (self.df[self.time_column] >= start_time) &
             (self.df[self.time_column] <= end_time)
         ]
+
         # covs = self.data["cov_list"].values[0]
-        tic_list = self.data[self.tic_column].unique()
         state = None
-        for tic in tic_list:
+        for tic in self.tic_list:
             tic_data = self.data[self.data[self.tic_column] == tic]
-            tic_data = tic_data[self.features].to_numpy()
+            tic_data = tic_data[self.features].to_numpy().T
             tic_data = tic_data[..., np.newaxis]
             state = tic_data if state is None else np.append(state, tic_data, axis=2)
         info = {
-            "tics": tic_list,
+            "tics": self.tic_list,
             "start_time": start_time,
             "end_time": end_time,
             "data": self.df[
                 (self.df[self.time_column] >= start_time) &
                 (self.df[self.time_column] <= end_time)
-            ]
+            ][[self.time_column, self.tic_column] + self.features]
         }
         return state, info
 
