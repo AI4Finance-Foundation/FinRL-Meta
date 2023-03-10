@@ -12,7 +12,7 @@ from stable_baselines3.common.vec_env import DummyVecEnv
 from pathlib import Path
 
 
-class StockPortfolioEnv(gym.Env):
+class PortfolioAllocationEnv(gym.Env):
     """A single stock trading environment for OpenAI gym
 
     Attributes
@@ -75,20 +75,26 @@ class StockPortfolioEnv(gym.Env):
         action_space,
         tech_indicator_list,
         turbulence_threshold=None,
-        lookback=252,
+        features=["close", "high", "low"],
+        time_column="date",
+        tic_column="tic",
+        time_window=0,
         time_index=0,
         cwd="./",
     ):
         # super(StockEnv, self).__init__()
         # money = 10 , scope = 1
         self.time_index = time_index
-        self.lookback = lookback
+        self.time_window = time_window
+        self.time_column = time_column
+        self.tic_column = tic_column
         self.df = df
         self.stock_dim = stock_dim
         self.hmax = hmax
         self.initial_amount = initial_amount
         self.transaction_cost_pct = transaction_cost_pct
         self.reward_scaling = reward_scaling
+        self.features=features
         self.state_space = state_space
         self.action_space = action_space
         self.tech_indicator_list = tech_indicator_list
@@ -96,8 +102,8 @@ class StockPortfolioEnv(gym.Env):
         self.results_file = self.cwd / "results" / "rl"
         self.results_file.mkdir(parents=True, exist_ok=True)
 
-        self.df.time = pd.to_datetime(self.df.time)
-        self.sorted_times = sorted(set(self.df.time))
+        self.df[time_column] = pd.to_datetime(self.df[time_column])
+        self.sorted_times = sorted(set(self.df[time_column]))
 
         # action_space normalization and shape is self.stock_dim
         self.action_space = spaces.Box(low=0, high=1, shape=(self.action_space,))
@@ -121,7 +127,8 @@ class StockPortfolioEnv(gym.Env):
         #     [self.data[tech].values.tolist() for tech in self.tech_indicator_list],
         #     axis=0,
         # )
-        self.state, self.info = self.get_state_and_info_from_day(day)
+        # THE LINE BELOW SHOULDN'T RUN
+        # self.state, self.info = self.get_state_and_info_from_day(day)
         self.terminal = False
         self.turbulence_threshold = turbulence_threshold
         # initalize state: inital portfolio return + individual stock return + individual weights
@@ -184,8 +191,7 @@ class StockPortfolioEnv(gym.Env):
 
             # load next state
             self.time_index += 1
-            day = self.sorted_times[self.time_index]
-            self.state, self.info = self.get_state_and_info_from_day(day)
+            self.state, self.info = self.get_state_and_info_from_time_index(self.time_index)
             # self.data = self.df[self.df["time"] == day]
             # self.covs = self.data["cov_list"].values[0]
             # self.state = np.append(
@@ -205,7 +211,7 @@ class StockPortfolioEnv(gym.Env):
 
             # save into memory
             self.portfolio_return_memory.append(portfolio_return)
-            self.date_memory.append(day)
+            self.date_memory.append(self.info["end_time"])
             self.asset_memory.append(new_portfolio_value)
 
             # the reward is the new portfolio value or end portfolo value
@@ -216,10 +222,10 @@ class StockPortfolioEnv(gym.Env):
         return self.state, self.reward, self.terminal, False, self.info
 
     def reset(self):
-        self.time_index = 0
+        # time_index must start a little bit in the future to implement lookback
+        self.time_index = self.time_window
         self.asset_memory = [self.initial_amount]
-        day = self.sorted_times[self.time_index]
-        self.state, self.info = self.get_state_and_info_from_day(day)
+        self.state, self.info = self.get_state_and_info_from_time_index(self.time_index)
         # self.data = self.df[self.df["time"] == day]
         # self.covs = self.data["cov_list"].values[0]
         # self.state = np.append(
@@ -233,19 +239,32 @@ class StockPortfolioEnv(gym.Env):
         self.terminal = False
         self.portfolio_return_memory = [0]
         self.actions_memory = [[1 / self.stock_dim] * self.stock_dim]
-        self.date_memory = [day]
+        self.date_memory = [self.info["end_time"]]
         return self.state, self.info
 
-    def get_state_and_info_from_day(self, day):
-        self.data = self.df[self.df["time"] == day]
-        covs = self.data["cov_list"].values[0]
-        state = np.append(
-            np.array(covs),
-            [self.data[tech].values.tolist() for tech in self.tech_indicator_list],
-            axis=0,
-        )
+    def get_state_and_info_from_time_index(self, time_index):
+        end_time = self.sorted_times[self.time_index]
+        start_time = self.sorted_times[self.time_index - self.time_window]
+        self.data = self.df[
+            (self.df[self.time_column] >= start_time) &
+            (self.df[self.time_column] <= end_time)
+        ]
+        # covs = self.data["cov_list"].values[0]
+        tic_list = self.data[self.tic_column].unique()
+        state = None
+        for tic in tic_list:
+            tic_data = self.data[self.data[self.tic_column] == tic]
+            tic_data = tic_data[self.features].to_numpy()
+            tic_data = tic_data[..., np.newaxis]
+            state = tic_data if state is None else np.append(state, tic_data, axis=2)
         info = {
-            "data": self.df[self.df.time <= day],
+            "tics": tic_list,
+            "start_time": start_time,
+            "end_time": end_time,
+            "data": self.df[
+                (self.df[self.time_column] >= start_time) &
+                (self.df[self.time_column] <= end_time)
+            ]
         }
         return state, info
 
