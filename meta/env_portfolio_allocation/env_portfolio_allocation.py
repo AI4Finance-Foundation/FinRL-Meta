@@ -286,6 +286,11 @@ class PortfolioAllocationEnv(gym.Env):
             {"date": date_list, "daily_return": portfolio_return}
         )
         return df_account_value
+    
+    def enumerate_portfolio(self):
+        print("Index: 0. Tic: Cash")
+        for index, tic in enumerate(self.tic_list):
+            print("Index: {}. Tic: {}".format(index + 1, tic))
 
     def save_action_memory(self):
         # date and close price length must match actions length
