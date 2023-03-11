@@ -87,7 +87,6 @@ class PortfolioAllocationEnv(gym.Env):
         self.transaction_cost_pct = transaction_cost_pct
         self.reward_scaling = reward_scaling
         self.features = features
-        self.action_space = action_space
         self.cwd = Path(cwd)
 
         # results file
@@ -182,11 +181,17 @@ class PortfolioAllocationEnv(gym.Env):
                 weights = self.softmax_normalization(actions)
             # print("Normalized actions: ", weights)
             self.actions_memory.append(weights)
-            last_day_memory = self.data
+            last_time_memory = self.data[
+                self.data[self.time_column] == self.sorted_times[self.time_index]
+            ]
 
             # load next state
             self.time_index += 1
             self.state, self.info = self.get_state_and_info_from_time_index(self.time_index)
+
+            curr_time_data = self.data[
+                self.data[self.time_column] == self.sorted_times[self.time_index]
+            ]
             # self.data = self.df[self.df["time"] == day]
             # self.covs = self.data["cov_list"].values[0]
             # self.state = np.append(
@@ -198,7 +203,7 @@ class PortfolioAllocationEnv(gym.Env):
             # calcualte portfolio return
             # individual stocks' return * weight
             portfolio_return = sum(
-                ((self.data.close.values / last_day_memory.close.values) - 1) * weights
+                (np.insert(curr_time_data["close"].values, 0, 1) / np.insert(last_time_memory["close"].values, 0, 1) - 1) * weights
             )
             # update portfolio value
             new_portfolio_value = self.portfolio_value * (1 + portfolio_return)
