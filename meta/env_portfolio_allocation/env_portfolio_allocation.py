@@ -70,7 +70,9 @@ class PortfolioAllocationEnv(gym.Env):
         transaction_cost_pct,
         action_space=None,
         reward_scaling=1,
+        remainder_factor=1,
         features=["close", "high", "low"],
+        valuation_feature="close",
         time_column="date",
         tic_column="tic",
         time_window=1,
@@ -86,7 +88,9 @@ class PortfolioAllocationEnv(gym.Env):
         self.initial_amount = initial_amount
         self.transaction_cost_pct = transaction_cost_pct
         self.reward_scaling = reward_scaling
+        self.remainder_factor = remainder_factor
         self.features = features
+        self.valuation_feature = valuation_feature
         self.cwd = Path(cwd)
 
         # results file
@@ -98,13 +102,14 @@ class PortfolioAllocationEnv(gym.Env):
         self.stock_dim = len(self.tic_list)
         self.action_space = 1 + self.stock_dim if action_space is None else action_space
 
+        # sort datetimes
         self.df[time_column] = pd.to_datetime(self.df[time_column])
         self.sorted_times = sorted(set(self.df[time_column]))
 
         # action_space normalization and shape is self.stock_dim
         self.action_space = spaces.Box(low=0, high=1, shape=(self.action_space,))
-        # Shape = (34, 30)
-        # covariance matrix + technical indicators
+
+        # define observation state
         self.observation_space = spaces.Box(
             low=-np.inf,
             high=np.inf,
@@ -116,14 +121,8 @@ class PortfolioAllocationEnv(gym.Env):
         )
 
         # load data from a pandas dataframe
-        day = self.sorted_times[self.time_index]
-        # self.data = self.df[self.df["time"] == day]
-        # self.covs = self.data["cov_list"].values[0]
-        # self.state = np.append(
-        #     np.array(self.covs),
-        #     [self.data[tech].values.tolist() for tech in self.tech_indicator_list],
-        #     axis=0,
-        # )
+        date_time = self.sorted_times[self.time_index]
+
         self.terminal = False
         # initalize state: inital portfolio return + individual stock return + individual weights
         self.portfolio_value = self.initial_amount
@@ -133,7 +132,7 @@ class PortfolioAllocationEnv(gym.Env):
         # memorize portfolio return each step
         self.portfolio_return_memory = [0]
         self.actions_memory = [[1 / self.stock_dim] * self.stock_dim]
-        self.date_memory = [day]
+        self.date_memory = [date_time]
 
     def step(self, actions):
         self.terminal = self.time_index >= len(self.sorted_times) - 1
@@ -168,13 +167,6 @@ class PortfolioAllocationEnv(gym.Env):
             return self.state, self.reward, self.terminal, False, self.info
 
         else:
-            # print("Model actions: ",actions)
-            # actions are the portfolio weight
-            # normalize to sum of 1
-            # if (np.array(actions) - np.array(actions).min()).sum() != 0:
-            #  norm_actions = (np.array(actions) - np.array(actions).min()) / (np.array(actions) - np.array(actions).min()).sum()
-            # else:
-            #  norm_actions = actions
             if np.sum(actions) == 1 and np.min(actions) >= 0:
                 weights = actions
             else:
@@ -192,8 +184,11 @@ class PortfolioAllocationEnv(gym.Env):
             ]
 
             # Calculate new portfolio vector
-            variation_rate = np.insert(curr_time_data["close"].values, 0, 1)
+            variation_rate = np.insert(curr_time_data[self.valuation_feature].values, 0, 1)
             new_portfolio_value = np.sum(self.portfolio_value * weights * variation_rate)
+
+            # apply transaction remainder factor
+            new_portfolio_value = self.remainder_factor * new_portfolio_value
 
             # define portfolio return
             portfolio_return = np.log(new_portfolio_value / self.portfolio_value)
@@ -218,16 +213,7 @@ class PortfolioAllocationEnv(gym.Env):
         self.time_index = self.time_window - 1
         self.asset_memory = [self.initial_amount]
         self.state, self.info = self.get_state_and_info_from_time_index(self.time_index)
-        # self.data = self.df[self.df["time"] == day]
-        # self.covs = self.data["cov_list"].values[0]
-        # self.state = np.append(
-        #     np.array(self.covs),
-        #     [self.data[tech].values.tolist() for tech in self.tech_indicator_list],
-        #     axis=0,
-        # )
         self.portfolio_value = self.initial_amount
-        # self.cost = 0
-        # self.trades = 0
         self.terminal = False
         self.portfolio_return_memory = [0]
         self.actions_memory = [[1 / self.stock_dim] * self.stock_dim]
@@ -242,7 +228,6 @@ class PortfolioAllocationEnv(gym.Env):
             (self.df[self.time_column] <= end_time)
         ]
 
-        # covs = self.data["cov_list"].values[0]
         state = None
         for tic in self.tic_list:
             tic_data = self.data[self.data[self.tic_column] == tic]
@@ -272,8 +257,7 @@ class PortfolioAllocationEnv(gym.Env):
     def save_asset_memory(self):
         date_list = self.date_memory
         portfolio_return = self.portfolio_return_memory
-        # print(len(date_list))
-        # print(len(asset_list))
+
         df_account_value = pd.DataFrame(
             {"date": date_list, "daily_return": portfolio_return}
         )
@@ -294,7 +278,7 @@ class PortfolioAllocationEnv(gym.Env):
         df_actions = pd.DataFrame(action_list)
         df_actions.columns = self.data.tic.values
         df_actions.index = df_date.date
-        # df_actions = pd.DataFrame({'date':date_list,'actions':action_list})
+
         return df_actions
 
     def _seed(self, seed=None):
