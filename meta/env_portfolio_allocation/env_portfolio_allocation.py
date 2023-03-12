@@ -68,6 +68,8 @@ class PortfolioAllocationEnv(gym.Env):
         df,
         initial_amount,
         transaction_cost_pct,
+        order_df=True,
+        normalize_df=True,
         action_space=None,
         reward_scaling=1,
         remainder_factor=1,
@@ -96,6 +98,9 @@ class PortfolioAllocationEnv(gym.Env):
         # results file
         self.results_file = self.cwd / "results" / "rl"
         self.results_file.mkdir(parents=True, exist_ok=True)
+
+        # preprocess data
+        self.preprocess_data(order_df, normalize_df)
 
         # dims and spaces
         self.tic_list = self.df[self.tic_column].unique()
@@ -262,11 +267,6 @@ class PortfolioAllocationEnv(gym.Env):
             {"date": date_list, "daily_return": portfolio_return}
         )
         return df_account_value
-    
-    def enumerate_portfolio(self):
-        print("Index: 0. Tic: Cash")
-        for index, tic in enumerate(self.tic_list):
-            print("Index: {}. Tic: {}".format(index + 1, tic))
 
     def save_action_memory(self):
         # date and close price length must match actions length
@@ -280,6 +280,27 @@ class PortfolioAllocationEnv(gym.Env):
         df_actions.index = df_date.date
 
         return df_actions
+    
+    def enumerate_portfolio(self):
+        print("Index: 0. Tic: Cash")
+        for index, tic in enumerate(self.tic_list):
+            print("Index: {}. Tic: {}".format(index + 1, tic))
+
+    def preprocess_data(self, order, normalize):
+        if order:
+            self.df = self.df.sort_values(by=[self.tic_column, self.time_column])
+        if normalize:
+            self.normalize_dataframe()
+
+    def normalize_dataframe(self):
+        self.df = self.df.copy()
+        prev_columns = []
+        for column in self.features:
+            prev_column = "prev_{}".format(column)
+            prev_columns.append(prev_column)
+            self.df[prev_column] = self.df.groupby(self.tic_column)[column].shift()
+            self.df[column] = self.df[column] / self.df[prev_column]
+        self.df = self.df.drop(columns=prev_columns).fillna(1).reset_index(drop=True)
 
     def _seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
