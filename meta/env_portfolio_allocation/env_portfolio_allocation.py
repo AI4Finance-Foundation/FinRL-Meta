@@ -179,11 +179,9 @@ class PortfolioAllocationEnv(gym.Env):
                 weights = actions
             else:
                 weights = self.softmax_normalization(actions)
+                
             # print("Normalized actions: ", weights)
             self.actions_memory.append(weights)
-            last_time_memory = self.data[
-                self.data[self.time_column] == self.sorted_times[self.time_index]
-            ]
 
             # load next state
             self.time_index += 1
@@ -192,21 +190,15 @@ class PortfolioAllocationEnv(gym.Env):
             curr_time_data = self.data[
                 self.data[self.time_column] == self.sorted_times[self.time_index]
             ]
-            # self.data = self.df[self.df["time"] == day]
-            # self.covs = self.data["cov_list"].values[0]
-            # self.state = np.append(
-            #     np.array(self.covs),
-            #     [self.data[tech].values.tolist() for tech in self.tech_indicator_list],
-            #     axis=0,
-            # )
-            # print(self.state)
-            # calcualte portfolio return
-            # individual stocks' return * weight
-            portfolio_return = sum(
-                (np.insert(curr_time_data["close"].values, 0, 1) / np.insert(last_time_memory["close"].values, 0, 1) - 1) * weights
-            )
+
+            # Calculate new portfolio vector
+            variation_rate = np.insert(curr_time_data["close"].values, 0, 1)
+            new_portfolio_value = np.sum(self.portfolio_value * weights * variation_rate)
+
+            # define portfolio return
+            portfolio_return = np.log(new_portfolio_value / self.portfolio_value)
+
             # update portfolio value
-            new_portfolio_value = self.portfolio_value * (1 + portfolio_return)
             self.portfolio_value = new_portfolio_value
 
             # save into memory
@@ -215,7 +207,7 @@ class PortfolioAllocationEnv(gym.Env):
             self.asset_memory.append(new_portfolio_value)
 
             # the reward is the new portfolio value or end portfolo value
-            self.reward = new_portfolio_value
+            self.reward = portfolio_return
             # print("Step reward: ", self.reward)
             self.reward = self.reward * self.reward_scaling
 
