@@ -79,6 +79,7 @@ class PortfolioAllocationEnv(gym.Env):
         tic_column="tic",
         time_window=1,
         cwd="./",
+        new_gym_api=False
     ):
         # super(StockEnv, self).__init__()
         # money = 10 , scope = 1
@@ -94,6 +95,7 @@ class PortfolioAllocationEnv(gym.Env):
         self.features = features
         self.valuation_feature = valuation_feature
         self.cwd = Path(cwd)
+        self.new_gym_api = new_gym_api
 
         # results file
         self.results_file = self.cwd / "results" / "rl"
@@ -169,7 +171,10 @@ class PortfolioAllocationEnv(gym.Env):
                 )
                 print("Sharpe: ", sharpe)
             print("=================================")
-            return self.state, self.reward, self.terminal, False, self.info
+
+            if self.new_gym_api:
+                return self.state, self.reward, self.terminal, False, self.info
+            return self.state, self.reward, self.terminal, self.info
 
         else:
             if np.sum(actions) == 1 and np.min(actions) >= 0:
@@ -211,7 +216,9 @@ class PortfolioAllocationEnv(gym.Env):
             # print("Step reward: ", self.reward)
             self.reward = self.reward * self.reward_scaling
 
-        return self.state, self.reward, self.terminal, False, self.info
+        if self.new_gym_api:
+            return self.state, self.reward, self.terminal, False, self.info
+        return self.state, self.reward, self.terminal, self.info
 
     def reset(self):
         # time_index must start a little bit in the future to implement lookback
@@ -223,7 +230,10 @@ class PortfolioAllocationEnv(gym.Env):
         self.portfolio_return_memory = [0]
         self.actions_memory = [[1 / self.stock_dim] * self.stock_dim]
         self.date_memory = [self.info["end_time"]]
-        return self.state, self.info
+
+        if self.new_gym_api:
+            return self.state, self.info
+        return self.state
 
     def get_state_and_info_from_time_index(self, time_index):
         end_time = self.sorted_times[time_index]
