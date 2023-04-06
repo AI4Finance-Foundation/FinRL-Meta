@@ -69,10 +69,10 @@ class PortfolioAllocationEnv(gym.Env):
         initial_amount,
         transaction_cost_pct,
         order_df=True,
-        normalize_df=True,
-        action_space=None,
+        normalize_df=None,
         reward_scaling=1,
-        remainder_factor=1,
+        comission_fee_model="wvm",
+        comission_fee_pct=0,
         features=["close", "high", "low"],
         valuation_feature="close",
         time_column="date",
@@ -91,7 +91,8 @@ class PortfolioAllocationEnv(gym.Env):
         self.initial_amount = initial_amount
         self.transaction_cost_pct = transaction_cost_pct
         self.reward_scaling = reward_scaling
-        self.remainder_factor = remainder_factor
+        self.comission_fee_pct = comission_fee_pct
+        self.comission_fee_model = comission_fee_model
         self.features = features
         self.valuation_feature = valuation_feature
         self.cwd = Path(cwd)
@@ -101,19 +102,22 @@ class PortfolioAllocationEnv(gym.Env):
         self.results_file = self.cwd / "results" / "rl"
         self.results_file.mkdir(parents=True, exist_ok=True)
 
+        # price variation dataframe
+        self.df_price_variation = self._temporal_variation_df()
+
         # preprocess data
         self.preprocess_data(order_df, normalize_df)
 
         # dims and spaces
         self.tic_list = self.df[self.tic_column].unique()
         self.stock_dim = len(self.tic_list)
-        self.action_space = 1 + self.stock_dim if action_space is None else action_space
+        self.action_space = 1 + self.stock_dim
 
         # sort datetimes
         self.df[time_column] = pd.to_datetime(self.df[time_column])
         self.sorted_times = sorted(set(self.df[time_column]))
 
-        # action_space normalization and shape is self.stock_dim
+        # define action space
         self.action_space = spaces.Box(low=0, high=1, shape=(self.action_space,))
 
         # define observation state
@@ -180,9 +184,10 @@ class PortfolioAllocationEnv(gym.Env):
             if np.sum(actions) == 1 and np.min(actions) >= 0:
                 weights = actions
             else:
-                weights = self.softmax_normalization(actions)
+                weights = self._softmax_normalization(actions)
                 
             # print("Normalized actions: ", weights)
+            last_weights = self.actions_memory[-1]
             self.actions_memory.append(weights)
 
             # load next state
@@ -195,10 +200,18 @@ class PortfolioAllocationEnv(gym.Env):
 
             # Calculate new portfolio vector
             variation_rate = np.insert(curr_time_data[self.valuation_feature].values, 0, 1)
-            new_portfolio_value = np.sum(self.portfolio_value * weights * variation_rate)
+            old_portfolio_prices = self.portfolio_value * weights
+            new_portfolio_prices = old_portfolio_prices * variation_rate
 
-            # apply transaction remainder factor
-            new_portfolio_value = self.remainder_factor * new_portfolio_value
+            # apply transaction cost to portfolio vector
+            delta_prices = new_portfolio_prices - old_portfolio_prices # erro:
+            fees = np.sum(np.abs(delta_prices) * self.transaction_cost_pct)
+            if fees > new_portfolio_prices:
+                new_portfolio_prices[0] -= fees # remove fees from cash
+            else: # in this case, action must not be performed
+                new_portfolio_prices = self.portfolio_value * last_weights * variation_rate
+
+            new_portfolio_value = np.sum(new_portfolio_prices)
 
             # define portfolio return
             portfolio_return = np.log(new_portfolio_value / self.portfolio_value)
@@ -263,7 +276,7 @@ class PortfolioAllocationEnv(gym.Env):
     def render(self, mode="human"):
         return self.state
 
-    def softmax_normalization(self, actions):
+    def _softmax_normalization(self, actions):
         numerator = np.exp(actions)
         denominator = np.sum(np.exp(actions))
         softmax_output = numerator / denominator
@@ -300,17 +313,38 @@ class PortfolioAllocationEnv(gym.Env):
         if order:
             self.df = self.df.sort_values(by=[self.tic_column, self.time_column])
         if normalize:
-            self.normalize_dataframe()
+            self._normalize_dataframe(normalize)
 
-    def normalize_dataframe(self):
-        self.df = self.df.copy()
+    def _normalize_dataframe(self, normalize):
+        if type(normalize) == str: 
+            if normalize == "by_fist_time_window_value":
+                print("Normalizing {} by first time window value...".format(self.features))
+                self.df = self._temporal_variation_df(self.time_window - 1)
+            elif normalize == "by_previous_time":
+                print("Normalizing {} by previous time...".format(self.features))
+                self.df = self._temporal_variation_df()
+            elif normalize.startswith("by_"):
+                normalizer_column = normalize[3:]
+                print("Normalizing {} by {}".format(self.features, normalizer_column))
+                for column in self.features:
+                    self.df[column] = self.df[column] / self.df[normalizer_column]
+        elif callable(normalize):
+            print("Applying custom normalization function...")
+            self.df = normalize(self.df)
+        else:
+            print("No normalization was performed.")
+
+
+    def _temporal_variation_df(self, periods=1):
+        df_temporal_variation = self.df.copy()
         prev_columns = []
         for column in self.features:
             prev_column = "prev_{}".format(column)
             prev_columns.append(prev_column)
-            self.df[prev_column] = self.df.groupby(self.tic_column)[column].shift()
-            self.df[column] = self.df[column] / self.df[prev_column]
-        self.df = self.df.drop(columns=prev_columns).fillna(1).reset_index(drop=True)
+            df_temporal_variation[prev_column] = df_temporal_variation.groupby(self.tic_column)[column].shift(periods=periods)
+            df_temporal_variation[column] = df_temporal_variation[column] / df_temporal_variation[prev_column]
+        df_temporal_variation = df_temporal_variation.drop(columns=prev_columns).fillna(1).reset_index(drop=True)
+        return df_temporal_variation
 
     def _seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
