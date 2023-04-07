@@ -67,15 +67,15 @@ class PortfolioAllocationEnv(gym.Env):
         self,
         df,
         initial_amount,
-        transaction_cost_pct,
         order_df=True,
-        normalize_df=None,
+        normalize_df="by_previous_time",
         reward_scaling=1,
         comission_fee_model="wvm",
         comission_fee_pct=0,
         features=["close", "high", "low"],
         valuation_feature="close",
         time_column="date",
+        time_format="%Y-%m-%d",
         tic_column="tic",
         time_window=1,
         cwd="./",
@@ -86,10 +86,10 @@ class PortfolioAllocationEnv(gym.Env):
         self.time_window = time_window
         self.time_index = time_window - 1
         self.time_column = time_column
+        self.time_format = time_format
         self.tic_column = tic_column
         self.df = df
         self.initial_amount = initial_amount
-        self.transaction_cost_pct = transaction_cost_pct
         self.reward_scaling = reward_scaling
         self.comission_fee_pct = comission_fee_pct
         self.comission_fee_model = comission_fee_model
@@ -102,8 +102,8 @@ class PortfolioAllocationEnv(gym.Env):
         self.results_file = self.cwd / "results" / "rl"
         self.results_file.mkdir(parents=True, exist_ok=True)
 
-        # price variation dataframe
-        self.df_price_variation = self._temporal_variation_df()
+        # price variation
+        self.df_price_variation = None
 
         # preprocess data
         self.preprocess_data(order_df, normalize_df)
@@ -114,7 +114,6 @@ class PortfolioAllocationEnv(gym.Env):
         self.action_space = 1 + self.stock_dim
 
         # sort datetimes
-        self.df[time_column] = pd.to_datetime(self.df[time_column])
         self.sorted_times = sorted(set(self.df[time_column]))
 
         # define action space
@@ -139,10 +138,17 @@ class PortfolioAllocationEnv(gym.Env):
         self.portfolio_value = self.initial_amount
 
         # memorize portfolio value each step
-        self.asset_memory = [self.initial_amount]
+        self.asset_memory = {
+            "initial" : [self.initial_amount],
+            "final" : [self.initial_amount]
+        }
         # memorize portfolio return each step
         self.portfolio_return_memory = [0]
-        self.actions_memory = [[1 / self.stock_dim] * self.stock_dim]
+        # memorize actions performed
+        self.actions_memory = [[1 / (1 + self.stock_dim)] * (1 + self.stock_dim)]
+        # memorize portfolio weights at the ending of time step
+        self.final_weights = [[1 / (1 + self.stock_dim)] * (1 + self.stock_dim)]
+        # memorize datetimes
         self.date_memory = [date_time]
 
     def step(self, actions):
@@ -153,7 +159,7 @@ class PortfolioAllocationEnv(gym.Env):
                 {"date": self.date_memory, "daily_return": self.portfolio_return_memory}
             )
             df.set_index("date", inplace=True)
-            plt.plot((1 + df.daily_return).cumprod() * self.initial_amount, "r")
+            plt.plot(np.exp((df.daily_return).cumsum()) * self.initial_amount, "r")
             plt.savefig(self.results_file / "cumulative_reward.png")
             plt.close()
 
@@ -162,18 +168,19 @@ class PortfolioAllocationEnv(gym.Env):
             plt.close()
 
             print("=================================")
-            print(f"begin_total_asset:{self.asset_memory[0]}")
-            print(f"end_total_asset:{self.portfolio_value}")
+            print("Initial portfolio value:{}".format(self.asset_memory['final'][0]))
+            print("Final portfolio value: {}".format(self.portfolio_value))
+            print("Final accumulative portfolio value: {}".format(self.portfolio_value / self.asset_memory['final'][0]))
 
             df_daily_return = pd.DataFrame(self.portfolio_return_memory)
             df_daily_return.columns = ["daily_return"]
+            df_daily_return["daily_return"] = np.exp(df_daily_return["daily_return"])
             if df_daily_return["daily_return"].std() != 0:
                 sharpe = (
-                    (252**0.5)
-                    * df_daily_return["daily_return"].mean()
+                    df_daily_return["daily_return"].mean()
                     / df_daily_return["daily_return"].std()
                 )
-                print("Sharpe: ", sharpe)
+                print("Sharpe ratio: ", sharpe)
             print("=================================")
 
             if self.new_gym_api:
@@ -181,52 +188,62 @@ class PortfolioAllocationEnv(gym.Env):
             return self.state, self.reward, self.terminal, self.info
 
         else:
+            # if necessary, normalize weights
             if np.sum(actions) == 1 and np.min(actions) >= 0:
                 weights = actions
             else:
                 weights = self._softmax_normalization(actions)
                 
-            # print("Normalized actions: ", weights)
-            last_weights = self.actions_memory[-1]
+            # save initial portfolio weights for this time step
             self.actions_memory.append(weights)
+
+            # get last step final weights and portfolio_value
+            last_weights = self.final_weights[-1]
 
             # load next state
             self.time_index += 1
             self.state, self.info = self.get_state_and_info_from_time_index(self.time_index)
 
-            curr_time_data = self.data[
-                self.data[self.time_column] == self.sorted_times[self.time_index]
-            ]
+            # if using weights vector modifier, we need to modify weights vector
+            if self.comission_fee_model == "wvm":
+                delta_weights = weights - last_weights
+                delta_assets = delta_weights[1:] # disconsider 
+                # calculate fees considering weights modification
+                fees = np.sum(np.abs(delta_assets * self.portfolio_value))
+                if fees > weights[0] * self.portfolio_value:
+                    weights = last_weights
+                    # maybe add negative reward
+                else:
+                    portfolio = weights * self.portfolio_value
+                    portfolio[0] -= fees
+                    self.portfolio_value = np.sum(portfolio) # new portfolio value
+                    weights = portfolio / self.portfolio_value # new weights
 
-            # Calculate new portfolio vector
-            variation_rate = np.insert(curr_time_data[self.valuation_feature].values, 0, 1)
-            old_portfolio_prices = self.portfolio_value * weights
-            new_portfolio_prices = old_portfolio_prices * variation_rate
+            # save initial portfolio value of this time step
+            self.asset_memory["initial"].append(self.portfolio_value)
 
-            # apply transaction cost to portfolio vector
-            delta_prices = new_portfolio_prices - old_portfolio_prices # erro:
-            fees = np.sum(np.abs(delta_prices) * self.transaction_cost_pct)
-            if fees > new_portfolio_prices:
-                new_portfolio_prices[0] -= fees # remove fees from cash
-            else: # in this case, action must not be performed
-                new_portfolio_prices = self.portfolio_value * last_weights * variation_rate
+            # time passes and time variation changes the portfolio distribution
+            portfolio = self.portfolio_value * (weights * self.price_variation)
 
-            new_portfolio_value = np.sum(new_portfolio_prices)
+            # calculate new portfolio value and weights
+            self.portfolio_value = np.sum(portfolio)
+            weights = portfolio / self.portfolio_value
+
+            # save final portfolio value and weights of this time step
+            self.asset_memory["final"].append(self.portfolio_value)
+            self.final_weights.append(weights)
+
+            # save date memory
+            self.date_memory.append(self.info["end_time"])
 
             # define portfolio return
-            portfolio_return = np.log(new_portfolio_value / self.portfolio_value)
+            portfolio_return = np.log(self.asset_memory["final"][-1] / self.asset_memory["final"][-2])
 
-            # update portfolio value
-            self.portfolio_value = new_portfolio_value
-
-            # save into memory
+            # save portfolio return memory
             self.portfolio_return_memory.append(portfolio_return)
-            self.date_memory.append(self.info["end_time"])
-            self.asset_memory.append(new_portfolio_value)
 
-            # the reward is the new portfolio value or end portfolo value
+            # Define portfolio return
             self.reward = portfolio_return
-            # print("Step reward: ", self.reward)
             self.reward = self.reward * self.reward_scaling
 
         if self.new_gym_api:
@@ -236,12 +253,17 @@ class PortfolioAllocationEnv(gym.Env):
     def reset(self):
         # time_index must start a little bit in the future to implement lookback
         self.time_index = self.time_window - 1
-        self.asset_memory = [self.initial_amount]
+        self.asset_memory = {
+            "initial" : [self.initial_amount],
+            "final" : [self.initial_amount]
+        }
         self.state, self.info = self.get_state_and_info_from_time_index(self.time_index)
         self.portfolio_value = self.initial_amount
         self.terminal = False
+        
         self.portfolio_return_memory = [0]
-        self.actions_memory = [[1 / self.stock_dim] * self.stock_dim]
+        self.actions_memory = [[1 / (1 + self.stock_dim)] * (1 + self.stock_dim)]
+        self.final_weights = [[1 / (1 + self.stock_dim)] * (1 + self.stock_dim)]
         self.date_memory = [self.info["end_time"]]
 
         if self.new_gym_api:
@@ -251,11 +273,20 @@ class PortfolioAllocationEnv(gym.Env):
     def get_state_and_info_from_time_index(self, time_index):
         end_time = self.sorted_times[time_index]
         start_time = self.sorted_times[time_index - (self.time_window - 1)]
+
+        # define data to be used in this time step
         self.data = self.df[
             (self.df[self.time_column] >= start_time) &
             (self.df[self.time_column] <= end_time)
-        ]
+        ][[self.time_column, self.tic_column] + self.features]
 
+        # define price variation of this time_step
+        self.price_variation = self.df_price_variation[
+                self.df_price_variation[self.time_column] == end_time
+            ][self.valuation_feature].to_numpy()
+        self.price_variation = np.insert(self.price_variation, 0, 1)
+        
+        # define state to be returned
         state = None
         for tic in self.tic_list:
             tic_data = self.data[self.data[self.tic_column] == tic]
@@ -266,10 +297,8 @@ class PortfolioAllocationEnv(gym.Env):
             "tics": self.tic_list,
             "start_time": start_time,
             "end_time": end_time,
-            "data": self.df[
-                (self.df[self.time_column] >= start_time) &
-                (self.df[self.time_column] <= end_time)
-            ][[self.time_column, self.tic_column] + self.features]
+            "data": self.data,
+            "price_variation": self.price_variation
         }
         return state, info
 
@@ -310,10 +339,18 @@ class PortfolioAllocationEnv(gym.Env):
             print("Index: {}. Tic: {}".format(index + 1, tic))
 
     def preprocess_data(self, order, normalize):
+        # order time dataframe by tic and time
         if order:
             self.df = self.df.sort_values(by=[self.tic_column, self.time_column])
+        # defining price variation after ordering dataframe
+        self.df_price_variation = self._temporal_variation_df()
+        # apply normalization
         if normalize:
             self._normalize_dataframe(normalize)
+        # transform str to datetime
+        self.df[self.time_column] = pd.to_datetime(self.df[self.time_column])
+        self.df_price_variation[self.time_column] = pd.to_datetime(self.df_price_variation[self.time_column])
+        
 
     def _normalize_dataframe(self, normalize):
         if type(normalize) == str: 
