@@ -13,52 +13,11 @@ from pathlib import Path
 
 
 class PortfolioAllocationEnv(gym.Env):
-    """A single stock trading environment for OpenAI gym
+    """A portfolio allocantion environment for OpenAI gym.
 
-    Attributes
-    ----------
-        df: DataFrame
-            input data
-        stock_dim : int
-            number of unique stocks
-        hmax : int
-            maximum number of shares to trade
-        initial_amount : int
-            start money
-        transaction_cost_pct: float
-            transaction cost percentage per trade
-        reward_scaling: float
-            scaling factor for reward, good for training
-        state_space: int
-            the dimension of input features
-        action_space: int
-            equals stock dimension
-        tech_indicator_list: list
-            a list of technical indicator names
-        turbulence_threshold: int
-            a threshold to control risk aversion
-        day: int
-            an increment number to control date
-
-    Methods
-    -------
-    _sell_stock()
-        perform sell action based on the sign of the action
-    _buy_stock()
-        perform buy action based on the sign of the action
-    step()
-        at each step the agent will return actions, then
-        we will calculate the reward, and return the next observation.
-    reset()
-        reset the environment
-    render()
-        use render to return other functions
-    save_asset_memory()
-        return account value at each time step
-    save_action_memory()
-        return actions/positions at each time step
-
-
+    TO-DO: 
+        Document functions,
+        Refactor cost
     """
 
     metadata = {"render.modes": ["human"]}
