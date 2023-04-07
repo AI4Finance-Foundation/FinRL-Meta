@@ -70,7 +70,7 @@ class PortfolioAllocationEnv(gym.Env):
         order_df=True,
         normalize_df="by_previous_time",
         reward_scaling=1,
-        comission_fee_model="wvm",
+        comission_fee_model="trf",
         comission_fee_pct=0,
         features=["close", "high", "low"],
         valuation_feature="close",
@@ -188,6 +188,9 @@ class PortfolioAllocationEnv(gym.Env):
             return self.state, self.reward, self.terminal, self.info
 
         else:
+            # transform action to numpy array (if it's a list)
+            actions = np.array(actions, dtype=np.float32)
+
             # if necessary, normalize weights
             if np.sum(actions) == 1 and np.min(actions) >= 0:
                 weights = actions
@@ -218,6 +221,15 @@ class PortfolioAllocationEnv(gym.Env):
                     portfolio[0] -= fees
                     self.portfolio_value = np.sum(portfolio) # new portfolio value
                     weights = portfolio / self.portfolio_value # new weights
+            elif self.comission_fee_model == "trf":
+                last_mu = 1
+                mu = 1 - 2 * self.comission_fee_pct + self.comission_fee_pct ** 2
+                while abs(mu - last_mu) > 1e-10:
+                    last_mu = mu
+                    mu = (1 - self.comission_fee_pct * weights[0] - 
+                          (2 * self.comission_fee_pct - self.comission_fee_pct ** 2) *
+                          np.sum(np.maximum(last_weights[1:] - mu * weights[1:], 0))) / (1 - self.comission_fee_pct * weights[0])
+                self.portfolio_value = mu * self.portfolio_value
 
             # save initial portfolio value of this time step
             self.asset_memory["initial"].append(self.portfolio_value)
