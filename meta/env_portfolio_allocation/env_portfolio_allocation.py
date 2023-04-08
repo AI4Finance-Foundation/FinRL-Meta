@@ -11,6 +11,16 @@ import matplotlib.pyplot as plt
 from stable_baselines3.common.vec_env import DummyVecEnv
 from pathlib import Path
 
+try:
+    import quantstats as qs
+except ModuleNotFoundError:
+    raise ModuleNotFoundError(
+        """QuantStats module not found, environment can't plot results and calculate indicadors. 
+        This module is not installed with FinRL. Install by running one of the options: 
+        pip install quantstats --upgrade --no-cache-dir
+        conda install -c ranaroussi quantstats
+        """
+        )
 
 class PortfolioAllocationEnv(gym.Env):
     """A portfolio allocantion environment for OpenAI gym.
@@ -101,8 +111,9 @@ class PortfolioAllocationEnv(gym.Env):
             "initial" : [self.initial_amount],
             "final" : [self.initial_amount]
         }
-        # memorize portfolio return each step
+        # memorize portfolio return and reward each step
         self.portfolio_return_memory = [0]
+        self.portfolio_reward_memory = [0]
         # memorize actions performed
         self.actions_memory = [[1 / (1 + self.stock_dim)] * (1 + self.stock_dim)]
         # memorize portfolio weights at the ending of time step
@@ -114,33 +125,39 @@ class PortfolioAllocationEnv(gym.Env):
         self.terminal = self.time_index >= len(self.sorted_times) - 1
 
         if self.terminal:
-            df = pd.DataFrame(
-                {"date": self.date_memory, "daily_return": self.portfolio_return_memory}
+            metrics_df = pd.DataFrame(
+                {"date": self.date_memory, 
+                 "returns": self.portfolio_return_memory,
+                 "rewards": self.portfolio_reward_memory,
+                 "portfolio_values": self.asset_memory["final"]}
             )
-            df.set_index("date", inplace=True)
-            plt.plot(np.exp((df.daily_return).cumsum()) * self.initial_amount, "r")
-            plt.savefig(self.results_file / "cumulative_reward.png")
+            metrics_df.set_index("date", inplace=True)
+
+            plt.plot(metrics_df["portfolio_values"], "r")
+            plt.title("Portfolio Value Over Time")
+            plt.xlabel("Time")
+            plt.ylabel("Portfolio value")
+            plt.savefig(self.results_file / "portfolio_value.png")
             plt.close()
 
-            plt.plot(self.portfolio_return_memory, "r")
-            plt.savefig(self.results_file / "rewards.png")
+            plt.plot(self.portfolio_reward_memory, "r")
+            plt.title("Reward Over Time")
+            plt.xlabel("Time")
+            plt.ylabel("Reward")
+            plt.savefig(self.results_file / "reward.png")
             plt.close()
 
             print("=================================")
             print("Initial portfolio value:{}".format(self.asset_memory['final'][0]))
             print("Final portfolio value: {}".format(self.portfolio_value))
             print("Final accumulative portfolio value: {}".format(self.portfolio_value / self.asset_memory['final'][0]))
-
-            df_daily_return = pd.DataFrame(self.portfolio_return_memory)
-            df_daily_return.columns = ["daily_return"]
-            df_daily_return["daily_return"] = np.exp(df_daily_return["daily_return"])
-            if df_daily_return["daily_return"].std() != 0:
-                sharpe = (
-                    df_daily_return["daily_return"].mean()
-                    / df_daily_return["daily_return"].std()
-                )
-                print("Sharpe ratio: ", sharpe)
+            print("Maximum DrawDown: {}".format(qs.stats.max_drawdown(metrics_df["portfolio_values"])))
+            print("Sharpe ratio: {}".format(qs.stats.sharpe(metrics_df["returns"])))
             print("=================================")
+
+            qs.plots.snapshot(metrics_df["returns"], show=False, savefig=self.results_file / "portfolio_summary.png")
+
+            print(metrics_df)
 
             if self.new_gym_api:
                 return self.state, self.reward, self.terminal, False, self.info
@@ -208,13 +225,16 @@ class PortfolioAllocationEnv(gym.Env):
             self.date_memory.append(self.info["end_time"])
 
             # define portfolio return
-            portfolio_return = np.log(self.asset_memory["final"][-1] / self.asset_memory["final"][-2])
+            rate_of_return = self.asset_memory["final"][-1] / self.asset_memory["final"][-2]
+            portfolio_return = rate_of_return - 1
+            portfolio_reward = np.log(rate_of_return)
 
             # save portfolio return memory
             self.portfolio_return_memory.append(portfolio_return)
+            self.portfolio_reward_memory.append(portfolio_reward)
 
             # Define portfolio return
-            self.reward = portfolio_return
+            self.reward = portfolio_reward
             self.reward = self.reward * self.reward_scaling
 
         if self.new_gym_api:
@@ -233,6 +253,7 @@ class PortfolioAllocationEnv(gym.Env):
         self.terminal = False
         
         self.portfolio_return_memory = [0]
+        self.portfolio_reward_memory = [0]
         self.actions_memory = [[1 / (1 + self.stock_dim)] * (1 + self.stock_dim)]
         self.final_weights = [[1 / (1 + self.stock_dim)] * (1 + self.stock_dim)]
         self.date_memory = [self.info["end_time"]]
