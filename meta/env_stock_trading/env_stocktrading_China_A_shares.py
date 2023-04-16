@@ -468,6 +468,11 @@ class StockTradingEnv(gym.Env):
             np.array(self.state[1 : (self.stock_dim + 1)])
             * np.array(self.state[(self.stock_dim + 1) : (self.stock_dim * 2 + 1)])
         )
+    
+    def save_asset_memory(self):
+        portfolio_df = self.get_portfolio_df()
+        df_account_value = portfolio_df[['date', 'total_asset']].rename(columns={'total_asset':'account_value'})
+        return df_account_value
 
     def save_action_memory(self):
         if len(self.df.tic.unique()) > 1:
