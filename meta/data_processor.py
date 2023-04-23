@@ -75,7 +75,7 @@ class DataProcessor:
             from meta.data_processors.tushare import Tushare
 
             processor_dict = {self.data_source: Tushare}
-            
+
         elif self.data_source == "akshare":
             from meta.data_processors.akshare import Akshare
 

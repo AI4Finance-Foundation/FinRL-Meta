@@ -109,7 +109,7 @@ class Akshare(_Base):
 
         self.dataframe.dropna(inplace=True)
         self.dataframe.sort_values(by=["time", "tic"], inplace=True)
-        self.dataframe.rename(columns={"time":"date"})
+        self.dataframe.rename(columns={"time": "date"})
         self.dataframe.reset_index(drop=True, inplace=True)
 
         self.save_data(save_path)
