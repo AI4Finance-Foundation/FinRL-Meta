@@ -75,6 +75,11 @@ class DataProcessor:
             from meta.data_processors.tushare import Tushare
 
             processor_dict = {self.data_source: Tushare}
+            
+        elif self.data_source == "akshare":
+            from meta.data_processors.akshare import Akshare
+
+            processor_dict = {self.data_source: Akshare}
 
         elif self.data_source == "wrds":
             from meta.data_processors.wrds import Wrds
