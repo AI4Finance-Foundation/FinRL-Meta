@@ -365,7 +365,7 @@ class DRLEnsembleAgent:
             print("============================================")
             ## initial state is empty
             if i - self.rebalance_window - self.validation_window == 0:
-                # inital state
+                # initial state
                 initial = True
             else:
                 # previous state
