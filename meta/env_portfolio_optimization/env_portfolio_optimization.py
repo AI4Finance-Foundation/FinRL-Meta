@@ -115,10 +115,10 @@ class PortfolioOptimizationEnv(gym.Env):
         # memorize portfolio return and reward each step
         self.portfolio_return_memory = [0]
         self.portfolio_reward_memory = [0]
-        # memorize actions performed
-        self.actions_memory = [[1 / (1 + self.stock_dim)] * (1 + self.stock_dim)]
+        # initial action: all money is allocated in cash
+        self.actions_memory = [[1] + [0] * self.stock_dim]
         # memorize portfolio weights at the ending of time step
-        self.final_weights = [[1 / (1 + self.stock_dim)] * (1 + self.stock_dim)]
+        self.final_weights = [[1] + [0] * self.stock_dim]
         # memorize datetimes
         self.date_memory = [date_time]
 
