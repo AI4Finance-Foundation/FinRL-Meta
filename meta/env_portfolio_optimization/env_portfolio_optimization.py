@@ -82,8 +82,9 @@ class PortfolioOptimizationEnv(gym.Env):
         self.stock_dim = len(self.tic_list)
         self.action_space = 1 + self.stock_dim
 
-        # sort datetimes
+        # sort datetimes and define episode length
         self.sorted_times = sorted(set(self.df[time_column]))
+        self.episode_length = len(self.sorted_times) - time_window + 1
 
         # define action space
         self.action_space = spaces.Box(low=0, high=1, shape=(self.action_space,))
@@ -94,8 +95,8 @@ class PortfolioOptimizationEnv(gym.Env):
             high=np.inf,
             shape=(
                 len(self.features),
-                self.time_window,
-                self.stock_dim
+                self.stock_dim,
+                self.time_window
             ),
         )
 
@@ -156,8 +157,6 @@ class PortfolioOptimizationEnv(gym.Env):
             print("=================================")
 
             qs.plots.snapshot(metrics_df["returns"], show=False, savefig=self.results_file / "portfolio_summary.png")
-
-            print(metrics_df)
 
             if self.new_gym_api:
                 return self.state, self.reward, self.terminal, False, self.info
@@ -263,6 +262,7 @@ class PortfolioOptimizationEnv(gym.Env):
         return self.state
 
     def get_state_and_info_from_time_index(self, time_index):
+        # returns state in form (channels, tics, timesteps)
         end_time = self.sorted_times[time_index]
         start_time = self.sorted_times[time_index - (self.time_window - 1)]
 
@@ -285,6 +285,7 @@ class PortfolioOptimizationEnv(gym.Env):
             tic_data = tic_data[self.features].to_numpy().T
             tic_data = tic_data[..., np.newaxis]
             state = tic_data if state is None else np.append(state, tic_data, axis=2)
+        state = state.transpose((0, 2, 1))
         info = {
             "tics": self.tic_list,
             "start_time": start_time,
@@ -342,7 +343,9 @@ class PortfolioOptimizationEnv(gym.Env):
         # transform str to datetime
         self.df[self.time_column] = pd.to_datetime(self.df[self.time_column])
         self.df_price_variation[self.time_column] = pd.to_datetime(self.df_price_variation[self.time_column])
-        
+        # transform numeric variables to float32 (compatibility with pytorch)
+        self.df[self.features] = self.df[self.features].astype("float32")
+        self.df_price_variation[self.features] = self.df_price_variation[self.features].astype("float32")
 
     def _normalize_dataframe(self, normalize):
         if type(normalize) == str: 
