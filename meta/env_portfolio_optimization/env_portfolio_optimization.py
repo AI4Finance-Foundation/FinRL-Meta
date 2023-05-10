@@ -303,28 +303,6 @@ class PortfolioOptimizationEnv(gym.Env):
         denominator = np.sum(np.exp(actions))
         softmax_output = numerator / denominator
         return softmax_output
-
-    def save_asset_memory(self):
-        date_list = self.date_memory
-        portfolio_return = self.portfolio_return_memory
-
-        df_account_value = pd.DataFrame(
-            {"date": date_list, "daily_return": portfolio_return}
-        )
-        return df_account_value
-
-    def save_action_memory(self):
-        # date and close price length must match actions length
-        date_list = self.date_memory
-        df_date = pd.DataFrame(date_list)
-        df_date.columns = ["date"]
-
-        action_list = self.actions_memory
-        df_actions = pd.DataFrame(action_list)
-        df_actions.columns = self.data.tic.values
-        df_actions.index = df_date.date
-
-        return df_actions
     
     def enumerate_portfolio(self):
         print("Index: 0. Tic: Cash")
