@@ -37,6 +37,7 @@ class PortfolioOptimizationEnv(gym.Env):
         df,
         initial_amount,
         order_df=True,
+        return_last_action=False,
         normalize_df="by_previous_time",
         reward_scaling=1,
         comission_fee_model="trf",
@@ -59,6 +60,7 @@ class PortfolioOptimizationEnv(gym.Env):
         self.tic_column = tic_column
         self.df = df
         self.initial_amount = initial_amount
+        self.return_last_action = return_last_action
         self.reward_scaling = reward_scaling
         self.comission_fee_pct = comission_fee_pct
         self.comission_fee_model = comission_fee_model
@@ -80,47 +82,50 @@ class PortfolioOptimizationEnv(gym.Env):
         # dims and spaces
         self.tic_list = self.df[self.tic_column].unique()
         self.stock_dim = len(self.tic_list)
-        self.action_space = 1 + self.stock_dim
+        action_space = 1 + self.stock_dim
 
         # sort datetimes and define episode length
         self.sorted_times = sorted(set(self.df[time_column]))
         self.episode_length = len(self.sorted_times) - time_window + 1
 
         # define action space
-        self.action_space = spaces.Box(low=0, high=1, shape=(self.action_space,))
+        self.action_space = spaces.Box(low=0, high=1, shape=(action_space,))
 
         # define observation state
-        self.observation_space = spaces.Box(
-            low=-np.inf,
-            high=np.inf,
-            shape=(
-                len(self.features),
-                self.stock_dim,
-                self.time_window
-            ),
-        )
+        if self.return_last_action:
+            # if  last action must be returned, a dict observation
+            # is defined
+            self.observation_space = spaces.Dict({
+                "state": spaces.Box(
+                    low=-np.inf,
+                    high=np.inf,
+                    shape=(
+                        len(self.features),
+                        self.stock_dim,
+                        self.time_window
+                    )
+                ),
+                "last_action": spaces.Box(
+                    low=0, high=1, shape=(action_space,)
+                )
+            })
+        else:
+            # if information about last action is not relevant,
+            # a 3D observation space is defined
+            self.observation_space = spaces.Box(
+                low=-np.inf,
+                high=np.inf,
+                shape=(
+                    len(self.features),
+                    self.stock_dim,
+                    self.time_window
+                ),
+            )
 
-        # load data from a pandas dataframe
-        date_time = self.sorted_times[self.time_index]
+        self._reset_memory()
 
-        self.terminal = False
-        # initalize state: inital portfolio return + individual stock return + individual weights
         self.portfolio_value = self.initial_amount
-
-        # memorize portfolio value each step
-        self.asset_memory = {
-            "initial" : [self.initial_amount],
-            "final" : [self.initial_amount]
-        }
-        # memorize portfolio return and reward each step
-        self.portfolio_return_memory = [0]
-        self.portfolio_reward_memory = [0]
-        # initial action: all money is allocated in cash
-        self.actions_memory = [[1] + [0] * self.stock_dim]
-        # memorize portfolio weights at the ending of time step
-        self.final_weights = [[1] + [0] * self.stock_dim]
-        # memorize datetimes
-        self.date_memory = [date_time]
+        self.terminal = False
 
     def step(self, actions):
         self.terminal = self.time_index >= len(self.sorted_times) - 1
@@ -243,19 +248,11 @@ class PortfolioOptimizationEnv(gym.Env):
     def reset(self):
         # time_index must start a little bit in the future to implement lookback
         self.time_index = self.time_window - 1
-        self.asset_memory = {
-            "initial" : [self.initial_amount],
-            "final" : [self.initial_amount]
-        }
+        self._reset_memory()
+
         self.state, self.info = self.get_state_and_info_from_time_index(self.time_index)
         self.portfolio_value = self.initial_amount
         self.terminal = False
-        
-        self.portfolio_return_memory = [0]
-        self.portfolio_reward_memory = [0]
-        self.actions_memory = [[1 / (1 + self.stock_dim)] * (1 + self.stock_dim)]
-        self.final_weights = [[1 / (1 + self.stock_dim)] * (1 + self.stock_dim)]
-        self.date_memory = [self.info["end_time"]]
 
         if self.new_gym_api:
             return self.state, self.info
@@ -293,7 +290,7 @@ class PortfolioOptimizationEnv(gym.Env):
             "data": self.data,
             "price_variation": self.price_variation
         }
-        return state, info
+        return self._standardize_state(state), info
 
     def render(self, mode="human"):
         return self.state
@@ -324,6 +321,30 @@ class PortfolioOptimizationEnv(gym.Env):
         # transform numeric variables to float32 (compatibility with pytorch)
         self.df[self.features] = self.df[self.features].astype("float32")
         self.df_price_variation[self.features] = self.df_price_variation[self.features].astype("float32")
+
+    def _reset_memory(self):
+        date_time = self.sorted_times[self.time_index]
+        # memorize portfolio value each step
+        self.asset_memory = {
+            "initial" : [self.initial_amount],
+            "final" : [self.initial_amount]
+        }
+        # memorize portfolio return and reward each step
+        self.portfolio_return_memory = [0]
+        self.portfolio_reward_memory = [0]
+        # initial action: all money is allocated in cash
+        self.actions_memory = [np.array([1] + [0] * self.stock_dim, dtype=np.float32)]
+        # memorize portfolio weights at the ending of time step
+        self.final_weights = [np.array([1] + [0] * self.stock_dim, dtype=np.float32)]
+        # memorize datetimes
+        self.date_memory = [date_time]
+
+    def _standardize_state(self, state):
+        last_action = self.actions_memory[-1]
+        if self.return_last_action:
+            return { "state": state, "last_action": last_action }
+        else:
+            return state
 
     def _normalize_dataframe(self, normalize):
         if type(normalize) == str: 
