@@ -26,10 +26,8 @@ class PortfolioOptimizationEnv(gym.Env):
     """A portfolio allocantion environment for OpenAI gym.
 
     TO-DO: 
-        Document functions,
-        Refactor cost
+        Document this part
     """
-
     metadata = {"render.modes": ["human"]}
 
     def __init__(
@@ -51,6 +49,38 @@ class PortfolioOptimizationEnv(gym.Env):
         cwd="./",
         new_gym_api=False
     ):
+        """Initializes environment's instance.
+
+        Args:
+            df: Dataframe with market information over a period of time.
+            initial_amount: Initial amount of cash available to be invested.
+            order_df: If True input dataframe is ordered by time.
+            return_last_action: If True, observations also return the last performed
+                action. Note that, in that case, the observation space is a Dict.
+            normalize_df: Defines the normalization method applied to input dataframe.
+                Possible values are "by_previous_time", "by_fist_time_window_value", 
+                "by_COLUMN_NAME" (where COLUMN_NAME must be changed to a real column
+                name) and a custom function. If None no normalization is done.
+            reward_scaling: A scaling factor to multiply the reward function. This
+                factor can help training.
+            comission_fee_model: Model used to simulate comission fee. Possible values
+                are "trf" (for transaction remainder factor model) and "wvm" (for weights
+                vector modifier model). If None, commission fees are not considered.
+            comission_fee_pct: Percentage to be used in comission fee. It must be a value
+                between 0 and 1.
+            features: List of features to be considered in the observation space. The 
+                items
+                of the list must be names of columns of the input dataframe.
+            valuation_feature: Feature to be considered in the portfolio value calculation.
+            time_column: Name of the dataframe's column that contain the datetimes that
+                index the dataframe.
+            time_format: Formatting string of time column.
+            tic_name: Name of the dataframe's column that contain ticker symbols.
+            time_window: Size of time window.
+            cwd: Local repository in which resulting graphs will be saved.
+            new_gym_api: If True, the environment will use the new gym api standard for
+                step and reset methods.
+        """
         # super(StockEnv, self).__init__()
         # money = 10 , scope = 1
         self.time_window = time_window
@@ -128,6 +158,30 @@ class PortfolioOptimizationEnv(gym.Env):
         self.terminal = False
 
     def step(self, actions):
+        """Performs a simulation step.
+
+        Args:
+            actions: An unidimensional array containing the new portfolio
+                weights.
+
+        Note:
+            If the environment was created with "return_last_action" set to
+            True, the next state returned will be a Dict. If it's set to False,
+            the next state will be a Box. You can check the observation state
+            through the attribute "observation_space".
+        
+        Returns:
+            If "new_gym_api" is set to True, the following tuple is returned:
+            (state, reward, terminal, truncated, info). If it's set to False,
+            the following tuple is returned: (state, reward, terminal, info).
+
+            state: Next simulation state.
+            reward: Reward related to the last performed action.
+            terminal: If True, the environment is in a terminal state.
+            truncated: If True, the environment has passed it's simulation
+                time limit. Currently, it's always False.
+            info: A dictionary containing informations about the last state.
+        """
         self.terminal = self.time_index >= len(self.sorted_times) - 1
 
         if self.terminal:
@@ -246,6 +300,23 @@ class PortfolioOptimizationEnv(gym.Env):
         return self.state, self.reward, self.terminal, self.info
 
     def reset(self):
+        """Resets the environment and returns it to its initial state (the 
+        fist date of the dataframe).
+
+        Note:
+            If the environment was created with "return_last_action" set to
+            True, the initial state will be a Dict. If it's set to False,
+            the initial state will be a Box. You can check the observation 
+            state through the attribute "observation_space".
+        
+        Returns:
+            If "new_gym_api" is set to True, the following tuple is returned:
+            (state, info). If it's set to False, only the initial state is
+            returned.
+
+            state: Initial state.
+            info: Initial state info.
+        """
         # time_index must start a little bit in the future to implement lookback
         self.time_index = self.time_window - 1
         self._reset_memory()
@@ -259,6 +330,34 @@ class PortfolioOptimizationEnv(gym.Env):
         return self.state
 
     def get_state_and_info_from_time_index(self, time_index):
+        """Gets state and information given a time index. It also updates "data" 
+        attribute with information about the current simulation step.
+
+        Args:
+            time_index: An integer that represents the index of a specific datetime.
+                The initial datetime of the dataframe is given by 0.
+
+        Note:
+            If the environment was created with "return_last_action" set to
+            True, the returned state will be a Dict. If it's set to False,
+            the returned state will be a Box. You can check the observation 
+            state through the attribute "observation_space".
+
+        Returns:
+            A tuple with the following form: (state, info).
+
+            state: The state of the current time index. It can be a Box or a Dict.
+            info: A dictionary with some informations about the current simulation
+                step. The dict has the following keys::
+
+                {
+                "tics": List of ticker symbols,
+                "start_time": Start time of current time window,
+                "end_time": End time of current time window,
+                "data": Data related to the current time window,
+                "price_variation": Price variation of current time step
+                }
+        """
         # returns state in form (channels, tics, timesteps)
         end_time = self.sorted_times[time_index]
         start_time = self.sorted_times[time_index - (self.time_window - 1)]
@@ -293,20 +392,43 @@ class PortfolioOptimizationEnv(gym.Env):
         return self._standardize_state(state), info
 
     def render(self, mode="human"):
+        """Renders the environment.
+
+        Returns:
+            Observation of current simulation step.
+        """
         return self.state
 
     def _softmax_normalization(self, actions):
+        """Normalizes the action vector using softmax function.
+
+        Returns:
+            Normalized action vector (portfolio vector).
+        """
         numerator = np.exp(actions)
         denominator = np.sum(np.exp(actions))
         softmax_output = numerator / denominator
         return softmax_output
     
     def enumerate_portfolio(self):
+        """Enumerates the current porfolio by showing the ticker symbols
+        of all the investments considered in the portfolio.
+        """
         print("Index: 0. Tic: Cash")
         for index, tic in enumerate(self.tic_list):
             print("Index: {}. Tic: {}".format(index + 1, tic))
 
     def preprocess_data(self, order, normalize):
+        """Orders and normalizes the environment's dataframe.
+
+        Args:
+            order: If true, the dataframe will be ordered by ticker list
+                and datetime.
+            normalize: Defines the normalization method applied to the dataframe.
+                Possible values are "by_previous_time", "by_fist_time_window_value", 
+                "by_COLUMN_NAME" (where COLUMN_NAME must be changed to a real column
+                name) and a custom function. If None no normalization is done.
+        """
         # order time dataframe by tic and time
         if order:
             self.df = self.df.sort_values(by=[self.tic_column, self.time_column])
@@ -323,6 +445,7 @@ class PortfolioOptimizationEnv(gym.Env):
         self.df_price_variation[self.features] = self.df_price_variation[self.features].astype("float32")
 
     def _reset_memory(self):
+        """Resets the environment's memory."""
         date_time = self.sorted_times[self.time_index]
         # memorize portfolio value each step
         self.asset_memory = {
@@ -340,6 +463,15 @@ class PortfolioOptimizationEnv(gym.Env):
         self.date_memory = [date_time]
 
     def _standardize_state(self, state):
+        """Standardize the state given the observation space. If "return_last_action"
+        is set to False, a three-dimensional box is returned. If it's set to True, a 
+        dictionary is returned. The dictionary follows the standard below::
+
+            { 
+            "state": Three-dimensional box representing the current state,
+            "last_action": One-dimensional box representing the last action
+            }
+        """
         last_action = self.actions_memory[-1]
         if self.return_last_action:
             return { "state": state, "last_action": last_action }
@@ -347,6 +479,18 @@ class PortfolioOptimizationEnv(gym.Env):
             return state
 
     def _normalize_dataframe(self, normalize):
+        """"Normalizes the environment's dataframe.
+
+        Args:
+            normalize: Defines the normalization method applied to the dataframe.
+                Possible values are "by_previous_time", "by_fist_time_window_value", 
+                "by_COLUMN_NAME" (where COLUMN_NAME must be changed to a real column
+                name) and a custom function. If None no normalization is done.
+
+        Note:
+            If a custom function is used in the normalization, it must have an
+            argument representing the environment's dataframe.
+        """
         if type(normalize) == str: 
             if normalize == "by_fist_time_window_value":
                 print("Normalizing {} by first time window value...".format(self.features))
@@ -367,6 +511,16 @@ class PortfolioOptimizationEnv(gym.Env):
 
 
     def _temporal_variation_df(self, periods=1):
+        """Calculates the temporal variation dataframe. For each feature, this
+        dataframe contains the rate of the current feature's value and the last
+        feature's value given a period. It's used to normalize the dataframe.
+
+        Args:
+            periods: Periods (in time indexes) to calculate temporal variation.
+
+        Returns:
+            Temporal variation dataframe.
+        """
         df_temporal_variation = self.df.copy()
         prev_columns = []
         for column in self.features:
@@ -378,10 +532,25 @@ class PortfolioOptimizationEnv(gym.Env):
         return df_temporal_variation
 
     def _seed(self, seed=None):
+        """Seeds the sources of randomness of this environment to guarantee
+        reproducibility.
+
+        Args:
+            seed: Seed value to be applied.
+
+        Returns:
+            Seed value applied.
+        """
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
     def get_sb_env(self):
+        """Generates an environment compatible with Stable Baselines 3. The
+        generated environment is a vectorized version of the current one.
+
+        Returns:
+            A tuple with the generated environment and an initial observation.
+        """
         e = DummyVecEnv([lambda: self])
         obs = e.reset()
         return e, obs
