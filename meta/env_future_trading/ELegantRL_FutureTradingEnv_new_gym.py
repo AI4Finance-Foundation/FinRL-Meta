@@ -121,8 +121,8 @@ def get_week_factors_to_data(data):
 '''env'''
 
 
-class OptionTradingEnv:
-    def __init__(self, cost_pct=1e-4, max_position=64, gpu_id=-1):
+class FutureTradingVecEnv:
+    def __init__(self, num_envs=8, cost_pct=1e-4, max_position=64, max_holding=512, gpu_id=-1):
         data_dir = DataDir
         data_name = "cu_top1_2023-01-03_2023-03-07.csv"
         data_path = f"{data_dir}/{data_name}"
@@ -144,28 +144,34 @@ class OptionTradingEnv:
         assert isinstance(data.week_factors, Ary)
         self.data = data
 
-        self.max_position = max_position
+        self.num_envs = num_envs
         self.cost_pct = cost_pct
+        self.max_position = max_position
+        self.max_holding = max_holding
+
+        self.map_i_to_action = th.tensor((0, 1, 2, 4, -4, -2, -1), device=self.device)
 
         # reset()
-        self.px0 = None
-        self.vol = None
-        self.fac = None
+        self.px0 = None  # close price
+        self.vol = None  # volume
+        self.fac = None  # factors
         self.t = None
         self.max_t = None
-        self.total_asset = None
+        self.asset = None
         self.cumulative_returns = 0
 
         self.amount = None
         self.position = None
+        self.holding = None  # holding period
 
         # environment information
         self.env_name = 'OptionStockEnv-v0'
 
         position_dim = 1
+        holding_dim = 1
         factors_dim = data.week_factors.shape[1]
-        self.state_dim = position_dim + factors_dim
-        self.action_dim = 5
+        self.state_dim = position_dim + holding_dim + factors_dim
+        self.action_dim = len(self.map_i_to_action)
         self.if_discrete = True
         self.max_step = max([data.px0.shape[0] for data in datas])
 
@@ -175,13 +181,18 @@ class OptionTradingEnv:
         rd_i_data = rd.randint(len(self.datas))
         data = self.datas[rd_i_data]
         self.data = data
-        self.px0 = data.px0
-        self.vol = data.vol
-        self.fac = data.week_factors
-        self.max_t = data.px0.shape[0]
-        self.total_asset = 0.0
-        self.cumulative_returns = 0.0
-        return self.get_state(), {}
+        self.px0 = th.tensor(data.px0, dtype=th.float32, device=self.device)
+        self.vol = th.tensor(data.vol, dtype=th.float32, device=self.device)
+        self.fac = th.tensor(data.week_factors, dtype=th.float32, device=self.device)
+        self.max_t = data.px0.shape[0] - 1
+        self.asset = th.zeros(self.num_envs, dtype=th.float32, device=self.device)
+
+        self.amount = th.zeros(self.num_envs, dtype=th.float32, device=self.device)
+        self.position = th.zeros(self.num_envs, dtype=th.float32, device=self.device)
+        self.holding = th.zeros(self.num_envs, dtype=th.float32, device=self.device)
+
+        obs = self.get_state()
+        return obs, {}
 
     @staticmethod
     def load_datas_from_disk(data_path):
@@ -189,48 +200,94 @@ class OptionTradingEnv:
         # data_name = "cu_top1_2023-01-03_2023-03-07.csv"
         # data_path = f"{data_dir}/{data_name}"
         df_raw = pd.read_csv(data_path, parse_dates=['ExchangeTS'])
-
         dfs = split_df_by_time(df_raw, time_col='ExchangeTS')
 
         datas = [get_data_of_arys_from_df(df) for df in dfs]
-
         for data in datas:
             data.week_factors = get_week_factors_to_data(data)
         return datas
 
     def get_state(self):
-        pass
+        state = th.empty((self.num_envs, self.state_dim), dtype=th.float32, device=self.device)
+        state[:, 0] = self.position
+        state[:, 1] = self.holding
+        state[:, 2:] = self.fac[self.t]
+        return state
 
     def step(self, action):
-        trade_action = self.map_id_to_action(action_id=action)
+        self.t += 1
+        close_price = self.px0[self.t]
+        volume = self.vol[self.t]
 
-        position = self.position + trade_action
-        pass
+        a0_int = self.map_i_to_action[action]
+
+        # limit -max_position <= position <= +max_position
+        a1_int = a0_int.clip(min=-self.max_position - self.position,
+                             max=self.max_position - self.position)
+
+        # limit the trade_action when over max_holding, write before limit trade_volume
+        holding_mask = self.holding > self.max_holding
+        a1_int[holding_mask] = -self.position[holding_mask]
+
+        # limit -trade_volume <= trade_action <= +trade_volume
+        trade_volume = (volume * 0.5).to(th.long)
+        a1_int = a1_int.clip(min=-trade_volume, max=trade_volume)
+
+        # limit a1_int by _position, in order to empty position
+        _position = self.position + a1_int
+        _position_mask = (self.position * _position) < 0
+        a1_int[_position_mask] = -self.position[_position_mask]
+
+        '''update holding'''
+        position = self.position + a1_int
+        position_mask = position == 0
+        self.holding[position_mask] = 0
+        self.holding += 1
+
+        '''trade: update amount asset'''
+        amount = self.amount - a1_int * close_price - th.abs(a1_int) * self.cost_pct
+        asset = amount + position * close_price
+
+        '''get reward'''
+        reward = asset - self.asset
+
         self.position = position
+        self.amount = amount
+        self.asset = asset
 
-        total_asset = 0.0
-        reward = total_asset - self.total_asset
-
-        if self.position == 0:
-            terminal = True
+        done = self.t >= self.max_t
+        if self.t >= self.max_t:
+            state, info = self.reset()
         else:
-            terminal = False
+            state, info = self.get_state(), {}
 
-        if self.t == self.max_t:
-            truncate = True
-        else:
-            truncate = False
-        return self.get_state(), reward, terminal, truncate, {}
-
-    @staticmethod
-    def map_id_to_action(action_id):
-        # self.id_action_map = {0:-2, 1:-1, 2:0, 3:1, 4:2}
-        return action_id - 2
+        terminal = position_mask  # position == 0
+        truncate = th.full((4,), done, dtype=th.bool)
+        return state, reward, terminal, truncate, {}
 
 
 def run():
-    env = OptionTradingEnv()
-    env.reset()
+    num_envs = 16
+    gpu_id = -1
+
+    env = FutureTradingVecEnv(num_envs=num_envs, gpu_id=gpu_id)
+
+    device = env.device
+    max_step = env.max_step
+    state_dim = env.state_dim
+    action_dim = env.action_dim
+
+    state, info = env.reset()
+    assert state.shape == (num_envs, state_dim)
+
+    cumulative_reward = th.zeros_like(env.amount)
+    for t in range(max_step):
+        action = th.randint(action_dim, size=(num_envs,), device=device)
+        state, reward, terminal, truncate, info = env.step(action)
+
+        cumulative_reward += reward
+
+    print(cumulative_reward.detach().cpu().numpy().round(3))
 
 
 if __name__ == '__main__':
