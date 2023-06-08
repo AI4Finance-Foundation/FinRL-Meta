@@ -1,12 +1,12 @@
-import torch as th
 import numpy as np
 import numpy.random as rd
 import pandas as pd
+import torch as th
 
 Ary = np.ndarray
 DataDir = "./dlmd"
 
-'''load csv'''
+"""load csv"""
 
 
 def split_df_by_time(df, time_col):
@@ -38,10 +38,10 @@ def split_df_by_time(df, time_col):
 
 
 def get_data_of_arys_from_df(df):
-    data = type('', (), {})()
-    time_col = 'ExchangeTS'
+    data = type("", (), {})()
+    time_col = "ExchangeTS"
 
-    data.ins_id = df.iloc[0]['InstrumentID']
+    data.ins_id = df.iloc[0]["InstrumentID"]
     data.beg_ts = df.iloc[0][time_col]
     data.end_ts = df.iloc[-1][time_col]
 
@@ -57,16 +57,16 @@ def get_data_of_arys_from_df(df):
     return data
 
 
-'''week factors'''
+"""week factors"""
 
 
 def moving_average(ary0, k):
     window = np.ones(k) / k
 
     ary1 = ary0.copy()
-    ary1[k - 1:] = np.convolve(ary0, window, mode='valid')
+    ary1[k - 1 :] = np.convolve(ary0, window, mode="valid")
     for i in range(k):
-        ary1[i] = ary0[:i + 1].mean()
+        ary1[i] = ary0[: i + 1].mean()
     return ary1
 
 
@@ -97,7 +97,7 @@ def get_week_factors_to_data(data):
     rate_av1 = av1 / wol
     rate_bv1 = bv1 / wol
 
-    press1 = (ap1 * av1 - bp1 * bv1)
+    press1 = ap1 * av1 - bp1 * bv1
     press1_px = press1 / (av1 + bv1 + 1)
     press1_pv = press1 / wol
     delta1_px = press1_px - px0
@@ -109,25 +109,37 @@ def get_week_factors_to_data(data):
 
     week_factors = []
     for ary in (
-            px0, vol,
-            rate_av1, rate_bv1,
-            press1, press1_px, press1_pv, delta1_px,
-            amount0, amount1, weight_px, weight_vpx
+        px0,
+        vol,
+        rate_av1,
+        rate_bv1,
+        press1,
+        press1_px,
+        press1_pv,
+        delta1_px,
+        amount0,
+        amount1,
+        weight_px,
+        weight_vpx,
     ):
         week_factors.extend(get_arys_move_average_05_15_30(ary))
     return np.stack(week_factors, axis=1)
 
 
-'''env'''
+"""env"""
 
 
 class FutureTradingVecEnv:
-    def __init__(self, num_envs=8, cost_pct=1e-4, max_position=64, max_holding=512, gpu_id=-1):
+    def __init__(
+        self, num_envs=8, cost_pct=1e-4, max_position=64, max_holding=512, gpu_id=-1
+    ):
         data_dir = DataDir
         data_name = "cu_top1_2023-01-03_2023-03-07.csv"
         data_path = f"{data_dir}/{data_name}"
 
-        self.device = th.device(f"cuda:{gpu_id}" if (th.cuda.is_available() and (gpu_id >= 0)) else "cpu")
+        self.device = th.device(
+            f"cuda:{gpu_id}" if (th.cuda.is_available() and (gpu_id >= 0)) else "cpu"
+        )
 
         datas = self.load_datas_from_disk(data_path)
         self.datas = datas
@@ -165,7 +177,7 @@ class FutureTradingVecEnv:
         self.holding = None  # holding period
 
         # environment information
-        self.env_name = 'OptionStockEnv-v0'
+        self.env_name = "OptionStockEnv-v0"
 
         position_dim = 1
         holding_dim = 1
@@ -199,8 +211,8 @@ class FutureTradingVecEnv:
         # data_dir = DataDir
         # data_name = "cu_top1_2023-01-03_2023-03-07.csv"
         # data_path = f"{data_dir}/{data_name}"
-        df_raw = pd.read_csv(data_path, parse_dates=['ExchangeTS'])
-        dfs = split_df_by_time(df_raw, time_col='ExchangeTS')
+        df_raw = pd.read_csv(data_path, parse_dates=["ExchangeTS"])
+        dfs = split_df_by_time(df_raw, time_col="ExchangeTS")
 
         datas = [get_data_of_arys_from_df(df) for df in dfs]
         for data in datas:
@@ -208,7 +220,9 @@ class FutureTradingVecEnv:
         return datas
 
     def get_state(self):
-        state = th.empty((self.num_envs, self.state_dim), dtype=th.float32, device=self.device)
+        state = th.empty(
+            (self.num_envs, self.state_dim), dtype=th.float32, device=self.device
+        )
         state[:, 0] = self.position
         state[:, 1] = self.holding
         state[:, 2:] = self.fac[self.t]
@@ -222,8 +236,10 @@ class FutureTradingVecEnv:
         a0_int = self.map_i_to_action[action]
 
         # limit -max_position <= position <= +max_position
-        a1_int = a0_int.clip(min=-self.max_position - self.position,
-                             max=self.max_position - self.position)
+        a1_int = a0_int.clip(
+            min=-self.max_position - self.position,
+            max=self.max_position - self.position,
+        )
 
         # limit the trade_action when over max_holding, write before limit trade_volume
         holding_mask = self.holding > self.max_holding
@@ -238,17 +254,17 @@ class FutureTradingVecEnv:
         _position_mask = (self.position * _position) < 0
         a1_int[_position_mask] = -self.position[_position_mask]
 
-        '''update holding'''
+        """update holding"""
         position = self.position + a1_int
         position_mask = position == 0
         self.holding[position_mask] = 0
         self.holding += 1
 
-        '''trade: update amount asset'''
+        """trade: update amount asset"""
         amount = self.amount - a1_int * close_price - th.abs(a1_int) * self.cost_pct
         asset = amount + position * close_price
 
-        '''get reward'''
+        """get reward"""
         reward = asset - self.asset
 
         self.position = position
@@ -290,5 +306,5 @@ def run():
     print(cumulative_reward.detach().cpu().numpy().round(3))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run()
