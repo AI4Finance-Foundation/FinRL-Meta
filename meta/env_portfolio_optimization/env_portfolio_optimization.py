@@ -1,5 +1,6 @@
 """From FinRL https://github.com/AI4Finance-LLC/FinRL/tree/master/finrl/env"""
 import gym
+import math
 import matplotlib
 import numpy as np
 import pandas as pd
@@ -15,8 +16,8 @@ try:
     import quantstats as qs
 except ModuleNotFoundError:
     raise ModuleNotFoundError(
-        """QuantStats module not found, environment can't plot results and calculate indicadors. 
-        This module is not installed with FinRL. Install by running one of the options: 
+        """QuantStats module not found, environment can't plot results and calculate indicadors.
+        This module is not installed with FinRL. Install by running one of the options:
         pip install quantstats --upgrade --no-cache-dir
         conda install -c ranaroussi quantstats
         """
@@ -26,22 +27,22 @@ class PortfolioOptimizationEnv(gym.Env):
     """A portfolio allocantion environment for OpenAI gym.
 
     This environment simulates the interactions between an agent and the financial market
-    based on data provided by a dataframe. The dataframe contains the time series of 
+    based on data provided by a dataframe. The dataframe contains the time series of
     features defined by the user (such as closing, high and low prices) and must have
     a time and a tic column with a list of datetimes and ticker symbols respectively.
     An example of dataframe is shown below::
 
-            date        high            low             close           tic	  
+            date        high            low             close           tic
         0   2020-12-23  0.157414        0.127420        0.136394        ADA-USD
         1   2020-12-23  34.381519       30.074295       31.097898       BNB-USD
         2   2020-12-23  24024.490234    22802.646484    23241.345703    BTC-USD
         3   2020-12-23  0.004735        0.003640        0.003768        DOGE-USD
         4   2020-12-23  637.122803      560.364258      583.714600      ETH-USD
         ... ...         ...             ...             ...             ...
-    
+
     Based on this dataframe, the environment will create an observation space that can
     be a Dict or a Box. The Box observation space is a three-dimensional array of shape
-    (f, n, t), where f is the number of features, n is the number of stocks in the 
+    (f, n, t), where f is the number of features, n is the number of stocks in the
     portfolio and t is the user-defined time window. If the environment is created with
     the parameter return_last_action set to True, the observation space is a Dict with
     the following keys::
@@ -90,7 +91,7 @@ class PortfolioOptimizationEnv(gym.Env):
             return_last_action: If True, observations also return the last performed
                 action. Note that, in that case, the observation space is a Dict.
             normalize_df: Defines the normalization method applied to input dataframe.
-                Possible values are "by_previous_time", "by_fist_time_window_value", 
+                Possible values are "by_previous_time", "by_fist_time_window_value",
                 "by_COLUMN_NAME" (where COLUMN_NAME must be changed to a real column
                 name) and a custom function. If None no normalization is done.
             reward_scaling: A scaling factor to multiply the reward function. This
@@ -100,7 +101,7 @@ class PortfolioOptimizationEnv(gym.Env):
                 vector modifier model). If None, commission fees are not considered.
             comission_fee_pct: Percentage to be used in comission fee. It must be a value
                 between 0 and 1.
-            features: List of features to be considered in the observation space. The 
+            features: List of features to be considered in the observation space. The
                 items
                 of the list must be names of columns of the input dataframe.
             valuation_feature: Feature to be considered in the portfolio value calculation.
@@ -201,7 +202,7 @@ class PortfolioOptimizationEnv(gym.Env):
             True, the next state returned will be a Dict. If it's set to False,
             the next state will be a Box. You can check the observation state
             through the attribute "observation_space".
-        
+
         Returns:
             If "new_gym_api" is set to True, the following tuple is returned:
             (state, reward, terminal, truncated, info). If it's set to False,
@@ -218,7 +219,7 @@ class PortfolioOptimizationEnv(gym.Env):
 
         if self._terminal:
             metrics_df = pd.DataFrame(
-                {"date": self._date_memory, 
+                {"date": self._date_memory,
                  "returns": self._portfolio_return_memory,
                  "rewards": self._portfolio_reward_memory,
                  "portfolio_values": self._asset_memory["final"]}
@@ -237,6 +238,13 @@ class PortfolioOptimizationEnv(gym.Env):
             plt.xlabel("Time")
             plt.ylabel("Reward")
             plt.savefig(self._results_file / "reward.png")
+            plt.close()
+
+            plt.plot(self._actions_memory)
+            plt.title("Actions performed")
+            plt.xlabel("Time")
+            plt.ylabel("Weight")
+            plt.savefig(self._results_file / "actions.png")
             plt.close()
 
             print("=================================")
@@ -258,11 +266,11 @@ class PortfolioOptimizationEnv(gym.Env):
             actions = np.array(actions, dtype=np.float32)
 
             # if necessary, normalize weights
-            if np.sum(actions) == 1 and np.min(actions) >= 0:
+            if math.isclose(np.sum(actions), 1, abs_tol=1e-6) and np.min(actions) >= 0:
                 weights = actions
             else:
                 weights = self._softmax_normalization(actions)
-                
+
             # save initial portfolio weights for this time step
             self._actions_memory.append(weights)
 
@@ -276,7 +284,7 @@ class PortfolioOptimizationEnv(gym.Env):
             # if using weights vector modifier, we need to modify weights vector
             if self._comission_fee_model == "wvm":
                 delta_weights = weights - last_weights
-                delta_assets = delta_weights[1:] # disconsider 
+                delta_assets = delta_weights[1:] # disconsider
                 # calculate fees considering weights modification
                 fees = np.sum(np.abs(delta_assets * self._portfolio_value))
                 if fees > weights[0] * self._portfolio_value:
@@ -292,7 +300,7 @@ class PortfolioOptimizationEnv(gym.Env):
                 mu = 1 - 2 * self._comission_fee_pct + self._comission_fee_pct ** 2
                 while abs(mu - last_mu) > 1e-10:
                     last_mu = mu
-                    mu = (1 - self._comission_fee_pct * weights[0] - 
+                    mu = (1 - self._comission_fee_pct * weights[0] -
                           (2 * self._comission_fee_pct - self._comission_fee_pct ** 2) *
                           np.sum(np.maximum(last_weights[1:] - mu * weights[1:], 0))) / (1 - self._comission_fee_pct * weights[0])
                 self._portfolio_value = mu * self._portfolio_value
@@ -332,15 +340,15 @@ class PortfolioOptimizationEnv(gym.Env):
         return self._state, self._reward, self._terminal, self._info
 
     def reset(self):
-        """Resets the environment and returns it to its initial state (the 
+        """Resets the environment and returns it to its initial state (the
         fist date of the dataframe).
 
         Note:
             If the environment was created with "return_last_action" set to
             True, the initial state will be a Dict. If it's set to False,
-            the initial state will be a Box. You can check the observation 
+            the initial state will be a Box. You can check the observation
             state through the attribute "observation_space".
-        
+
         Returns:
             If "new_gym_api" is set to True, the following tuple is returned:
             (state, info). If it's set to False, only the initial state is
@@ -362,7 +370,7 @@ class PortfolioOptimizationEnv(gym.Env):
         return self._state
 
     def _get_state_and_info_from_time_index(self, time_index):
-        """Gets state and information given a time index. It also updates "data" 
+        """Gets state and information given a time index. It also updates "data"
         attribute with information about the current simulation step.
 
         Args:
@@ -372,7 +380,7 @@ class PortfolioOptimizationEnv(gym.Env):
         Note:
             If the environment was created with "return_last_action" set to
             True, the returned state will be a Dict. If it's set to False,
-            the returned state will be a Box. You can check the observation 
+            the returned state will be a Box. You can check the observation
             state through the attribute "observation_space".
 
         Returns:
@@ -405,7 +413,7 @@ class PortfolioOptimizationEnv(gym.Env):
                 self._df_price_variation[self._time_column] == end_time
             ][self._valuation_feature].to_numpy()
         self._price_variation = np.insert(self._price_variation, 0, 1)
-        
+
         # define state to be returned
         state = None
         for tic in self._tic_list:
@@ -441,7 +449,7 @@ class PortfolioOptimizationEnv(gym.Env):
         denominator = np.sum(np.exp(actions))
         softmax_output = numerator / denominator
         return softmax_output
-    
+
     def enumerate_portfolio(self):
         """Enumerates the current porfolio by showing the ticker symbols
         of all the investments considered in the portfolio.
@@ -457,7 +465,7 @@ class PortfolioOptimizationEnv(gym.Env):
             order: If true, the dataframe will be ordered by ticker list
                 and datetime.
             normalize: Defines the normalization method applied to the dataframe.
-                Possible values are "by_previous_time", "by_fist_time_window_value", 
+                Possible values are "by_previous_time", "by_fist_time_window_value",
                 "by_COLUMN_NAME" (where COLUMN_NAME must be changed to a real column
                 name) and a custom function. If None no normalization is done.
         """
@@ -496,10 +504,10 @@ class PortfolioOptimizationEnv(gym.Env):
 
     def _standardize_state(self, state):
         """Standardize the state given the observation space. If "return_last_action"
-        is set to False, a three-dimensional box is returned. If it's set to True, a 
+        is set to False, a three-dimensional box is returned. If it's set to True, a
         dictionary is returned. The dictionary follows the standard below::
 
-            { 
+            {
             "state": Three-dimensional box representing the current state,
             "last_action": One-dimensional box representing the last action
             }
@@ -515,7 +523,7 @@ class PortfolioOptimizationEnv(gym.Env):
 
         Args:
             normalize: Defines the normalization method applied to the dataframe.
-                Possible values are "by_previous_time", "by_fist_time_window_value", 
+                Possible values are "by_previous_time", "by_fist_time_window_value",
                 "by_COLUMN_NAME" (where COLUMN_NAME must be changed to a real column
                 name) and a custom function. If None no normalization is done.
 
@@ -523,7 +531,7 @@ class PortfolioOptimizationEnv(gym.Env):
             If a custom function is used in the normalization, it must have an
             argument representing the environment's dataframe.
         """
-        if type(normalize) == str: 
+        if type(normalize) == str:
             if normalize == "by_fist_time_window_value":
                 print("Normalizing {} by first time window value...".format(self._features))
                 self._df = self._temporal_variation_df(self._time_window - 1)
@@ -576,13 +584,13 @@ class PortfolioOptimizationEnv(gym.Env):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
-    def get_sb_env(self):
+    def get_sb_env(self, env_number=1):
         """Generates an environment compatible with Stable Baselines 3. The
         generated environment is a vectorized version of the current one.
 
         Returns:
             A tuple with the generated environment and an initial observation.
         """
-        e = DummyVecEnv([lambda: self])
+        e = DummyVecEnv([lambda: self] * env_number)
         obs = e.reset()
         return e, obs
