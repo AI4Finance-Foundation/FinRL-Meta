@@ -425,7 +425,9 @@ class PortfolioOptimizationEnv(gym.Env):
         info = {
             "tics": self._tic_list,
             "start_time": start_time,
+            "start_time_index": time_index - (self._time_window - 1),
             "end_time": end_time,
+            "end_time_index": time_index,
             "data": self._data,
             "price_variation": self._price_variation
         }
