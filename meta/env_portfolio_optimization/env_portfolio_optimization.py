@@ -393,7 +393,9 @@ class PortfolioOptimizationEnv(gym.Env):
                 {
                 "tics": List of ticker symbols,
                 "start_time": Start time of current time window,
+                "start_time_index": Index of start time of current time window,
                 "end_time": End time of current time window,
+                "end_time_index": Index of end time of current time window,
                 "data": Data related to the current time window,
                 "price_variation": Price variation of current time step
                 }
