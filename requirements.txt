@@ -7,7 +7,7 @@ elegantrl
 # market data & paper trading API
 exchange_calendars==4.1.1
 gputil==1.4.0
-gym==0.24.1
+gym>=0.17 #gym==0.24.1
 jqdatasdk==1.8.10
 lz4==4.0.1
 
