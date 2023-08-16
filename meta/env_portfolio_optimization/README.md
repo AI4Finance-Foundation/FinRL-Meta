@@ -65,4 +65,4 @@ POE can return two types of observations during simulation: a Dict or a Box.
 Given the simulation of timestep $t$, the reward is given by the following formula: $r_{t} = ln(V_{t}/V_{t-1})$, where $V_{t}$ is the value of the portfolio at time $t$. By using this formulation, the reward is negative whenever the portfolio value decreases due to a rebalancing and is positive otherwise.
 
 ## Example
-A jupyter notebook showing using this environment can be found [here](/examples/FinRL_PortfolioOptimizationEnv_Demo.ipynb).
+A jupyter notebook using this environment can be found [here](/examples/FinRL_PortfolioOptimizationEnv_Demo.ipynb).
