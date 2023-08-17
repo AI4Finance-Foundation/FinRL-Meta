@@ -1,6 +1,6 @@
 # PortfolioOptimizationEnv (POE)
 
-This environment simulates the effects of the market in a portfolio that is periodically rebalanced through a reinforcement learning agent. At every timestep $t$, the agent is responsible for determining a portfolio vector $W_{t}$ which contains the percentage of money invested in each stock. The environment, then, utilizes data provided by the user to simulate the new portfolio value at time-step $t+1$. 
+This environment simulates the effects of the market in a portfolio that is periodically rebalanced through a reinforcement learning agent. At every timestep $t$, the agent is responsible for determining a portfolio vector $W_{t}$ which contains the percentage of money invested in each stock. The environment, then, utilizes data provided by the user to simulate the new portfolio value at time-step $t+1$.
 
 For more details on the formulation of this problem, check the following paper:
 
@@ -48,7 +48,7 @@ For example: given a portfolio of three stocks, a valid portfolio vector would b
 
 ## Observations
 
-POE can return two types of observations during simulation: a Dict or a Box. 
+POE can return two types of observations during simulation: a Dict or a Box.
 
 - The box is a three-dimensional array of shape $(f, n, t)$, where $f$ s the number of features, $n$ is the number of stocks in the portfolio and $t$ is the time series timw window. This observation basically only contains the current state of the agent.
 

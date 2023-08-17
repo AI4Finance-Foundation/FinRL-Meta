@@ -1,6 +1,7 @@
 """From FinRL https://github.com/AI4Finance-LLC/FinRL/tree/master/finrl/env"""
-import gym
 import math
+
+import gym
 import matplotlib
 import numpy as np
 import pandas as pd
@@ -21,7 +22,8 @@ except ModuleNotFoundError:
         pip install quantstats --upgrade --no-cache-dir
         conda install -c ranaroussi quantstats
         """
-        )
+    )
+
 
 class PortfolioOptimizationEnv(gym.Env):
     """A portfolio allocantion environment for OpenAI gym.
@@ -61,6 +63,7 @@ class PortfolioOptimizationEnv(gym.Env):
         observation_space: Observation space.
         episode_length: Number of timesteps of an episode.
     """
+
     metadata = {"render.modes": ["human"]}
 
     def __init__(
@@ -80,7 +83,7 @@ class PortfolioOptimizationEnv(gym.Env):
         tic_column="tic",
         time_window=1,
         cwd="./",
-        new_gym_api=False
+        new_gym_api=False,
     ):
         """Initializes environment's instance.
 
@@ -158,31 +161,23 @@ class PortfolioOptimizationEnv(gym.Env):
         if self._return_last_action:
             # if  last action must be returned, a dict observation
             # is defined
-            self.observation_space = spaces.Dict({
-                "state": spaces.Box(
-                    low=-np.inf,
-                    high=np.inf,
-                    shape=(
-                        len(self._features),
-                        self._stock_dim,
-                        self._time_window
-                    )
-                ),
-                "last_action": spaces.Box(
-                    low=0, high=1, shape=(action_space,)
-                )
-            })
+            self.observation_space = spaces.Dict(
+                {
+                    "state": spaces.Box(
+                        low=-np.inf,
+                        high=np.inf,
+                        shape=(len(self._features), self._stock_dim, self._time_window),
+                    ),
+                    "last_action": spaces.Box(low=0, high=1, shape=(action_space,)),
+                }
+            )
         else:
             # if information about last action is not relevant,
             # a 3D observation space is defined
             self.observation_space = spaces.Box(
                 low=-np.inf,
                 high=np.inf,
-                shape=(
-                    len(self._features),
-                    self._stock_dim,
-                    self._time_window
-                ),
+                shape=(len(self._features), self._stock_dim, self._time_window),
             )
 
         self._reset_memory()
@@ -219,10 +214,12 @@ class PortfolioOptimizationEnv(gym.Env):
 
         if self._terminal:
             metrics_df = pd.DataFrame(
-                {"date": self._date_memory,
-                 "returns": self._portfolio_return_memory,
-                 "rewards": self._portfolio_reward_memory,
-                 "portfolio_values": self._asset_memory["final"]}
+                {
+                    "date": self._date_memory,
+                    "returns": self._portfolio_return_memory,
+                    "rewards": self._portfolio_reward_memory,
+                    "portfolio_values": self._asset_memory["final"],
+                }
             )
             metrics_df.set_index("date", inplace=True)
 
@@ -248,14 +245,26 @@ class PortfolioOptimizationEnv(gym.Env):
             plt.close()
 
             print("=================================")
-            print("Initial portfolio value:{}".format(self._asset_memory['final'][0]))
+            print("Initial portfolio value:{}".format(self._asset_memory["final"][0]))
             print("Final portfolio value: {}".format(self._portfolio_value))
-            print("Final accumulative portfolio value: {}".format(self._portfolio_value / self._asset_memory['final'][0]))
-            print("Maximum DrawDown: {}".format(qs.stats.max_drawdown(metrics_df["portfolio_values"])))
+            print(
+                "Final accumulative portfolio value: {}".format(
+                    self._portfolio_value / self._asset_memory["final"][0]
+                )
+            )
+            print(
+                "Maximum DrawDown: {}".format(
+                    qs.stats.max_drawdown(metrics_df["portfolio_values"])
+                )
+            )
             print("Sharpe ratio: {}".format(qs.stats.sharpe(metrics_df["returns"])))
             print("=================================")
 
-            qs.plots.snapshot(metrics_df["returns"], show=False, savefig=self._results_file / "portfolio_summary.png")
+            qs.plots.snapshot(
+                metrics_df["returns"],
+                show=False,
+                savefig=self._results_file / "portfolio_summary.png",
+            )
 
             if self._new_gym_api:
                 return self._state, self._reward, self._terminal, False, self._info
@@ -279,12 +288,14 @@ class PortfolioOptimizationEnv(gym.Env):
 
             # load next state
             self._time_index += 1
-            self._state, self._info = self._get_state_and_info_from_time_index(self._time_index)
+            self._state, self._info = self._get_state_and_info_from_time_index(
+                self._time_index
+            )
 
             # if using weights vector modifier, we need to modify weights vector
             if self._comission_fee_model == "wvm":
                 delta_weights = weights - last_weights
-                delta_assets = delta_weights[1:] # disconsider
+                delta_assets = delta_weights[1:]  # disconsider
                 # calculate fees considering weights modification
                 fees = np.sum(np.abs(delta_assets * self._portfolio_value))
                 if fees > weights[0] * self._portfolio_value:
@@ -293,16 +304,19 @@ class PortfolioOptimizationEnv(gym.Env):
                 else:
                     portfolio = weights * self._portfolio_value
                     portfolio[0] -= fees
-                    self._portfolio_value = np.sum(portfolio) # new portfolio value
-                    weights = portfolio / self._portfolio_value # new weights
+                    self._portfolio_value = np.sum(portfolio)  # new portfolio value
+                    weights = portfolio / self._portfolio_value  # new weights
             elif self._comission_fee_model == "trf":
                 last_mu = 1
-                mu = 1 - 2 * self._comission_fee_pct + self._comission_fee_pct ** 2
+                mu = 1 - 2 * self._comission_fee_pct + self._comission_fee_pct**2
                 while abs(mu - last_mu) > 1e-10:
                     last_mu = mu
-                    mu = (1 - self._comission_fee_pct * weights[0] -
-                          (2 * self._comission_fee_pct - self._comission_fee_pct ** 2) *
-                          np.sum(np.maximum(last_weights[1:] - mu * weights[1:], 0))) / (1 - self._comission_fee_pct * weights[0])
+                    mu = (
+                        1
+                        - self._comission_fee_pct * weights[0]
+                        - (2 * self._comission_fee_pct - self._comission_fee_pct**2)
+                        * np.sum(np.maximum(last_weights[1:] - mu * weights[1:], 0))
+                    ) / (1 - self._comission_fee_pct * weights[0])
                 self._portfolio_value = mu * self._portfolio_value
 
             # save initial portfolio value of this time step
@@ -323,7 +337,9 @@ class PortfolioOptimizationEnv(gym.Env):
             self._date_memory.append(self._info["end_time"])
 
             # define portfolio return
-            rate_of_return = self._asset_memory["final"][-1] / self._asset_memory["final"][-2]
+            rate_of_return = (
+                self._asset_memory["final"][-1] / self._asset_memory["final"][-2]
+            )
             portfolio_return = rate_of_return - 1
             portfolio_reward = np.log(rate_of_return)
 
@@ -361,7 +377,9 @@ class PortfolioOptimizationEnv(gym.Env):
         self._time_index = self._time_window - 1
         self._reset_memory()
 
-        self._state, self._info = self._get_state_and_info_from_time_index(self._time_index)
+        self._state, self._info = self._get_state_and_info_from_time_index(
+            self._time_index
+        )
         self._portfolio_value = self._initial_amount
         self._terminal = False
 
@@ -406,14 +424,14 @@ class PortfolioOptimizationEnv(gym.Env):
 
         # define data to be used in this time step
         self._data = self._df[
-            (self._df[self._time_column] >= start_time) &
-            (self._df[self._time_column] <= end_time)
+            (self._df[self._time_column] >= start_time)
+            & (self._df[self._time_column] <= end_time)
         ][[self._time_column, self._tic_column] + self._features]
 
         # define price variation of this time_step
         self._price_variation = self._df_price_variation[
-                self._df_price_variation[self._time_column] == end_time
-            ][self._valuation_feature].to_numpy()
+            self._df_price_variation[self._time_column] == end_time
+        ][self._valuation_feature].to_numpy()
         self._price_variation = np.insert(self._price_variation, 0, 1)
 
         # define state to be returned
@@ -431,7 +449,7 @@ class PortfolioOptimizationEnv(gym.Env):
             "end_time": end_time,
             "end_time_index": time_index,
             "data": self._data,
-            "price_variation": self._price_variation
+            "price_variation": self._price_variation,
         }
         return self._standardize_state(state), info
 
@@ -483,18 +501,22 @@ class PortfolioOptimizationEnv(gym.Env):
             self._normalize_dataframe(normalize)
         # transform str to datetime
         self._df[self._time_column] = pd.to_datetime(self._df[self._time_column])
-        self._df_price_variation[self._time_column] = pd.to_datetime(self._df_price_variation[self._time_column])
+        self._df_price_variation[self._time_column] = pd.to_datetime(
+            self._df_price_variation[self._time_column]
+        )
         # transform numeric variables to float32 (compatibility with pytorch)
         self._df[self._features] = self._df[self._features].astype("float32")
-        self._df_price_variation[self._features] = self._df_price_variation[self._features].astype("float32")
+        self._df_price_variation[self._features] = self._df_price_variation[
+            self._features
+        ].astype("float32")
 
     def _reset_memory(self):
         """Resets the environment's memory."""
         date_time = self._sorted_times[self._time_index]
         # memorize portfolio value each step
         self._asset_memory = {
-            "initial" : [self._initial_amount],
-            "final" : [self._initial_amount]
+            "initial": [self._initial_amount],
+            "final": [self._initial_amount],
         }
         # memorize portfolio return and reward each step
         self._portfolio_return_memory = [0]
@@ -518,12 +540,12 @@ class PortfolioOptimizationEnv(gym.Env):
         """
         last_action = self._actions_memory[-1]
         if self._return_last_action:
-            return { "state": state, "last_action": last_action }
+            return {"state": state, "last_action": last_action}
         else:
             return state
 
     def _normalize_dataframe(self, normalize):
-        """"Normalizes the environment's dataframe.
+        """ "Normalizes the environment's dataframe.
 
         Args:
             normalize: Defines the normalization method applied to the dataframe.
@@ -537,7 +559,11 @@ class PortfolioOptimizationEnv(gym.Env):
         """
         if type(normalize) == str:
             if normalize == "by_fist_time_window_value":
-                print("Normalizing {} by first time window value...".format(self._features))
+                print(
+                    "Normalizing {} by first time window value...".format(
+                        self._features
+                    )
+                )
                 self._df = self._temporal_variation_df(self._time_window - 1)
             elif normalize == "by_previous_time":
                 print("Normalizing {} by previous time...".format(self._features))
@@ -552,7 +578,6 @@ class PortfolioOptimizationEnv(gym.Env):
             self._df = normalize(self._df)
         else:
             print("No normalization was performed.")
-
 
     def _temporal_variation_df(self, periods=1):
         """Calculates the temporal variation dataframe. For each feature, this
@@ -570,9 +595,17 @@ class PortfolioOptimizationEnv(gym.Env):
         for column in self._features:
             prev_column = "prev_{}".format(column)
             prev_columns.append(prev_column)
-            df_temporal_variation[prev_column] = df_temporal_variation.groupby(self._tic_column)[column].shift(periods=periods)
-            df_temporal_variation[column] = df_temporal_variation[column] / df_temporal_variation[prev_column]
-        df_temporal_variation = df_temporal_variation.drop(columns=prev_columns).fillna(1).reset_index(drop=True)
+            df_temporal_variation[prev_column] = df_temporal_variation.groupby(
+                self._tic_column
+            )[column].shift(periods=periods)
+            df_temporal_variation[column] = (
+                df_temporal_variation[column] / df_temporal_variation[prev_column]
+            )
+        df_temporal_variation = (
+            df_temporal_variation.drop(columns=prev_columns)
+            .fillna(1)
+            .reset_index(drop=True)
+        )
         return df_temporal_variation
 
     def _seed(self, seed=None):
