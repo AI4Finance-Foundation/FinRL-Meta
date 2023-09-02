@@ -8,8 +8,8 @@ from typing import List
 
 import numpy as np
 import pandas as pd
-import stockstats
-import talib
+#import stockstats
+#import talib
 
 from meta.config import BINANCE_BASE_URL
 from meta.config import TIME_ZONE_BERLIN

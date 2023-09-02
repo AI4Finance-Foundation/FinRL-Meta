@@ -8,10 +8,10 @@ from typing import List
 
 import pandas as pd
 from tqdm import tqdm
-from matplotlib import pyplot as plt
+#from matplotlib import pyplot as plt
 
-import stockstats
-import talib
+#import stockstats
+#import talib
 from meta.data_processors._base import _Base
 
 import tushare as ts
@@ -46,15 +46,114 @@ class Tushare(_Base):
         else:
             self.adj = None
 
+        ts.set_token(self.token)
+        self.pro = ts.pro_api(self.token)
+
+
+    def download_share_list(self, 
+                            cfg, 
+                            save_path=None, 
+                            filter_item=None, 
+                            filter_value=None):    
+        df = self.pro.stock_basic(**{
+            "ts_code": "",
+            "name": "",
+            "exchange": "",
+            "market": "",
+            "is_hs": "",
+            "list_status": "L",
+            "limit": "",
+            "offset": ""
+        }, fields=[
+            cfg["basic"]["stock_code_full"],
+            cfg["basic"]["stock_code"],
+            cfg["basic"]["stock_name"],
+            cfg["basic"]["area"],
+            cfg["basic"]["industry"],
+            cfg["basic"]["market_type"],
+            cfg["basic"]["ipo_date"],
+            cfg["basic"]["exchange"],
+            cfg["basic"]["status"],
+            cfg["basic"]["is_hs"]
+        ])
+    
+        df = self.convert_name(df, cfg)
+        self.sharelist_df = df
+        if filter_item is not None:
+            assert(len(filter_item) == len(filter_value))
+            for col, val in zip(filter_item, filter_value):
+                self.sharelist_df = self.sharelist_df[self.sharelist_df[col] == val]
+        if save_path is not None:
+            self.sharelist_df.to_csv(save_path, index=False)
+        
+
+    def get_string_pairs(self, input_dict):
+        # 初始化结果列表
+        result = []
+        # 遍历输入字典的每一个键值对
+        for key, value in input_dict.items():
+            # 检查值是否是一个字典
+            if isinstance(value, dict):
+                # 如果是，递归地调用这个函数来处理这个子字典
+                result += self.get_string_pairs(value)
+            # 检查值是否是一个字符串
+            elif isinstance(value, str):
+                # 如果是，添加到结果列表中
+                result.append((key, value))
+        # 返回结果列表
+        return result   
+
+    def convert_name(self, df, cfg):
+        ''' iterate all key-value pairs in cfg '''
+        pairs = self.get_string_pairs(cfg)
+        for pair in pairs:
+            key, value = pair
+            if value in df.columns:
+                df.rename(columns={value: key} ,inplace=True)
+        return df
+
+    def get_skip_stocks(self, directory):
+        files = os.listdir(directory)
+        csv_files = [file[:-4] for file in files if file.endswith('.csv')]
+        return csv_files
+
+    def download_market_daily(self, cfg, share_list, start_date, end_date, adj, save_folder=None):
+        self.sharelist = share_list
+        self.start_date = start_date
+        self.end_date = end_date
+        self.adj = adj
+
+        skip_list = self.get_skip_stocks(save_folder)
+
+        for i in tqdm(self.sharelist, total=len(self.sharelist)):
+            if i in skip_list:
+                continue
+            df = self.get_data(i)
+            df = self.convert_name(df, cfg)
+            df.sort_values(by=["trade_date"], inplace=True)
+            df.reset_index(drop=True, inplace=True)
+            df["trade_date"] = pd.to_datetime(df["trade_date"], format="%Y%m%d")
+            df["day_of_week"] = df["trade_date"].dt.dayofweek
+            df["trade_date"] = df.trade_date.apply(
+                lambda x: x.strftime("%Y-%m-%d")
+            )
+            #df.dropna(inplace=True)
+
+            if save_folder is not None:
+                df.to_csv(os.path.join(save_folder, i+".csv"), index=False)
+            time.sleep(0.25)    
+
+
     def get_data(self, id) -> pd.DataFrame:
-        # df1 = ts.pro_bar(ts_code=id, start_date=self.start_date,end_date='20180101')
-        # dfb=pd.concat([df, df1], ignore_index=True)
-        # print(dfb.shape)
         return ts.pro_bar(
             ts_code=id,
+            asset='E',
             start_date=self.start_date,
             end_date=self.end_date,
             adj=self.adj,
+            freq="D",
+            ma=[5, 10, 30],
+            factors=['tor', 'vr']
         )
 
     def download_data(
@@ -68,7 +167,7 @@ class Tushare(_Base):
         assert self.time_interval == "1d", "Not supported currently"
 
         self.ticker_list = ticker_list
-        ts.set_token(self.token)
+        
 
         self.dataframe = pd.DataFrame()
         for i in tqdm(ticker_list, total=len(ticker_list)):

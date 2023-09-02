@@ -1,0 +1,10 @@
+basic:
+  stock_code,
+  stock_name,
+  area,
+  industry,
+  market_type, # 市场类型：主板，创业板，科创板
+  exchange, # 交易所：深交所、沪交所、北交所
+  status, # 上市，退市，暂停上市
+  ipo_date, # 上市日期
+  is_hs, # 是否是沪深港通标的。N否 H沪股通 S深股通

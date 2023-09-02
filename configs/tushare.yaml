@@ -1,0 +1,150 @@
+trade_date: trade_date
+basic:
+  stock_code: ts_code # 股票代码
+  stock_name: name # 股票名称
+  area: area
+  industry: industry
+  market_type: market # 市场类型：主板，创业板，科创板
+  exchange: exchange # 交易所：深交所、沪交所、北交所
+  status: list_status # 上市，退市，暂停上市
+  ipo_date: list_date # 上市日期
+  is_hs: is_hs # 是否是沪深港通标的。N否 H沪股通 S深股通
+market_daily:
+  suspend_type: suspend_type # S-停牌，R-复牌
+  price_daily:
+    open: open
+    high: high
+    low: low
+    close: close
+    pre_close: pre_close
+  vol_daily:
+    vol: vol # 成交量
+    amount: amount # 成交额
+    turnover_rate: turnover_rate  # 换手率
+    turnover_rate_f: turnover_rate_f # 自由流通股换手率
+    volume_ratio: volume_ratio # 量比
+  price_derivatives:
+    change_abs: change
+    change_pct: pct_chg
+    ma_5: ma5
+    ma_10: ma10
+    ma_30: ma30
+    ma_v_5: ma_v_5
+    ma_v_10: ma_v_10
+    ma_v_30: ma_v_30
+    pe: pe
+    pb: pb
+    ps: ps
+    dividend_ratio: dv_ratio # 股息率
+    pe_ttm: pe_ttm
+    ps_ttm: ps_ttm
+    dividend_ratio_ttm: dv_ttm
+    total_share: total_share
+    float_share: float_share  # 流通股本
+    free_share: free_share # 自由流通股本
+    total_market_value: total_mv # 总市值
+    circ_market_value: circ_mv # 流通市值
+  trade_component:
+    buy_sm_vol: buy_sm_vol
+    buy_sm_amount: buy_sm_amount
+    sell_sm_vol: sell_sm_vol
+    sell_sm_amount: sell_sm_amount
+    buy_md_vol: buy_md_vol
+    buy_md_amount: buy_md_amount
+    sell_md_vol: sell_md_vol
+    sell_md_amount: sell_md_amount
+    buy_lg_vol: buy_lg_vol
+    buy_lg_amount: buy_lg_amount
+    sell_lg_vol: sell_lg_vol
+    sell_lg_amount: sell_lg_amount
+    buy_elg_vol: buy_elg_vol
+    buy_elg_amount: buy_elg_amount
+    sell_elg_vol: sell_elg_vol
+    sell_elg_amount: sell_elg_amount
+    net_mf_vol: net_mf_vol # 净流入量
+    net_mf_amount: net_mf_amount
+    trade_count: trade_count # 交易笔数
+  trade_flow:
+    ggt_ss: ggt_ss
+    ggt_sz: ggt_sz
+    hgt: hgt
+    sgt: sgt
+    north_money: north_money
+    south_money: south_money
+    ggt_buy_amount: buy_amount
+    ggt_buy_volume: buy_volume
+    ggt_sell_amount: sell_amount
+    ggt_sell_volume: sell_volume
+financial_data:
+  report_type: report_type  # 报告类型 1合并报表 2单季合并 3调整单季合并表 4调整合并报表 5调整前合并报表 6母公司报表 7母公司单季表 8 母公司调整单季表 9母公司调整表 10母公司调整前报表 11调整前合并报表 12母公司调整前报表
+  end_date: end_date # 报告期
+  end_type: end_type # 报告期类型
+  income_sheet:
+    basic_eps: basic_eps
+    diluted_eps: diluted_eps
+    total_revenue: total_revenue
+    revenue: revenue
+    int_income: int_income
+    total_cogs: total_cogs
+    oper_cost: oper_cost
+    int_exp: int_exp
+    sell_exp: sell_exp
+    admin_exp: admin_exp
+    fin_exp: fin_exp
+    assets_impair_loss: assets_impair_loss
+    operate_profit: operate_profit
+    non_oper_income: non_oper_income
+    non_oper_exp: non_oper_exp
+    total_profit: total_profit
+    n_income: n_income
+    n_income_attr_p: n_income_attr_p
+    ebit: ebit
+    ebitda: ebitda
+    rd_exp: rd_exp
+    continued_net_profit: continued_net_profit
+  balance_sheet:
+    notes_receiv: notes_receiv
+    accounts_receiv: accounts_receiv
+    prepayment: prepayment
+    inventories: inventories
+    total_cur_assets: total_cur_assets
+    total_nca: total_nca
+    total_assets: total_assets
+    total_cur_liab: total_cur_liab
+    total_ncl: total_ncl
+    total_liab: total_liab
+    acc_receivable: acc_receivable
+    payables: payables
+  cashflow_sheet:
+    n_cashflow_act: n_cashflow_act
+    n_cashflow_inv_act: n_cashflow_inv_act
+    n_cash_flows_fnc_act: n_cash_flows_fnc_act
+    free_cashflow: free_cashflow
+    end_bal_cash: end_bal_cash
+  financial_index:
+    gross_margin: gross_margin
+    current_ratio: current_ratio
+    quick_ratio: quick_ratio
+    cash_ratio: cash_ratio
+    profit_dedt: profit_dedt
+    invturn_days: invturn_days
+    arturn_days: arturn_days
+    inv_turn: inv_turn
+    ar_turn: ar_turn
+    ca_turn: ca_turn
+    fa_turn: fa_turn
+    assets_turn: assets_turn
+    op_income: op_income
+    fcff_ps: fcff_ps
+    fcfe_ps: fcfe_ps
+security_lending_financing:
+  rzye: rzye
+  rqye: rqye
+  rzmre: rzmre
+  rqyl: rqyl
+  rzche: rzche
+  rqchl: rqchl
+  rqmcl: rqmcl
+  rzrqye: rzrqye
+
+

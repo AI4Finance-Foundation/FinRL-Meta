@@ -4,15 +4,15 @@ from typing import List
 
 import numpy as np
 import pandas as pd
-
+import yaml
 
 class DataProcessor:
     def __init__(
         self,
         data_source: str,
-        start_date: str,
-        end_date: str,
-        time_interval: str,
+        start_date: str = None,
+        end_date: str = None,
+        time_interval: str = None,
         **kwargs,
     ):
         self.data_source = data_source
@@ -69,6 +69,8 @@ class DataProcessor:
             from meta.data_processors.tushare import Tushare
 
             processor_dict = {self.data_source: Tushare}
+            with open("./configs/tushare.yaml", "r", encoding="utf-8") as ymlfile:
+                self.cfg = yaml.safe_load(ymlfile)
         elif self.data_source == "wrds":
             from meta.data_processors.wrds import Wrds
 
@@ -89,6 +91,24 @@ class DataProcessor:
             raise ValueError(
                 f"Please input correct account info for {self.data_source}!"
             )
+
+    def download_share_list(self, save_path=None, filter_item=None, filter_value=None):
+        self.processor.download_share_list(self.cfg, save_path, filter_item, filter_value)
+        self.sharelist_df = self.processor.sharelist_df
+        self.sharelist = self.sharelist_df['stock_code_full'].unique()
+
+    def load_share_list(self, csv_path, filter_item=None, filter_value=None):
+        self.sharelist_df = pd.read_csv(csv_path)
+        if filter_item is not None:
+            assert(len(filter_item) == len(filter_value))
+            for col, val in zip(filter_item, filter_value):
+                self.sharelist_df = self.sharelist_df[self.sharelist_df[col] == val]
+        self.sharelist = self.sharelist_df['stock_code_full'].unique()
+
+
+    def download_market_daily(self, share_list, start_date, end_date, adj, save_folder=None):
+        self.processor.download_market_daily(self.cfg, share_list, start_date, end_date, adj, save_folder)
+        self.dataframe = self.processor.dataframe
 
     def download_data(self, ticker_list):
         self.processor.download_data(ticker_list=ticker_list)
