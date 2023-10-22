@@ -8,7 +8,10 @@
 
 FinRL-Meta ([docs website](https://finrl.readthedocs.io/en/latest/finrl_meta/background.html)) builds a universe of market environments for data-driven financial reinforcement learning. We aim to help the users in our community to easily build environments.
 
-[FinRL](https://github.com/AI4Finance-Foundation/FinRL) Project
+[![](https://dcbadge.vercel.app/api/server/trsr8SXpW5)](https://discord.gg/trsr8SXpW5)
+
+
+Check out the [FinRL](https://github.com/AI4Finance-Foundation/FinRL) Project
 
 1. FinRL-Meta provides hundreds of market environments.
 2. FinRL-Meta reproduces existing papers as benchmarks.
