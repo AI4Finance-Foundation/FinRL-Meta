@@ -35,6 +35,7 @@ Check out the [FinRL](https://github.com/AI4Finance-Foundation/FinRL) Project
 + [央广网] [2021 IDEA大会开启AI思想盛宴 沈向洋理事长发布六大前沿产品](https://baijiahao.baidu.com/s?id=1717101783873523790&wfr=spider&for=pc)
 + [IDEA新闻] [2021 IDEA大会发布产品FinRL-Meta——基于数据驱动的强化学习金融风险模拟系统](https://idea.edu.cn/news/20211213143128.html)
 + [知乎] [FinRL-Meta基于数据驱动的强化学习金融元宇宙](https://zhuanlan.zhihu.com/p/437804814)
++ [知乎] [FinRL-Meta: 未来金融强化学习的元宇宙](https://zhuanlan.zhihu.com/p/544621882?)
 
 ## Our Goals
 + To provide benchmarks and facilitate fair comparisons, we allow researchers to evaluate different strategies on the same dataset. Also, it would help researchers to better understand the “black-box” nature (deep neural network-based) of DRL algorithms.
