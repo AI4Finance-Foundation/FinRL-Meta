@@ -8,6 +8,8 @@
 
 [FinRL-Meta](https://finrl.readthedocs.io/en/latest/finrl_meta/background.html) builds a universe of market environments for data-driven financial reinforcement learning. We aim to help the users in our community to easily build environments.
 
+Check out our latest competition: [ACM ICAIF 2023 FinRL Contest](https://finrl-contest.github.io/)
+
 [![](https://dcbadge.vercel.app/api/server/trsr8SXpW5)](https://discord.gg/trsr8SXpW5)
 
 
