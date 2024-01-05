@@ -137,8 +137,8 @@ For future work, we plan to build a multi-agent-based market simulator that cons
 @article{dynamic_datasets,
     author = {Liu, Xiao-Yang and Xia, Ziyi and Yang, Hongyang and Gao, Jiechao and Zha, Daochen and Zhu, Ming and Wang, Christina Dan and Wang, Zhaoran and Guo, Jian},
     title = {Dynamic Datasets and Market Environments for Financial Reinforcement Learning},
-    journal = {Machine Learning Journal - Springer Nature},
-    year = {2023}
+    journal = {Machine Learning - Springer Nature},
+    year = {2024}
 }
 ```
 
