@@ -282,9 +282,11 @@ def train_and_evaluate(args, learner_id=0):
 
             if if_save and not if_overwrite:
                 agent.save_or_load_agent("%s/best/" % (cwd), if_save=True)
-                buffer.save_or_load_history(
-                    "%s/best/" % (cwd), if_save=True
-                ) if agent.if_off_policy else None
+                (
+                    buffer.save_or_load_history("%s/best/" % (cwd), if_save=True)
+                    if agent.if_off_policy
+                    else None
+                )
 
             if_train = not (
                 (if_allow_break and if_reach_goal)
@@ -508,12 +510,16 @@ class PipeLearner:
                 avg_update_net(agent.cri, data[2], device) if data[2] else None
                 avg_update_optim(agent.cri_optim, data[3], device)
 
-                avg_update_net(
-                    agent.act_target, data[4], device
-                ) if agent.if_use_act_target else None
-                avg_update_net(
-                    agent.cri_target, data[5], device
-                ) if agent.if_use_cri_target else None
+                (
+                    avg_update_net(agent.act_target, data[4], device)
+                    if agent.if_use_act_target
+                    else None
+                )
+                (
+                    avg_update_net(agent.cri_target, data[5], device)
+                    if agent.if_use_cri_target
+                    else None
+                )
 
     def run0(self, args, comm_eva, comm_exp, learner_id=0):
         # print(f'| os.getpid()={os.getpid()} PipeLearn.run, {learner_id}')

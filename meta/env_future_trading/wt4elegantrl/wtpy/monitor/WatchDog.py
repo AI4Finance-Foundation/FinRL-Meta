@@ -120,7 +120,9 @@ class AppInfo(EventSink):
                     url=self._mq_url, logger=self.__logger__
                 )
                 self._evt_receiver.run()
-                self.__logger__.info("应用%s开始接收%s的通知信息" % (self._id, self._mq_url))
+                self.__logger__.info(
+                    "应用%s开始接收%s的通知信息" % (self._id, self._mq_url)
+                )
 
     def getConf(self):
         self._lock.acquire()
@@ -168,7 +170,8 @@ class AppInfo(EventSink):
                                 )
                                 self._evt_receiver.run()
                                 self.__logger__.info(
-                                    "应用%s开始接收%s的通知信息" % (self._id, self._mq_url)
+                                    "应用%s开始接收%s的通知信息"
+                                    % (self._id, self._mq_url)
                                 )
                 except:
                     pass
@@ -188,7 +191,9 @@ class AppInfo(EventSink):
                 url=self._mq_url, logger=self.__logger__, sink=self
             )
             self._evt_receiver.run()
-            self.__logger__.info("应用%s开始接收%s的通知信息" % (self._id, self._mq_url))
+            self.__logger__.info(
+                "应用%s开始接收%s的通知信息" % (self._id, self._mq_url)
+            )
 
         try:
             fullPath = os.path.join(self.__info__["folder"], self.__info__["param"])

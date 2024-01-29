@@ -104,7 +104,9 @@ def hhv(S, N):  # hhv(C, 5) 最近5天收盘最高价
     return pd.Series(S).rolling(N).max().values
 
 
-def sma(S, N, M=1):  # 中国式的SMA,至少需要120周期才精确 (雪球180周期)    alpha=1/(1+com)
+def sma(
+    S, N, M=1
+):  # 中国式的SMA,至少需要120周期才精确 (雪球180周期)    alpha=1/(1+com)
     return pd.Series(S).ewm(alpha=M / N, adjust=False).mean().values  # com=N-M/M
 
 

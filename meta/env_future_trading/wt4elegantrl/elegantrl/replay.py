@@ -380,9 +380,9 @@ class BinarySearchTree:
         self.now_len += (ids >= self.now_len).sum()
 
         upper_step = self.depth - 1
-        self.prob_ary[
-            ids
-        ] = prob  # here, ids means the indices of given children (maybe the right ones or left ones)
+        self.prob_ary[ids] = (
+            prob  # here, ids means the indices of given children (maybe the right ones or left ones)
+        )
         p_ids = (ids - 1) // 2
 
         while upper_step:  # propagate the change through tree
