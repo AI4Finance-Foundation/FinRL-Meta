@@ -782,7 +782,9 @@ class WtMonSvr(WatcherSink):
                         usrInf["loginip"] = request.remote_addr
                         usrInf["logintime"] = now.strftime("%Y/%m/%d %H:%M:%S")
 
-                        exptime = now + datetime.timedelta(minutes=360)  # 360分钟令牌超时
+                        exptime = now + datetime.timedelta(
+                            minutes=360
+                        )  # 360分钟令牌超时
                         session["userinfo"] = usrInf
                         session["expiretime"] = exptime.replace(
                             tzinfo=pytz.timezone("UTC")
@@ -1704,7 +1706,10 @@ class WtMonSvr(WatcherSink):
             if len(id) == 0:
                 ret = {"result": -1, "message": "组合ID不能为空"}
             elif self.__data_mgr__.has_group(id):
-                ret = {"result": -2, "message": "该调度任务是策略组合，请从组合管理删除"}
+                ret = {
+                    "result": -2,
+                    "message": "该调度任务是策略组合，请从组合管理删除",
+                }
             elif not self._dog.has_app(id):
                 ret = {"result": -3, "message": "该调度任务不存在"}
             elif self._dog.isRunning(id):

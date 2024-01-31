@@ -6,6 +6,7 @@ Date: 2021-07-27 09:53:43
 LastEditors: Wesley
 LastEditTime: 2021-08-13 15:26:16
 """
+
 import os
 from ctypes import c_bool
 from ctypes import c_char_p
@@ -78,7 +79,9 @@ class WtDtWrapper:
         except OSError as oe:
             print(oe)
 
-        self.write_log(102, "WonderTrader datakit initialzied，version：%s" % (self.ver))
+        self.write_log(
+            102, "WonderTrader datakit initialzied，version：%s" % (self.ver)
+        )
 
     def create_extended_parser(self, id: str) -> bool:
         return self.api.create_ext_parser(bytes(id, encoding="utf8"))

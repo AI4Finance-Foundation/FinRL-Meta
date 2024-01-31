@@ -193,7 +193,10 @@ if __name__ == "__main__":
                 obs, reward, done, info = env.step(action)
                 n += 1
                 # print('action:', action, 'obs:', obs, 'reward:', reward, 'done:', done)
-            print("第%s次训练完成，执行%s步, 奖励%s, 盈亏%s。" % (i, n, reward, env.assets))
+            print(
+                "第%s次训练完成，执行%s步, 奖励%s, 盈亏%s。"
+                % (i, n, reward, env.assets)
+            )
         env.close()
 
     @command()

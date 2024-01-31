@@ -185,7 +185,9 @@ class SimpleAssessment(Assessment):  # 借鉴了neofinrl
         # gamma = np.round(np.nanprod(np.array(self.__reward__)+1, axis=0)-1, 5)
         # gamma = self.__assets__[-1]/max(self.__assets__)-1
         # gamma = self.__assets__[-1]/self.init_assets-1
-        self.__reward__.append(gamma)  # 在结束的时候把过程奖励做处理，作为整个训练的奖励
+        self.__reward__.append(
+            gamma
+        )  # 在结束的时候把过程奖励做处理，作为整个训练的奖励
         self.__done__ = True
 
     @property

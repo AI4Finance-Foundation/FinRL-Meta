@@ -796,17 +796,25 @@ def trading_analyze(workbook: Workbook, df_closes, df_funds, capital=500000):
     worksheet.write_column("B40", s.values(), value_format)
 
     worksheet.write_row("A49", ["连续交易系列统计"], title_format)
-    worksheet.write_row("A51", ["连续盈利次数", "出现次数", "每个序列的平均收益"], index_format)
+    worksheet.write_row(
+        "A51", ["连续盈利次数", "出现次数", "每个序列的平均收益"], index_format
+    )
     worksheet.write_column("A52", f_result["连续次数"], value_format)
     worksheet.write_column("B52", f_result["出现次数"], value_format)
     worksheet.write_column("C52", f_result["每个序列平均收益"], value_format)
 
     win_cnt = len(f_result)
     next_row = win_cnt + 52
-    worksheet.write_row("A%d" % next_row, ["连续亏损次数", "出现次数", "每个序列的平均亏损"], index_format)
+    worksheet.write_row(
+        "A%d" % next_row,
+        ["连续亏损次数", "出现次数", "每个序列的平均亏损"],
+        index_format,
+    )
     worksheet.write_column("A%d" % (next_row + 1), f_2_result["连续次数"], value_format)
     worksheet.write_column("B%d" % (next_row + 1), f_2_result["出现次数"], value_format)
-    worksheet.write_column("C%d" % (next_row + 1), f_2_result["每个序列平均亏损"], value_format)
+    worksheet.write_column(
+        "C%d" % (next_row + 1), f_2_result["每个序列平均亏损"], value_format
+    )
 
     # 这里开始画图
     next_row += len(f_2_result) + 3

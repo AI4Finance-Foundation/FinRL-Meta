@@ -576,24 +576,30 @@ class WtMailNotifier:
         for exchg in hot_changes:
             for pid in hot_changes[exchg]:
                 item = hot_changes[exchg][pid][-1]
-                content += "品种%s.%s的主力合约已切换,下个交易日(%s)生效, %s -> %s\n" % (
-                    exchg,
-                    pid,
-                    dtStr,
-                    item["from"],
-                    item["to"],
+                content += (
+                    "品种%s.%s的主力合约已切换,下个交易日(%s)生效, %s -> %s\n"
+                    % (
+                        exchg,
+                        pid,
+                        dtStr,
+                        item["from"],
+                        item["to"],
+                    )
                 )
 
         content += "\n"
         for exchg in sec_changes:
             for pid in sec_changes[exchg]:
                 item = sec_changes[exchg][pid][-1]
-                content += "品种%s.%s的次主力合约已切换,下个交易日(%s)生效, %s -> %s\n" % (
-                    exchg,
-                    pid,
-                    dtStr,
-                    item["from"],
-                    item["to"],
+                content += (
+                    "品种%s.%s的次主力合约已切换,下个交易日(%s)生效, %s -> %s\n"
+                    % (
+                        exchg,
+                        pid,
+                        dtStr,
+                        item["from"],
+                        item["to"],
+                    )
                 )
 
         msg_mp = MIMEMultipart()
@@ -910,7 +916,8 @@ class WtHotPicker:
             else:
                 total[exchg][pid].extend(switch_list[pid])
                 logging.info(
-                    "[%s]品种%s主力切换规则追加%d条" % (exchg, pid, len(switch_list[pid]))
+                    "[%s]品种%s主力切换规则追加%d条"
+                    % (exchg, pid, len(switch_list[pid]))
                 )
                 bChanged = True
         return bChanged, total
@@ -1060,7 +1067,8 @@ class WtHotPicker:
         lastDate = str(marker["date"])
         if lastDate >= endDate.strftime("%Y%m%d"):
             logging.info(
-                "上次更新日期%s大于结束日期%s，退出更新" % (lastDate, endDate.strftime("%Y%m%d"))
+                "上次更新日期%s大于结束日期%s，退出更新"
+                % (lastDate, endDate.strftime("%Y%m%d"))
             )
             exit()
         elif lastDate != "0":

@@ -337,7 +337,9 @@ class WtBtWrapper:
         addr = addressof(curTick.contents)  # 获取内存地址
         ticks = [None] * count  # 预先分配list的长度
         for idx in range(count):
-            realTick = WTSTickStruct.from_address(addr)  # 从内存中直接解析成WTSTickStruct
+            realTick = WTSTickStruct.from_address(
+                addr
+            )  # 从内存中直接解析成WTSTickStruct
             tick = dict()
             tick["time"] = realTick.action_date * 1000000000 + realTick.action_time
             tick["open"] = realTick.open

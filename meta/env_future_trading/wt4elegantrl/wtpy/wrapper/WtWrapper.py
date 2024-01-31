@@ -336,7 +336,9 @@ class WtWrapper:
         addr = addressof(curTick.contents)  # 获取内存地址
         ticks = [None] * count  # 预先分配list的长度
         for idx in range(count):
-            realTick = WTSTickStruct.from_address(addr)  # 从内存中直接解析成WTSTickStruct
+            realTick = WTSTickStruct.from_address(
+                addr
+            )  # 从内存中直接解析成WTSTickStruct
             tick = dict()
             tick["time"] = realTick.action_date * 1000000000 + realTick.action_time
             tick["open"] = realTick.open
@@ -729,7 +731,8 @@ class WtWrapper:
 
         self.write_log(
             102,
-            "WonderTrader CTA production framework initialzied，version：%s" % (self.ver),
+            "WonderTrader CTA production framework initialzied，version：%s"
+            % (self.ver),
         )
 
     def initialize_hft(
@@ -780,7 +783,8 @@ class WtWrapper:
 
         self.write_log(
             102,
-            "WonderTrader HFT production framework initialzied，version：%s" % (self.ver),
+            "WonderTrader HFT production framework initialzied，version：%s"
+            % (self.ver),
         )
 
     def initialize_sel(
@@ -820,7 +824,8 @@ class WtWrapper:
 
         self.write_log(
             102,
-            "WonderTrader SEL production framework initialzied，version：%s" % (self.ver),
+            "WonderTrader SEL production framework initialzied，version：%s"
+            % (self.ver),
         )
 
     def cta_enter_long(

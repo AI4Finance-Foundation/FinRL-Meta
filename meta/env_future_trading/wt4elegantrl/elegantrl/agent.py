@@ -74,12 +74,12 @@ class AgentBase:
         self.get_obj_critic = None
 
         self.criterion = torch.nn.SmoothL1Loss()
-        self.cri = (
-            self.cri_target
-        ) = self.if_use_cri_target = self.cri_optim = self.ClassCri = None
-        self.act = (
-            self.act_target
-        ) = self.if_use_act_target = self.act_optim = self.ClassAct = None
+        self.cri = self.cri_target = self.if_use_cri_target = self.cri_optim = (
+            self.ClassCri
+        ) = None
+        self.act = self.act_target = self.if_use_act_target = self.act_optim = (
+            self.ClassAct
+        ) = None
 
         assert isinstance(gpu_id, int)
         assert isinstance(env_num, int)

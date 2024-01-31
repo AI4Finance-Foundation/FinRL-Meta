@@ -23,7 +23,9 @@ class HftContext:
         self.__wrapper__ = wrapper  # 底层接口转换器
         self.__id__ = id  # 策略ID
         self.__bar_cache__ = dict()  # K线缓存
-        self.__tick_cache__ = dict()  # Tick缓存,每次都重新去拉取,这个只做中转用,不在python里维护副本
+        self.__tick_cache__ = (
+            dict()
+        )  # Tick缓存,每次都重新去拉取,这个只做中转用,不在python里维护副本
         self.__ordque_cache__ = dict()  # 委托队列缓存，用法同__tick_cache__
         self.__orddtl_cache__ = dict()  # 逐笔委托缓存，用法同__tick_cache__
         self.__trans_cache__ = dict()  # 逐笔成交缓存，用法同__tick_cache__
