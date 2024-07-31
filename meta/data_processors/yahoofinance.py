@@ -95,7 +95,7 @@ class Yahoofinance(_Base):
         trading_days = self.get_trading_days(start=self.start_date, end=self.end_date)
         if time_interval == "1D":
             times = trading_days
-        elif time_interval == "1Min":
+        elif time_interval == "1m":
             times = []
             for day in trading_days:
                 current_time = pd.Timestamp(day + " 09:30:00").tz_localize(
