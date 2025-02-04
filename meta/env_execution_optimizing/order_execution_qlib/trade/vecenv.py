@@ -210,7 +210,7 @@ class SubprocEnvWorker(EnvWorker):
         """ """
 
         def decode_obs(
-            buffer: Optional[Union[dict, tuple, ShArray]]
+            buffer: Optional[Union[dict, tuple, ShArray]],
         ) -> Union[dict, tuple, np.ndarray]:
             """
 
