@@ -222,7 +222,7 @@ def flatten_batch(batch):
 
 
 def to_numpy(
-    x: Union[Batch, dict, list, tuple, np.ndarray, torch.Tensor]
+    x: Union[Batch, dict, list, tuple, np.ndarray, torch.Tensor],
 ) -> Union[Batch, dict, list, tuple, np.ndarray, torch.Tensor]:
     """
 
