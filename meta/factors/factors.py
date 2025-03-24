@@ -136,35 +136,35 @@ class MomentumFactors:
     """
 
     # 5日乖离率 'ic_mean': '-0.045657'
-    def bias_5_days(close, N=5):
+    def bias_5_days(self, close, N=5):
         # （收盘价-收盘价的N日简单平均）/ 收盘价的N日简单平均*100，在此n取5
         mac = ma(close, N)
         return (close - mac) / (mac * 100)
 
     # 10日乖离率  'ic_mean': '-0.043967'
-    def bias_10_days(close, N=10):
+    def bias_10_days(self, close, N=10):
         # （收盘价-收盘价的N日简单平均）/ 收盘价的N日简单平均*100，在此n取10
         mac = ma(close, N)
         return (close - mac) / (mac * 100)
 
     # 60日乖离率 'ic_mean': '-0.039533'
-    def bias_60_days(close, N=60):
+    def bias_60_days(self, close, N=60):
         # （收盘价-收盘价的N日简单平均）/ 收盘价的N日简单平均*100，在此n取60
         mac = ma(close, N)
         return (close - mac) / (mac * 100)
 
     # 当前股价除以过去一个月股价均值再减1 'ic_mean': '-0.039303'
-    def price_1_month(close, N=21):
+    def price_1_month(self, close, N=21):
         # 当日收盘价 / mean(过去一个月(21天)的收盘价) -1
         return close / close.rolling(N).mean() - 1
 
     # 当前股价除以过去三个月股价均值再减1 'ic_mean': '-0.034927'
-    def price_3_monthes(close, N=61):
+    def price_3_monthes(self, close, N=61):
         # 当日收盘价 / mean(过去三个月(61天)的收盘价) -1
         return close / close.rolling(N).mean() - 1
 
     # 6日变动速率（Price Rate of Change） 'ic_mean': '-0.030587'
-    def roc_6_days(close, N=6):
+    def roc_6_days(self, close, N=6):
         # ①AX=今天的收盘价—6天前的收盘价
         # ②BX=6天前的收盘价
         # ③ROC=AX/BX*100
@@ -173,51 +173,51 @@ class MomentumFactors:
         return AX / (BX * 100)
 
     # 12日变动速率（Price Rate of Change） 'ic_mean': '-0.034748'
-    def roc_12_days(close, N=12):
+    def roc_12_days(self, close, N=12):
         # ①AX=今天的收盘价—12天前的收盘价 ②BX=12天前的收盘价 ③ROC=AX/BX*100
         BX = close.shift(N)
         AX = close - BX
         return AX / (BX * 100)
 
     # 20日变动速率（Price Rate of Change）  'ic_mean': '-0.031276'
-    def roc_20_days(close, N=20):
+    def roc_20_days(self, close, N=20):
         #  ①AX=今天的收盘价—20天前的收盘价 ②BX=20天前的收盘价 ③ROC=AX/BX*100
         BX = close.shift(N)
         AX = close - BX
         return AX / (BX * 100)
 
     # 单日价量趋势  'ic_mean': '-0.051037'
-    def single_day_vpt(df):
+    def single_day_vpt(self, df):
         # （今日收盘价 - 昨日收盘价）/ 昨日收盘价 * 当日成交量  # (复权方法为基于当日前复权)
         sft = df["close_price"].shift(1)
         return (df["close_price"] - sft) / sft * df["volume"]
 
     # 单日价量趋势6日均值 'ic_mean': '-0.032458'
-    def single_day_vpt_6(df):
+    def single_day_vpt_6(self, df):
         # ma(single_day_VPT, 6)
         sft = df["close_price"].shift(1)
         return pd.Series(ma((df["close_price"] - sft) / sft * df["volume"], 6))
 
     # 单日价量趋势12均值 'ic_mean': '-0.031016'
-    def single_day_vpt_12(df):
+    def single_day_vpt_12(self, df):
         # ma(single_day_VPT, 12)
         sft = df["close_price"].shift(1)
         return pd.Series(ma((df["close_price"] - sft) / sft * df["volume"], 12))
 
     # 10日顺势指标 'ic_mean': '-0.038179'
-    def cci_10_days(df, N=10):
+    def cci_10_days(self, df, N=10):
         #  CCI:=(TYP-ma(TYP,N))/(0.015*avedev(TYP,N)) TYP:=(HIGH+LOW+CLOSE)/3 N:=10
         TYP = (df["high_price"] + df["low_price"] + df["close_price"]) / 3
         return (TYP - ma(TYP, N)) / (0.015 * avedev(TYP, N))
 
     # 15日顺势指标 'ic_mean': '-0.035973'
-    def cci_15_days(df, N=15):
+    def cci_15_days(self, df, N=15):
         #  CCI:=(TYP-ma(TYP,N))/(0.015*avedev(TYP,N)) TYP:=(HIGH+LOW+CLOSE)/3 N:=15
         TYP = (df["high_price"] + df["low_price"] + df["close_price"]) / 3
         return (TYP - ma(TYP, N)) / (0.015 * avedev(TYP, N))
 
     # 20日顺势指标 'ic_mean': '-0.033437'
-    def cci_20_days(df, N=20):
+    def cci_20_days(self, df, N=20):
         # CCI:=(TYP-ma(TYP,N))/(0.015*avedev(TYP,N)) TYP:=(HIGH+LOW+CLOSE)/3 N:=20
         TYP = (df["high_price"] + df["low_price"] + df["close_price"]) / 3
         return (TYP - ma(TYP, N)) / (0.015 * avedev(TYP, N))
@@ -225,7 +225,7 @@ class MomentumFactors:
     # 当前交易量相比过去1个月日均交易量 与过去过去20日日均收益率乘积 'ic_mean': '-0.032789'
     # def Volume1M(volume, profit):
     #     # 当日交易量 / 过去20日交易量MEAN * 过去20日收益率MEAN
-    def volume_1_month(df, N=21):
+    def volume_1_month(self, df, N=21):
         # 当日交易量 / 过去20日交易量MEAN * 过去20日收益率MEAN
         return (
             df["volume"]
@@ -234,7 +234,7 @@ class MomentumFactors:
         )
 
     # 多头力道 'ic_mean': '-0.039968'
-    def bull_power(df, timeperiod=13):
+    def bull_power(self, df, timeperiod=13):
         return (df["high_price"] - ema(df["close_price"], timeperiod)) / df[
             "close_price"
         ]
@@ -247,7 +247,7 @@ class EmotionFactors:
 
     # 换手率： 某一段时期内的成交量/发行总股数×100%
     # 5日平均换手率 'ic_mean': '-0.044'
-    def vol_5_days(S, total_volume, N=5):
+    def vol_5_days(self, S, total_volume, N=5):
         # 5日换手率均值
         S = S / total_volume
         return pd.Series(S).rolling(N).mean()
@@ -259,84 +259,84 @@ class EmotionFactors:
         return pd.Series(S).rolling(N).mean()
 
     # 20日平均换手率 'ic_mean': '-0.035'
-    def vol_20_days(S, total_volume, N=20):
+    def vol_20_days(self, S, total_volume, N=20):
         # 20日换手率的均值,单位为%
         S = S / total_volume
         return pd.Series(S).rolling(N).mean()
 
     # 5日平均换手率与120日平均换手率 'ic_mean': '-0.039'
-    def davol_5_days(S):
+    def davol_5_days(self, S):
         # 5日平均换手率 / 120日平均换手率
         return EmotionFactors.vol_5_days(S) / EmotionFactors.vol_5_days(S, N=120)
 
     # 10日平均换手率与120日平均换手率之比 'ic_mean': '-0.033'
-    def davol_10_days(S):
+    def davol_10_days(self, S):
         # 10日平均换手率 / 120日平均换手率
         return EmotionFactors.vol_10_days(S) / EmotionFactors.vol_5_days(S, N=120)
 
     # 10日成交量标准差 'ic_mean': '-0.037'
-    def vstd_10_days(volume, N=10):
+    def vstd_10_days(self, volume, N=10):
         # 10日成交量去标准差
         return pd.Series(std(volume, N))
 
     # 20日成交量标准差 'ic_mean': '-0.033'
-    def vstd_20_days(volume, N=20):
+    def vstd_20_days(self, volume, N=20):
         # 20日成交量去标准差
         return pd.Series(std(volume, N))
 
     # 6日成交金额的标准差 'ic_mean': '-0.044'
-    def tvstd_6_days(df, N=6):
+    def tvstd_6_days(self, df, N=6):
         # 6日成交额的标准差
         trades = df["close_price"] * df["volume"]
         return pd.Series(std(trades, N))
 
     # 20日成交金额的标准差 'ic_mean': '-0.038'
-    def tvstd_20_days(df, N=20):
+    def tvstd_20_days(self, df, N=20):
         # 20日成交额的标准差
         trades = df["close_price"] * df["volume"]
         return pd.Series(std(trades, N))
 
     # 成交量的5日指数移动平均 'ic_mean': '-0.035'
-    def vema_5_days(volume, N=5):
+    def vema_5_days(self, volume, N=5):
         #
         return pd.Series(ema(volume, N))
 
     # 成交量的10日指数移动平均 'ic_mean': '-0.032'
-    def vema_10_days(volume, N=10):
+    def vema_10_days(self, volume, N=10):
         #
         return pd.Series(ema(volume, N))
 
     # 12日成交量的移动平均值 'ic_mean': '-0.031'
-    def vema_12_days(volume, N=12):
+    def vema_12_days(self, volume, N=12):
         #
         return pd.Series(ema(volume, N))
 
     # 成交量震荡 'ic_mean': '-0.039'
-    def vosc(volume):
+    def vosc(self, volume):
         # 'VEMA12'和'VEMA26'两者的差值，再求差值与'VEMA12'的比，最后将比值放大100倍，得到VOSC值
         ema12 = ema(volume, 12)
         return pd.Series((ema(volume, 26) - ema12 / (ema12 * 100)))
 
     # 6日量变动速率指标 'ic_mean': '-0.032'
-    def vroc_6_days(volume, N=6):
+    def vroc_6_days(self, volume, N=6):
         # 成交量减N日前的成交量，再除以N日前的成交量，放大100倍，得到VROC值 ，n=6
         sft = volume.shift(N)
         return pd.Series((volume - sft) / (sft * 100))
 
     # 12日量变动速率指标 'ic_mean': '-0.040'
-    def vroc_12_days(volume, N=12):
+    def vroc_12_days(self, volume, N=12):
         # 成交量减N日前的成交量，再除以N日前的成交量，放大100倍，得到VROC值 ，n=12
         sft = volume.shift(N)
         return pd.Series((volume - sft) / (sft * 100))
 
     # 6日成交金额的移动平均值 'ic_mean': '-0.038'
-    def tvma_6_days(df, N=6):
+    def tvma_6_days(self, df, N=6):
         # 6日成交金额的移动平均值
         trades = df["close_price"] * df["volume"]
         return pd.Series(ma(trades, N))
 
     # 威廉变异离散量 'ic_mean': '-0.031'
-    def wvad(df, N=6):
+    def wvad(self, df, N=6):
         # (收盘价－开盘价)/(最高价－最低价)×成交量，再做加和，使用过去6个交易日的数据
         WVA = (
             (df["close_price"] - df["open_price"])
@@ -364,7 +364,7 @@ class extraFacters:
     特殊因子
     """
 
-    def rsrs(df, N):
+    def rsrs(self, df, N):
         # 用于记录回归后的beta值，即斜率
         ans = []
         # 用于计算被决定系数加权修正后的贝塔值
@@ -390,7 +390,7 @@ class extraFacters:
         # 计算右偏RSRS标准分
         return pd.Series(zscore * beta * r2)
 
-    def vix():
+    def vix(self):
         pass
 
 
