@@ -7,10 +7,10 @@ import pytz
 import wrds
 
 try:
-    import exchange_calendars as tc
+    import pandas_market_calendars as tc
 except:
     print(
-        "Cannot import exchange_calendars.",
+        "Cannot import pandas_market_calendars.",
         "If you are using python>=3.7, please install it.",
     )
     import trading_calendars as tc
