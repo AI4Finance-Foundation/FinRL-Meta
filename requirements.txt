@@ -5,7 +5,7 @@ ccxt==1.90.41
 elegantrl
 
 # market data & paper trading API
-exchange_calendars==4.1.1
+pandas_market_calendars
 gputil==1.4.0
 gym>=0.17 #gym==0.24.1
 jqdatasdk==1.8.10
@@ -34,7 +34,7 @@ scikit-learn==1.1.1
 setuptools==63.1.0
 stable-baselines3[extra]==1.5.0
 stockstats==0.4.1
-tensorboardX==2.5.1
+tensorboard
 vectorbt[full]==0.23.3
 wheel==0.37.1
 wrds==3.1.1
