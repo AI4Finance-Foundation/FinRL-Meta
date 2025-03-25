@@ -13,12 +13,12 @@ lz4==4.0.1
 
 # plot
 matplotlib==3.5.2
-# data handling
+
+
 numpy==1.23.1
 pandas==1.4.3
 
-# pandas
-pandas_market_calendars==3.5
+pandas_market_calendars # calendars
 
 # hooks
 pre-commit==2.19.0
