@@ -41,33 +41,62 @@ class Yahoofinance(_Base):
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
 
     def download_data(
-        self, ticker_list: List[str], save_path: str = "./data/dataset.csv"
+        self, ticker_list: List[str], save_path: str = "./data/dataset.csv",
+            proxy=None, auto_adjust=False
     ):
         self.time_zone = calc_time_zone(
             ticker_list, TIME_ZONE_SELFDEFINED, USE_TIME_ZONE_SELFDEFINED
         )
         self.dataframe = pd.DataFrame()
+        num_failures = 0
         for tic in ticker_list:
             temp_df = yf.download(
                 tic,
                 start=self.start_date,
                 end=self.end_date,
                 interval=self.time_interval,
+                proxy=proxy,
+                auto_adjust=auto_adjust,
             )
+            if temp_df.columns.nlevels != 1:
+                temp_df.columns = temp_df.columns.droplevel(1)
             temp_df["tic"] = tic
-            self.dataframe = pd.concat([self.dataframe, temp_df], axis=0, join="outer")
+            if len(temp_df) > 0:
+                # data_df = data_df.append(temp_df)
+                self.dataframe = pd.concat([self.dataframe, temp_df], axis=0)
+            else:
+                num_failures += 1
+        if num_failures == len(ticker_list):
+            raise ValueError("no data is fetched.")
         self.dataframe.reset_index(inplace=True)
         try:
-            self.dataframe.columns = [
-                "date",
-                "open",
-                "high",
-                "low",
-                "close",
-                "adjusted_close",
-                "volume",
-                "tic",
-            ]
+            # self.dataframe.columns = [
+            #     "date",
+            #     "open",
+            #     "high",
+            #     "low",
+            #     "close",
+            #     "adjusted_close",
+            #     "volume",
+            #     "tic",
+            # ]
+            self.dataframe.rename(
+                columns={
+                    "Date": "date",
+                    "Adj Close": "adjusted_close",
+                    "Close": "close",
+                    "High": "high",
+                    "Low": "low",
+                    "Volume": "volume",
+                    "Open": "open",
+                    "tic": "tic",
+                },
+                inplace=True,
+            )
+            # use adjusted close price instead of close price
+            self.dataframe["close"] = self.dataframe["adjusted_close"]
+            # drop the adjusted close price column
+            # self.dataframe = self.dataframe.drop(labels="adjcp", axis=1)
         except NotImplementedError:
             print("the features are not supported currently")
         self.dataframe["day"] = self.dataframe["date"].dt.dayofweek
@@ -83,9 +112,7 @@ class Yahoofinance(_Base):
 
         self.save_data(save_path)
 
-        print(
-            f"Download complete! Dataset saved to {save_path}. \nShape of DataFrame: {self.dataframe.shape}"
-        )
+        print(f"Download complete! Dataset saved to {save_path}. \nShape of DataFrame: {self.dataframe.shape}")
 
     def clean_data(self):
         df = self.dataframe.copy()
@@ -93,16 +120,16 @@ class Yahoofinance(_Base):
         time_interval = self.time_interval
         tic_list = np.unique(df.tic.values)
         trading_days = self.get_trading_days(start=self.start_date, end=self.end_date)
-        if time_interval == "1D":
-            times = trading_days
+        if time_interval == "1d":
+            time_list = trading_days
         elif time_interval == "1m":
-            times = []
+            time_list = []
             for day in trading_days:
                 current_time = pd.Timestamp(day + " 09:30:00").tz_localize(
                     self.time_zone
                 )
                 for _ in range(390):
-                    times.append(current_time)
+                    time_list.append(current_time)
                     current_time += pd.Timedelta(minutes=1)
         else:
             raise ValueError(
@@ -120,7 +147,7 @@ class Yahoofinance(_Base):
                     "adjusted_close",
                     "volume",
                 ],
-                index=times,
+                index=time_list,
             )
             # get data for current ticker
             tic_df = df[df.tic == tic]
@@ -174,7 +201,8 @@ class Yahoofinance(_Base):
             # merge single ticker data to new DataFrame
             tmp_df = tmp_df.astype(float)
             tmp_df["tic"] = tic
-            new_df = new_df.append(tmp_df)
+            # new_df = new_df.append(tmp_df)
+            new_df = pd.concat([new_df, tmp_df])
 
             print(("Data clean for ") + tic + (" is finished."))
 
@@ -186,5 +214,8 @@ class Yahoofinance(_Base):
 
     def get_trading_days(self, start, end):
         nyse = tc.get_calendar("NYSE")
-        df = nyse.sessions_in_range(pd.Timestamp(start), pd.Timestamp(end))
-        return [str(day)[:10] for day in df]
+
+        df = nyse.date_range_htf(self.time_interval.upper(), pd.Timestamp(start), pd.Timestamp(end))
+        days = [str(day)[:10] for day in df]
+        # e.g., df = ['2022-09-01 10-0'], days = ['2022-09-01']
+        return days
