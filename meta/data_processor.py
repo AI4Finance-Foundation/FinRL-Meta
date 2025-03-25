@@ -5,6 +5,8 @@ from typing import List
 import numpy as np
 import pandas as pd
 
+from meta.config_tickers import DOW_30_TICKER
+
 
 class DataProcessor:
     def __init__(
@@ -99,13 +101,9 @@ class DataProcessor:
         self.processor.clean_data()
         self.dataframe = self.processor.dataframe
 
-    def add_technical_indicator(
-        self, tech_indicator_list: List[str], select_stockstats_talib: int = 0
-    ):
+    def add_technical_indicator(self, tech_indicator_list: List[str], select_stockstats_talib: int = 0):
         self.tech_indicator_list = tech_indicator_list
-        self.processor.add_technical_indicator(
-            tech_indicator_list, select_stockstats_talib
-        )
+        self.processor.add_technical_indicator(tech_indicator_list, select_stockstats_talib)
         self.dataframe = self.processor.dataframe
 
     def add_turbulence(self):
@@ -117,9 +115,7 @@ class DataProcessor:
         self.dataframe = self.processor.dataframe
 
     def df_to_array(self, if_vix: bool) -> np.array:
-        price_array, tech_array, turbulence_array = self.processor.df_to_array(
-            self.tech_indicator_list, if_vix
-        )
+        price_array, tech_array, turbulence_array = self.processor.df_to_array(self.tech_indicator_list, if_vix)
         # fill nan with 0 for technical indicators
         tech_nan_positions = np.isnan(tech_array)
         tech_array[tech_nan_positions] = 0
@@ -151,9 +147,7 @@ class DataProcessor:
         select_stockstats_talib: int = 0,
     ):
         if self.time_interval == "1s" and self.data_source != "binance":
-            raise ValueError(
-                "Currently 1s interval data is only supported with 'binance' as data source"
-            )
+            raise ValueError("Currently 1s interval data is only supported with 'binance' as data source")
 
         cache_filename = (
             "_".join(
@@ -182,11 +176,7 @@ class DataProcessor:
                 if not os.path.exists(cache_dir):
                     os.mkdir(cache_dir)
                 with open(cache_path, "wb") as handle:
-                    pickle.dump(
-                        self.dataframe,
-                        handle,
-                        protocol=pickle.HIGHEST_PROTOCOL,
-                    )
+                    pickle.dump(self.dataframe, handle, protocol=pickle.HIGHEST_PROTOCOL,)
 
         self.add_technical_indicator(technical_indicator_list, select_stockstats_talib)
         if if_vix:
@@ -200,8 +190,8 @@ class DataProcessor:
 
 def test_joinquant():
     # TRADE_START_DATE = "2019-09-01"
-    TRADE_START_DATE = "2020-09-01"
-    TRADE_END_DATE = "2021-09-11"
+    TRADE_START_DATE = "2022-09-01"
+    TRADE_END_DATE = "2023-11-01"
 
     # supported time interval: '1m', '5m', '15m', '30m', '60m', '120m', '1d', '1w', '1M'
     TIME_INTERVAL = "1d"
@@ -238,10 +228,54 @@ def test_joinquant():
     )
     pass
 
+def test_data_processor(data_source):
+    # TRADE_START_DATE = "2019-09-01"
+    TRADE_START_DATE = "2022-09-01"
+    TRADE_END_DATE = "2023-11-01"
 
-# if __name__ == "__main__":
-#     # test_joinquant()
-#     # test_binance()
-#     # test_yahoofinance()
-#     test_baostock()
-#     # test_quandl()
+    # supported time interval: '1m', '5m', '15m', '30m', '60m', '120m', '1d', '1w', '1M'
+    TIME_INTERVAL = "1d"
+    TECHNICAL_INDICATOR = [
+        "macd",
+        "boll_ub",
+        "boll_lb",
+        "rsi_30",
+        "dx_30",
+        "close_30_sma",
+        "close_60_sma",
+    ]
+
+    kwargs = {}
+    p = DataProcessor(
+        data_source=data_source,
+        start_date=TRADE_START_DATE,
+        end_date=TRADE_END_DATE,
+        time_interval=TIME_INTERVAL,
+        **kwargs,
+    )
+
+    ticker_list = DOW_30_TICKER
+
+    p.download_data(ticker_list=ticker_list)
+
+    p.clean_data()
+    p.add_turbulence()
+    p.add_technical_indicator(TECHNICAL_INDICATOR)
+    p.add_vix()
+
+    price_array, tech_array, turbulence_array = p.run(
+        ticker_list, TECHNICAL_INDICATOR, if_vix=False, cache=True
+    )
+
+    pass
+
+
+if __name__ == "__main__":
+    pass
+    # test_joinquant()
+    # test_binance()
+    # test_yahoofinance()
+    # test_baostock()
+    # test_quandl()
+    data_source = "yahoofinance"
+    test_data_processor()
