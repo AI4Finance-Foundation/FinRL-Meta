@@ -229,7 +229,9 @@ def test_joinquant():
     pass
 
 def test_data_processor(data_source):
-    # TRADE_START_DATE = "2019-09-01"
+    if data_source != "yahoofinance":
+        return
+
     TRADE_START_DATE = "2022-09-01"
     TRADE_END_DATE = "2023-11-01"
 
@@ -272,10 +274,5 @@ def test_data_processor(data_source):
 
 if __name__ == "__main__":
     pass
-    # test_joinquant()
-    # test_binance()
-    # test_yahoofinance()
-    # test_baostock()
-    # test_quandl()
     data_source = "yahoofinance"
-    test_data_processor()
+    test_data_processor(data_source)
