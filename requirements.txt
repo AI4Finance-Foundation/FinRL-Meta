@@ -3,9 +3,6 @@
 alpaca_trade_api>=2.1.0
 ccxt==1.90.41
 elegantrl
-
-# market data & paper trading API
-pandas_market_calendars
 gputil==1.4.0
 gym>=0.17 #gym==0.24.1
 jqdatasdk==1.8.10
@@ -17,6 +14,9 @@ matplotlib==3.5.2
 
 numpy==1.23.1
 pandas==1.4.3
+
+# market data & paper trading API
+pandas_market_calendars
 
 pandas_market_calendars # calendars
 
