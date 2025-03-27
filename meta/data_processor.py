@@ -101,9 +101,13 @@ class DataProcessor:
         self.processor.clean_data()
         self.dataframe = self.processor.dataframe
 
-    def add_technical_indicator(self, tech_indicator_list: List[str], select_stockstats_talib: int = 0):
+    def add_technical_indicator(
+        self, tech_indicator_list: List[str], select_stockstats_talib: int = 0
+    ):
         self.tech_indicator_list = tech_indicator_list
-        self.processor.add_technical_indicator(tech_indicator_list, select_stockstats_talib)
+        self.processor.add_technical_indicator(
+            tech_indicator_list, select_stockstats_talib
+        )
         self.dataframe = self.processor.dataframe
 
     def add_turbulence(self):
@@ -115,7 +119,9 @@ class DataProcessor:
         self.dataframe = self.processor.dataframe
 
     def df_to_array(self, if_vix: bool) -> np.array:
-        price_array, tech_array, turbulence_array = self.processor.df_to_array(self.tech_indicator_list, if_vix)
+        price_array, tech_array, turbulence_array = self.processor.df_to_array(
+            self.tech_indicator_list, if_vix
+        )
         # fill nan with 0 for technical indicators
         tech_nan_positions = np.isnan(tech_array)
         tech_array[tech_nan_positions] = 0
@@ -147,7 +153,9 @@ class DataProcessor:
         select_stockstats_talib: int = 0,
     ):
         if self.time_interval == "1s" and self.data_source != "binance":
-            raise ValueError("Currently 1s interval data is only supported with 'binance' as data source")
+            raise ValueError(
+                "Currently 1s interval data is only supported with 'binance' as data source"
+            )
 
         cache_filename = (
             "_".join(
@@ -176,7 +184,11 @@ class DataProcessor:
                 if not os.path.exists(cache_dir):
                     os.mkdir(cache_dir)
                 with open(cache_path, "wb") as handle:
-                    pickle.dump(self.dataframe, handle, protocol=pickle.HIGHEST_PROTOCOL,)
+                    pickle.dump(
+                        self.dataframe,
+                        handle,
+                        protocol=pickle.HIGHEST_PROTOCOL,
+                    )
 
         self.add_technical_indicator(technical_indicator_list, select_stockstats_talib)
         if if_vix:
@@ -227,6 +239,7 @@ def check_joinquant():
         ticker_list, TECHNICAL_INDICATOR, if_vix=False, cache=True
     )
     pass
+
 
 def check_yahoofinance():
     data_source = "yahoofinance"
