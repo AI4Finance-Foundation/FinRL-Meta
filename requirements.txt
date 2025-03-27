@@ -1,41 +1,41 @@
 # Requirements
 
 alpaca_trade_api>=2.1.0
-ccxt==1.90.41
+ccxt>=1.90.41
 elegantrl
 
 # market data & paper trading API
 pandas_market_calendars
-gputil==1.4.0
-gym>=0.17 #gym==0.24.1
-jqdatasdk==1.8.10
-lz4==4.0.1
+gputil>=1.4.0
+gym>=0.17 #gym>=0.24.1
+jqdatasdk>=1.8.10
+lz4>=4.0.1
 
 # plot
-matplotlib==3.5.2
+matplotlib>=3.5.2
 
 
-numpy==1.23.1
-pandas==1.4.3
+numpy>=1.23.1
+pandas>=1.4.3
 
 pandas_market_calendars # calendars
 
 # hooks
-pre-commit==2.19.0
+pre-commit>=2.19.0
 
 # testing requirements
-pytest==7.1.2
-ray[default]==1.13.0
+pytest>=7.1.2
+ray[default]>=1.13.0
 
 # Model Building Requirements
-scikit-learn==1.1.1
+scikit-learn>=1.1.1
 
 # packaging
-setuptools==63.1.0
-stable-baselines3[extra]==1.5.0
-stockstats==0.4.1
+setuptools>=63.1.0
+stable-baselines3[extra]>=1.5.0
+stockstats>=0.4.1
 tensorboard
-vectorbt[full]==0.23.3
-wheel==0.37.1
-wrds==3.1.1
-yfinance==0.1.72
+vectorbt[full]>=0.23.3
+wheel>=0.37.1
+wrds>=3.1.1
+yfinance>=0.1.72
