@@ -214,8 +214,7 @@ class Yahoofinance(_Base):
 
     def get_trading_days(self, start, end):
         nyse = tc.get_calendar("NYSE")
-
-        df = nyse.date_range_htf(self.time_interval.upper(), pd.Timestamp(start), pd.Timestamp(end))
+        df = nyse.date_range_htf("1D", pd.Timestamp(start), pd.Timestamp(end))
         days = [str(day)[:10] for day in df]
         # e.g., df = ['2022-09-01 10-0'], days = ['2022-09-01']
         return days
