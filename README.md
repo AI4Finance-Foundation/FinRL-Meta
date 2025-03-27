@@ -2,7 +2,7 @@
 <img align="center" width="30%" alt="image" src="https://github.com/AI4Finance-Foundation/FinGPT/assets/31713746/e0371951-1ce1-488e-aa25-0992dafcc139">
 </div>
 
-# FinRL-Meta: A Metaverse of Market Environments and Benchmarks for Data-Driven Financial Reinforcement Learning
+# FinRL®-Meta: A Metaverse of Market Environments and Benchmarks for Data-Driven Financial Reinforcement Learning
 
 
 [![Downloads](https://pepy.tech/badge/finrl_meta)](https://pepy.tech/project/finrl_meta)
@@ -10,7 +10,7 @@
 [![Python 3.6](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/downloads/release/python-360/)
 [![PyPI](https://img.shields.io/pypi/v/finrl_meta.svg)](https://pypi.org/project/finrl_meta/)
 
-[FinRL-Meta](https://finrl.readthedocs.io/en/latest/finrl_meta/background.html) builds a universe of market environments for data-driven financial reinforcement learning. We aim to help the users in our community to easily build environments.
+[FinRL®-Meta](https://finrl.readthedocs.io/en/latest/finrl_meta/background.html) builds a universe of market environments for data-driven financial reinforcement learning. We aim to help the users in our community to easily build environments.
 
 Check out our latest competition: [ACM ICAIF 2023 FinRL Contest](https://finrl-contest.github.io/)
 
@@ -18,7 +18,7 @@ Check out our latest competition: [ACM ICAIF 2023 FinRL Contest](https://finrl-c
 
 ![Visitors](https://api.visitorbadge.io/api/VisitorHit?user=AI4Finance-Foundation&repo=FinRL-Meta&countColor=%23B17A)
 
-Check out the [FinRL](https://github.com/AI4Finance-Foundation/FinRL) Project
+Check out the [FinRL®](https://github.com/AI4Finance-Foundation/FinRL) Project
 
 1. FinRL-Meta provides hundreds of market environments.
 2. FinRL-Meta reproduces existing papers as benchmarks.
