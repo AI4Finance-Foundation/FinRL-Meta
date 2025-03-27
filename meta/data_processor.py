@@ -188,7 +188,7 @@ class DataProcessor:
         return price_array, tech_array, turbulence_array
 
 
-def test_joinquant():
+def check_joinquant():
     # TRADE_START_DATE = "2019-09-01"
     TRADE_START_DATE = "2022-09-01"
     TRADE_END_DATE = "2023-11-01"
@@ -228,9 +228,8 @@ def test_joinquant():
     )
     pass
 
-def test_data_processor(data_source):
-    if data_source != "yahoofinance":
-        return
+def check_yahoofinance():
+    data_source = "yahoofinance"
 
     TRADE_START_DATE = "2022-09-01"
     TRADE_END_DATE = "2023-11-01"
@@ -274,5 +273,4 @@ def test_data_processor(data_source):
 
 if __name__ == "__main__":
     pass
-    data_source = "yahoofinance"
-    test_data_processor(data_source)
+    check_yahoofinance()
