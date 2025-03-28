@@ -8,7 +8,7 @@ from meta import config
 from meta import config_tickers
 from meta.data_processor import DataProcessor
 from meta.env_portfolio_allocation.env_portfolio_yahoofinance import StockPortfolioEnv
-
+from meta.data_processors._base import DataSource
 
 def data_split(df, start, end, target_date_col="time"):
     """
@@ -30,7 +30,7 @@ def main(
     end_date=config.TRADE_END_DATE,
     ticker_list=config_tickers.DOW_30_TICKER,
     time_interval="1D",
-    data_source="yahoofinance",
+    data_source=DataSource.yahoofinance,
     technical_indicator_list=config.INDICATORS,
     if_vix=True,
     hmax=100,
