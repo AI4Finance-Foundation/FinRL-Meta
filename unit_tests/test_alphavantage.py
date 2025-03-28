@@ -1,7 +1,7 @@
 import pytest
 
 from meta.data_processor import DataProcessor
-
+from meta.data_processors._base import DataSource
 
 def test_alphavantage():
     TRADE_START_DATE = "2020-09-01"
@@ -19,7 +19,7 @@ def test_alphavantage():
     ]
     kwargs = {}
     p = DataProcessor(
-        data_source="alphavantage",
+        data_source=DataSource.alphavantage,
         start_date=TRADE_START_DATE,
         end_date=TRADE_END_DATE,
         time_interval=TIME_INTERVAL,
