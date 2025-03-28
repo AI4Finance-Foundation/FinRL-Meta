@@ -8,7 +8,7 @@ from meta.config import INDICATORS
 from meta.config_tickers import DOW_30_TICKER
 from meta.config_tickers import SINGLE_TICKER
 from meta.data_processor import DataProcessor
-
+from meta.data_processors._base import DataSource
 
 @pytest.fixture(scope="session")
 def start_date():
@@ -49,7 +49,7 @@ class TestYahoo:
         """
         assert isinstance(start_date, str)
         assert isinstance(end_date, str)
-        data_source = "yahoofinance"
+        data_source = DataSource.yahoofinance
         dp = DataProcessor(data_source, start_date, end_date, time_interval)
         dp.download_data(ticker_input)
         assert isinstance(dp.dataframe, pd.DataFrame)
@@ -74,7 +74,7 @@ class TestYahoo:
         """
         Tests the Yahoo Downloader and the clean_data() function
         """
-        data_source = "yahoofinance"
+        data_source = DataSource.yahoofinance
         dp = DataProcessor(data_source, start_date, end_date, time_interval)
         dp.download_data(ticker_input)
         dp.clean_data()
@@ -93,7 +93,7 @@ class TestYahoo:
         """
         Tests the Yahoo Downloader and the returned data shape
         """
-        data_source = "yahoofinance"
+        data_source = DataSource.yahoofinance
         dp = DataProcessor(data_source, start_date, end_date, time_interval)
         dp.download_data(ticker_input)
         dp.add_technical_indicator(tech_indicator_list, select_stockstats_talib=talib)
@@ -109,7 +109,7 @@ class TestYahoo:
         expected_df_size: int,
         if_vix: bool,
     ) -> None:
-        data_source = "yahoofinance"
+        data_source = DataSource.yahoofinance
         dp = DataProcessor(data_source, start_date, end_date, time_interval)
         price_array, tech_array, turbulence_array = dp.run(
             ticker_input, tech_indicator_list, if_vix

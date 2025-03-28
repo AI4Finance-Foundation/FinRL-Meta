@@ -1,11 +1,5 @@
-import copy
 import os
-import urllib
-import zipfile
-from datetime import *
-from pathlib import Path
 from typing import List
-
 import numpy as np
 import pandas as pd
 import stockstats
@@ -31,7 +25,24 @@ from meta.config_tickers import SDAX_50_TICKER
 from meta.config_tickers import SP_500_TICKER
 from meta.config_tickers import SSE_50_TICKER
 from meta.config_tickers import TECDAX_TICKER
+from enum import Enum
 
+class DataSource(Enum):
+    akshare = "akshare"
+    alpaca = "alpaca"
+    alphavantage = "alphavantage"
+    baostock = "baostock"
+    binance = "binance"
+    ccxt = "ccxt"
+    iexcloud = "iexcloud"
+    joinquant = "joinquant"
+    quandl = "quandl"
+    quantconnect = "quantconnect"
+    rqdata = "rqdata"
+    ricequant = "ricequant"
+    tushare = "tushare"
+    wrds = "wrds"
+    yahoofinance = "yahoofinance"
 
 class _Base:
     def __init__(
@@ -62,10 +73,10 @@ class _Base:
             self.dataframe.rename(columns={"date": "time"}, inplace=True)
         if "datetime" in self.dataframe.columns.values.tolist():
             self.dataframe.rename(columns={"datetime": "time"}, inplace=True)
-        if self.data_source == "ccxt":
+        if self.data_source == DataSource.ccxt:
             self.dataframe.rename(columns={"index": "time"}, inplace=True)
 
-        if self.data_source == "ricequant":
+        if self.data_source == DataSource.ricequant:
             """RiceQuant data is already cleaned, we only need to transform data format here.
             No need for filling NaN data"""
             self.dataframe.rename(columns={"order_book_id": "tic"}, inplace=True)
@@ -73,7 +84,7 @@ class _Base:
             self.dataframe.reset_index(level=[0, 1], inplace=True)
             # check if there is NaN values
             assert not self.dataframe.isnull().values.any()
-        elif self.data_source == "baostock":
+        elif self.data_source == DataSource.baostock:
             self.dataframe.rename(columns={"code": "tic"}, inplace=True)
 
         self.dataframe.dropna(inplace=True)
@@ -141,11 +152,11 @@ class _Base:
 
     def get_trading_days(self, start: str, end: str) -> List[str]:
         if self.data_source in [
-            "binance",
-            "ccxt",
-            "quantconnect",
-            "ricequant",
-            "tushare",
+            DataSource.binance,
+            DataSource.ccxt,
+            DataSource.quantconnect,
+            DataSource.ricequant,
+            DataSource.tushare,
         ]:
             print(
                 f"Calculate get_trading_days not supported for {self.data_source} yet."
@@ -169,7 +180,7 @@ class _Base:
         if "date" in self.dataframe.columns.values.tolist():
             self.dataframe.rename(columns={"date": "time"}, inplace=True)
 
-        if self.data_source == "ccxt":
+        if self.data_source == DataSource.ccxt:
             self.dataframe.rename(columns={"index": "time"}, inplace=True)
 
         self.dataframe.reset_index(drop=False, inplace=True)
@@ -257,21 +268,21 @@ class _Base:
         # df = df.sort_values(["time", "tic"]).reset_index(drop=True)
         # return df
         if self.data_source in [
-            "binance",
-            "ccxt",
-            "iexcloud",
-            "joinquant",
-            "quantconnect",
+            DataSource.binance,
+            DataSource.ccxt,
+            DataSource.iexcloud,
+            DataSource.joinquant,
+            DataSource.quantconnect
         ]:
             print(
                 f"Turbulence not supported for {self.data_source} yet. Return original DataFrame."
             )
         if self.data_source in [
-            "alpaca",
-            "ricequant",
-            "tushare",
-            "wrds",
-            "yahoofinance",
+            DataSource.alpaca,
+            DataSource.ricequant,
+            DataSource.tushare,
+            DataSource.wrds,
+            DataSource.yahoofinance
         ]:
             turbulence_index = self.calculate_turbulence()
             self.dataframe = self.dataframe.merge(turbulence_index, on="time")
@@ -335,13 +346,13 @@ class _Base:
         :return: (df) pandas dataframe
         """
         if self.data_source in [
-            "binance",
-            "ccxt",
-            "iexcloud",
-            "joinquant",
-            "quantconnect",
-            "ricequant",
-            "tushare",
+            DataSource.binance,
+            DataSource.ccxt,
+            DataSource.iexcloud,
+            DataSource.joinquant,
+            DataSource.quantconnect,
+            DataSource.ricequant,
+            DataSource.tushare
         ]:
             print(
                 f"VIX is not applicable for {self.data_source}. Return original DataFrame"
@@ -380,11 +391,11 @@ class _Base:
         #     df = df.merge(vix, on="date")
         #     df = df.sort_values(["date", "tic"]).reset_index(drop=True)
 
-        elif self.data_source == "yahoofinance":
+        elif self.data_source == DataSource.yahoofinance:
             ticker = "^VIX"
-        elif self.data_source == "alpaca":
+        elif self.data_source == DataSource.alpaca:
             ticker = "VIXY"
-        elif self.data_source == "wrds":
+        elif self.data_source == DataSource.wrds:
             ticker = "vix"
         else:
             pass
@@ -441,9 +452,9 @@ class _Base:
     # standard_time_interval  s: second, m: minute, h: hour, d: day, w: week, M: month, q: quarter, y: year
     # output time_interval of the processor
     def calc_nonstandard_time_interval(self) -> str:
-        if self.data_source == "alpaca":
+        if self.data_source == DataSource.alpaca:
             pass
-        elif self.data_source == "baostock":
+        elif self.data_source == DataSource.baostock:
             # nonstandard_time_interval: 默认为d，日k线；d=日k线、w=周、m=月、5=5分钟、15=15分钟、30=30分钟、60=60分钟k线数据，不区分大小写；指数没有分钟线数据；周线每周最后一个交易日才可以获取，月线每月最后一个交易日才可以获取。
             pass
             time_intervals = ["5m", "15m", "30m", "60m", "1d", "1w", "1M"]
@@ -459,7 +470,7 @@ class _Base:
                 return self.time_interval[-1:].lower()
             elif "m" in self.time_interval:
                 return self.time_interval[:-1]
-        elif self.data_source == "binance":
+        elif self.data_source == DataSource.binance:
             # nonstandard_time_interval: 1m,3m,5m,15m,30m,1h,2h,4h,6h,8h,12h,1d,3d,1w,1M
             time_intervals = [
                 "1m",
@@ -483,16 +494,16 @@ class _Base:
                 + ",".join(time_intervals)
             )
             return self.time_interval
-        elif self.data_source == "ccxt":
+        elif self.data_source == DataSource.ccxt:
             pass
-        elif self.data_source == "iexcloud":
+        elif self.data_source == DataSource.iexcloud:
             time_intervals = ["1d"]
             assert self.time_interval in time_intervals, (
                 "This time interval is not supported. Supported time intervals: "
                 + ",".join(time_intervals)
             )
             return self.time_interval.upper()
-        elif self.data_source == "joinquant":
+        elif self.data_source == DataSource.joinquant:
             # '1m', '5m', '15m', '30m', '60m', '120m', '1d', '1w', '1M'
             time_intervals = [
                 "1m",
@@ -510,9 +521,9 @@ class _Base:
                 + ",".join(time_intervals)
             )
             return self.time_interval
-        elif self.data_source == "quantconnect":
+        elif self.data_source == DataSource.quantconnect:
             pass
-        elif self.data_source == "ricequant":
+        elif self.data_source == DataSource.ricequant:
             #  nonstandard_time_interval: 'd' - 天，'w' - 周，'m' - 月， 'q' - 季，'y' - 年
             time_intervals = ["d", "w", "M", "q", "y"]
             assert self.time_interval[-1] in time_intervals, (
@@ -523,7 +534,7 @@ class _Base:
                 return self.time_interval.lower()
             else:
                 return self.time_interval
-        elif self.data_source == "tushare":
+        elif self.data_source == DataSource.tushare:
             # 分钟频度包括1分、5、15、30、60分数据. Not support currently.
             # time_intervals = ["1m", "5m", "15m", "30m", "60m", "1d"]
             time_intervals = ["1d"]
@@ -532,9 +543,9 @@ class _Base:
                 + ",".join(time_intervals)
             )
             return self.time_interval
-        elif self.data_source == "wrds":
+        elif self.data_source == DataSource.wrds:
             pass
-        elif self.data_source == "yahoofinance":
+        elif self.data_source == DataSource.yahoofinance:
             # nonstandard_time_interval: ["1m", "2m", "5m", "15m", "30m", "60m", "90m", "1h", "1d", "5d","1wk", "1mo", "3mo"]
             time_intervals = [
                 "1m",

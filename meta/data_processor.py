@@ -4,14 +4,13 @@ from typing import List
 
 import numpy as np
 import pandas as pd
-
 from meta.config_tickers import DOW_30_TICKER
-
+from meta.data_processors._base import DataSource
 
 class DataProcessor:
     def __init__(
         self,
-        data_source: str,
+        data_source: DataSource,
         start_date: str,
         end_date: str,
         time_interval: str,
@@ -23,59 +22,59 @@ class DataProcessor:
         self.time_interval = time_interval
         self.dataframe = pd.DataFrame()
 
-        if self.data_source == "akshare":
+        if self.data_source == DataSource.akshare:
             from meta.data_processors.akshare import Akshare
 
             processor_dict = {self.data_source: Akshare}
-        elif self.data_source == "alpaca":
+        elif self.data_source == DataSource.alpaca:
             from meta.data_processors.alpaca import Alpaca
 
             processor_dict = {self.data_source: Alpaca}
-        elif self.data_source == "alphavantage":
+        elif self.data_source == DataSource.alphavantage:
             from meta.data_processors.alphavantage import Alphavantage
 
             processor_dict = {self.data_source: Alphavantage}
-        elif self.data_source == "baostock":
+        elif self.data_source == DataSource.baostock:
             from meta.data_processors.baostock import Baostock
 
             processor_dict = {self.data_source: Baostock}
-        elif self.data_source == "binance":
+        elif self.data_source == DataSource.binance:
             from meta.data_processors.binance import Binance
 
             processor_dict = {self.data_source: Binance}
-        elif self.data_source == "ccxt":
+        elif self.data_source == DataSource.ccxt:
             from meta.data_processors.ccxt import Ccxt
 
             processor_dict = {self.data_source: Ccxt}
-        elif self.data_source == "iexcloud":
+        elif self.data_source == DataSource.iexcloud:
             from meta.data_processors.iexcloud import Iexcloud
 
             processor_dict = {self.data_source: Iexcloud}
-        elif self.data_source == "joinquant":
+        elif self.data_source == DataSource.joinquant:
             from meta.data_processors.joinquant import Joinquant
 
             processor_dict = {self.data_source: Joinquant}
-        elif self.data_source == "quandl":
+        elif self.data_source == DataSource.quandl:
             from meta.data_processors.quandl import Quandl
 
             processor_dict = {self.data_source: Quandl}
-        elif self.data_source == "quantconnect":
+        elif self.data_source == DataSource.quantconnect:
             from meta.data_processors.quantconnect import Quantconnect
 
             processor_dict = {self.data_source: Quantconnect}
-        elif self.data_source == "ricequant":
+        elif self.data_source == DataSource.ricequant:
             from meta.data_processors.ricequant import Ricequant
 
             processor_dict = {self.data_source: Ricequant}
-        elif self.data_source == "tushare":
+        elif self.data_source == DataSource.tushare:
             from meta.data_processors.tushare import Tushare
 
             processor_dict = {self.data_source: Tushare}
-        elif self.data_source == "wrds":
+        elif self.data_source == DataSource.wrds:
             from meta.data_processors.wrds import Wrds
 
             processor_dict = {self.data_source: Wrds}
-        elif self.data_source == "yahoofinance":
+        elif self.data_source == DataSource.yahoofinance:
             from meta.data_processors.yahoofinance import Yahoofinance
 
             processor_dict = {self.data_source: Yahoofinance}
@@ -152,7 +151,7 @@ class DataProcessor:
         cache: bool = False,
         select_stockstats_talib: int = 0,
     ):
-        if self.time_interval == "1s" and self.data_source != "binance":
+        if self.time_interval == "1s" and self.data_source != DataSource.binance:
             raise ValueError(
                 "Currently 1s interval data is only supported with 'binance' as data source"
             )
@@ -219,7 +218,7 @@ def check_joinquant():
 
     kwargs = {"username": "xxx", "password": "xxx"}
     p = DataProcessor(
-        data_source="joinquant",
+        data_source=DataSource.joinquant,
         start_date=TRADE_START_DATE,
         end_date=TRADE_END_DATE,
         time_interval=TIME_INTERVAL,
@@ -242,7 +241,7 @@ def check_joinquant():
 
 
 def check_yahoofinance():
-    data_source = "yahoofinance"
+    data_source = DataSource.yahoofinance
 
     TRADE_START_DATE = "2022-09-01"
     TRADE_END_DATE = "2023-11-01"

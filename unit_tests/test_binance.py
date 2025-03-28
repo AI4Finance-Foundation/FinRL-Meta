@@ -5,7 +5,7 @@ import pytest
 
 from meta.config import INDICATORS
 from meta.data_processor import DataProcessor
-
+from meta.data_processor import DataSource
 
 @pytest.fixture(scope="session")
 def start_date():
@@ -48,7 +48,7 @@ class TestBinance:
         """
         assert isinstance(start_date, str)
         assert isinstance(end_date, str)
-        data_source = "binance"
+        data_source = DataSource.binance
         dp = DataProcessor(data_source, start_date, end_date, time_interval)
         dp.download_data(ticker_input_binance)
         assert isinstance(dp.dataframe, pd.DataFrame)
@@ -71,7 +71,7 @@ class TestBinance:
         expected_df_size_binance: int,
         tech_indicator_list: List[str],
     ) -> None:
-        data_source = "binance"
+        data_source = DataSource.binance
         dp = DataProcessor(data_source, start_date, end_date, time_interval)
         dp.download_data(ticker_input_binance)
 
@@ -86,7 +86,7 @@ class TestBinance:
         tech_indicator_list: List[str],
         talib: int,
     ) -> None:
-        data_source = "binance"
+        data_source = DataSource.binance
         dp = DataProcessor(data_source, start_date, end_date, time_interval)
         dp.download_data(ticker_input_binance)
         dp.add_technical_indicator(tech_indicator_list, select_stockstats_talib=talib)
@@ -102,7 +102,7 @@ class TestBinance:
         tech_indicator_list: List[str],
         if_vix: bool,
     ) -> None:
-        data_source = "binance"
+        data_source = DataSource.binance
         dp = DataProcessor(data_source, start_date, end_date, time_interval)
         price_array, tech_array, turbulence_array = dp.run(
             ticker_input_binance, tech_indicator_list, if_vix
