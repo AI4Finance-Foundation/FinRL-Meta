@@ -10,6 +10,7 @@ from meta.config_tickers import SINGLE_TICKER
 from meta.data_processor import DataProcessor
 from meta.data_processors._base import DataSource
 
+
 @pytest.fixture(scope="session")
 def start_date():
     return "2021-01-01"

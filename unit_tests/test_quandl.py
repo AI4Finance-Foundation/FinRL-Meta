@@ -3,6 +3,7 @@ import pytest
 from meta.data_processor import DataProcessor
 from meta.data_processors._base import DataSource
 
+
 def test_quandl():
     TRADE_START_DATE = "2020-09-01"
     TRADE_END_DATE = "2021-09-11"

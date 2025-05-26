@@ -5,6 +5,7 @@ from wtpy.apps.datahelper.DHTushare import DHTushare
 
 from meta.data_processors._base import DataSource
 
+
 class DHFactory:
     @staticmethod
     def createHelper(name: str) -> BaseDataHelper:

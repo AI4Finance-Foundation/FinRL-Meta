@@ -7,8 +7,9 @@ from agents.stablebaselines3_models import DRLAgent
 from meta import config
 from meta import config_tickers
 from meta.data_processor import DataProcessor
-from meta.env_portfolio_allocation.env_portfolio_yahoofinance import StockPortfolioEnv
 from meta.data_processors._base import DataSource
+from meta.env_portfolio_allocation.env_portfolio_yahoofinance import StockPortfolioEnv
+
 
 def data_split(df, start, end, target_date_col="time"):
     """

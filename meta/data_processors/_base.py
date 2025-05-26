@@ -1,5 +1,7 @@
 import os
+from enum import Enum
 from typing import List
+
 import numpy as np
 import pandas as pd
 import stockstats
@@ -25,7 +27,7 @@ from meta.config_tickers import SDAX_50_TICKER
 from meta.config_tickers import SP_500_TICKER
 from meta.config_tickers import SSE_50_TICKER
 from meta.config_tickers import TECDAX_TICKER
-from enum import Enum
+
 
 class DataSource(Enum):
     akshare = "akshare"
@@ -43,6 +45,7 @@ class DataSource(Enum):
     tushare = "tushare"
     wrds = "wrds"
     yahoofinance = "yahoofinance"
+
 
 class _Base:
     def __init__(
@@ -272,7 +275,7 @@ class _Base:
             DataSource.ccxt,
             DataSource.iexcloud,
             DataSource.joinquant,
-            DataSource.quantconnect
+            DataSource.quantconnect,
         ]:
             print(
                 f"Turbulence not supported for {self.data_source} yet. Return original DataFrame."
@@ -282,7 +285,7 @@ class _Base:
             DataSource.ricequant,
             DataSource.tushare,
             DataSource.wrds,
-            DataSource.yahoofinance
+            DataSource.yahoofinance,
         ]:
             turbulence_index = self.calculate_turbulence()
             self.dataframe = self.dataframe.merge(turbulence_index, on="time")
@@ -352,7 +355,7 @@ class _Base:
             DataSource.joinquant,
             DataSource.quantconnect,
             DataSource.ricequant,
-            DataSource.tushare
+            DataSource.tushare,
         ]:
             print(
                 f"VIX is not applicable for {self.data_source}. Return original DataFrame"

@@ -7,6 +7,7 @@ from meta.config import INDICATORS
 from meta.data_processor import DataProcessor
 from meta.data_processor import DataSource
 
+
 @pytest.fixture(scope="session")
 def start_date():
     return "2021-01-01"
