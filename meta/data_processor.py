@@ -4,8 +4,10 @@ from typing import List
 
 import numpy as np
 import pandas as pd
+
 from meta.config_tickers import DOW_30_TICKER
 from meta.data_processors._base import DataSource
+
 
 class DataProcessor:
     def __init__(
