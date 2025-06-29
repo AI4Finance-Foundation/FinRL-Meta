@@ -73,16 +73,6 @@ class Yahoofinance(_Base):
             raise ValueError("no data is fetched.")
         self.dataframe.reset_index(inplace=True)
         try:
-            # self.dataframe.columns = [
-            #     "date",
-            #     "open",
-            #     "high",
-            #     "low",
-            #     "close",
-            #     "adjusted_close",
-            #     "volume",
-            #     "tic",
-            # ]
             self.dataframe.rename(
                 columns={
                     "Date": "date",
@@ -96,10 +86,8 @@ class Yahoofinance(_Base):
                 },
                 inplace=True,
             )
-            # use adjusted close price instead of close price
-            self.dataframe["close"] = self.dataframe["adjusted_close"]
-            # drop the adjusted close price column
-            # self.dataframe = self.dataframe.drop(labels="adjcp", axis=1)
+            if not auto_adjust:
+                self.dataframe = self._adjust_prices(self.dataframe)
         except NotImplementedError:
             print("the features are not supported currently")
         self.dataframe["day"] = self.dataframe["date"].dt.dayofweek
@@ -118,6 +106,15 @@ class Yahoofinance(_Base):
         print(
             f"Download complete! Dataset saved to {save_path}. \nShape of DataFrame: {self.dataframe.shape}"
         )
+
+    def _adjust_prices(self, df: pd.DataFrame) -> pd.DataFrame:
+        # use adjusted close price instead of close price
+        df["adj"] = df["adjusted_close"] / df["close"]
+        for col in ["open", "high", "low", "close"]:
+            df[col] *= df["adj"]
+
+        # drop the adjusted close price column
+        return df.drop(["adj"], axis=1)
 
     def clean_data(self):
         df = self.dataframe.copy()
