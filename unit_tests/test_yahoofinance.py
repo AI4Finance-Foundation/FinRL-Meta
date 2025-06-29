@@ -39,7 +39,7 @@ def yahoofinance_processor():
         data_source="yahoofinance",
         start_date="2020-01-01",
         end_date="2020-01-03",
-        time_interval="1d"
+        time_interval="1d",
     )
 
 
@@ -53,7 +53,10 @@ def sample_raw_data():
             "high": [105.0, 106.0],
             "low": [98.0, 100.0],
             "close": [104.0, 105.0],
-            "adjusted_close": [100.0, 102.9],  # Adjusted close price - crucial for the method
+            "adjusted_close": [
+                100.0,
+                102.9,
+            ],  # Adjusted close price - crucial for the method
             "volume": [10000, 11000],
             "tic": ["AAPL", "AAPL"],
         }
@@ -146,11 +149,9 @@ class TestYahoo:
 
 class TestYahooAdjustPrices:
     """Separate test class for _adjust_prices functionality without parametrization."""
-    
+
     def test_adjust_prices_calculates_correctly(
-        self, 
-        yahoofinance_processor: Yahoofinance,
-        sample_raw_data: pd.DataFrame
+        self, yahoofinance_processor: Yahoofinance, sample_raw_data: pd.DataFrame
     ) -> None:
         """Test that prices are adjusted correctly based on adjusted_close/close ratio."""
         # Ensure required columns exist
@@ -160,8 +161,12 @@ class TestYahooAdjustPrices:
         adjusted_df = yahoofinance_processor._adjust_prices(sample_raw_data.copy())
 
         # Calculate expected values
-        adj_ratio_1 = sample_raw_data.loc[0, "adjusted_close"] / sample_raw_data.loc[0, "close"]
-        adj_ratio_2 = sample_raw_data.loc[1, "adjusted_close"] / sample_raw_data.loc[1, "close"]
+        adj_ratio_1 = (
+            sample_raw_data.loc[0, "adjusted_close"] / sample_raw_data.loc[0, "close"]
+        )
+        adj_ratio_2 = (
+            sample_raw_data.loc[1, "adjusted_close"] / sample_raw_data.loc[1, "close"]
+        )
 
         expected_data = pd.DataFrame(
             {
@@ -179,8 +184,10 @@ class TestYahooAdjustPrices:
                     sample_raw_data.loc[1, "low"] * adj_ratio_2,
                 ],
                 "close": [
-                    sample_raw_data.loc[0, "close"] * adj_ratio_1,  # close becomes adjusted
-                    sample_raw_data.loc[1, "close"] * adj_ratio_2,  # close becomes adjusted
+                    sample_raw_data.loc[0, "close"]
+                    * adj_ratio_1,  # close becomes adjusted
+                    sample_raw_data.loc[1, "close"]
+                    * adj_ratio_2,  # close becomes adjusted
                 ],
                 "adjusted_close": [
                     sample_raw_data.loc[0, "adjusted_close"],
@@ -200,9 +207,7 @@ class TestYahooAdjustPrices:
         assert_frame_equal(adjusted_df_compare, expected_data, check_dtype=False)
 
     def test_adjust_prices_drops_columns(
-        self,
-        yahoofinance_processor: Yahoofinance,
-        sample_raw_data: pd.DataFrame
+        self, yahoofinance_processor: Yahoofinance, sample_raw_data: pd.DataFrame
     ) -> None:
         """Test that the temporary 'adj' column is dropped after adjustment."""
         # Ensure required columns exist
@@ -213,11 +218,13 @@ class TestYahooAdjustPrices:
 
         # Ensure the temporary 'adj' column is dropped
         assert "adj" not in adjusted_df.columns
-        
+
         # Ensure other essential columns remain
         assert "open" in adjusted_df.columns
         assert "close" in adjusted_df.columns  # Note: This is the *new* adjusted close
         assert "tic" in adjusted_df.columns
         assert "date" in adjusted_df.columns
         assert "volume" in adjusted_df.columns
-        assert "adjusted_close" in adjusted_df.columns  # This column is kept in FinRL-Meta
+        assert (
+            "adjusted_close" in adjusted_df.columns
+        )  # This column is kept in FinRL-Meta
