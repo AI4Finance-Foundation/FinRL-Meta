@@ -19,9 +19,9 @@ class StockTradingEnvMinTrades(gym.Env):
     """
     A stock trading env for OpenAI gym
     The environment is implements the simple StockTradingEnv as in env_stocktrading.py.
-    However this env implements a custom reward function based on Sharpe Ratio, Profit factor, 
-    and a constraint that atleast 75% of the available trading timestamps must involve a trade. 
-    The exact implementation can be found in the _get_reward() function. 
+    However this env implements a custom reward function based on Sharpe Ratio, Profit factor,
+    and a constraint that atleast 75% of the available trading timestamps must involve a trade.
+    The exact implementation can be found in the _get_reward() function.
     """
 
     metadata = {"render.modes": ["human"]}
@@ -110,7 +110,7 @@ class StockTradingEnvMinTrades(gym.Env):
         self.trade_history = []  # list of {'profit': float}
         self.trade_days = set()  # set of unique datetime.date for trade activity
         self._seed()
-    
+
     def _sell_stock(self, index, action):
         def _do_sell_normal():
             if self.state[index + 2 * self.stock_dim + 1] != True:
@@ -171,7 +171,7 @@ class StockTradingEnvMinTrades(gym.Env):
         else:
             sell_num_shares = _do_sell_normal()
         return sell_num_shares
-    
+
     def _buy_stock(self, index, action):
         def _do_buy():
             if self.state[index + 2 * self.stock_dim + 1] != True:
@@ -205,12 +205,12 @@ class StockTradingEnvMinTrades(gym.Env):
             else:
                 buy_num_shares = 0
         return buy_num_shares
-    
+
     def _make_plot(self):
         plt.plot(self.asset_memory, "r")
         plt.savefig(f"results/account_value_trade_{self.episode}.png")
         plt.close()
-    
+
     def _get_reward(self):
         """
         Custom reward combining Sharpe Ratio, Profit Factor,
@@ -219,7 +219,7 @@ class StockTradingEnvMinTrades(gym.Env):
         Mathematical Representation
         Reward = Sharpe-Ratio + Profit-Factor + Min-Trades-Penalty
 
-        Sharpe Ratio = (sqroot(N) x r_mean / sigma_r) where, 
+        Sharpe Ratio = (sqroot(N) x r_mean / sigma_r) where,
         N = annualization factor (e.g., 252 for daily returns)
         r_mean = Mean of periodic returns
         sigma_r = Standard deviation of periodic returns
@@ -280,7 +280,7 @@ class StockTradingEnvMinTrades(gym.Env):
                     * df_total_value["daily_return"].mean()
                     / df_total_value["daily_return"].std()
                 )
-            
+
             print("\n=================================")
             print(f"day: {self.day}, episode: {self.episode}")
             print(f"begin_total_asset: {self.asset_memory[0]:0.2f}")
@@ -297,7 +297,7 @@ class StockTradingEnvMinTrades(gym.Env):
             # Usual diagnostic and export code...
 
             return self.state, self.reward, self.terminal, False, {}
-        
+
         else:
             actions = actions * self.hmax
             actions = actions.astype(int)
@@ -324,7 +324,7 @@ class StockTradingEnvMinTrades(gym.Env):
 
             if(isTrade):
                 self.unique_trades += 1
-            
+
             self.actions_memory.append(actions)
 
             # next timestep
@@ -355,7 +355,7 @@ class StockTradingEnvMinTrades(gym.Env):
             self.state_memory.append(self.state)
 
             return self.state, self.reward, self.terminal, False, {}
-    
+
     def reset(self, *, seed=None, options=None):
         self.day = 0
         self.data = self.df.loc[self.day, :]
@@ -392,7 +392,7 @@ class StockTradingEnvMinTrades(gym.Env):
 
     def render(self, mode="human", close=False):
         return self.state
-    
+
     def _initiate_state(self):
         if self.initial:
             if len(self.df.tic.unique()) > 1:
@@ -425,7 +425,7 @@ class StockTradingEnvMinTrades(gym.Env):
                     + sum(([self.data[tech]] for tech in self.tech_indicator_list), [])
                 )
         return state
-    
+
     def _update_state(self):
         if len(self.df.tic.unique()) > 1:
             state = (
@@ -493,4 +493,3 @@ class StockTradingEnvMinTrades(gym.Env):
         e = DummyVecEnv([lambda: self])
         obs = e.reset()
         return e, obs
-        
