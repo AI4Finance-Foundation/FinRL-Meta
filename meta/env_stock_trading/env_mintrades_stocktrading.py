@@ -40,6 +40,7 @@ class StockTradingEnvMinTrades(gym.Env):
         action_space: int,
         tech_indicator_list: list[str],
 
+        min_trade_factor = 0.75 # (%) of tradeable timestamps which must involve a trade, else be penalized
         turbulence_threshold=None,
         risk_indicator_col="turbulence",
         make_plots: bool = False,
@@ -71,6 +72,7 @@ class StockTradingEnvMinTrades(gym.Env):
         self.terminal = False
         self.make_plots = make_plots
         self.print_verbosity = print_verbosity
+        self.min_trade_factor = min_trade_factor
         self.turbulence_threshold = turbulence_threshold
         self.risk_indicator_col = risk_indicator_col
         self.initial = initial
@@ -241,7 +243,7 @@ class StockTradingEnvMinTrades(gym.Env):
         total_days_count = self.step_count
         trade_ratio = trade_days_count / total_days_count if total_days_count > 0 else 0
 
-        activity_penalty = 0 if trade_ratio >= 0.75 else -1
+        activity_penalty = 0 if trade_ratio >= self.min_trade_factor else -1
 
         total_reward = sharpe + profit_factor + activity_penalty
 
