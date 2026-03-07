@@ -262,23 +262,39 @@ class _Base:
         for indicator in tech_indicator_list:
             indicator = indicator.lower()
             if indicator == "macd":
-                df["macd"], _, _ = talib.MACD(df["close"], fastperiod=12, slowperiod=26, signalperiod=9)
+                df["macd"], _, _ = talib.MACD(
+                    df["close"], fastperiod=12, slowperiod=26, signalperiod=9
+                )
             elif indicator == "macd_signal":
-                _, df["macd_signal"], _ = talib.MACD(df["close"], fastperiod=12, slowperiod=26, signalperiod=9)
+                _, df["macd_signal"], _ = talib.MACD(
+                    df["close"], fastperiod=12, slowperiod=26, signalperiod=9
+                )
             elif indicator == "macd_hist":
-                _, _, df["macd_hist"] = talib.MACD(df["close"], fastperiod=12, slowperiod=26, signalperiod=9)
+                _, _, df["macd_hist"] = talib.MACD(
+                    df["close"], fastperiod=12, slowperiod=26, signalperiod=9
+                )
             elif indicator == "rsi_30":
                 df["rsi_30"] = talib.RSI(df["close"], timeperiod=14)
             elif indicator == "cci_30":
-                df["cci_30"] = talib.CCI(df["high"], df["low"], df["close"], timeperiod=14)
+                df["cci_30"] = talib.CCI(
+                    df["high"], df["low"], df["close"], timeperiod=14
+                )
             elif indicator == "dx_30":
-                df["dx_30"] = talib.DX(df["high"], df["low"], df["close"], timeperiod=14)
+                df["dx_30"] = talib.DX(
+                    df["high"], df["low"], df["close"], timeperiod=14
+                )
             elif indicator == "boll_ub":
-                df["boll_ub"], _, _ = talib.BBANDS(df["close"], timeperiod=20, nbdevup=2, nbdevdn=2, matype=0)
+                df["boll_ub"], _, _ = talib.BBANDS(
+                    df["close"], timeperiod=20, nbdevup=2, nbdevdn=2, matype=0
+                )
             elif indicator == "boll_mb":
-                _, df["boll_mb"], _ = talib.BBANDS(df["close"], timeperiod=20, nbdevup=2, nbdevdn=2, matype=0)
+                _, df["boll_mb"], _ = talib.BBANDS(
+                    df["close"], timeperiod=20, nbdevup=2, nbdevdn=2, matype=0
+                )
             elif indicator == "boll_lb":
-                _, _, df["boll_lb"] = talib.BBANDS(df["close"], timeperiod=20, nbdevup=2, nbdevdn=2, matype=0)
+                _, _, df["boll_lb"] = talib.BBANDS(
+                    df["close"], timeperiod=20, nbdevup=2, nbdevdn=2, matype=0
+                )
             elif indicator == "close_30_sma":
                 df["close_30_sma"] = talib.SMA(df["close"], timeperiod=30)
             elif indicator == "close_60_sma":
