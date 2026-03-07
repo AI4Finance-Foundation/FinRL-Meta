@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 
 from meta.config_tickers import DOW_30_TICKER
-from meta.data_processors._base import DataSource
+from meta.data_processors._base import DataSource, IndicatorLib
 
 
 class DataProcessor:
@@ -103,11 +103,14 @@ class DataProcessor:
         self.dataframe = self.processor.dataframe
 
     def add_technical_indicator(
-        self, tech_indicator_list: List[str], select_stockstats_talib: int = 0
+        self,
+        tech_indicator_list: list[str],
+        select_stockstats_talib: IndicatorLib = IndicatorLib.STOCKSTATS,
+        drop_na_timesteps: int = 1,
     ):
         self.tech_indicator_list = tech_indicator_list
         self.processor.add_technical_indicator(
-            tech_indicator_list, select_stockstats_talib
+            tech_indicator_list, select_stockstats_talib, drop_na_timesteps
         )
         self.dataframe = self.processor.dataframe
 
@@ -151,7 +154,7 @@ class DataProcessor:
         technical_indicator_list: List[str],
         if_vix: bool,
         cache: bool = False,
-        select_stockstats_talib: int = 0,
+        select_stockstats_talib: IndicatorLib = IndicatorLib.STOCKSTATS,
     ):
         if self.time_interval == "1s" and self.data_source != DataSource.binance:
             raise ValueError(
