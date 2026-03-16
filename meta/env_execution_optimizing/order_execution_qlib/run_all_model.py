@@ -27,7 +27,6 @@ from qlib.utils import exists_qlib_data
 from qlib.workflow import R
 from qlib.workflow.cli import workflow
 
-
 # init qlib
 provider_uri = "~/.qlib/qlib_data/cn_data"
 exp_folder_name = "run_all_model_records"
