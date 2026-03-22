@@ -1,5 +1,6 @@
 import os
 from enum import Enum
+from enum import IntEnum
 from typing import List
 
 import numpy as np
@@ -47,13 +48,16 @@ class DataSource(Enum):
     yahoofinance = "yahoofinance"
 
 
-class IndicatorLib(Enum):
+class IndicatorLib(IntEnum):
     """
     An enumeration of technical indicator libraries.
+
+    Backwards-compatible with the legacy integer convention:
+    0 = stockstats (default), 1 = talib.
     """
 
-    STOCKSTATS = "stockstats"
-    TALIB = "talib"
+    STOCKSTATS = 0
+    TALIB = 1
 
 
 class _Base:
@@ -207,7 +211,7 @@ class _Base:
         elif select_stockstats_talib == IndicatorLib.TALIB:
             self._add_technical_indicator_talib(tech_indicator_list)
         else:
-            raise ValueError(f"Unknown indicator library: {indicator_lib}")
+            raise ValueError(f"Unknown indicator library: {select_stockstats_talib}")
 
         self.dataframe.sort_values(by=["time", "tic"], inplace=True)
         if drop_na_timesteps:
