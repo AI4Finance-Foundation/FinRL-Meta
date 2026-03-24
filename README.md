@@ -67,6 +67,9 @@ For the next-generation **AI-native modular trading infrastructure** and product
 ![Overview image of FinRL-Meta](https://github.com/AI4Finance-Foundation/FinRL-Meta/blob/master/figs/neofinrl_overview.png)
 We utilize a layered structure in FinRL-Meta, as shown in the figure above, that consists of three layers: data layer, environment layer, and agent layer. Each layer executes its functions and is independent. Meanwhile, layers interact through end-to-end interfaces to implement the complete workflow of algorithm trading. Moreover, the layer structure allows easy extension of user-defined functions.
 
+FinRL-Meta focuses on the **data layer and environment layer** for financial reinforcement learning research and benchmarking.  
+For full-stack deployment and production-oriented trading infrastructure, please see **[FinRL-X / FinRL-Trading](https://github.com/AI4Finance-Foundation/FinRL-Trading)**.
+
 ## DataOps
 
 <div align="center">
