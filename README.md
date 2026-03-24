@@ -121,6 +121,9 @@ The following DRL libraries are supported:
 
 A demonstration notebook for plug-and-play with ElegantRL, Stable Baselines3 and RLlib: [Plug and Play with DRL Agents](https://colab.research.google.com/github/AI4Finance-Foundation/FinRL-Meta/blob/main/Demo_Plug_and_Play_with_DRL_Libraries.ipynb)
 
+In addition to research-oriented DRL workflows, FinRL-Meta can serve as the market environment layer for broader ecosystem projects.  
+For next-generation modular trading infrastructure and production deployment, see **[FinRL-X / FinRL-Trading](https://github.com/AI4Finance-Foundation/FinRL-Trading)**.
+
 ## "Training-Testing-Trading" Pipeline
 
 <div align="center">
