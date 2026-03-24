@@ -177,7 +177,7 @@ For future work, we plan to build a multi-agent-based market simulator that cons
 }
 ```
 
-
+For the next-generation production-oriented trading stack in the FinRL ecosystem, please also see **[FinRL-X / FinRL-Trading](https://github.com/AI4Finance-Foundation/FinRL-Trading)**.
 
 ## Collaborators
 
