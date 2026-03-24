@@ -3,6 +3,7 @@
 </div>
 
 # FinRL®-Meta: A Metaverse of Market Environments and Benchmarks for Data-Driven Financial Reinforcement Learning
+> Part of the **FinRL ecosystem**. For the next-generation production-oriented trading stack, see **[FinRL-X / FinRL-Trading](https://github.com/AI4Finance-Foundation/FinRL-Trading)**.
 <div align="center">
 <img align="center" src="https://github.com/user-attachments/assets/0eca8d77-15bc-4e39-9b54-b1a5aca0caa5" width="55%"/>
 </div>
@@ -16,7 +17,6 @@
 
 [FinRL®-Meta](https://finrl.readthedocs.io/en/latest/finrl_meta/background.html) builds a universe of market environments for data-driven financial reinforcement learning. We aim to help the users in our community to easily build environments.
 
-Check out our latest competition: [ACM ICAIF 2023 FinRL Contest](https://finrl-contest.github.io/)
 
 ![Visitors](https://api.visitorbadge.io/api/VisitorHit?user=AI4Finance-Foundation&repo=FinRL-Meta&countColor=%23B17A)
 [![](https://dcbadge.limes.pink/api/server/trsr8SXpW5?cb=1)](https://discord.gg/trsr8SXpW5)
