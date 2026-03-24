@@ -3,7 +3,11 @@
 </div>
 
 # FinRL®-Meta: A Metaverse of Market Environments and Benchmarks for Data-Driven Financial Reinforcement Learning
-<img width="3400" height="1346" alt="logo_transparent_background" src="https://github.com/user-attachments/assets/0eca8d77-15bc-4e39-9b54-b1a5aca0caa5" />
+<img width="2000" height="1346" alt="logo_transparent_background" src="https://github.com/user-attachments/assets/0eca8d77-15bc-4e39-9b54-b1a5aca0caa5" />
+
+<div align="center">
+<img align="center" src="https://github.com/user-attachments/assets/0eca8d77-15bc-4e39-9b54-b1a5aca0caa5" width="55%"/>
+</div>
 
 
 [![Downloads](https://pepy.tech/badge/finrl_meta)](https://pepy.tech/project/finrl_meta)
