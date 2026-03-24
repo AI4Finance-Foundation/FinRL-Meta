@@ -15,8 +15,9 @@
 [![Python 3.6](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/downloads/release/python-360/)
 [![PyPI](https://img.shields.io/pypi/v/finrl_meta.svg)](https://pypi.org/project/finrl_meta/)
 
-[FinRL®-Meta](https://finrl.readthedocs.io/en/latest/finrl_meta/background.html) builds a universe of market environments for data-driven financial reinforcement learning. We aim to help the users in our community to easily build environments.
+**FinRL®-Meta** is the **market environment and benchmark layer** of the FinRL ecosystem. It builds a universe of market environments for data-driven financial reinforcement learning and helps users easily develop, evaluate, and compare trading agents across diverse financial tasks.
 
+For the next-generation **AI-native modular trading infrastructure** and production-oriented deployment workflow, please visit **[FinRL-X / FinRL-Trading](https://github.com/AI4Finance-Foundation/FinRL-Trading)**.
 
 ![Visitors](https://api.visitorbadge.io/api/VisitorHit?user=AI4Finance-Foundation&repo=FinRL-Meta&countColor=%23B17A)
 [![](https://dcbadge.limes.pink/api/server/trsr8SXpW5?cb=1)](https://discord.gg/trsr8SXpW5)
