@@ -22,11 +22,11 @@ For the next-generation **AI-native modular trading infrastructure** and product
 ![Visitors](https://api.visitorbadge.io/api/VisitorHit?user=AI4Finance-Foundation&repo=FinRL-Meta&countColor=%23B17A)
 [![](https://dcbadge.limes.pink/api/server/trsr8SXpW5?cb=1)](https://discord.gg/trsr8SXpW5)
 
-Check out the [FinRL®](https://github.com/AI4Finance-Foundation/FinRL) Project
-
-1. FinRL-Meta provides hundreds of market environments.
-2. FinRL-Meta reproduces existing papers as benchmarks.
-3. FinRL-Meta provides dozens of demos/tutorials, organized in a curriculum.
+## FinRL Ecosystem
+- [**FinRL**](https://github.com/AI4Finance-Foundation/FinRL): the original open-source end-to-end framework for financial reinforcement learning
+- [**FinRL-Meta**](https://github.com/AI4Finance-Foundation/FinRL-Meta): market environments and benchmarks for data-driven financial reinforcement learning
+- [**ElegantRL**](https://github.com/AI4Finance-Foundation/ElegantRL): lightweight deep reinforcement learning algorithms
+- [**FinRL-X / FinRL-Trading**](https://github.com/AI4Finance-Foundation/FinRL-Trading): next-generation AI-native modular infrastructure for production-oriented quantitative trading
 
 ## Outline
 - [News and Tutorials](#news-and-tutorials)
