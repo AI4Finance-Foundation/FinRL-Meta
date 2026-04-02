@@ -26,15 +26,17 @@ import os
 import numpy as np
 import pandas as pd
 
-from meta.data_processor import DataProcessor
-from meta.data_processors._base import DataSource, IndicatorLib
 from .utils import get_logger
+from meta.data_processor import DataProcessor
+from meta.data_processors._base import DataSource
+from meta.data_processors._base import IndicatorLib
 
 log = get_logger()
 
 
 class Split(enum.Enum):
     """Identifies a data split for :meth:`MarketDataPreparator.create_env_config`."""
+
     TRAIN = "train"
     TRADE = "trade"
 
@@ -204,13 +206,23 @@ class MarketDataPreparator:
 
         self._train_df = self._market_df[self._market_df.date < split_date]
         self._trade_df = self._market_df[self._market_df.date >= split_date]
-        self._train_benchmark_df = self._benchmark_df[self._benchmark_df.date < split_date]
-        self._trade_benchmark_df = self._benchmark_df[self._benchmark_df.date >= split_date].reset_index(drop=True)
+        self._train_benchmark_df = self._benchmark_df[
+            self._benchmark_df.date < split_date
+        ]
+        self._trade_benchmark_df = self._benchmark_df[
+            self._benchmark_df.date >= split_date
+        ].reset_index(drop=True)
         self._train_rf_df = self._rf_df[self._rf_df.date < split_date]
-        self._trade_rf_df = self._rf_df[self._rf_df.date >= split_date].reset_index(drop=True)
+        self._trade_rf_df = self._rf_df[self._rf_df.date >= split_date].reset_index(
+            drop=True
+        )
 
-        log.info(f"Training from {self._train_df.date.min()} to {self._train_df.date.max()}")
-        log.info(f"Trading from {self._trade_df.date.min()} to {self._trade_df.date.max()}")
+        log.info(
+            f"Training from {self._train_df.date.min()} to {self._train_df.date.max()}"
+        )
+        log.info(
+            f"Trading from {self._trade_df.date.min()} to {self._trade_df.date.max()}"
+        )
 
     def _get_cache_path(self) -> str:
         """Deterministic cache-file path based on request parameters."""

@@ -25,12 +25,16 @@ Reference:
     Intelligence in Finance (pp. 132-143). SBC.
     https://doi.org/10.5753/bwaif.2023.231144
 """
-from typing import Dict, Optional, Tuple
+
+from typing import Dict
+from typing import Optional
+from typing import Tuple
 
 import gymnasium as gym
 import numpy as np
 
-from .impact_models import SqrtImpactModel, ImpactModel
+from .impact_models import ImpactModel
+from .impact_models import SqrtImpactModel
 
 EPS = 1e-8
 
@@ -71,9 +75,7 @@ class PortfolioOptimizationImpactEnv(gym.Env):
         self.volatility_array = config.get(
             "volatility_array", np.ones_like(price_array) * 0.02
         )
-        self.volume_array = config.get(
-            "volume_array", np.ones_like(price_array) * 1e6
-        )
+        self.volume_array = config.get("volume_array", np.ones_like(price_array) * 1e6)
 
         self.price_array = price_array.astype(np.float32)
         self.tech_array = tech_array.astype(np.float32) * 2**-7
@@ -95,10 +97,10 @@ class PortfolioOptimizationImpactEnv(gym.Env):
         # State: [price_variation(N), current_weights(1+N),
         #         last_action(1+N), perm_impact(N), tech(T)]
         self.state_dim = (
-            self.stock_dim          # price variation
-            + action_space_dim      # current weights (cash + stocks)
-            + action_space_dim      # last action
-            + self.stock_dim        # permanent impact
+            self.stock_dim  # price variation
+            + action_space_dim  # current weights (cash + stocks)
+            + action_space_dim  # last action
+            + self.stock_dim  # permanent impact
             + self.tech_array.shape[1]  # tech indicators
         )
 
@@ -257,14 +259,10 @@ class PortfolioOptimizationImpactEnv(gym.Env):
         # Can't sell more shares than currently held (no short selling)
         for i in range(self.stock_dim):
             if trades_in_shares[i] < 0:
-                trades_in_shares[i] = max(
-                    trades_in_shares[i], -int(self.holdings[i])
-                )
+                trades_in_shares[i] = max(trades_in_shares[i], -int(self.holdings[i]))
 
         # Turnover percentiles for logging
-        turnover_percentiles = self._calculate_turnover_percentiles(
-            curr_prices, volume
-        )
+        turnover_percentiles = self._calculate_turnover_percentiles(curr_prices, volume)
 
         # ── 4. Execute trades through impact model ────────────────────
         total_impact_cost = 0.0
@@ -279,7 +277,10 @@ class PortfolioOptimizationImpactEnv(gym.Env):
                 continue
 
             impact = self.impact_model.apply_trade(
-                ts, curr_prices[i], volatility[i], volume[i],
+                ts,
+                curr_prices[i],
+                volatility[i],
+                volume[i],
                 self.stock_symbols[i],
             )
             total_impact_cost += impact.cost
@@ -293,14 +294,16 @@ class PortfolioOptimizationImpactEnv(gym.Env):
                 total_sell_value += notional
             total_traded_value += notional
 
-            trades.append({
-                "stock_idx": i,
-                "side": side,
-                "shares": abs(ts),
-                "notional": notional,
-                "pov": pov,
-                "turnover_percentile": turnover_percentiles[i],
-            })
+            trades.append(
+                {
+                    "stock_idx": i,
+                    "side": side,
+                    "shares": abs(ts),
+                    "notional": notional,
+                    "pov": pov,
+                    "turnover_percentile": turnover_percentiles[i],
+                }
+            )
 
             # Update cash: buy costs cash, sell generates cash
             self._cash_balance -= ts * curr_prices[i]
@@ -319,9 +322,7 @@ class PortfolioOptimizationImpactEnv(gym.Env):
 
         # ── 7. Reward: log return (original paper) ────────────────────
         last_value = self._asset_memory["final"][-2]
-        rate_of_return = (
-            self._portfolio_value / last_value if last_value > EPS else 1.0
-        )
+        rate_of_return = self._portfolio_value / last_value if last_value > EPS else 1.0
         portfolio_return = rate_of_return - 1
         log_return = np.log(max(rate_of_return, EPS))
 
@@ -336,9 +337,7 @@ class PortfolioOptimizationImpactEnv(gym.Env):
                 else 0.0
             )
 
-        turnover = (
-            total_traded_value / self.total_asset if self.total_asset > 0 else 0
-        )
+        turnover = total_traded_value / self.total_asset if self.total_asset > 0 else 0
         info = {
             "turnover": turnover,
             "cost": total_impact_cost,

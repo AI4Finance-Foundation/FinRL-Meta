@@ -73,7 +73,8 @@ def sample_env_params(
     they are set by the caller and forwarded as-is.
     """
     use_obs_normalizer = trial.suggest_categorical(
-        "use_obs_normalizer", [True, False],
+        "use_obs_normalizer",
+        [True, False],
     )
     obs_clip = (
         trial.suggest_float("obs_clip", 5.0, 20.0)
@@ -85,16 +86,22 @@ def sample_env_params(
         max_stock_pct=max_stock_pct,
         max_trade_volume_pct=max_trade_volume_pct,
         reward_scaling=trial.suggest_float(
-            "reward_scaling", 2**-14, 2**-8, log=True,
+            "reward_scaling",
+            2**-14,
+            2**-8,
+            log=True,
         ),
         include_permanent_impact_in_state=trial.suggest_categorical(
-            "include_permanent_impact_in_state", [True, False],
+            "include_permanent_impact_in_state",
+            [True, False],
         ),
         include_cooldown_in_state=trial.suggest_categorical(
-            "include_cooldown_in_state", [True, False],
+            "include_cooldown_in_state",
+            [True, False],
         ),
         include_tbill_in_state=trial.suggest_categorical(
-            "include_tbill_in_state", [True, False],
+            "include_tbill_in_state",
+            [True, False],
         ),
         horizon=trial.suggest_categorical("horizon", [10, 20, 40, 80]),
         eta_dd=trial.suggest_float("eta_dd", 0.0, 3.0),
@@ -114,7 +121,8 @@ def sample_model_kwargs(
     """
     # ── Common: network architecture ─────────────────────────────────
     net_arch_key = trial.suggest_categorical(
-        "net_arch", list(NET_ARCH.keys()),
+        "net_arch",
+        list(NET_ARCH.keys()),
     )
     policy_kwargs = {"net_arch": NET_ARCH[net_arch_key]}
 
@@ -151,10 +159,12 @@ def sample_model_kwargs(
         model_kwargs = {
             "learning_rate": lr,
             "batch_size": trial.suggest_categorical(
-                "batch_size", [64, 128, 256, 512],
+                "batch_size",
+                [64, 128, 256, 512],
             ),
             "buffer_size": trial.suggest_categorical(
-                "buffer_size", [10_000, 50_000, 100_000],
+                "buffer_size",
+                [10_000, 50_000, 100_000],
             ),
             "gamma": trial.suggest_float("gamma", 0.90, 0.999),
             "tau": trial.suggest_float("tau", 0.001, 0.05, log=True),
@@ -164,10 +174,12 @@ def sample_model_kwargs(
         model_kwargs = {
             "learning_rate": lr,
             "batch_size": trial.suggest_categorical(
-                "batch_size", [64, 128, 256, 512],
+                "batch_size",
+                [64, 128, 256, 512],
             ),
             "buffer_size": trial.suggest_categorical(
-                "buffer_size", [10_000, 50_000, 100_000],
+                "buffer_size",
+                [10_000, 50_000, 100_000],
             ),
             "gamma": trial.suggest_float("gamma", 0.90, 0.999),
             "tau": trial.suggest_float("tau", 0.001, 0.05, log=True),
@@ -178,7 +190,6 @@ def sample_model_kwargs(
         raise ValueError(f"Unsupported model: {model_name}")
 
     return model_kwargs, policy_kwargs
-
 
 
 def objective(
@@ -446,15 +457,21 @@ def backtest_best_trial(
 def save_study_results(study: optuna.Study, path: str) -> None:
     """Persist the study's best params and top-N trials to a JSON file."""
     trials_data = []
-    for t in sorted(study.trials, key=lambda x: x.value if x.value is not None else float("-inf"), reverse=True):
+    for t in sorted(
+        study.trials,
+        key=lambda x: x.value if x.value is not None else float("-inf"),
+        reverse=True,
+    ):
         if t.value is None:
             continue
-        trials_data.append({
-            "number": t.number,
-            "value": t.value,
-            "params": t.params,
-            "state": t.state.name,
-        })
+        trials_data.append(
+            {
+                "number": t.number,
+                "value": t.value,
+                "params": t.params,
+                "state": t.state.name,
+            }
+        )
 
     result = {
         "best_trial": study.best_trial.number,
@@ -541,10 +558,12 @@ def run_multi_agent_hpo():
         save_study_results(study, f"{results_dir}/{model_name}_study_results.json")
         save_best_params(study, f"{results_dir}/{model_name}_best_params.json")
 
-        best_configs.append({
-            "model_name": model_name,
-            "study": study,
-        })
+        best_configs.append(
+            {
+                "model_name": model_name,
+                "study": study,
+            }
+        )
 
     # ── Build comparison backtest grid ───────────────────────────────
     # Baselines (default params) + HPO best for each agent
@@ -558,17 +577,19 @@ def run_multi_agent_hpo():
         best = study.best_params
 
         # Baseline with default agent params
-        baseline_configs.append({
-            "model_name": model_name,
-            "impact_model_class": impact_model_class,
-            "initial_capital": initial_capital,
-            # Default env params (EnvParams defaults)
-            "include_permanent_impact_in_state": True,
-            "include_cooldown_in_state": True,
-            "include_tbill_in_state": True,
-            "use_obs_normalizer": False,
-            "eta_dd": 0.5,
-        })
+        baseline_configs.append(
+            {
+                "model_name": model_name,
+                "impact_model_class": impact_model_class,
+                "initial_capital": initial_capital,
+                # Default env params (EnvParams defaults)
+                "include_permanent_impact_in_state": True,
+                "include_cooldown_in_state": True,
+                "include_tbill_in_state": True,
+                "use_obs_normalizer": False,
+                "eta_dd": 0.5,
+            }
+        )
 
         # HPO best params
         model_kwargs, policy_kwargs = reconstruct_agent_kwargs(best, model_name)
@@ -580,7 +601,9 @@ def run_multi_agent_hpo():
             "policy_kwargs": policy_kwargs,
             "use_obs_normalizer": best["use_obs_normalizer"],
             "reward_scaling": best["reward_scaling"],
-            "include_permanent_impact_in_state": best["include_permanent_impact_in_state"],
+            "include_permanent_impact_in_state": best[
+                "include_permanent_impact_in_state"
+            ],
             "include_cooldown_in_state": best["include_cooldown_in_state"],
             "include_tbill_in_state": best["include_tbill_in_state"],
             "horizon": best["horizon"],
@@ -615,7 +638,9 @@ def run_multi_agent_hpo():
     log.info("=" * 60)
     for entry in best_configs:
         study = entry["study"]
-        log.info(f"\n  {entry['model_name'].upper()} (OOS Sharpe={study.best_value:.4f}):")
+        log.info(
+            f"\n  {entry['model_name'].upper()} (OOS Sharpe={study.best_value:.4f}):"
+        )
         for k, v in study.best_params.items():
             log.info(f"    {k}: {v}")
     log.info("=" * 60)

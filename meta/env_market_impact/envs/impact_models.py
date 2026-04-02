@@ -1,16 +1,18 @@
-from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from abc import ABC
+from abc import abstractmethod
 from collections import defaultdict
+from dataclasses import dataclass
+from datetime import date
+
 import numpy as np
 import pandas as pd
-from datetime import date
 
 
 @dataclass
 class TradeImpact:
     """
     Encapsulates the result of an impact model's trade.
-    
+
     Attributes:
     -----------
     cost : float
@@ -18,6 +20,7 @@ class TradeImpact:
     price_shift : float
         Permanent price shift ΔP to apply to the mid-price for subsequent trades.
     """
+
     cost: float
     price_shift: float
 
@@ -27,7 +30,7 @@ class ImpactModel(ABC):
     def __init__(self, perm_half_life_days: float = 5.0):
         """
         Initialize the impact model.
-        
+
         Parameters
         ----------
         perm_half_life_days : float (default=5.0)
@@ -35,7 +38,7 @@ class ImpactModel(ABC):
             impact decays exponentially as the market absorbs the information.
             Empirical research suggests 1-5 days for large-cap stocks (default 5.0).
             Use longer values (5-20 days) for less liquid securities.
-            
+
         References
         ----------
         Bouchaud, J.P., Farmer, J.D., & Lillo, F. (2009). How markets slowly digest
@@ -51,12 +54,14 @@ class ImpactModel(ABC):
         self.reset()
 
     @abstractmethod
-    def apply_trade(self,
-                    trade_size: float,
-                    price: float,
-                    volatility: float,
-                    volume: float,
-                    symbol: str) -> TradeImpact:
+    def apply_trade(
+        self,
+        trade_size: float,
+        price: float,
+        volatility: float,
+        volume: float,
+        symbol: str,
+    ) -> TradeImpact:
         """
         Execute a trade and return its impact.
 
@@ -83,18 +88,18 @@ class ImpactModel(ABC):
     def end_day(self, date_str: str) -> None:
         """
         Apply decay and record the permanent impact state at the end of a trading day.
-        
+
         Parameters
         ----------
         date_str : str
             The date of the trading day being ended.
-            
+
         Notes
         -----
         This method first applies exponential decay to the permanent impact state
         (simulating market absorption of information), then records the state for
         each symbol into the impact history dataframe for later analysis.
-        
+
         The decay follows: impact_new = impact_old * (1 - decay_rate)
         where decay_rate is computed from perm_half_life_days.
         """
@@ -105,25 +110,23 @@ class ImpactModel(ABC):
                 self._perm_state[symbol] *= decay_factor
 
         for symbol, impact in self._perm_state.items():
-            self._impact_records.append({
-                'date': date_str,
-                'symbol': symbol,
-                'permanent_impact': impact
-            })
+            self._impact_records.append(
+                {"date": date_str, "symbol": symbol, "permanent_impact": impact}
+            )
 
     def get_impact_history(self) -> pd.DataFrame:
         """
         Get the recorded impact history as a DataFrame.
-        
+
         Returns
         -------
         pd.DataFrame
             The impact history with columns ['date', 'symbol', 'permanent_impact'].
         """
         if not self._impact_records:
-            return pd.DataFrame(columns=['date', 'symbol', 'permanent_impact'])
+            return pd.DataFrame(columns=["date", "symbol", "permanent_impact"])
         return pd.DataFrame(self._impact_records)
-    
+
     def reset(self) -> None:
         """
         Reset the impact model state.
@@ -138,7 +141,9 @@ class ImpactModel(ABC):
 
     def get_perm_state_array(self, symbols: list) -> np.ndarray:
         """Get the permanent impact state as an array for a list of symbols."""
-        return np.array([self._perm_state.get(s, 0.0) for s in symbols], dtype=np.float32)
+        return np.array(
+            [self._perm_state.get(s, 0.0) for s in symbols], dtype=np.float32
+        )
 
 
 class SqrtImpactModel(ImpactModel):
@@ -189,7 +194,12 @@ class SqrtImpactModel(ImpactModel):
         *Journal of Risk*, 3(2), 5-39. (For historical context on the original model)
     """
 
-    def __init__(self, Y: float = 0.6, perm_fraction: float = 0.25, perm_half_life_days: float = 5.0) -> None:
+    def __init__(
+        self,
+        Y: float = 0.6,
+        perm_fraction: float = 0.25,
+        perm_half_life_days: float = 5.0,
+    ) -> None:
         super().__init__(perm_half_life_days=perm_half_life_days)
         self.Y = Y
         self.perm_fraction = perm_fraction
@@ -201,12 +211,14 @@ class SqrtImpactModel(ImpactModel):
     def __repr__(self):
         return f"SqrtImpactModel(Y={self.Y}, perm_fraction={self.perm_fraction}, perm_half_life_days={self.perm_half_life_days})"
 
-    def apply_trade(self,
-                    trade_size: float,
-                    price: float,
-                    volatility: float,
-                    volume: float,
-                    symbol: str) -> TradeImpact:
+    def apply_trade(
+        self,
+        trade_size: float,
+        price: float,
+        volatility: float,
+        volume: float,
+        symbol: str,
+    ) -> TradeImpact:
         if volume <= 0.0 or trade_size == 0.0:
             return TradeImpact(cost=0.0, price_shift=0.0)
 
@@ -279,7 +291,14 @@ class ACImpactModel(ImpactModel):
     Almgren, R., Thum, C., Hauptmann, E., & Li, H. (2005). Direct estimation of
         equity market impact. *Risk*, 18(7), 58-62.
     """
-    def __init__(self, alpha: float = 1.0, beta: float = 1.0, epsilon: float = 0.0005, perm_half_life_days: float = 5.0) -> None:
+
+    def __init__(
+        self,
+        alpha: float = 1.0,
+        beta: float = 1.0,
+        epsilon: float = 0.0005,
+        perm_half_life_days: float = 5.0,
+    ) -> None:
         super().__init__(perm_half_life_days=perm_half_life_days)
         self.alpha = alpha
         self.beta = beta
@@ -291,12 +310,14 @@ class ACImpactModel(ImpactModel):
     def __repr__(self):
         return f"ACImpactModel(alpha={self.alpha}, beta={self.beta}, epsilon={self.epsilon}, perm_half_life_days={self.perm_half_life_days})"
 
-    def apply_trade(self,
-                    trade_size: float,
-                    price: float,
-                    volatility: float,
-                    volume: float,
-                    symbol: str) -> TradeImpact:
+    def apply_trade(
+        self,
+        trade_size: float,
+        price: float,
+        volatility: float,
+        volume: float,
+        symbol: str,
+    ) -> TradeImpact:
         if volume <= 0.0 or trade_size == 0.0:
             return TradeImpact(cost=0.0, price_shift=0.0)
 
@@ -373,7 +394,13 @@ class OWImpactModel(ImpactModel):
         Algorithms for Order Execution. Handbook on Systemic Risk, pp. 579–599.
     """
 
-    def __init__(self, Y: float = 0.6, perm_fraction: float = 0.25, half_life_days: float = 0.08, perm_half_life_days: float = 5.0):
+    def __init__(
+        self,
+        Y: float = 0.6,
+        perm_fraction: float = 0.25,
+        half_life_days: float = 0.08,
+        perm_half_life_days: float = 5.0,
+    ):
         super().__init__(perm_half_life_days=perm_half_life_days)
         self.Y = Y
         self.perm_fraction = perm_fraction
@@ -394,12 +421,14 @@ class OWImpactModel(ImpactModel):
         super().reset()
         self._transient_states = defaultdict(float)
 
-    def apply_trade(self,
-                    trade_size: float,
-                    price: float,
-                    volatility: float,
-                    volume: float,
-                    symbol: str) -> TradeImpact:
+    def apply_trade(
+        self,
+        trade_size: float,
+        price: float,
+        volatility: float,
+        volume: float,
+        symbol: str,
+    ) -> TradeImpact:
         """
         Execute a trade and compute cost and permanent price shift.
 
@@ -449,6 +478,7 @@ class BaselineImpactModel(ImpactModel):
     sophisticated models like Almgren-Chriss. It assumes a fixed transaction
     cost of 0.10% of the trade's notional value and no permanent impact.
     """
+
     def __init__(self, basis_points=10, perm_half_life_days: float = 5.0):
         super().__init__(perm_half_life_days=perm_half_life_days)
         self.basis_points = basis_points
@@ -460,12 +490,14 @@ class BaselineImpactModel(ImpactModel):
     def __repr__(self):
         return f"BaselineImpactModel(basis_points={self.basis_points})"
 
-    def apply_trade(self,
-                    trade_size: float,
-                    price: float,
-                    volatility: float, # Unused, for interface compatibility
-                    volume: float,     # Unused, for interface compatibility
-                    symbol: str) -> TradeImpact:
+    def apply_trade(
+        self,
+        trade_size: float,
+        price: float,
+        volatility: float,  # Unused, for interface compatibility
+        volume: float,  # Unused, for interface compatibility
+        symbol: str,
+    ) -> TradeImpact:
         """
         Calculates a fixed cost based on trade size and price.
 
@@ -483,7 +515,7 @@ class BaselineImpactModel(ImpactModel):
             price_shift : permanent mid-price shift (always 0 for this model)
         """
         cost = self.fee_rate * abs(trade_size) * price
-        
+
         # No permanent impact in the baseline model
         price_shift = 0.0
 

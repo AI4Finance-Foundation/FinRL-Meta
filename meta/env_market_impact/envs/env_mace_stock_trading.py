@@ -1,11 +1,14 @@
 from dataclasses import dataclass
-from typing import Dict, Optional, Tuple
+from typing import Dict
+from typing import Optional
+from typing import Tuple
 
 import gymnasium as gym
 import numpy as np
-
-from .impact_models import SqrtImpactModel, ImpactModel
 from stable_baselines3.common.running_mean_std import RunningMeanStd
+
+from .impact_models import ImpactModel
+from .impact_models import SqrtImpactModel
 
 EPS = 1e-8
 
@@ -141,9 +144,13 @@ class MACEStockTradingEnv(gym.Env):
         self.alpha = 1.0 / params.horizon
         self.eta_dd = params.eta_dd
 
-        self.impact_model = impact_model if impact_model is not None else SqrtImpactModel()
+        self.impact_model = (
+            impact_model if impact_model is not None else SqrtImpactModel()
+        )
         self.stock_symbols = config["tic_list"]
-        self.include_permanent_impact_in_state = params.include_permanent_impact_in_state
+        self.include_permanent_impact_in_state = (
+            params.include_permanent_impact_in_state
+        )
         self.include_cooldown_in_state = params.include_cooldown_in_state
         self.include_tbill_in_state = params.include_tbill_in_state
 
@@ -169,8 +176,12 @@ class MACEStockTradingEnv(gym.Env):
             low, high = -np.inf, np.inf
             self.obs_normalizer = None
 
-        self.observation_space = gym.spaces.Box(low=low, high=high, shape=(self.state_dim,), dtype=np.float32)
-        self.action_space = gym.spaces.Box(low=-1, high=1, shape=(self.action_dim,), dtype=np.float32)
+        self.observation_space = gym.spaces.Box(
+            low=low, high=high, shape=(self.state_dim,), dtype=np.float32
+        )
+        self.action_space = gym.spaces.Box(
+            low=-1, high=1, shape=(self.action_dim,), dtype=np.float32
+        )
         self.max_step = self.price_array.shape[0] - 1
 
     def _get_perm_impact(self) -> np.ndarray:
@@ -180,7 +191,7 @@ class MACEStockTradingEnv(gym.Env):
     def get_normalizer_state(self) -> Optional[Dict]:
         """
         Get the current state of the observation normalizer.
-        
+
         Returns
         -------
         dict or None
@@ -190,18 +201,18 @@ class MACEStockTradingEnv(gym.Env):
         if self.obs_normalizer is None:
             return None
         return {
-            'mean': self.obs_normalizer.mean.copy(),
-            'var': self.obs_normalizer.var.copy(),
-            'count': self.obs_normalizer.count,
+            "mean": self.obs_normalizer.mean.copy(),
+            "var": self.obs_normalizer.var.copy(),
+            "count": self.obs_normalizer.count,
         }
 
     def set_normalizer_state(self, state: Dict, freeze: bool = True) -> None:
         """
         Set the observation normalizer state from a saved state.
-        
+
         Use this to transfer normalizer statistics from a training environment
         to a test environment, ensuring consistent observation scaling.
-        
+
         Parameters
         ----------
         state : dict
@@ -211,9 +222,9 @@ class MACEStockTradingEnv(gym.Env):
         """
         if self.obs_normalizer is None:
             return
-        self.obs_normalizer.mean = state['mean'].copy()
-        self.obs_normalizer.var = state['var'].copy()
-        self.obs_normalizer.count = state['count']
+        self.obs_normalizer.mean = state["mean"].copy()
+        self.obs_normalizer.var = state["var"].copy()
+        self.obs_normalizer.count = state["count"]
         if freeze:
             self._obs_norm_update = False
 
@@ -238,10 +249,12 @@ class MACEStockTradingEnv(gym.Env):
         self.peak = self.total_asset
         return self.get_state(adjusted_prices, adjusted_prices, self.total_asset), {}
 
-    def _calculate_turnover_percentiles(self, prices: np.ndarray, volumes: np.ndarray) -> np.ndarray:
+    def _calculate_turnover_percentiles(
+        self, prices: np.ndarray, volumes: np.ndarray
+    ) -> np.ndarray:
         """
         Calculate the percentile rank of each stock's market turnover (gross notional).
-        
+
         Returns an array where percentile[i] is the percentile rank (0-100) of stock i's
         daily gross notional among all stocks in the universe.
         """
@@ -250,12 +263,12 @@ class MACEStockTradingEnv(gym.Env):
         n = len(gross_notional)
         if n <= 1:
             return np.full(n, 50.0)
-        
+
         # Get ranks (1-based, with average for ties)
         sorted_indices = np.argsort(gross_notional)
         ranks = np.empty_like(sorted_indices, dtype=float)
         ranks[sorted_indices] = np.arange(1, n + 1)
-        
+
         # Convert to percentile (0-100 scale)
         percentiles = (ranks - 1) / (n - 1) * 100
         return percentiles
@@ -294,18 +307,22 @@ class MACEStockTradingEnv(gym.Env):
         for i in range(len(trade_shares)):
             if trade_shares[i] < 0:
                 sell_shares = -trade_shares[i]
-                traded_value, trade_cost = self._sell_stock(i, sell_shares, adjusted_prices[i], volatility[i], volume[i])
+                traded_value, trade_cost = self._sell_stock(
+                    i, sell_shares, adjusted_prices[i], volatility[i], volume[i]
+                )
                 if traded_value > 0:
                     gross_notional = adjusted_prices[i] * sell_shares
                     pov = sell_shares / volume[i] if volume[i] > 0 else 0.0
-                    trades.append({
-                        "stock_idx": i,
-                        "side": "sell",
-                        "shares": sell_shares,
-                        "notional": gross_notional,
-                        "pov": pov,
-                        "turnover_percentile": turnover_percentiles[i],
-                    })
+                    trades.append(
+                        {
+                            "stock_idx": i,
+                            "side": "sell",
+                            "shares": sell_shares,
+                            "notional": gross_notional,
+                            "pov": pov,
+                            "turnover_percentile": turnover_percentiles[i],
+                        }
+                    )
                 total_sell_value += traded_value
                 total_traded_value += traded_value
                 total_trade_cost += trade_cost
@@ -313,18 +330,22 @@ class MACEStockTradingEnv(gym.Env):
         for i in range(len(trade_shares)):
             if trade_shares[i] > 0:
                 buy_shares = trade_shares[i]
-                traded_value, trade_cost = self._buy_stock(i, buy_shares, adjusted_prices[i], volatility[i], volume[i])
+                traded_value, trade_cost = self._buy_stock(
+                    i, buy_shares, adjusted_prices[i], volatility[i], volume[i]
+                )
                 if traded_value > 0:
                     gross_notional = adjusted_prices[i] * buy_shares
                     pov = buy_shares / volume[i] if volume[i] > 0 else 0.0
-                    trades.append({
-                        "stock_idx": i,
-                        "side": "buy",
-                        "shares": buy_shares,
-                        "notional": gross_notional,
-                        "pov": pov,
-                        "turnover_percentile": turnover_percentiles[i],
-                    })
+                    trades.append(
+                        {
+                            "stock_idx": i,
+                            "side": "buy",
+                            "shares": buy_shares,
+                            "notional": gross_notional,
+                            "pov": pov,
+                            "turnover_percentile": turnover_percentiles[i],
+                        }
+                    )
                 total_buy_value += traded_value
                 total_traded_value += traded_value
                 total_trade_cost += trade_cost
@@ -339,9 +360,13 @@ class MACEStockTradingEnv(gym.Env):
             state = np.zeros(self.state_dim, dtype=np.float32)
             self.episode_return = self.total_asset / self.initial_capital
         else:
-            state = self.get_state(adjusted_prices_post, prev_adjusted_prices, end_total_asset)
+            state = self.get_state(
+                adjusted_prices_post, prev_adjusted_prices, end_total_asset
+            )
             # Calculate reward based on next day's total asset
-            tomorrow_adjusted_prices = self.price_array[self.time + 1] + self._get_perm_impact()
+            tomorrow_adjusted_prices = (
+                self.price_array[self.time + 1] + self._get_perm_impact()
+            )
             end_total_asset = self._calculate_total_asset(tomorrow_adjusted_prices)
 
         reward = self._calculate_reward(end_total_asset)
@@ -356,9 +381,13 @@ class MACEStockTradingEnv(gym.Env):
         }
         return state, reward, terminated, False, info
 
-    def _calculate_trade_shares(self, actions: np.ndarray, adjusted_prices: np.ndarray, volume: np.ndarray) -> np.ndarray:
+    def _calculate_trade_shares(
+        self, actions: np.ndarray, adjusted_prices: np.ndarray, volume: np.ndarray
+    ) -> np.ndarray:
         # Determine the desired trade size while respecting max exposure constraints
-        max_stocks_per_position = self._calculate_max_stock_per_position(adjusted_prices)
+        max_stocks_per_position = self._calculate_max_stock_per_position(
+            adjusted_prices
+        )
         desired_shares = (actions * max_stocks_per_position).astype(int)
         trade_shares = np.zeros_like(desired_shares)
         for i in range(len(desired_shares)):
@@ -400,14 +429,14 @@ class MACEStockTradingEnv(gym.Env):
         -----
         Let α = 1 / horizon.  Update the first and second moments via
 
-            μ_t   = (1-α) μ_{t-1} + α r_t  
+            μ_t   = (1-α) μ_{t-1} + α r_t
             m²_t  = (1-α) m²_{t-1} + α r_t²
 
         Then
 
-            σ_t²  = max(m²_t – μ_t², eps)  
-            SR_{t-1} = μ_{t-1} / σ_{t-1}  
-            x     = (r_t – μ_{t-1}) / σ_t  
+            σ_t²  = max(m²_t – μ_t², eps)
+            SR_{t-1} = μ_{t-1} / σ_{t-1}
+            x     = (r_t – μ_{t-1}) / σ_t
             DSR_t = x – 0.5 · SR_{t-1} · x²
 
         The DSR is the stochastic gradient of the Sharpe ratio, giving a dense,
@@ -420,7 +449,7 @@ class MACEStockTradingEnv(gym.Env):
         """
         # update moments
         mu_next = (1 - self.alpha) * self.mu_prev + self.alpha * r_t
-        m2_next = (1 - self.alpha) * self.m2_prev + self.alpha * (r_t ** 2)
+        m2_next = (1 - self.alpha) * self.m2_prev + self.alpha * (r_t**2)
 
         var_next = max(m2_next - mu_next**2, EPS)
         sigma_next = np.sqrt(var_next)
@@ -445,10 +474,15 @@ class MACEStockTradingEnv(gym.Env):
         dd_new = (self.peak - end_total_asset) / self.peak
         delta_dd = max(0, dd_new - self.dd)
         self.dd = dd_new
-        return (dsr_reward - self.eta_dd * delta_dd ** 2) * self.reward_scaling
+        return (dsr_reward - self.eta_dd * delta_dd**2) * self.reward_scaling
 
     def _sell_stock(
-        self, index: int, sell_shares: int, price: float, volatility: float, volume: float
+        self,
+        index: int,
+        sell_shares: int,
+        price: float,
+        volatility: float,
+        volume: float,
     ) -> Tuple[float, float]:
         """Executes a sell trade and returns the traded value and cost."""
         if price > 0 and sell_shares > 0:
@@ -467,7 +501,12 @@ class MACEStockTradingEnv(gym.Env):
         return 0.0, 0.0
 
     def _buy_stock(
-        self, index: int, buy_shares: int, price: float, volatility: float, volume: float
+        self,
+        index: int,
+        buy_shares: int,
+        price: float,
+        volatility: float,
+        volume: float,
     ) -> Tuple[float, float]:
         """Executes a buy trade and returns the traded value and cost."""
         if price > 0 and buy_shares > 0:
@@ -491,13 +530,22 @@ class MACEStockTradingEnv(gym.Env):
         r = self.cash + (self.stocks * adjusted_prices).sum()
         return r if r > 0 else EPS
 
-    def _calculate_max_stock_per_position(self, current_prices: np.ndarray) -> np.ndarray:
+    def _calculate_max_stock_per_position(
+        self, current_prices: np.ndarray
+    ) -> np.ndarray:
         """Calculates the max number of shares per stock based on portfolio percentage."""
         portfolio_value = self.cash + (self.stocks * current_prices).sum()
         max_position_value = portfolio_value * self.max_stock_pct
-        return np.where(current_prices > 0, max_position_value / current_prices, 0).astype(int)
+        return np.where(
+            current_prices > 0, max_position_value / current_prices, 0
+        ).astype(int)
 
-    def get_state(self, adjusted_prices: np.ndarray, prev_adjusted_prices: np.ndarray, end_total_asset: float) -> np.ndarray:
+    def get_state(
+        self,
+        adjusted_prices: np.ndarray,
+        prev_adjusted_prices: np.ndarray,
+        end_total_asset: float,
+    ) -> np.ndarray:
         """Build and return the current observation vector.
 
         Computes internally all features that depend on the current env state and prices,
@@ -521,7 +569,9 @@ class MACEStockTradingEnv(gym.Env):
         if self.include_permanent_impact_in_state:
             state_components.append(impact_bps)
         if self.include_cooldown_in_state:
-            state_components.append((np.clip(self.stocks_cool_down, 0, 10.0) / 10.0).astype(np.float32))
+            state_components.append(
+                (np.clip(self.stocks_cool_down, 0, 10.0) / 10.0).astype(np.float32)
+            )
         if self.include_tbill_in_state:
             state_components.append(np.array([self._calc_rf_rate()], dtype=np.float32))
 

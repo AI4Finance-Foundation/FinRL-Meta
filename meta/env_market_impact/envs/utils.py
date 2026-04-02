@@ -12,7 +12,9 @@ def get_logger():
 
     logger.setLevel(logging.INFO)
     handler = logging.StreamHandler(sys.stdout)
-    formatter = logging.Formatter('[%(asctime)s] - %(filename)s:%(lineno)d - [%(levelname)s]: %(message)s')
+    formatter = logging.Formatter(
+        "[%(asctime)s] - %(filename)s:%(lineno)d - [%(levelname)s]: %(message)s"
+    )
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     logger.propagate = False
@@ -38,7 +40,7 @@ def rolling_sharpe(returns, window: int = 252, min_periods: int = 180):
     """
     returns = pd.Series(returns, dtype=float)
     return returns.rolling(window=window, min_periods=min_periods).apply(
-        lambda x: (x.mean() * 252) / (x.std() * (252 ** 0.5)) if x.std() != 0 else 0
+        lambda x: (x.mean() * 252) / (x.std() * (252**0.5)) if x.std() != 0 else 0
     )
 
 
@@ -122,9 +124,7 @@ def compute_performance_stats(
 
     # Annualized return (%)
     annualized_return = (
-        ((final_value / initial_value) ** (252 / days) - 1) * 100
-        if days > 0
-        else 0.0
+        ((final_value / initial_value) ** (252 / days) - 1) * 100 if days > 0 else 0.0
     )
 
     # Sharpe ratios & volatility
@@ -132,19 +132,19 @@ def compute_performance_stats(
     std = daily_returns.std()
     if std != 0:
         total_sharpe = daily_returns.mean() / std
-        annualized_sharpe = total_sharpe * (252 ** 0.5)
+        annualized_sharpe = total_sharpe * (252**0.5)
     else:
         total_sharpe = 0.0
         annualized_sharpe = 0.0
 
     # Annualized volatility (%)
-    annualized_volatility = std * (252 ** 0.5) * 100 if std != 0 else 0.0
+    annualized_volatility = std * (252**0.5) * 100 if std != 0 else 0.0
 
     # Sortino ratio (annualized, downside deviation only)
     negative_returns = daily_returns[daily_returns < 0]
     downside_std = negative_returns.std()
     if downside_std != 0 and len(negative_returns) > 1:
-        sortino_ratio = (daily_returns.mean() / downside_std) * (252 ** 0.5)
+        sortino_ratio = (daily_returns.mean() / downside_std) * (252**0.5)
     else:
         sortino_ratio = 0.0
 
@@ -157,9 +157,7 @@ def compute_performance_stats(
     max_drawdown = drawdown.min()
 
     # Calmar ratio (annualized return / |max drawdown|)
-    calmar_ratio = (
-        annualized_return / abs(max_drawdown) if max_drawdown != 0 else 0.0
-    )
+    calmar_ratio = annualized_return / abs(max_drawdown) if max_drawdown != 0 else 0.0
 
     # Trading costs
     total_trading_cost = costs.sum()
@@ -171,9 +169,8 @@ def compute_performance_stats(
         total_notional = trades_df["notional"].sum()
         if total_notional > 0:
             wtd_avg_turnover_percentile = (
-                (trades_df["turnover_percentile"] * trades_df["notional"]).sum()
-                / total_notional
-            )
+                trades_df["turnover_percentile"] * trades_df["notional"]
+            ).sum() / total_notional
         else:
             wtd_avg_turnover_percentile = 0.0
     else:

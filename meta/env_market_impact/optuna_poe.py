@@ -4,6 +4,7 @@ Searches over environment parameters (reward_scaling, max_trade_volume_pct)
 and algorithm-specific hyperparameters to maximise OOS annualized Sharpe.
 The original paper's log-return reward is preserved.
 """
+
 import json
 import os
 import sys
@@ -41,48 +42,69 @@ def sample_env_kwargs(trial: optuna.Trial, initial_amount: float) -> dict:
     }
 
 
-def sample_model_kwargs(trial: optuna.Trial, model_name: str) -> tuple[dict, dict | None]:
+def sample_model_kwargs(
+    trial: optuna.Trial, model_name: str
+) -> tuple[dict, dict | None]:
     net_arch_key = trial.suggest_categorical("net_arch", list(NET_ARCH.keys()))
     policy_kwargs = {"net_arch": NET_ARCH[net_arch_key]}
     lr = trial.suggest_float("learning_rate", 1e-5, 1e-2, log=True)
 
     if model_name == "a2c":
-        mk = {"learning_rate": lr,
-              "n_steps": trial.suggest_categorical("n_steps", [5, 10, 20, 50]),
-              "ent_coef": trial.suggest_float("ent_coef", 1e-4, 0.1, log=True),
-              "gamma": trial.suggest_float("gamma", 0.90, 0.999),
-              "gae_lambda": trial.suggest_float("gae_lambda", 0.8, 1.0)}
+        mk = {
+            "learning_rate": lr,
+            "n_steps": trial.suggest_categorical("n_steps", [5, 10, 20, 50]),
+            "ent_coef": trial.suggest_float("ent_coef", 1e-4, 0.1, log=True),
+            "gamma": trial.suggest_float("gamma", 0.90, 0.999),
+            "gae_lambda": trial.suggest_float("gae_lambda", 0.8, 1.0),
+        }
     elif model_name == "ppo":
         n_steps = trial.suggest_categorical("n_steps", [512, 1024, 2048, 4096])
         valid = [b for b in [32, 64, 128, 256, 512] if n_steps % b == 0]
-        mk = {"learning_rate": lr, "n_steps": n_steps,
-              "batch_size": trial.suggest_categorical("batch_size", valid),
-              "ent_coef": trial.suggest_float("ent_coef", 1e-4, 0.1, log=True),
-              "gamma": trial.suggest_float("gamma", 0.90, 0.999),
-              "gae_lambda": trial.suggest_float("gae_lambda", 0.8, 1.0),
-              "clip_range": trial.suggest_float("clip_range", 0.1, 0.4),
-              "n_epochs": trial.suggest_categorical("n_epochs_ppo", [3, 5, 10, 20])}
+        mk = {
+            "learning_rate": lr,
+            "n_steps": n_steps,
+            "batch_size": trial.suggest_categorical("batch_size", valid),
+            "ent_coef": trial.suggest_float("ent_coef", 1e-4, 0.1, log=True),
+            "gamma": trial.suggest_float("gamma", 0.90, 0.999),
+            "gae_lambda": trial.suggest_float("gae_lambda", 0.8, 1.0),
+            "clip_range": trial.suggest_float("clip_range", 0.1, 0.4),
+            "n_epochs": trial.suggest_categorical("n_epochs_ppo", [3, 5, 10, 20]),
+        }
     elif model_name in ("ddpg", "td3"):
-        mk = {"learning_rate": lr,
-              "batch_size": trial.suggest_categorical("batch_size", [64, 128, 256, 512]),
-              "buffer_size": trial.suggest_categorical("buffer_size", [10_000, 50_000, 100_000]),
-              "gamma": trial.suggest_float("gamma", 0.90, 0.999),
-              "tau": trial.suggest_float("tau", 0.001, 0.05, log=True)}
+        mk = {
+            "learning_rate": lr,
+            "batch_size": trial.suggest_categorical("batch_size", [64, 128, 256, 512]),
+            "buffer_size": trial.suggest_categorical(
+                "buffer_size", [10_000, 50_000, 100_000]
+            ),
+            "gamma": trial.suggest_float("gamma", 0.90, 0.999),
+            "tau": trial.suggest_float("tau", 0.001, 0.05, log=True),
+        }
     elif model_name == "sac":
-        mk = {"learning_rate": lr,
-              "batch_size": trial.suggest_categorical("batch_size", [64, 128, 256, 512]),
-              "buffer_size": trial.suggest_categorical("buffer_size", [10_000, 50_000, 100_000]),
-              "gamma": trial.suggest_float("gamma", 0.90, 0.999),
-              "tau": trial.suggest_float("tau", 0.001, 0.05, log=True),
-              "ent_coef": "auto"}
+        mk = {
+            "learning_rate": lr,
+            "batch_size": trial.suggest_categorical("batch_size", [64, 128, 256, 512]),
+            "buffer_size": trial.suggest_categorical(
+                "buffer_size", [10_000, 50_000, 100_000]
+            ),
+            "gamma": trial.suggest_float("gamma", 0.90, 0.999),
+            "tau": trial.suggest_float("tau", 0.001, 0.05, log=True),
+            "ent_coef": "auto",
+        }
     else:
         raise ValueError(f"Unsupported model: {model_name}")
     return mk, policy_kwargs
 
 
 def objective(
-    trial, *, data_prep, model_name, impact_model_class,
-    initial_amount, num_epochs, seed=42,
+    trial,
+    *,
+    data_prep,
+    model_name,
+    impact_model_class,
+    initial_amount,
+    num_epochs,
+    seed=42,
 ) -> float:
     env_kwargs = sample_env_kwargs(trial, initial_amount)
     model_kwargs, policy_kwargs = sample_model_kwargs(trial, model_name)
@@ -97,8 +119,10 @@ def objective(
     vec = DummyVecEnv([lambda: train_env])
     try:
         mdl = DRLAgent(env=vec).get_model(
-            model_name, model_kwargs=model_kwargs,
-            policy_kwargs=policy_kwargs, seed=seed,
+            model_name,
+            model_kwargs=model_kwargs,
+            policy_kwargs=policy_kwargs,
+            seed=seed,
         )
     except Exception as e:
         log.warning(f"Trial {trial.number}: model creation failed – {e}")
@@ -109,8 +133,11 @@ def objective(
 
     for epoch in range(num_epochs):
         try:
-            mdl.learn(total_timesteps=n_days, reset_num_timesteps=(epoch == 0),
-                      tb_log_name=f"optuna_poe_{trial.number}")
+            mdl.learn(
+                total_timesteps=n_days,
+                reset_num_timesteps=(epoch == 0),
+                tb_log_name=f"optuna_poe_{trial.number}",
+            )
         except Exception as e:
             log.warning(f"Trial {trial.number}, epoch {epoch}: failed – {e}")
             raise optuna.TrialPruned()
@@ -119,15 +146,23 @@ def objective(
             config=trade_cfg, impact_model=impact_model_class(), **env_kwargs
         )
         res, trades = run_and_log_simulation(
-            eval_env, mdl, trade_cfg["date_list"], trade_bench,
+            eval_env,
+            mdl,
+            trade_cfg["date_list"],
+            trade_bench,
         )
         stats = compute_performance_stats(
-            res["portfolio_value"], res["turnover"],
-            res["cost"], trades, rewards=res["reward"],
+            res["portfolio_value"],
+            res["turnover"],
+            res["cost"],
+            trades,
+            rewards=res["reward"],
         )
         s = stats["annualized_sharpe"]
         best_sharpe = max(best_sharpe, s)
-        log.info(f"Trial {trial.number} | epoch {epoch+1}/{num_epochs} | OOS Sharpe={s:.3f}")
+        log.info(
+            f"Trial {trial.number} | epoch {epoch+1}/{num_epochs} | OOS Sharpe={s:.3f}"
+        )
         trial.report(s, epoch)
         if trial.should_prune():
             raise optuna.TrialPruned()
@@ -143,8 +178,12 @@ def run_multi_agent_hpo():
     num_epochs = 20
 
     data_prep = MarketDataPreparator(
-        tickers=NAS_100_TICKER, start_date=start_date, end_date=end_date,
-        tech_indicators=INDICATORS, train_ratio=0.9, benchmark_ticker="QQEW",
+        tickers=NAS_100_TICKER,
+        start_date=start_date,
+        end_date=end_date,
+        tech_indicators=INDICATORS,
+        train_ratio=0.9,
+        benchmark_ticker="QQEW",
     )
     agents = ["a2c", "ppo", "ddpg", "sac", "td3"]
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -158,20 +197,35 @@ def run_multi_agent_hpo():
         try:
             sampler = optuna.samplers.TPESampler(seed=42)
             pruner = MedianPruner(n_startup_trials=5, n_warmup_steps=3)
-            study = optuna.create_study(direction="maximize", sampler=sampler,
-                                         pruner=pruner, study_name=f"hpo_poe_{mn}")
+            study = optuna.create_study(
+                direction="maximize",
+                sampler=sampler,
+                pruner=pruner,
+                study_name=f"hpo_poe_{mn}",
+            )
             study.optimize(
-                lambda t: objective(t, data_prep=data_prep, model_name=mn,
-                                    impact_model_class=ACImpactModel,
-                                    initial_amount=1e9, num_epochs=num_epochs, seed=42),
-                n_trials=100, show_progress_bar=True,
+                lambda t: objective(
+                    t,
+                    data_prep=data_prep,
+                    model_name=mn,
+                    impact_model_class=ACImpactModel,
+                    initial_amount=1e9,
+                    num_epochs=num_epochs,
+                    seed=42,
+                ),
+                n_trials=100,
+                show_progress_bar=True,
             )
 
             # Save study results
             study_path = f"{results_dir}/{mn}_study.json"
             with open(study_path, "w") as f:
-                json.dump({"best_value": study.best_value,
-                           "best_params": study.best_params}, f, indent=2, default=str)
+                json.dump(
+                    {"best_value": study.best_value, "best_params": study.best_params},
+                    f,
+                    indent=2,
+                    default=str,
+                )
             log.info(f"Study results saved to {study_path}")
 
             # Save best params separately
@@ -206,8 +260,10 @@ def run_multi_agent_hpo():
     log.info("=" * 60)
     for entry in all_results:
         study = entry["study"]
-        log.info(f"\n  {entry['model_name'].upper()} (OOS Sharpe={study.best_value:.4f}, "
-                 f"trial #{study.best_trial.number}):")
+        log.info(
+            f"\n  {entry['model_name'].upper()} (OOS Sharpe={study.best_value:.4f}, "
+            f"trial #{study.best_trial.number}):"
+        )
         for k, v in study.best_params.items():
             log.info(f"    {k}: {v}")
     log.info("=" * 60)

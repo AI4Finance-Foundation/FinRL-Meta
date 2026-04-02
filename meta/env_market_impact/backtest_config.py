@@ -15,13 +15,15 @@ instead of duplicating definitions.
 
 import itertools
 import uuid
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from dataclasses import field
 
 import numpy as np
 
+from meta.env_market_impact.envs.env_mace_stock_trading import EnvParams
+
 # ── Lazy imports resolved at module level ────────────────────────────────
 # EnvParams is needed by BacktestParams; it lives in the env package.
-from meta.env_market_impact.envs.env_mace_stock_trading import EnvParams
 
 
 # ═════════════════════════════════════════════════════════════════════════
@@ -30,7 +32,12 @@ from meta.env_market_impact.envs.env_mace_stock_trading import EnvParams
 
 MODEL_KWARGS: dict[str, dict] = {
     "a2c": {"n_steps": 5, "ent_coef": 0.01, "learning_rate": 0.0007},
-    "ppo": {"n_steps": 2048, "ent_coef": 0.01, "learning_rate": 0.0003, "batch_size": 64},
+    "ppo": {
+        "n_steps": 2048,
+        "ent_coef": 0.01,
+        "learning_rate": 0.0003,
+        "batch_size": 64,
+    },
     "ddpg": {"batch_size": 128, "buffer_size": 50000, "learning_rate": 0.001},
     "sac": {"batch_size": 128, "buffer_size": 50000, "learning_rate": 0.001},
     "td3": {"batch_size": 128, "buffer_size": 50000, "learning_rate": 0.001},
@@ -53,8 +60,16 @@ NET_ARCH: dict[str, list[int]] = {
 
 AGENT_KEYS: dict[str, set[str]] = {
     "a2c": {"learning_rate", "n_steps", "ent_coef", "gamma", "gae_lambda"},
-    "ppo": {"learning_rate", "n_steps", "batch_size", "ent_coef", "gamma",
-            "gae_lambda", "clip_range", "n_epochs_ppo"},
+    "ppo": {
+        "learning_rate",
+        "n_steps",
+        "batch_size",
+        "ent_coef",
+        "gamma",
+        "gae_lambda",
+        "clip_range",
+        "n_epochs_ppo",
+    },
     "ddpg": {"learning_rate", "batch_size", "buffer_size", "gamma", "tau"},
     "td3": {"learning_rate", "batch_size", "buffer_size", "gamma", "tau"},
     "sac": {"learning_rate", "batch_size", "buffer_size", "gamma", "tau"},
@@ -124,7 +139,11 @@ class BacktestParams:
 
     def get_model_kwargs(self) -> dict:
         """Return agent hyper-parameters, falling back to ``MODEL_KWARGS``."""
-        return self.model_kwargs if self.model_kwargs is not None else MODEL_KWARGS[self.model_name]
+        return (
+            self.model_kwargs
+            if self.model_kwargs is not None
+            else MODEL_KWARGS[self.model_name]
+        )
 
     @property
     def base_filename(self) -> str:
@@ -147,7 +166,13 @@ class BacktestParams:
         return f"{base}_{uid}"
 
     # Fields that belong to BacktestParams itself (not EnvParams)
-    _BACKTEST_KEYS = {"model_name", "impact_model_class", "initial_capital", "model_kwargs", "policy_kwargs"}
+    _BACKTEST_KEYS = {
+        "model_name",
+        "impact_model_class",
+        "initial_capital",
+        "model_kwargs",
+        "policy_kwargs",
+    }
 
     @staticmethod
     def from_explicit(
@@ -181,10 +206,13 @@ class BacktestParams:
         -------
         list[BacktestParams]
         """
-        default_max_stock_pct = float(np.clip(
-            (1.0 / num_stocks) * max_stock_weight_multiplier,
-            max_stock_pct_clip[0], max_stock_pct_clip[1],
-        ))
+        default_max_stock_pct = float(
+            np.clip(
+                (1.0 / num_stocks) * max_stock_weight_multiplier,
+                max_stock_pct_clip[0],
+                max_stock_pct_clip[1],
+            )
+        )
 
         result: list[BacktestParams] = []
         for cfg in configs:
@@ -235,10 +263,13 @@ class BacktestParams:
         -------
         list[BacktestParams]
         """
-        max_stock_pct = float(np.clip(
-            (1.0 / num_stocks) * max_stock_weight_multiplier,
-            max_stock_pct_clip[0], max_stock_pct_clip[1],
-        ))
+        max_stock_pct = float(
+            np.clip(
+                (1.0 / num_stocks) * max_stock_weight_multiplier,
+                max_stock_pct_clip[0],
+                max_stock_pct_clip[1],
+            )
+        )
         return [
             BacktestParams(
                 model_name=m,

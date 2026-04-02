@@ -38,13 +38,17 @@ Reference:
     In Proceedings of the Fourth ACM International Conference on AI in
     Finance (pp. 610-618).
 """
+
 from collections import deque
-from typing import Dict, Optional, Tuple
+from typing import Dict
+from typing import Optional
+from typing import Tuple
 
 import gymnasium as gym
 import numpy as np
 
-from .impact_models import SqrtImpactModel, ImpactModel
+from .impact_models import ImpactModel
+from .impact_models import SqrtImpactModel
 
 EPS = 1e-8
 
@@ -92,9 +96,7 @@ class MarginTraderImpactEnv(gym.Env):
         self.volatility_array = config.get(
             "volatility_array", np.ones_like(price_array) * 0.02
         )
-        self.volume_array = config.get(
-            "volume_array", np.ones_like(price_array) * 1e6
-        )
+        self.volume_array = config.get("volume_array", np.ones_like(price_array) * 1e6)
 
         self.price_array = price_array.astype(np.float32)
         self.tech_array = tech_array.astype(np.float32) * 2**-7
@@ -296,9 +298,7 @@ class MarginTraderImpactEnv(gym.Env):
           appreciation), a forced reduction is triggered.
         """
         max_position_value = max(total_equity * self.max_stock_pct, 0.0)
-        max_shares = np.where(
-            prices > 0, max_position_value / prices, 0
-        ).astype(int)
+        max_shares = np.where(prices > 0, max_position_value / prices, 0).astype(int)
 
         desired_trade = (actions * max_shares).astype(int)
         trade_shares = np.zeros(self.stock_dim, dtype=int)
@@ -355,14 +355,16 @@ class MarginTraderImpactEnv(gym.Env):
             if traded_value > 0:
                 pov = abs(trade_shares[i]) / volume[i] if volume[i] > 0 else 0.0
                 for side_info in trade_sides:
-                    trades.append({
-                        "stock_idx": i,
-                        "side": side_info["side"],
-                        "shares": side_info["shares"],
-                        "notional": side_info["shares"] * trade_price[i],
-                        "pov": pov,
-                        "turnover_percentile": turnover_percentiles[i],
-                    })
+                    trades.append(
+                        {
+                            "stock_idx": i,
+                            "side": side_info["side"],
+                            "shares": side_info["shares"],
+                            "notional": side_info["shares"] * trade_price[i],
+                            "pov": pov,
+                            "turnover_percentile": turnover_percentiles[i],
+                        }
+                    )
                 if trade_shares[i] > 0:
                     total_buy_value += traded_value
                 else:
@@ -407,11 +409,7 @@ class MarginTraderImpactEnv(gym.Env):
                 else 0.0
             )
 
-        turnover = (
-            total_traded_value / self.total_asset
-            if self.total_asset > 0
-            else 0
-        )
+        turnover = total_traded_value / self.total_asset if self.total_asset > 0 else 0
         info = {
             "turnover": turnover,
             "cost": total_trade_cost,
@@ -425,8 +423,12 @@ class MarginTraderImpactEnv(gym.Env):
     # ── Trade execution ───────────────────────────────────────────────
 
     def _execute_trade(
-        self, i: int, trade_size: int,
-        price: np.ndarray, volatility: np.ndarray, volume: np.ndarray,
+        self,
+        i: int,
+        trade_size: int,
+        price: np.ndarray,
+        volatility: np.ndarray,
+        volume: np.ndarray,
     ) -> Tuple[float, float, list]:
         """Execute a trade with automatic position flipping.
 
@@ -451,20 +453,14 @@ class MarginTraderImpactEnv(gym.Env):
                 total_value += val
                 total_cost += cost
                 if val > 0:
-                    trade_sides.append({
-                        "side": "cover", "shares": shares_to_cover
-                    })
+                    trade_sides.append({"side": "cover", "shares": shares_to_cover})
                 trade_size -= shares_to_cover
             if trade_size > 0:
-                val, cost = self._buy_long(
-                    i, trade_size, price, volatility, volume
-                )
+                val, cost = self._buy_long(i, trade_size, price, volatility, volume)
                 total_value += val
                 total_cost += cost
                 if val > 0:
-                    trade_sides.append({
-                        "side": "buy", "shares": trade_size
-                    })
+                    trade_sides.append({"side": "buy", "shares": trade_size})
         else:  # Sell direction: sell long, then open short
             abs_trade = abs(trade_size)
             if current_holding > 0:
@@ -475,20 +471,14 @@ class MarginTraderImpactEnv(gym.Env):
                 total_value += val
                 total_cost += cost
                 if val > 0:
-                    trade_sides.append({
-                        "side": "sell", "shares": shares_to_sell
-                    })
+                    trade_sides.append({"side": "sell", "shares": shares_to_sell})
                 abs_trade -= shares_to_sell
             if abs_trade > 0:
-                val, cost = self._sell_short(
-                    i, abs_trade, price, volatility, volume
-                )
+                val, cost = self._sell_short(i, abs_trade, price, volatility, volume)
                 total_value += val
                 total_cost += cost
                 if val > 0:
-                    trade_sides.append({
-                        "side": "short", "shares": abs_trade
-                    })
+                    trade_sides.append({"side": "short", "shares": abs_trade})
 
         if total_value > 0:
             self.stocks_cool_down[i] = 0
@@ -497,8 +487,12 @@ class MarginTraderImpactEnv(gym.Env):
     # ── Long position trades ──────────────────────────────────────────
 
     def _buy_long(
-        self, i: int, shares: int,
-        price: np.ndarray, volatility: np.ndarray, volume: np.ndarray,
+        self,
+        i: int,
+        shares: int,
+        price: np.ndarray,
+        volatility: np.ndarray,
+        volume: np.ndarray,
     ) -> Tuple[float, float]:
         """Buy long: cash decreases, holdings increase.
 
@@ -528,8 +522,12 @@ class MarginTraderImpactEnv(gym.Env):
         return shares * price[i], impact.cost
 
     def _sell_long(
-        self, i: int, shares: int,
-        price: np.ndarray, volatility: np.ndarray, volume: np.ndarray,
+        self,
+        i: int,
+        shares: int,
+        price: np.ndarray,
+        volatility: np.ndarray,
+        volume: np.ndarray,
     ) -> Tuple[float, float]:
         """Sell long: cash increases, holdings decrease."""
         shares = min(shares, max(int(self.stocks[i]), 0))
@@ -551,8 +549,12 @@ class MarginTraderImpactEnv(gym.Env):
     # ── Short position trades ─────────────────────────────────────────
 
     def _sell_short(
-        self, i: int, shares: int,
-        price: np.ndarray, volatility: np.ndarray, volume: np.ndarray,
+        self,
+        i: int,
+        shares: int,
+        price: np.ndarray,
+        volatility: np.ndarray,
+        volume: np.ndarray,
     ) -> Tuple[float, float]:
         """Open/increase short: limit decreases, holdings go more negative.
 
@@ -582,8 +584,12 @@ class MarginTraderImpactEnv(gym.Env):
         return market_value, impact.cost
 
     def _cover_short(
-        self, i: int, shares: int,
-        price: np.ndarray, volatility: np.ndarray, volume: np.ndarray,
+        self,
+        i: int,
+        shares: int,
+        price: np.ndarray,
+        volatility: np.ndarray,
+        volume: np.ndarray,
     ) -> Tuple[float, float]:
         """Close/reduce short: limit increases, holdings go less negative."""
         shares = min(shares, max(int(abs(self.stocks[i])), 0))
@@ -634,7 +640,10 @@ class MarginTraderImpactEnv(gym.Env):
     # ── Margin Adjustment Module — Long (paper Section 4.3.2) ─────────
 
     def _margin_adjust_long(
-        self, price: np.ndarray, volatility: np.ndarray, volume: np.ndarray,
+        self,
+        price: np.ndarray,
+        volatility: np.ndarray,
+        volume: np.ndarray,
     ) -> None:
         """Periodic buying-power re-alignment for the long position.
 
@@ -682,7 +691,10 @@ class MarginTraderImpactEnv(gym.Env):
     # ── Margin Adjustment Module — Short (paper Section 4.3.2) ────────
 
     def _margin_adjust_short(
-        self, price: np.ndarray, volatility: np.ndarray, volume: np.ndarray,
+        self,
+        price: np.ndarray,
+        volatility: np.ndarray,
+        volume: np.ndarray,
     ) -> None:
         """Periodic credit/limit re-alignment for the short position.
 
@@ -720,16 +732,12 @@ class MarginTraderImpactEnv(gym.Env):
 
                 short_indices = np.where(self.stocks < 0)[0]
                 if len(short_indices) > 0:
-                    values = abs(
-                        self.stocks[short_indices] * adjusted[short_indices]
-                    )
+                    values = abs(self.stocks[short_indices] * adjusted[short_indices])
                     for idx in short_indices[np.argsort(values)]:
                         n_cover = int(abs(self.stocks[idx]))
                         if n_cover <= 0:
                             continue
-                        self._cover_short(
-                            idx, n_cover, price, volatility, volume
-                        )
+                        self._cover_short(idx, n_cover, price, volatility, volume)
                         if self.short_limit >= remaining:
                             self.short_limit -= remaining
                             break
@@ -753,9 +761,16 @@ class MarginTraderImpactEnv(gym.Env):
         perm_impact = self._get_perm_impact()
         state_components = [
             np.array(
-                [self.long_cash, self.loan, self.long_equity,
-                 self.short_limit, self.short_credit, self.short_equity]
-            ) * scale,
+                [
+                    self.long_cash,
+                    self.loan,
+                    self.long_equity,
+                    self.short_limit,
+                    self.short_credit,
+                    self.short_equity,
+                ]
+            )
+            * scale,
             price * scale,
             self.stocks * scale,
             perm_impact * scale,
