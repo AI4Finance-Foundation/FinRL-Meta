@@ -129,7 +129,7 @@ For next-generation modular trading infrastructure and production deployment, se
 <img align="center" src=figs/timeline.png width="80%">
 </div>
 
-We employ a training-testing-trading pipeline. First, a DRL agent is trained in a training dataset and fine-tuned (adjusting hyperparameters) in a testing dataset. Then, backtest the agent (on historical dataset), or depoy in a paper/live trading market.
+We employ a training-testing-trading pipeline. First, a DRL agent is trained in a training dataset and fine-tuned (adjusting hyperparameters) in a testing dataset. Then, backtest the agent (on historical dataset), or deploy in a paper/live trading market.
 
 This pipeline address the **information leakage problem** by separating the training/testing and trading periods.
 
