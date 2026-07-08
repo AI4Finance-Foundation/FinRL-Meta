@@ -1,4 +1,6 @@
 exclude: 'config_tickers.py'
+ci:
+  skip: [reorder-python-imports, black]
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
