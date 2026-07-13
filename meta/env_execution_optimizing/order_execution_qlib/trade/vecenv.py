@@ -18,7 +18,6 @@ import numpy as np
 from tianshou.env.utils import CloudpickleWrapper
 from tianshou.env.worker import EnvWorker
 
-
 _NP_TO_CT = {
     np.bool: ctypes.c_bool,
     np.bool_: ctypes.c_bool,
