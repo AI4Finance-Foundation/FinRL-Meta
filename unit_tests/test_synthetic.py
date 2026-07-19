@@ -5,7 +5,16 @@ import pytest
 from meta.data_processors.synthetic import generate_synthetic_data
 from meta.data_processors.synthetic import SUPPORTED_PATTERNS
 
-EXPECTED_COLUMNS = ["tic", "time", "open", "high", "low", "close", "adjusted_close", "volume"]
+EXPECTED_COLUMNS = [
+    "tic",
+    "time",
+    "open",
+    "high",
+    "low",
+    "close",
+    "adjusted_close",
+    "volume",
+]
 
 
 class TestSyntheticDataGenerator:

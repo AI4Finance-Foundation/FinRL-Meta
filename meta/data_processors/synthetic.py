@@ -8,7 +8,9 @@ to real, noisier data.
 
 See discussion: https://github.com/AI4Finance-Foundation/FinRL-Meta/issues/70
 """
-from typing import List, Optional
+
+from typing import List
+from typing import Optional
 
 import numpy as np
 import pandas as pd
