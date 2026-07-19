@@ -1,14 +1,12 @@
-"""Synthetic OHLCV data generator for FinRL-Meta.
-
-Generates idealized synthetic price series (sine wave, trend, random walk)
-in FinRL-Meta's standard OHLCV schema. Useful for quickly testing/debugging
-trading environments and agents without needing to download real market
-data, and for pre-training agents on simple patterns before exposing them
-to real, noisier data.
-
-See discussion: https://github.com/AI4Finance-Foundation/FinRL-Meta/issues/70
-"""
-
+# Synthetic OHLCV data generator for FinRL-Meta.
+#
+# Generates idealized synthetic price series (sine wave, trend, random walk)
+# in FinRL-Meta's standard OHLCV schema. Useful for quickly testing/debugging
+# trading environments and agents without needing to download real market
+# data, and for pre-training agents on simple patterns before exposing them
+# to real, noisier data.
+#
+# See discussion: https://github.com/AI4Finance-Foundation/FinRL-Meta/issues/70
 from typing import List
 from typing import Optional
 
