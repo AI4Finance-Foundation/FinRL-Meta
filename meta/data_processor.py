@@ -49,6 +49,10 @@ class DataProcessor:
             from meta.data_processors.ccxt import Ccxt
 
             processor_dict = {self.data_source: Ccxt}
+        elif self.data_source == DataSource.fxmacrodata:
+            from meta.data_processors.fxmacrodata import Fxmacrodata
+
+            processor_dict = {self.data_source: Fxmacrodata}
         elif self.data_source == DataSource.iexcloud:
             from meta.data_processors.iexcloud import Iexcloud
 
