@@ -37,6 +37,7 @@ class DataSource(Enum):
     baostock = "baostock"
     binance = "binance"
     ccxt = "ccxt"
+    fxmacrodata = "fxmacrodata"
     iexcloud = "iexcloud"
     joinquant = "joinquant"
     quandl = "quandl"
