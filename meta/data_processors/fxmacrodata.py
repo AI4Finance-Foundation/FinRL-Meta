@@ -5,12 +5,26 @@ from __future__ import annotations
 import json
 import os
 from urllib.parse import urlencode
-from urllib.request import Request, urlopen
+from urllib.request import Request
+from urllib.request import urlopen
 
 import pandas as pd
 
 FXMACRODATA_BASE_URL = "https://api.fxmacrodata.com/v1"
 FXMACRODATA_API_KEY_ENV_VARS = ("FXMACRODATA_API_KEY", "FXMD_API_KEY")
+# List endpoints return at most 100 rows per request, newest first.
+FXMACRODATA_PAGE_SIZE = 100
+FXMACRODATA_MAX_PAGES = 100
+FXMACRODATA_PAGED_DATASETS = {
+    "announcements",
+    "predictions",
+    "forex",
+    "cot",
+    "commodity",
+    "rate_differentials",
+    "forward_differentials",
+    "risk_sentiment",
+}
 FXMACRODATA_ENDPOINTS = {
     "data_catalogue": (
         "data_catalogue/{currency}",
@@ -208,6 +222,12 @@ class FXMacroDataClient:
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
 
+    def _headers(self):
+        headers = {"User-Agent": "fxmacrodata-integration"}
+        if self.api_key:
+            headers["X-API-Key"] = self.api_key
+        return headers
+
     def fetch_dataset(self, dataset, **kwargs):
         dataset = _dataset_name(dataset)
         if dataset not in FXMACRODATA_ENDPOINTS:
@@ -217,12 +237,12 @@ class FXMacroDataClient:
         path_template, query_keys = FXMACRODATA_ENDPOINTS[dataset]
         path = _format_path(path_template, kwargs)
         query = _clean_params({key: kwargs.get(key) for key in query_keys})
-        if self.api_key and "api_key" not in query:
-            query["api_key"] = self.api_key
+        if dataset in FXMACRODATA_PAGED_DATASETS and "limit" in query:
+            query["limit"] = min(int(query["limit"]), FXMACRODATA_PAGE_SIZE)
         url = "%s/%s" % (self.base_url, path.lstrip("/"))
         if query:
             url = "%s?%s" % (url, urlencode(query))
-        request = Request(url, headers={"User-Agent": "fxmacrodata-integration"})
+        request = Request(url, headers=self._headers())
         with urlopen(request, timeout=self.timeout) as response:  # nosec B310
             return json.loads(response.read().decode("utf-8"))
 
@@ -233,10 +253,7 @@ class FXMacroDataClient:
         request = Request(
             "%s/graphql" % self.base_url,
             data=body,
-            headers={
-                "Content-Type": "application/json",
-                "User-Agent": "fxmacrodata-integration",
-            },
+            headers={"Content-Type": "application/json", **self._headers()},
             method="POST",
         )
         with urlopen(request, timeout=self.timeout) as response:  # nosec B310
@@ -314,11 +331,50 @@ class FXMacroDataClient:
     def press_releases(self, currency, **kwargs):
         return self.fetch_dataset("press_releases", currency=currency, **kwargs)
 
+    def fetch_rows(
+        self, dataset, limit=None, max_pages=FXMACRODATA_MAX_PAGES, **kwargs
+    ):
+        """Page through a list endpoint and return up to ``limit`` rows.
+
+        Rows come back newest first, at most 100 per request, so the window is
+        read with ``offset`` until ``pagination.has_more`` is false. With
+        ``limit=None`` the whole window is read, up to ``max_pages`` requests.
+        """
+        kwargs.pop("page", None)
+        offset = int(kwargs.pop("offset", None) or 0)
+        limit = None if limit is None else max(1, int(limit))
+        rows = []
+        for _ in range(max(1, int(max_pages))):
+            page_size = FXMACRODATA_PAGE_SIZE
+            if limit is not None:
+                page_size = min(page_size, limit - len(rows))
+            payload = self.fetch_dataset(
+                dataset, limit=page_size, offset=offset, **kwargs
+            )
+            page = payload.get("data") if isinstance(payload, dict) else payload
+            if not isinstance(page, list) or not page:
+                break
+            rows.extend(page)
+            if limit is not None and len(rows) >= limit:
+                break
+            pagination = (
+                payload.get("pagination") if isinstance(payload, dict) else None
+            )
+            if not isinstance(pagination, dict) or not pagination.get("has_more"):
+                break
+            next_offset = pagination.get("next_offset")
+            offset = int(next_offset) if next_offset is not None else offset + len(page)
+        return rows
+
     def dataframe(self, dataset, limit=None, min_tier=None, index=True, **kwargs):
-        api_limit = None if _dataset_name(dataset) == "calendar" else limit
-        payload = self.fetch_dataset(
-            dataset, **{**kwargs, **({"limit": api_limit} if api_limit else {})}
-        )
+        name = _dataset_name(dataset)
+        if name in FXMACRODATA_PAGED_DATASETS:
+            payload = {"data": self.fetch_rows(name, limit=limit, **kwargs)}
+        else:
+            api_limit = None if name == "calendar" else limit
+            payload = self.fetch_dataset(
+                name, **{**kwargs, **({"limit": api_limit} if api_limit else {})}
+            )
         frame = self.to_dataframe(payload, limit=limit, index=index)
         return _filter_market_tier(frame, min_tier)
 
@@ -525,7 +581,7 @@ class Fxmacrodata(_Base):
         base: str = "eur",
         quote: str = "usd",
         commodity: str = "brent_crude_oil",
-        limit: int = 100,
+        limit: int = None,
         min_tier: int = None,
         api_key: str = None,
         base_url: str = FXMACRODATA_BASE_URL,
@@ -538,7 +594,8 @@ class Fxmacrodata(_Base):
         self.base = base.lower()
         self.quote = quote.lower()
         self.commodity = commodity
-        self.limit = max(1, int(limit))
+        # None reads the whole start_date..end_date window.
+        self.limit = None if limit is None else max(1, int(limit))
         self.min_tier = min_tier
         self.api_key = api_key
         self.base_url = base_url.rstrip("/")
