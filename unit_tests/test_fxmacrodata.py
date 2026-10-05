@@ -1,6 +1,10 @@
 import json
+import threading
 from datetime import date
 from datetime import timedelta
+from http.server import BaseHTTPRequestHandler
+from http.server import HTTPServer
+from urllib.error import HTTPError
 from urllib.parse import parse_qs
 from urllib.parse import urlparse
 
@@ -110,3 +114,125 @@ def test_fetch_dataset_never_sends_limit_above_100(fake_api):
     client = fxmacrodata.FXMacroDataClient()
     client.fetch_dataset("commodity", indicator="gold", limit=500)
     assert parse_qs(urlparse(fake_api[0].full_url).query)["limit"] == ["100"]
+
+
+def test_redirect_is_not_followed(monkeypatch):
+    for name in ("http_proxy", "HTTP_PROXY", "all_proxy", "ALL_PROXY"):
+        monkeypatch.delenv(name, raising=False)
+    paths = []
+
+    class Handler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            paths.append(self.path)
+            if self.path.startswith("/v1/"):
+                self.send_response(302)
+                self.send_header(
+                    "Location", "http://127.0.0.1:%d/target" % self.server.server_port
+                )
+                self.end_headers()
+                return
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b'{"data": []}')
+
+        def log_message(self, *args):
+            pass
+
+    server = HTTPServer(("127.0.0.1", 0), Handler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        client = fxmacrodata.FXMacroDataClient(
+            api_key="secret-key",
+            base_url="http://127.0.0.1:%d/v1" % server.server_port,
+        )
+        with pytest.raises(HTTPError) as excinfo:
+            client.fetch_dataset("forex", base="eur", quote="usd")
+    finally:
+        server.shutdown()
+        server.server_close()
+
+    assert excinfo.value.code == 302
+    assert "secret-key" not in str(excinfo.value)
+    assert paths == ["/v1/forex/eur/usd"]
+
+
+@pytest.mark.parametrize("api_key", ["secret\nkey", "secret key", "secret\x00key"])
+def test_bad_api_key_is_rejected_without_echoing_it(fake_api, api_key):
+    client = fxmacrodata.FXMacroDataClient(api_key=api_key)
+    with pytest.raises(ValueError) as excinfo:
+        client.fetch_dataset("forex", base="eur", quote="usd")
+    assert "invalid characters" in str(excinfo.value)
+    assert "secret" not in str(excinfo.value)
+    assert fake_api == []
+
+
+def test_api_key_is_stripped(fake_api):
+    client = fxmacrodata.FXMacroDataClient(api_key=" test-key\n")
+    client.fetch_dataset("forex", base="eur", quote="usd", limit=5)
+    assert fake_api[0].get_header("X-api-key") == "test-key"
+
+
+@pytest.mark.parametrize(
+    "body, message",
+    [
+        (json.dumps({"detail": "Invalid API key"}).encode(), "Invalid API key"),
+        (b"<html>Service Unavailable</html>", "non-JSON response"),
+        (b'"unexpected"', "expected a JSON object"),
+    ],
+)
+def test_fetch_dataset_rejects_error_bodies(monkeypatch, body, message):
+    def urlopen(request, timeout=None):
+        response = _Response(None)
+        response._body = body
+        return response
+
+    monkeypatch.setattr(fxmacrodata, "urlopen", urlopen)
+    client = fxmacrodata.FXMacroDataClient()
+    with pytest.raises(ValueError, match=message):
+        client.fetch_dataset("calendar", currency="usd")
+
+
+def test_fetch_rows_rejects_data_that_is_not_a_list(monkeypatch):
+    monkeypatch.setattr(
+        fxmacrodata,
+        "urlopen",
+        lambda request, timeout=None: _Response({"data": {"date": "2024-01-01"}}),
+    )
+    client = fxmacrodata.FXMacroDataClient()
+    with pytest.raises(ValueError, match="expected a JSON object"):
+        client.fetch_rows("forex", base="eur", quote="usd")
+
+
+def test_fetch_rows_skips_malformed_rows(monkeypatch):
+    monkeypatch.setattr(
+        fxmacrodata,
+        "urlopen",
+        lambda request, timeout=None: _Response(
+            {"data": ["2024-01-02", None, {"date": "2024-01-01", "val": 1.1}]}
+        ),
+    )
+    client = fxmacrodata.FXMacroDataClient()
+    assert client.fetch_rows("forex", base="eur", quote="usd") == [
+        {"date": "2024-01-01", "val": 1.1}
+    ]
+
+
+@pytest.mark.parametrize("next_offset", [0, "1"])
+def test_fetch_rows_stops_when_offset_does_not_advance(monkeypatch, next_offset):
+    requests = []
+
+    def urlopen(request, timeout=None):
+        requests.append(request)
+        return _Response(
+            {
+                "data": [{"date": "2024-01-01", "val": 1.1}],
+                "pagination": {"has_more": True, "next_offset": next_offset},
+            }
+        )
+
+    monkeypatch.setattr(fxmacrodata, "urlopen", urlopen)
+    client = fxmacrodata.FXMacroDataClient()
+    rows = client.fetch_rows("forex", base="eur", quote="usd")
+    assert len(requests) == 1
+    assert rows == [{"date": "2024-01-01", "val": 1.1}]
