@@ -5,8 +5,9 @@ from __future__ import annotations
 import json
 import os
 from urllib.parse import urlencode
+from urllib.request import build_opener
+from urllib.request import HTTPRedirectHandler
 from urllib.request import Request
-from urllib.request import urlopen
 
 import pandas as pd
 
@@ -114,6 +115,46 @@ FXMACRODATA_DATASET_ALIASES = {
     "commodities": "commodity",
     "press-releases": "press_releases",
 }
+
+
+class _NoRedirectHandler(HTTPRedirectHandler):
+    """Refuse redirects so the X-API-Key header never reaches another URL."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+def urlopen(request, timeout=None):
+    # A 3xx response surfaces as urllib.error.HTTPError instead of being followed.
+    return build_opener(_NoRedirectHandler).open(request, timeout=timeout)
+
+
+def _clean_api_key(api_key):
+    if not api_key:
+        return None
+    api_key = api_key.strip()
+    if any(not "!" <= char <= "~" for char in api_key):
+        # Never echo the key: http.client would put it in its error message.
+        raise ValueError(
+            "FXMacroData API key contains whitespace or other invalid characters"
+        )
+    return api_key or None
+
+
+def _read_json(response, path):
+    try:
+        return json.loads(response.read().decode("utf-8"))
+    except ValueError:
+        raise ValueError(
+            "FXMacroData returned a non-JSON response for %s" % path
+        ) from None
+
+
+def _response_error(payload):
+    message = "FXMacroData returned an unexpected response"
+    if isinstance(payload, dict) and isinstance(payload.get("detail"), str):
+        return "%s: %s" % (message, payload["detail"])
+    return "%s: expected a JSON object with a 'data' list" % message
 
 
 def _env_api_key():
@@ -224,8 +265,9 @@ class FXMacroDataClient:
 
     def _headers(self):
         headers = {"User-Agent": "fxmacrodata-integration"}
-        if self.api_key:
-            headers["X-API-Key"] = self.api_key
+        api_key = _clean_api_key(self.api_key)
+        if api_key:
+            headers["X-API-Key"] = api_key
         return headers
 
     def fetch_dataset(self, dataset, **kwargs):
@@ -244,7 +286,12 @@ class FXMacroDataClient:
             url = "%s?%s" % (url, urlencode(query))
         request = Request(url, headers=self._headers())
         with urlopen(request, timeout=self.timeout) as response:  # nosec B310
-            return json.loads(response.read().decode("utf-8"))
+            payload = _read_json(response, path)
+        if not isinstance(payload, (dict, list)) or (
+            isinstance(payload, dict) and "detail" in payload and "data" not in payload
+        ):
+            raise ValueError(_response_error(payload))
+        return payload
 
     def graphql(self, query, variables=None):
         body = json.dumps({"query": query, "variables": variables or {}}).encode(
@@ -257,7 +304,7 @@ class FXMacroDataClient:
             method="POST",
         )
         with urlopen(request, timeout=self.timeout) as response:  # nosec B310
-            return json.loads(response.read().decode("utf-8"))
+            return _read_json(response, "graphql")
 
     def to_dataframe(self, payload, limit=None, index=True):
         return _frame_from_payload(payload, limit=limit, index=index)
@@ -352,9 +399,11 @@ class FXMacroDataClient:
                 dataset, limit=page_size, offset=offset, **kwargs
             )
             page = payload.get("data") if isinstance(payload, dict) else payload
-            if not isinstance(page, list) or not page:
+            if not isinstance(page, list):
+                raise ValueError(_response_error(payload))
+            if not page:
                 break
-            rows.extend(page)
+            rows.extend(row for row in page if isinstance(row, dict))
             if limit is not None and len(rows) >= limit:
                 break
             pagination = (
@@ -363,7 +412,11 @@ class FXMacroDataClient:
             if not isinstance(pagination, dict) or not pagination.get("has_more"):
                 break
             next_offset = pagination.get("next_offset")
-            offset = int(next_offset) if next_offset is not None else offset + len(page)
+            if next_offset is None:
+                next_offset = offset + len(page)
+            if not isinstance(next_offset, int) or next_offset <= offset:
+                break
+            offset = next_offset
         return rows
 
     def dataframe(self, dataset, limit=None, min_tier=None, index=True, **kwargs):
