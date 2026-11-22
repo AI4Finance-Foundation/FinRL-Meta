@@ -1,3 +1,4 @@
+import inspect
 from typing import List
 
 import numpy as np
@@ -38,6 +39,8 @@ class Yahoofinance(_Base):
         time_interval: str,
         **kwargs,
     ):
+        if time_interval == "1D":
+            time_interval = "1d"
         super().__init__(data_source, start_date, end_date, time_interval, **kwargs)
 
     def download_data(
@@ -53,12 +56,15 @@ class Yahoofinance(_Base):
         self.dataframe = pd.DataFrame()
         num_failures = 0
         for tic in ticker_list:
+            download_kwargs = {}
+            if proxy is not None and "proxy" in inspect.signature(yf.download).parameters:
+                download_kwargs["proxy"] = proxy
             temp_df = yf.download(
                 tic,
                 start=self.start_date,
                 end=self.end_date,
                 interval=self.time_interval,
-                proxy=proxy,
+                **download_kwargs,
                 auto_adjust=auto_adjust,
             )
             if temp_df.columns.nlevels != 1:
