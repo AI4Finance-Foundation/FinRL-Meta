@@ -170,7 +170,7 @@ class DataProcessor:
             "_".join(
                 ticker_list
                 + [
-                    self.data_source,
+                    self.data_source.value,
                     self.start_date,
                     self.end_date,
                     self.time_interval,
