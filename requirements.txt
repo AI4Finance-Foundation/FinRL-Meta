@@ -16,8 +16,6 @@ numpy>=1.23.1
 pandas>=1.4.3
 
 # market data & paper trading API
-pandas_market_calendars
-
 pandas_market_calendars # calendars
 
 # hooks

@@ -147,7 +147,7 @@ def main(
     start_date=config.TRAIN_START_DATE,
     end_date=config.TRADE_END_DATE,
     ticker_list=config_tickers.DOW_30_TICKER,
-    time_interval="1D",
+    time_interval="1d",
     data_source=DataSource.yahoofinance,
     technical_indicator_list=config.INDICATORS,
     if_vix=True,

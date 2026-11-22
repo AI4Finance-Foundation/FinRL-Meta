@@ -93,10 +93,10 @@ class DataProcessor:
                 data_source, start_date, end_date, time_interval, **kwargs
             )
             print(f"{self.data_source} successfully connected")
-        except:
+        except Exception as e:
             raise ValueError(
-                f"Please input correct account info for {self.data_source}!"
-            )
+                f"Please input correct account info for {self.data_source}: {e}"
+            ) from e
 
     def download_data(self, ticker_list):
         self.processor.download_data(ticker_list=ticker_list)
@@ -109,7 +109,7 @@ class DataProcessor:
 
     def add_technical_indicator(
         self,
-        tech_indicator_list: list[str],
+        tech_indicator_list: List[str],
         select_stockstats_talib: IndicatorLib = IndicatorLib.STOCKSTATS,
         drop_na_timesteps: int = 1,
     ):
@@ -155,7 +155,7 @@ class DataProcessor:
 
     def run(
         self,
-        ticker_list: str,
+        ticker_list: List[str],
         technical_indicator_list: List[str],
         if_vix: bool,
         cache: bool = False,
@@ -170,7 +170,7 @@ class DataProcessor:
             "_".join(
                 ticker_list
                 + [
-                    self.data_source,
+                    self.data_source.value,
                     self.start_date,
                     self.end_date,
                     self.time_interval,
@@ -185,7 +185,8 @@ class DataProcessor:
             print(f"Using cached file {cache_path}")
             self.tech_indicator_list = technical_indicator_list
             with open(cache_path, "rb") as handle:
-                self.processor.dataframe = pickle.load(handle)
+                self.dataframe = pickle.load(handle)
+                self.processor.dataframe = self.dataframe
         else:
             self.download_data(ticker_list)
             self.clean_data()
