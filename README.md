@@ -107,6 +107,20 @@ OHLCV: open, high, low, and close prices; volume
 
 adjusted_close: adjusted close price
 
+**Synthetic data for testing:** `meta/data_processors/synthetic.py` provides `generate_synthetic_data()`, which generates idealized synthetic price series (sine wave, trend, random walk) in the standard OHLCV schema above — no API keys or network access required. This is useful for quickly testing/debugging a new environment or agent, or for pre-training on simple patterns before moving to real, noisier market data ([#70](https://github.com/AI4Finance-Foundation/FinRL-Meta/issues/70)).
+
+```python
+from meta.data_processors.synthetic import generate_synthetic_data
+
+df = generate_synthetic_data(
+    tic_list=["SYN1", "SYN2"],
+    start_date="2021-01-01",
+    end_date="2021-06-01",
+    pattern="random_walk",  # or "sine", "trend"
+    seed=42,
+)
+```
+
 Technical indicators users can add: 'macd', 'boll_ub', 'boll_lb', 'rsi_30', 'dx_30', 'close_30_sma', 'close_60_sma'. Users also can add their features.
 
 
